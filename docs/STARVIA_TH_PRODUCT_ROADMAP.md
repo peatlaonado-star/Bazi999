@@ -226,9 +226,9 @@ Status: started.
 - [x] Add test framework
 - [x] Add XSS regression tests
 - [x] Escape user-controlled names in renderers
-- [ ] Audit remaining `innerHTML` and `insertAdjacentHTML` usage
-- [ ] Add tests for Couple and Auspicious user inputs
-- [ ] Document known payment/security limitations
+- [x] Audit remaining `innerHTML` and `insertAdjacentHTML` usage (2026-05-17: all 21 points safe)
+- [x] Add tests for Couple and Auspicious user inputs (2026-05-17: 8 new tests added)
+- [x] Document known payment/security limitations (2026-05-17: docs/PAYMENT_SECURITY_LIMITATIONS.md)
 
 ### Phase 1 — Thai Content Architecture
 
