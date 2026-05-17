@@ -264,7 +264,7 @@ Goal: prepare STARVIA for larger product growth.
 
 - [x] Migrate to Vite (2026-05-17: dev server + build)
 - [ ] Introduce TypeScript gradually (future)
-- [ ] Split renderers into components/modules (future)
+- [x] Split renderers into components/modules (2026-05-17: renderer modules split by shared/individual/couple/auspicious)
 - [x] Add CI checks (2026-05-17: GitHub Actions)
 - [x] Add deploy pipeline (2026-05-17: Vercel/Netlify config)
 

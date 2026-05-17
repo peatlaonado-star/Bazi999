@@ -6,7 +6,12 @@ import { JSDOM } from 'jsdom';
 
 function loadRenderersContext(overrides = {}) {
   const helperSource = fs.readFileSync(path.resolve('js/reading-helpers.js'), 'utf8');
-  const source = fs.readFileSync(path.resolve('astro-renderers.js'), 'utf8');
+  const rendererSources = [
+    'js/renderer-shared.js',
+    'js/renderer-individual.js',
+    'js/renderer-couple.js',
+    'js/renderer-auspicious.js',
+  ].map((file) => [file, fs.readFileSync(path.resolve(file), 'utf8')]);
   const context = {
     window: {},
     document: {
@@ -20,7 +25,9 @@ function loadRenderersContext(overrides = {}) {
   };
   vm.createContext(context);
   vm.runInContext(helperSource, context, { filename: 'js/reading-helpers.js' });
-  vm.runInContext(source, context, { filename: 'astro-renderers.js' });
+  for (const [filename, source] of rendererSources) {
+    vm.runInContext(source, context, { filename });
+  }
   return context;
 }
 

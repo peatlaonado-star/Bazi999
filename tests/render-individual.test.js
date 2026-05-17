@@ -7,7 +7,12 @@ import { JSDOM } from 'jsdom';
 function loadContext(dom) {
   const contentSource = fs.readFileSync(path.resolve('data/thai-astrology-content.js'), 'utf8');
   const helperSource = fs.readFileSync(path.resolve('js/reading-helpers.js'), 'utf8');
-  const rendererSource = fs.readFileSync(path.resolve('astro-renderers.js'), 'utf8');
+  const rendererSources = [
+    'js/renderer-shared.js',
+    'js/renderer-individual.js',
+    'js/renderer-couple.js',
+    'js/renderer-auspicious.js',
+  ].map((file) => [file, fs.readFileSync(path.resolve(file), 'utf8')]);
   const context = {
     window: dom.window,
     document: dom.window.document,
@@ -25,7 +30,9 @@ function loadContext(dom) {
   vm.createContext(context);
   vm.runInContext(contentSource, context, { filename: 'data/thai-astrology-content.js' });
   vm.runInContext(helperSource, context, { filename: 'js/reading-helpers.js' });
-  vm.runInContext(rendererSource, context, { filename: 'astro-renderers.js' });
+  for (const [filename, source] of rendererSources) {
+    vm.runInContext(source, context, { filename });
+  }
   return context;
 }
 
