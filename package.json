@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "check:js": "node --check app.js && node --check astrology-core.js && node --check astro-renderers.js && node --check ui-actions.js"
+    "check:js": "node --check app.js && node --check astrology-core.js && node --check data/thai-astrology-content.js && node --check js/reading-helpers.js && node --check astro-renderers.js && node --check ui-actions.js"
   },
   "devDependencies": {
     "jsdom": "^24.1.3",

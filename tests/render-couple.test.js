@@ -6,6 +6,7 @@ import { JSDOM } from 'jsdom';
 
 function loadContext(dom, overrides = {}) {
   const contentSource = fs.readFileSync(path.resolve('data/thai-astrology-content.js'), 'utf8');
+  const helperSource = fs.readFileSync(path.resolve('js/reading-helpers.js'), 'utf8');
   const rendererSource = fs.readFileSync(path.resolve('astro-renderers.js'), 'utf8');
   const context = {
     window: dom.window,
@@ -18,6 +19,7 @@ function loadContext(dom, overrides = {}) {
   };
   vm.createContext(context);
   vm.runInContext(contentSource, context, { filename: 'data/thai-astrology-content.js' });
+  vm.runInContext(helperSource, context, { filename: 'js/reading-helpers.js' });
   vm.runInContext(rendererSource, context, { filename: 'astro-renderers.js' });
   return context;
 }

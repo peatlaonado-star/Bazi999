@@ -34,9 +34,16 @@ describe('Thai astrology content data', () => {
     });
   });
 
-  it('is loaded before astro-renderers.js in index.html', () => {
+  it('loads content, reading helpers, and renderers in dependency order in index.html', () => {
     const html = fs.readFileSync(path.resolve('index.html'), 'utf8');
-    expect(html.indexOf('data/thai-astrology-content.js')).toBeGreaterThan(-1);
-    expect(html.indexOf('data/thai-astrology-content.js')).toBeLessThan(html.indexOf('astro-renderers.js'));
+    const contentIndex = html.indexOf('data/thai-astrology-content.js');
+    const helpersIndex = html.indexOf('js/reading-helpers.js');
+    const renderersIndex = html.indexOf('astro-renderers.js');
+
+    expect(contentIndex).toBeGreaterThan(-1);
+    expect(helpersIndex).toBeGreaterThan(-1);
+    expect(renderersIndex).toBeGreaterThan(-1);
+    expect(contentIndex).toBeLessThan(helpersIndex);
+    expect(helpersIndex).toBeLessThan(renderersIndex);
   });
 });
