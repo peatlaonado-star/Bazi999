@@ -36,6 +36,46 @@ function buildKarmaMirror(p, dayOfWeek){
   };
 }
 
+var FALLBACK_COUPLE_DHARMA = {
+  intro: 'ดวงคู่คือแผนที่ความสัมพันธ์ที่ช่วยให้เห็นบทเรียนและวิธีดูแลกันให้ดีขึ้น',
+  pairTypes: {
+    supportive: { label: 'คู่เกื้อหนุน', title: 'คู่ที่ช่วยกันยกระดับชีวิต', meaning: 'มีพลังส่งเสริมกันและกัน', advice: 'วางเป้าหมายร่วมกัน' },
+    mirror: { label: 'คู่กระจกใจ', title: 'คู่ที่สะท้อนเงาในใจ', meaning: 'สะท้อนบทเรียนและแผลเดิมของกันและกัน', advice: 'คุยกันด้วยความซื่อสัตย์' },
+    fire: { label: 'คู่รักแรง', title: 'คู่ที่มีแรงดึงดูดสูง', meaning: 'เคมีแรงและปะทะง่าย', advice: 'พักก่อนคุยเมื่ออารมณ์ร้อน' },
+    lesson: { label: 'คู่บทเรียน', title: 'คู่ที่มาเปิดบทเรียนสำคัญ', meaning: 'ความสัมพันธ์นี้สอนเรื่องขอบเขตและคุณค่า', advice: 'ทำข้อตกลงที่ปลอดภัย' },
+    builder: { label: 'คู่สร้างฐาน', title: 'คู่ที่ค่อย ๆ สร้างชีวิตด้วยกัน', meaning: 'สร้างความมั่นคงระยะยาวได้ดี', advice: 'ดูแลแผนชีวิตและหน้าที่ร่วมกัน' }
+  }
+};
+
+function getCoupleDharmaType(total, elS, sameElement){
+  var content = (typeof THAI_ASTRO_CONTENT !== 'undefined') ? THAI_ASTRO_CONTENT : null;
+  var dharma = content && content.coupleDharma ? content.coupleDharma : FALLBACK_COUPLE_DHARMA;
+  var pairTypes = dharma.pairTypes || FALLBACK_COUPLE_DHARMA.pairTypes;
+  var key;
+
+  if (total >= 90 || (total >= 86 && elS >= 82)) {
+    key = 'supportive';
+  } else if (sameElement && total >= 65) {
+    key = 'mirror';
+  } else if (elS >= 88 && total >= 65) {
+    key = 'fire';
+  } else if (total < 60 || elS < 55) {
+    key = 'lesson';
+  } else {
+    key = 'builder';
+  }
+
+  var selected = pairTypes[key] || pairTypes.builder || FALLBACK_COUPLE_DHARMA.pairTypes.builder;
+  return {
+    key: key,
+    label: selected.label,
+    title: selected.title,
+    meaning: selected.meaning,
+    advice: selected.advice,
+    intro: dharma.intro || FALLBACK_COUPLE_DHARMA.intro
+  };
+}
+
 // ===== MODE 0: Individual =====
 function go0(){
   var ds=document.getElementById('d0').value; if(!ds)return;
@@ -425,6 +465,18 @@ function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2){
                  total >= 60 ? 'Understanding Needed (คู่ที่ต้องใช้ความเข้าใจสูง)' : 
                                'Karmic Lesson (คู่เวรคู่กรรม/บทเรียนสำคัญ)';
 
+  var dharma = getCoupleDharmaType(total, elS, pa.ei === pb.ei);
+  var dharmaHtml = '<div class="dharma-card">'
+    + '<div class="dharma-kicker">Couple Dharma Map</div>'
+    + '<div class="dharma-label">' + escapeHTML(dharma.label) + '</div>'
+    + '<div class="dharma-title">' + escapeHTML(dharma.title) + '</div>'
+    + '<div class="dharma-intro">' + escapeHTML(dharma.intro) + '</div>'
+    + '<div class="dharma-grid">'
+    + '<div><strong>สิ่งที่คู่นี้มาเรียนรู้ร่วมกัน</strong><br>' + escapeHTML(dharma.meaning) + '</div>'
+    + '<div><strong>วิธีดูแลความสัมพันธ์</strong><br>' + escapeHTML(dharma.advice) + '</div>'
+    + '</div>'
+    + '</div>';
+
   // สร้าง Viral Matrix Card
   var matrixHtml = '<div class="matrix-card">'
     + '<div class="mx-names">'
@@ -437,6 +489,7 @@ function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2){
     + '<div class="mx-title">The Compatibility Matrix</div>'
     + '<div class="mx-score">' + total + '% <span class="mx-grade">' + gradeLtr + '</span></div>'
     + '<div class="mx-lbl">' + gradeLbl + '</div>'
+    + '<div class="mx-lbl dharma-chip">' + escapeHTML(dharma.label) + '</div>'
     + '</div>'
 
     + '<div class="chem-box">'
@@ -447,6 +500,7 @@ function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2){
     + '<div class="share-btn-wrap"><button class="share-btn" data-action="save-image" data-target="matrix-card" data-filename="Soulmate_Matrix" style="color:#C9A227; border-color:rgba(201,162,39,0.4);">📸 เซฟรูปคะแนนคู่รัก</button></div>';
 
   wrap.innerHTML = matrixHtml
+    + dharmaHtml
     +'<div class="cg2">'
     +'<div class="ci2"><div class="ci2l">'+u.ec+'</div><div class="ci2s">'+pa.el+' + '+pb.el+'</div><div class="ci2v">'+elS+'%</div></div>'
     +'<div class="ci2"><div class="ci2l">'+u.pc+'</div><div class="ci2s">'+pa.s+' + '+pb.s+'</div><div class="ci2v">'+plS+'%</div></div>'

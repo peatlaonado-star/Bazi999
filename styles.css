@@ -861,3 +861,35 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .karma-ritual span { color: var(--g2); font-weight: 700; }
 @media(max-width:520px){.karma-grid{grid-template-columns:1fr}.karma-card{padding:18px 14px}}
 
+/* Couple Dharma Map */
+.dharma-card {
+  margin: 12px 0 15px;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(201,162,39,0.25);
+  background: linear-gradient(145deg, rgba(91,63,166,0.18), rgba(201,162,39,0.06)), rgba(255,255,255,0.025);
+  box-shadow: inset 0 0 22px rgba(201,162,39,0.04);
+  text-align: center;
+}
+.dharma-kicker {
+  color: var(--pu);
+  font-size: 9px;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.dharma-label {
+  color: var(--g2);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.dharma-title { color: var(--tx); font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+.dharma-intro { color: var(--tx2); font-size: 12px; line-height: 1.75; max-width: 560px; margin: 0 auto 12px; }
+.dharma-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; text-align: left; }
+.dharma-grid div { border: 1px solid rgba(201,162,39,0.12); border-radius: 11px; padding: 11px; background: rgba(0,0,0,0.16); color: var(--tx2); font-size: 12.5px; line-height: 1.75; }
+.dharma-grid strong { color: var(--g); font-size: 11px; letter-spacing: .04em; }
+.dharma-chip { width: fit-content; margin: 8px auto 0; padding: 4px 10px; border-radius: 50px; border: 1px solid rgba(201,162,39,0.25); color: var(--g2) !important; background: rgba(201,162,39,0.08); }
+@media(max-width:520px){.dharma-grid{grid-template-columns:1fr}.dharma-label{font-size:21px}}
+
