@@ -262,11 +262,11 @@ Goal: prepare for monetization without insecure client-side bypass.
 
 Goal: prepare STARVIA for larger product growth.
 
-- Migrate to Vite
-- Introduce TypeScript gradually
-- Split renderers into components/modules
-- Add CI checks
-- Add deploy pipeline
+- [x] Migrate to Vite (2026-05-17: dev server + build)
+- [ ] Introduce TypeScript gradually (future)
+- [ ] Split renderers into components/modules (future)
+- [x] Add CI checks (2026-05-17: GitHub Actions)
+- [x] Add deploy pipeline (2026-05-17: Vercel/Netlify config)
 
 ### Phase 5 — World-Class Differentiators
 
