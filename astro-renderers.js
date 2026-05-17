@@ -1,4 +1,13 @@
 // Renderers extracted from app.js
+function escapeHTML(value){
+  return String(value == null ? '' : value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // ===== MODE 0: Individual =====
 function go0(){
   var ds=document.getElementById('d0').value; if(!ds)return;
@@ -104,8 +113,11 @@ function buildLifeTimeline(kind, p, ageY, ageM){
 
 function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
   var wrap=document.getElementById('r0');
-  var td=fmtDate(ds);
-  var tDisp = ts ? (u.ti+' '+ts+u.tu) : '';
+  nm = escapeHTML(nm);
+  gd = escapeHTML(gd);
+  ts = escapeHTML(ts);
+  var td=escapeHTML(fmtDate(ds));
+  var tDisp = ts ? (escapeHTML(u.ti)+' '+ts+escapeHTML(u.tu)) : '';
   var dayOfWeek = new Date(ds).getDay();
   
   // คำนวณอายุ (ปี และ เดือน)
@@ -349,6 +361,8 @@ function go1(){
 
 function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2){
   var wrap=document.getElementById('r1');
+  na = escapeHTML(na);
+  nb = escapeHTML(nb);
   var elS=ELC[pa.ei][pb.ei];
   var piA=getPL().indexOf(pa), piB=getPL().indexOf(pb);
   var plS=PLC[piA>=0?piA:0][piB>=0?piB:0];
@@ -459,6 +473,7 @@ function go2(){
 
 function renderAusp(nm,p,pw,u){
   var wrap=document.getElementById('r2');
+  nm = escapeHTML(nm);
   var DN=u.dn;
   var DS=['☉','☽','♂','☿','♃','♀','♄'];
   var DC=['#FFB84D','#C8DCF0','#E8534A','#6EC89A','#F5A623','#E8A0CF','#9B8AB8'];

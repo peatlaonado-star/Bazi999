@@ -1,0 +1,14 @@
+{
+  "name": "starvia-split",
+  "version": "0.1.0",
+  "private": true,
+  "description": "STARVIA static astrology app",
+  "scripts": {
+    "test": "vitest run",
+    "check:js": "node --check app.js && node --check astrology-core.js && node --check astro-renderers.js && node --check ui-actions.js"
+  },
+  "devDependencies": {
+    "jsdom": "^24.1.3",
+    "vitest": "^2.1.9"
+  }
+}
