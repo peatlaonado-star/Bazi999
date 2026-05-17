@@ -428,7 +428,7 @@ function buildTabs(tid,sid,pre,TB,p,u){
     if (i > 0) isPremiumTab = true; 
 
     // ใส่คลาสเบลอ ถ้าเป็นแท็บพรีเมียมและยังไม่ได้จ่ายเงิน
-    if (isPremiumTab && !window.isPremiumUnlocked) {
+    if (isPremiumTab && !isPremiumUnlocked()) {
        sec.classList.add('is-locked');
     }
 
@@ -443,7 +443,7 @@ function buildTabs(tid,sid,pre,TB,p,u){
     });
 
     // วาดกล่องแม่กุญแจทับเนื้อหาที่เบลอไว้
-    if (isPremiumTab && !window.isPremiumUnlocked) {
+    if (isPremiumTab && !isPremiumUnlocked()) {
         html += '<div class="lock-overlay">'
               + '<div style="font-size:35px; margin-bottom:10px; filter:drop-shadow(0 2px 5px rgba(0,0,0,0.5));">🔒</div>'
               + '<div style="color:#C9A227; font-size:16px; font-weight:700; margin-bottom:5px;">เนื้อหาเจาะลึกเฉพาะคุณ (Premium)</div>'

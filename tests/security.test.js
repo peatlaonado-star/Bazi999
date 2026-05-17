@@ -14,6 +14,7 @@ function loadRenderersContext(overrides = {}) {
     },
     setTimeout: () => {},
     scrollTo: () => {},
+    isPremiumUnlocked: () => false,
     ...overrides,
   };
   vm.createContext(context);

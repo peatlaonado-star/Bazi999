@@ -19,6 +19,7 @@ function loadContext(dom) {
     },
     setTimeout: () => {},
     scrollTo: () => {},
+    isPremiumUnlocked: () => false,
   };
   vm.createContext(context);
   vm.runInContext(contentSource, context, { filename: 'data/thai-astrology-content.js' });

@@ -253,10 +253,10 @@ Goal: make the app feel richer without adding backend yet.
 
 Goal: prepare for monetization without insecure client-side bypass.
 
-- Hide hardcoded PIN from public production path
-- Define payment verification API contract
-- Add backend placeholder docs
-- Prepare premium state abstraction: `isPremiumUnlocked()` instead of direct global flag usage
+- [x] Hide hardcoded PIN from public production path (2026-05-17: demo mode gate)
+- [x] Define payment verification API contract (2026-05-17: docs/PAYMENT_API_CONTRACT.md)
+- [x] Add backend placeholder docs (2026-05-17: docs/BACKEND_ARCHITECTURE.md)
+- [x] Prepare premium state abstraction: `isPremiumUnlocked()` instead of direct global flag (2026-05-17)
 
 ### Phase 4 — Modern App Foundation
 

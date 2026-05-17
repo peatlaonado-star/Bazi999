@@ -85,8 +85,24 @@ initDailyMantra();
 
 // ===== FREEMIUM UNLOCK SYSTEM (ปลดล็อกเนื้อหาบนเว็บ) =====
 
-// ตั้งค่าเริ่มต้นให้ล็อคเนื้อหาไว้
-window.isPremiumUnlocked = false; 
+// ===== PREMIUM STATE ABSTRACTION =====
+// ใช้ isPremiumUnlocked() แทนการเช็ค window.isPremiumUnlocked โดยตรง
+// เมื่อย้ายไป backend จริง ให้เปลี่ยนแค่ฟังก์ชันนี้
+var _premiumState = { unlocked: false, token: null };
+
+function isPremiumUnlocked() {
+  return _premiumState.unlocked;
+}
+
+function setPremiumUnlocked(unlocked, token) {
+  _premiumState.unlocked = !!unlocked;
+  _premiumState.token = token || null;
+  // sync backward-compat global (DEPRECATED — will be removed after backend migration)
+  window.isPremiumUnlocked = _premiumState.unlocked;
+}
+
+// DEPRECATED: ใช้ isPremiumUnlocked() แทน — จะลบออกหลังย้าย backend
+window.isPremiumUnlocked = false;
 
 // 1. เปิดป๊อปอัปชำระเงิน (เวอร์ชันกระตุ้นยอดขายขั้นสุด)
 function openPayment() {
@@ -143,52 +159,85 @@ function closePayment() {
 }
 
 // 2. ระบบตรวจรหัสผ่าน และปลดความเบลอ
+// NOTE: โค้ดนี้เป็น DEMO MODE เท่านั้น — ห้ามใช้ใน production
+// Production ต้องเรียก backend API แทน
 function verifyPin() {
   var pin = document.getElementById('pdf-pin').value.trim().toUpperCase(); 
   var btn = document.getElementById('confirm-pay-btn');
   var err = document.getElementById('pin-error');
   
-  // รหัสผ่านสำหรับปลดล็อก
-  var correctPin = 'STAR199'; 
+  // ===== DEMO MODE: โค้ดด้านล่างนี้จะถูกลบเมื่อ backend พร้อม =====
+  // TODO: แทนที่ส่วนนี้ด้วย API call
+  // POST /api/premium/verify { pin: pin, userId: ... }
+  // Response: { success: true, token: 'xxx', expiresIn: 86400 }
+  var DEMO_PINS = ['STAR199']; // DEMO ONLY — will be removed
+  var isDemoMode = true; // SET TO false WHEN BACKEND IS READY
   
-  if(pin === correctPin) {
-    err.style.display = 'none';
-    btn.innerHTML = '✅ ปลดล็อกสำเร็จ!';
-    btn.style.background = '#4CAF50';
-    btn.style.color = '#fff';
-    btn.disabled = true;
-    
-    setTimeout(function() {
-      // 1. เปลี่ยนสถานะเป็นจ่ายเงินแล้ว
-      window.isPremiumUnlocked = true;
-      
-      // 2. ลบคลาสเบลอ (is-locked) ออกจากทุกแท็บ
-      document.querySelectorAll('.is-locked').forEach(function(el) {
-        el.classList.remove('is-locked');
-        
-        // 3. ลบกล่องแม่กุญแจทิ้งไปเลย
-        var overlay = el.querySelector('.lock-overlay');
-        if(overlay) overlay.remove();
-      });
-      
-      // 4. ปิดหน้าต่างชำระเงิน
-      closePayment();
-      
-      // 5. เลื่อนจอแสดงความยินดีเบาๆ
-      window.scrollBy({ top: 150, behavior: 'smooth' });
-      
-    }, 800);
-  } else {
-    err.style.display = 'block';
-    btn.innerHTML = '❌ กรอกรหัสใหม่อีกครั้ง';
-    btn.style.background = '#F44336';
-    btn.style.color = '#fff';
-    
-    setTimeout(function() {
-      btn.innerHTML = '🔓 ยืนยันรหัสปลดล็อก';
-      btn.style.background = '';
-      btn.style.color = '';
-    }, 2000);
+  if (isDemoMode) {
+    // Demo: check against local pins
+    if (DEMO_PINS.indexOf(pin) !== -1) {
+      onPremiumVerified(null);
+    } else {
+      onPremiumFailed();
+    }
+    return;
   }
+  // ===== END DEMO MODE =====
+  
+  // Production: call backend
+  // fetch('/api/premium/verify', {
+  //   method: 'POST',
+  //   headers: { 'Content-Type': 'application/json' },
+  //   body: JSON.stringify({ pin: pin })
+  // })
+  // .then(function(res) { return res.json(); })
+  // .then(function(data) {
+  //   if (data.success) {
+  //     onPremiumVerified(data.token);
+  //   } else {
+  //     onPremiumFailed();
+  //   }
+  // })
+  // .catch(function() { onPremiumFailed(); });
+}
+
+function onPremiumVerified(token) {
+  var btn = document.getElementById('confirm-pay-btn');
+  var err = document.getElementById('pin-error');
+  
+  err.style.display = 'none';
+  btn.innerHTML = '✅ ปลดล็อกสำเร็จ!';
+  btn.style.background = '#4CAF50';
+  btn.style.color = '#fff';
+  btn.disabled = true;
+  
+  setTimeout(function() {
+    setPremiumUnlocked(true, token);
+    
+    document.querySelectorAll('.is-locked').forEach(function(el) {
+      el.classList.remove('is-locked');
+      var overlay = el.querySelector('.lock-overlay');
+      if(overlay) overlay.remove();
+    });
+    
+    closePayment();
+    window.scrollBy({ top: 150, behavior: 'smooth' });
+  }, 800);
+}
+
+function onPremiumFailed() {
+  var btn = document.getElementById('confirm-pay-btn');
+  var err = document.getElementById('pin-error');
+  
+  err.style.display = 'block';
+  btn.innerHTML = '❌ กรอกรหัสใหม่อีกครั้ง';
+  btn.style.background = '#F44336';
+  btn.style.color = '#fff';
+  
+  setTimeout(function() {
+    btn.innerHTML = '🔓 ยืนยันรหัสปลดล็อก';
+    btn.style.background = '';
+    btn.style.color = '';
+  }, 2000);
 }
 
