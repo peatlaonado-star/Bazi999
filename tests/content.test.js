@@ -38,12 +38,15 @@ describe('Thai astrology content data', () => {
     const html = fs.readFileSync(path.resolve('index.html'), 'utf8');
     const contentIndex = html.indexOf('data/thai-astrology-content.js');
     const helpersIndex = html.indexOf('js/reading-helpers.js');
-    const renderersIndex = html.indexOf('astro-renderers.js');
+    const sharedIndex = html.indexOf('js/renderer-shared.js');
+    const individualIndex = html.indexOf('js/renderer-individual.js');
 
     expect(contentIndex).toBeGreaterThan(-1);
     expect(helpersIndex).toBeGreaterThan(-1);
-    expect(renderersIndex).toBeGreaterThan(-1);
+    expect(sharedIndex).toBeGreaterThan(-1);
+    expect(individualIndex).toBeGreaterThan(-1);
     expect(contentIndex).toBeLessThan(helpersIndex);
-    expect(helpersIndex).toBeLessThan(renderersIndex);
+    expect(helpersIndex).toBeLessThan(sharedIndex);
+    expect(sharedIndex).toBeLessThan(individualIndex);
   });
 });
