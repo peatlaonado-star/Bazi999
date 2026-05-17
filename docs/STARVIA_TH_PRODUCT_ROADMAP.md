@@ -243,11 +243,11 @@ Goal: separate Thai astrology content from rendering logic.
 
 Goal: make the app feel richer without adding backend yet.
 
-- Add `Karma Mirror` section to individual reading
-- Add `Thai Life Blueprint` header card
-- Upgrade couple result into `Couple Dharma Map`
-- Upgrade auspicious mode into `Personal Auspicious Calendar`
-- Add daily `Thai Cosmic Brief` block
+- [x] Add `Karma Mirror` section to individual reading (2026-05-17)
+- [x] Add `Thai Life Blueprint` header card (2026-05-17)
+- [x] Upgrade couple result into `Couple Dharma Map` (2026-05-17)
+- [x] Upgrade auspicious mode into `Personal Auspicious Calendar` (2026-05-17)
+- [x] Add daily `Thai Cosmic Brief` block (2026-05-17)
 
 ### Phase 3 — Premium Readiness
 

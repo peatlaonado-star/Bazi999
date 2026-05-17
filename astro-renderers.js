@@ -36,6 +36,26 @@ function buildKarmaMirror(p, dayOfWeek){
   };
 }
 
+function buildDailyBrief(p, dayOfWeek, personalColor) {
+  var content = (typeof THAI_ASTRO_CONTENT !== 'undefined') ? THAI_ASTRO_CONTENT : null;
+  var db = content && content.dailyBrief ? content.dailyBrief : null;
+  if (!db) {
+    db = {
+      weekdayEnergy: ['พลังงานวันนี้: มีพลังงานดีสำหรับการเริ่มต้นใหม่'],
+      weekdayFocus: ['โฟกัส: สิ่งที่สำคัญที่สุดวันนี้'],
+      weekdayWarning: ['ระวัง: อย่ารีบตัดสินใจ'],
+      weekdayAction: ['สิ่งที่ควรทำวันนี้: หยุดพักสักครู่']
+    };
+  }
+  var energy = db.weekdayEnergy[dayOfWeek] || db.weekdayEnergy[0];
+  var focus = db.weekdayFocus[dayOfWeek] || db.weekdayFocus[0];
+  var warning = db.weekdayWarning[dayOfWeek] || db.weekdayWarning[0];
+  var action = db.weekdayAction[dayOfWeek] || db.weekdayAction[0];
+  var colorName = personalColor ? personalColor.name : '';
+  var colorHex = personalColor ? personalColor.hex : '#C9A227';
+  return { energy: energy, colorName: colorName, colorHex: colorHex, focus: focus, warning: warning, action: action };
+}
+
 var FALLBACK_COUPLE_DHARMA = {
   intro: 'ดวงคู่คือแผนที่ความสัมพันธ์ที่ช่วยให้เห็นบทเรียนและวิธีดูแลกันให้ดีขึ้น',
   pairTypes: {
@@ -287,9 +307,31 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     + '<div class="karma-ritual"><span>พิธีเล็ก ๆ 7 วัน:</span> ' + escapeHTML(karma.ritual) + '</div>'
     + '</div>';
 
+  var briefData = buildDailyBrief(p, dayOfWeek, { name: pe.c1n, hex: pe.c1 });
+  var cosmicBriefHtml = '<div class="cosmic-brief">'
+    + '<div class="cb-title">✦ สรุปพลังงานวันนี้ · Daily Cosmic Brief ✦</div>'
+    + '<div class="cb-line"><div class="cb-dot" style="background:' + briefData.colorHex + '"></div><div>' + briefData.energy + '</div></div>'
+    + '<div class="cb-line"><div class="cb-dot" style="background:' + briefData.colorHex + '"></div><div>สีมงคลวันนี้: <strong style="color:' + briefData.colorHex + '">' + briefData.colorName + '</strong></div></div>'
+    + '<div class="cb-line"><div class="cb-dot" style="background:#E8A0CF"></div><div>' + briefData.focus + '</div></div>'
+    + '<div class="cb-line"><div class="cb-dot" style="background:#E8534A"></div><div>' + briefData.warning + '</div></div>'
+    + '<div class="cb-line"><div class="cb-dot" style="background:var(--g)"></div><div>' + briefData.action + '</div></div>'
+    + '</div>';
+
   // 5. ประกอบร่างการแสดงผล (Info + Power Elements + Radar)
-  wrap.innerHTML =
-    '<div class="brow"><span style="font-size:15px;color:'+p.c+'">'+p.s+'</span>'
+  // Blueprint Header Card
+  var blueprintCardHtml = '<div class="blueprint-card">'
+    + '<div class="bp-kicker">Thai Life Blueprint · พิมพ์เขียวชีวิตไทย</div>'
+    + '<div class="bp-title">✦ ' + nm + ' ✦</div>'
+    + '<div class="bp-grid">'
+    + '<div class="bp-item"><div class="bp-icon" style="color:' + p.c + '">' + p.s + '</div><div class="bp-label">ดาวเจ้าชะตา</div><div class="bp-value" style="color:' + p.c + '">' + p.n + '</div></div>'
+    + '<div class="bp-item"><div class="bp-icon">🌍</div><div class="bp-label">ธาตุ</div><div class="bp-value">ธาตุ' + p.el + '</div></div>'
+    + '<div class="bp-item"><div class="bp-icon" style="color:' + r.c + '">' + r.s + '</div><div class="bp-label">ราศีเกิด</div><div class="bp-value" style="color:' + r.c + '">' + r.n + '</div></div>'
+    + '<div class="bp-item"><div class="bp-icon" style="color:' + l.c + '">' + l.s + '</div><div class="bp-label">ลัคนา</div><div class="bp-value" style="color:' + l.c + '">' + l.n + '</div></div>'
+    + '<div class="bp-item"><div class="bp-icon">🎂</div><div class="bp-label">อายุ</div><div class="bp-value">' + ageTxt + '</div></div>'
+    + '</div></div>';
+
+  wrap.innerHTML = blueprintCardHtml
+    + '<div class="brow"><span style="font-size:15px;color:'+p.c+'">'+p.s+'</span>'
     +'<span style="font-size:11px;color:#c8b87a"><strong style="color:#C9A227">'+nm+'</strong>'
     +' · <strong style="color:#C9A227">'+p.n+'</strong>'
     +' · <strong style="color:'+r.c+'">'+r.n+'</strong>'
@@ -304,6 +346,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     +'</div></div>'
     + powerCardHtml 
     + karmaHtml
+    + cosmicBriefHtml
     + buildElementRadar(p, r, l)
     +'<div class="tabs-w"><div class="tabs" id="tt0"></div></div><div id="ts0"></div>';
 
@@ -571,6 +614,15 @@ function go2(){
 function renderAusp(nm,p,pw,u){
   var wrap=document.getElementById('r2');
   nm = escapeHTML(nm);
+  // Personal header card
+  var elementEmoji = p.el === 'ไฟ' ? '🔥' : p.el === 'ดิน' ? '🪨' : p.el === 'ลม' ? '💨' : '💧';
+  var connectionMsg = 'พลังงานจากดาว' + p.n + ' (' + p.el + ') เสริมจังหวะชีวิตของคุณ';
+  var auspHeaderHtml = '<div class="ausp-header-card">'
+    + '<div class="ahp-planet" style="color:' + p.c + '">' + p.s + '</div>'
+    + '<div class="ahp-info">'
+    + '<div class="ahp-name">' + nm + ' — ธาตุ' + p.el + ' ' + elementEmoji + '</div>'
+    + '<div class="ahp-connection">' + connectionMsg + '</div>'
+    + '</div></div>';
   var DN=u.dn;
   var DS=['☉','☽','♂','☿','♃','♀','♄'];
   var DC=['#FFB84D','#C8DCF0','#E8534A','#6EC89A','#F5A623','#E8A0CF','#9B8AB8'];
@@ -647,15 +699,24 @@ function renderAusp(nm,p,pw,u){
   dg+='</div>';
 
   var ACTS_TH=[['เริ่มโปรเจกต์ใหม่',pw,(pw+4)%7],['เจรจา/เซ็นสัญญา',3,4],['พบผู้ใหญ่/นำเสนองาน',4,0],['การเงิน/ลงทุน',5,4],['ความรัก/ออกเดต',5,1]];
+  var ACTIVITY_TIMES = {
+    'ไฟ': ['06:00–08:00', '09:00–14:00', '09:00–14:00', '09:00–14:00', '06:00–08:00'],
+    'ดิน': ['09:00–15:00', '09:00–15:00', '09:00–15:00', '16:00–18:00', '09:00–15:00'],
+    'ลม': ['09:00–12:00', '13:00–16:00', '13:00–16:00', '09:00–12:00', '13:00–16:00'],
+    'น้ำ': ['09:00–12:00', '09:00–12:00', '13:00–16:00', '09:00–12:00', '13:00–16:00']
+  };
+  var actTimes = ACTIVITY_TIMES[p.el] || ACTIVITY_TIMES['ไฟ'];
   var ah='';
-  ACTS_TH.forEach(function(a){
+  ACTS_TH.forEach(function(a, aIdx){
     ah+='<div class="hi"><div class="hn" style="width:auto;border-radius:7px;padding:0 8px;font-size:10px">'+a[0]+'</div>'
-      +'<div class="ht" style="font-size:12px;">'+u.ab+' <strong style="color:#C9A227">'+u.ad+DN[a[1]]+'</strong> <span style="font-size:10px;color:var(--tx2);">(รองลงมา: '+u.ad+DN[a[2]]+')</span></div></div>';
+      +'<div class="ht" style="font-size:12px;">'+u.ab+' <strong style="color:#C9A227">'+u.ad+DN[a[1]]+'</strong> <span style="font-size:10px;color:var(--tx2);">(รองลงมา: '+u.ad+DN[a[2]]+')</span>'
+      +'<span class="act-time-window">⏰ '+actTimes[aIdx]+'</span></div></div>';
   });
 
   // รวบรวมข้อมูลทั้งหมดแสดงผล
   wrap.innerHTML=
-    '<div class="brow"><span style="font-size:15px;color:'+p.c+'">'+p.s+'</span>'
+    auspHeaderHtml
+    +'<div class="brow"><span style="font-size:15px;color:'+p.c+'">'+p.s+'</span>'
     +'<span style="font-size:11px;color:#c8b87a"><strong style="color:#C9A227">'+nm+'</strong>'
     +' · <strong style="color:#C9A227">'+p.n+'</strong> · ตารางชีวิตประจำวัน</span></div>'
     

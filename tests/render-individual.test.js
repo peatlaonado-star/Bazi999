@@ -61,3 +61,123 @@ describe('Individual reading Karma Mirror render', () => {
     expect(dom.window.document.querySelector('.karma-card')).toBeTruthy();
   });
 });
+
+describe('Thai Life Blueprint header card', () => {
+  it('renders .blueprint-card class in the output', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+    const context = loadContext(dom);
+    context.renderInd('เบล', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const output = dom.window.document.getElementById('r0').innerHTML;
+    expect(output).toContain('blueprint-card');
+  });
+
+  it('contains the kicker text "Thai Life Blueprint"', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+    const context = loadContext(dom);
+    context.renderInd('เบล', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const output = dom.window.document.getElementById('r0').innerHTML;
+    expect(output).toContain('Thai Life Blueprint');
+    expect(output).toContain('พิมพ์เขียวชีวิตไทย');
+  });
+
+  it('shows the user escaped name', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+    const context = loadContext(dom);
+    context.renderInd('คาร่า', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const output = dom.window.document.getElementById('r0').innerHTML;
+    expect(output).toContain('คาร่า');
+  });
+
+  it('shows planet symbol and name', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+    const context = loadContext(dom);
+    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const output = dom.window.document.getElementById('r0').innerHTML;
+    expect(output).toContain('☉');
+    expect(output).toContain('อาทิตย์');
+  });
+
+  it('shows element, rasi, and lagna names', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+    const context = loadContext(dom);
+    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const output = dom.window.document.getElementById('r0').innerHTML;
+    expect(output).toContain('ธาตุไฟ');
+    expect(output).toContain('เมษ');
+  });
+
+  it('blueprint card appears before the info card in DOM order', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+    const context = loadContext(dom);
+    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const output = dom.window.document.getElementById('r0').innerHTML;
+    const bpIndex = output.indexOf('blueprint-card');
+    const cardIndex = output.indexOf('class="card"');
+    expect(bpIndex).toBeLessThan(cardIndex);
+  });
+
+  it('XSS: script tag in name is escaped inside blueprint card', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+    const context = loadContext(dom);
+    context.renderInd('<script>alert(1)</script>', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const output = dom.window.document.getElementById('r0').innerHTML;
+    expect(output).toContain('&lt;script&gt;');
+    expect(dom.window.document.querySelector('.blueprint-card script')).toBeNull();
+  });
+});
+
+describe('Daily Thai Cosmic Brief', () => {
+  it('renders .cosmic-brief class in output', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+    const context = loadContext(dom);
+    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const output = dom.window.document.getElementById('r0').innerHTML;
+    expect(output).toContain('cosmic-brief');
+  });
+
+  it('contains the Daily Cosmic Brief title text', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+    const context = loadContext(dom);
+    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const output = dom.window.document.getElementById('r0').innerHTML;
+    expect(output).toContain('Daily Cosmic Brief');
+    expect(output).toContain('สรุปพลังงานวันนี้');
+  });
+
+  it('contains 5 cb-line elements', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+    const context = loadContext(dom);
+    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const lines = dom.window.document.querySelectorAll('.cb-line');
+    expect(lines.length).toBe(5);
+  });
+
+  it('shows personal color name', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+    const context = loadContext(dom);
+    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const output = dom.window.document.getElementById('r0').innerHTML;
+    expect(output).toContain('สีมงคลวันนี้');
+  });
+
+  it('cosmic brief appears after karma card in DOM order', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+    const context = loadContext(dom);
+    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const output = dom.window.document.getElementById('r0').innerHTML;
+    const karmaIndex = output.indexOf('karma-card');
+    const briefIndex = output.indexOf('cosmic-brief');
+    expect(karmaIndex).toBeLessThan(briefIndex);
+  });
+
+  it('contains energy, focus, warning, and action text', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+    const context = loadContext(dom);
+    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const output = dom.window.document.getElementById('r0').innerHTML;
+    expect(output).toContain('พลังงานวัน');
+    expect(output).toContain('โฟกัส:');
+    expect(output).toContain('ระวัง:');
+    expect(output).toContain('สิ่งที่ควรทำวันนี้:');
+  });
+});

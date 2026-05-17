@@ -120,11 +120,64 @@ describe('Auspicious mode rendering', () => {
       ],
     });
     const p = planet();
-
     context.renderAusp('ทดสอบ', p, 0, auspiciousUi());
 
     const output = dom.window.document.getElementById('r2').innerHTML;
     expect(output).toContain('พลังงานสี');
     expect(output).toContain('Cosmic Routine');
+  });
+});
+
+describe('Auspicious mode personal upgrades', () => {
+  const PLC_DATA = [
+    [85, 70, 60, 90, 75, 80, 65],
+    [70, 85, 80, 65, 90, 60, 75],
+    [60, 80, 85, 75, 65, 90, 70],
+    [90, 65, 75, 85, 70, 60, 80],
+    [75, 90, 65, 70, 85, 80, 60],
+    [80, 60, 90, 80, 65, 75, 85],
+    [65, 75, 70, 80, 80, 85, 85],
+  ];
+
+  it('renders .ausp-header-card class', () => {
+    const dom = new JSDOM('<!doctype html><div id="r2"></div>');
+    const context = loadContext(dom, { PLC: PLC_DATA });
+    context.renderAusp('สมชาย', planet(), 0, auspiciousUi());
+    const output = dom.window.document.getElementById('r2').innerHTML;
+    expect(output).toContain('ausp-header-card');
+  });
+
+  it('header card shows planet name', () => {
+    const dom = new JSDOM('<!doctype html><div id="r2"></div>');
+    const context = loadContext(dom, { PLC: PLC_DATA });
+    context.renderAusp('Test', planet(), 0, auspiciousUi());
+    const output = dom.window.document.getElementById('r2').innerHTML;
+    expect(output).toContain('อาทิตย์');
+  });
+
+  it('header card shows element name', () => {
+    const dom = new JSDOM('<!doctype html><div id="r2"></div>');
+    const context = loadContext(dom, { PLC: PLC_DATA });
+    context.renderAusp('Test', planet(), 0, auspiciousUi());
+    const output = dom.window.document.getElementById('r2').innerHTML;
+    expect(output).toContain('ธาตุไฟ');
+  });
+
+  it('activity recommendations contain time window indicators', () => {
+    const dom = new JSDOM('<!doctype html><div id="r2"></div>');
+    const context = loadContext(dom, { PLC: PLC_DATA });
+    context.renderAusp('Test', planet(), 0, auspiciousUi());
+    const output = dom.window.document.getElementById('r2').innerHTML;
+    expect(output).toContain('act-time-window');
+    expect(output).toContain('⏰');
+  });
+
+  it('XSS: script tag in name is escaped in header card', () => {
+    const dom = new JSDOM('<!doctype html><div id="r2"></div>');
+    const context = loadContext(dom, { PLC: PLC_DATA });
+    context.renderAusp('<script>alert(1)</script>', planet(), 0, auspiciousUi());
+    const output = dom.window.document.getElementById('r2').innerHTML;
+    expect(output).toContain('&lt;script&gt;');
+    expect(dom.window.document.querySelector('.ausp-header-card script')).toBeNull();
   });
 });

@@ -860,6 +860,154 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 }
 .karma-ritual span { color: var(--g2); font-weight: 700; }
 @media(max-width:520px){.karma-grid{grid-template-columns:1fr}.karma-card{padding:18px 14px}}
+/* Thai Life Blueprint Header Card */
+.blueprint-card {
+  background: linear-gradient(145deg, rgba(20,10,45,0.95), rgba(43,20,82,0.7));
+  border: 1px solid rgba(201,162,39,0.35);
+  border-radius: 18px;
+  padding: 22px 20px 18px;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4), inset 0 0 20px rgba(201,162,39,0.06);
+}
+.blueprint-card::before {
+  content: '✦';
+  position: absolute;
+  top: -15px;
+  right: -10px;
+  font-size: 80px;
+  opacity: 0.04;
+  color: #C9A227;
+  pointer-events: none;
+}
+.bp-kicker {
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #C9A227;
+  text-align: center;
+  margin-bottom: 10px;
+  font-weight: 600;
+  background: rgba(201,162,39,0.08);
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin: 0 auto 10px;
+  display: block;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+.bp-title {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #C9A227, #E8D48B, #C9A227);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.bp-grid {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.bp-item {
+  text-align: center;
+  flex: 1;
+  min-width: 60px;
+}
+.bp-icon {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+.bp-label {
+  font-size: 9px;
+  color: #b8a8d8;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+.bp-value {
+  font-size: 11px;
+  font-weight: 600;
+  color: #C9A227;
+}
+
+/* Daily Thai Cosmic Brief */
+.cosmic-brief {
+  background: linear-gradient(90deg, rgba(201,162,39,0.04), rgba(91,63,166,0.08), rgba(201,162,39,0.04));
+  border: 1px dashed rgba(201,162,39,0.22);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 12px 0 16px;
+  font-size: 12.5px;
+  line-height: 1.9;
+  color: var(--tx);
+}
+.cosmic-brief .cb-title {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--g);
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+.cb-line {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 3px;
+}
+.cb-line:last-child { margin-bottom: 0; }
+.cb-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+/* Auspicious Header Card */
+.ausp-header-card {
+  background: linear-gradient(145deg, rgba(20,10,45,0.9), rgba(43,20,82,0.6));
+  border: 1px solid rgba(201,162,39,0.3);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+.ahp-planet {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+.ahp-info {
+  flex: 1;
+}
+.ahp-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #C9A227;
+  margin-bottom: 2px;
+}
+.ahp-connection {
+  font-size: 10.5px;
+  color: #b8a8d8;
+  line-height: 1.5;
+}
+.act-time-window {
+  font-size: 10px;
+  color: #E8A0CF;
+  margin-left: 6px;
+  white-space: nowrap;
+}
 
 /* Couple Dharma Map */
 .dharma-card {
