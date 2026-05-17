@@ -8,6 +8,34 @@ function escapeHTML(value){
     .replace(/'/g, '&#39;');
 }
 
+var FALLBACK_KARMA_MIRROR = {
+  intro: 'กระจกกรรมไม่ใช่คำตัดสิน แต่คือรูปแบบที่ชีวิตมักพาคุณกลับมาเรียนรู้ซ้ำ เพื่อให้คุณเลือกทางใหม่ได้ชัดขึ้น',
+  elements: {
+    'ไฟ': { pattern: 'พลังใจร้อนและการเร่งตัดสินใจ', lesson: 'ใช้ความกล้าอย่างมีสติ', action: 'หยุด 3 ลมหายใจก่อนตัดสินใจเรื่องสำคัญ', ritual: 'ตั้งเจตนาว่าใช้พลังเพื่อสร้าง ไม่ใช่เพื่อเอาชนะ' }
+  },
+  weekdayShadows: ['เงาของวันเกิดคือรูปแบบเดิมที่รอให้คุณมองเห็นและเลือกต่างจากเดิม']
+};
+
+function buildKarmaMirror(p, dayOfWeek){
+  var content = (typeof THAI_ASTRO_CONTENT !== 'undefined') ? THAI_ASTRO_CONTENT : null;
+  var km = content && content.karmaMirror ? content.karmaMirror : FALLBACK_KARMA_MIRROR;
+  var elements = km.elements || FALLBACK_KARMA_MIRROR.elements;
+  var weekdayShadows = km.weekdayShadows || FALLBACK_KARMA_MIRROR.weekdayShadows;
+  var elementKey = p && p.el ? p.el : 'ไฟ';
+  var element = elements[elementKey] || elements['ไฟ'] || FALLBACK_KARMA_MIRROR.elements['ไฟ'];
+  var shadow = weekdayShadows[dayOfWeek] || weekdayShadows[0] || FALLBACK_KARMA_MIRROR.weekdayShadows[0];
+
+  return {
+    title: 'กระจกกรรม · Karma Mirror',
+    intro: km.intro || FALLBACK_KARMA_MIRROR.intro,
+    pattern: element.pattern,
+    lesson: element.lesson,
+    weekdayShadow: shadow,
+    action: element.action,
+    ritual: element.ritual
+  };
+}
+
 // ===== MODE 0: Individual =====
 function go0(){
   var ds=document.getElementById('d0').value; if(!ds)return;
