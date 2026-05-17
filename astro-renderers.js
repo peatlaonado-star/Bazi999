@@ -233,6 +233,20 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     + '</div>' // ปิด power-card
     + '<div class="share-btn-wrap"><button class="share-btn" data-action="save-image" data-target="power-card" data-filename="Lucky_Elements">📸 เซฟรูปภาพเลขมงคล</button></div>';
 
+  var karma = buildKarmaMirror(p, dayOfWeek);
+  var karmaHtml = '<div class="karma-card">'
+    + '<div class="karma-kicker">Thai Life Blueprint</div>'
+    + '<div class="karma-title">✦ ' + escapeHTML(karma.title) + ' ✦</div>'
+    + '<div class="karma-desc">' + escapeHTML(karma.intro) + '</div>'
+    + '<div class="karma-grid">'
+    + '<div class="karma-item"><strong>รูปแบบที่มักวนซ้ำ</strong><br>' + escapeHTML(karma.pattern) + '</div>'
+    + '<div class="karma-item"><strong>บทเรียนของดาว</strong><br>' + escapeHTML(karma.lesson) + '</div>'
+    + '<div class="karma-item"><strong>เงาจากวันเกิด</strong><br>' + escapeHTML(karma.weekdayShadow) + '</div>'
+    + '<div class="karma-item"><strong>สิ่งที่ควรทำเดือนนี้</strong><br>' + escapeHTML(karma.action) + '</div>'
+    + '</div>'
+    + '<div class="karma-ritual"><span>พิธีเล็ก ๆ 7 วัน:</span> ' + escapeHTML(karma.ritual) + '</div>'
+    + '</div>';
+
   // 5. ประกอบร่างการแสดงผล (Info + Power Elements + Radar)
   wrap.innerHTML =
     '<div class="brow"><span style="font-size:15px;color:'+p.c+'">'+p.s+'</span>'
@@ -249,6 +263,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     +'<div class="ci"><div class="ci-l">'+u.ge+'</div><div class="ci-v">'+gd+'</div><div class="ci-s">'+nm+'</div></div>'
     +'</div></div>'
     + powerCardHtml 
+    + karmaHtml
     + buildElementRadar(p, r, l)
     +'<div class="tabs-w"><div class="tabs" id="tt0"></div></div><div id="ts0"></div>';
 
