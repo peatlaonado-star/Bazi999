@@ -191,3 +191,34 @@ describe('Daily Thai Cosmic Brief', () => {
     expect(output).toContain('สิ่งที่ควรทำวันนี้:');
   });
 });
+
+describe('Life Domain Forecast Matrix', () => {
+  it('renders all required life domains with required guidance parts', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+    const context = loadContext(dom);
+
+    context.renderInd('Test', 'หญิง', '1990-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+
+    const output = dom.window.document.getElementById('r0').innerHTML;
+    expect(output).toContain('Life Domain Forecast Matrix');
+    expect(output).toContain('แผนที่สถานการณ์ชีวิต');
+    for (const label of ['โชค', 'การเงิน', 'สุขภาพ', 'ความสัมพันธ์', 'การงาน', 'บริวาร']) {
+      expect(output).toContain(label);
+    }
+    for (const part of ['สถานการณ์ปัจจุบัน', 'สัญญาณเตือน', 'วิธีเสริม', 'โอกาสตามช่วงอายุ']) {
+      expect(output).toContain(part);
+    }
+    expect(dom.window.document.querySelectorAll('.domain-card').length).toBe(6);
+  });
+
+  it('shows explicit age-band opportunities for future life stages', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+    const context = loadContext(dom);
+
+    context.renderInd('Test', 'หญิง', '1990-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+
+    const chips = Array.from(dom.window.document.querySelectorAll('.domain-age-chip')).map((node) => node.textContent);
+    expect(chips.length).toBeGreaterThanOrEqual(2);
+    expect(chips.some((text) => /\d+–\d+ ปี/.test(text))).toBe(true);
+  });
+});

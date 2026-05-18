@@ -76,3 +76,68 @@ function getCoupleDharmaType(total, elS, sameElement){
     intro: dharma.intro || FALLBACK_COUPLE_DHARMA.intro
   };
 }
+
+var FALLBACK_LIFE_DOMAIN_FORECAST = {
+  domains: [
+    { key: 'luck', label: 'โชค', subtitle: 'จังหวะโอกาส', icon: '✦' },
+    { key: 'money', label: 'การเงิน', subtitle: 'ทรัพย์สิน', icon: '💰' },
+    { key: 'health', label: 'สุขภาพ', subtitle: 'พลังชีวิต', icon: '🫀' },
+    { key: 'relationship', label: 'ความสัมพันธ์', subtitle: 'คู่ครอง / ครอบครัว', icon: '♡' },
+    { key: 'career', label: 'การงาน', subtitle: 'ชื่อเสียง / ความก้าวหน้า', icon: '◈' },
+    { key: 'supporters', label: 'บริวาร', subtitle: 'ทีม / ผู้สนับสนุน', icon: '♟' }
+  ],
+  domainThemes: {
+    luck: { current: 'จังหวะชีวิตกำลังเปิดโอกาสใหม่', warning: 'อย่ารับทุกโอกาสโดยไม่เลือก', remedy: 'เลือกหนึ่งเรื่องที่สำคัญที่สุดแล้วลงมือให้ชัด' }
+  },
+  elementGuidance: {
+    'ไฟ': { tone: 'พลังไฟเปิดทางผ่านความกล้า', warning: 'ระวังใจร้อน', remedy: 'หยุด 3 ลมหายใจก่อนตัดสินใจ' }
+  },
+  ageBandOpportunities: {}
+};
+
+function formatDomainAgeRange(band){
+  if (!band) return 'ช่วงอายุถัดไป';
+  if (band.to >= 120) return band.from + ' ปีขึ้นไป';
+  return band.from + '–' + band.to + ' ปี';
+}
+
+function buildLifeDomainMatrix(p, r, l, currentBand, nextBands){
+  var content = (typeof THAI_ASTRO_CONTENT !== 'undefined') ? THAI_ASTRO_CONTENT : null;
+  var cfg = content && content.lifeDomainForecast ? content.lifeDomainForecast : FALLBACK_LIFE_DOMAIN_FORECAST;
+  var domains = cfg.domains || FALLBACK_LIFE_DOMAIN_FORECAST.domains;
+  var themes = cfg.domainThemes || FALLBACK_LIFE_DOMAIN_FORECAST.domainThemes;
+  var ageOps = cfg.ageBandOpportunities || {};
+  var elementKey = p && p.el ? p.el : 'ไฟ';
+  var element = (cfg.elementGuidance && (cfg.elementGuidance[elementKey] || cfg.elementGuidance['ไฟ'])) || FALLBACK_LIFE_DOMAIN_FORECAST.elementGuidance['ไฟ'];
+  var activeBand = currentBand || { key: 'build', from: 29, to: 35, title: 'สร้างฐานมั่นคง' };
+  var upcomingBands = (nextBands && nextBands.length ? nextBands : []).slice(0, 2);
+  if (!upcomingBands.length) upcomingBands = [activeBand];
+
+  return {
+    title: 'Life Domain Forecast Matrix · แผนที่สถานการณ์ชีวิต',
+    intro: 'อ่านสถานการณ์ปัจจุบัน วิธีเสริมให้ดีขึ้น และโอกาสที่จะเปิดตามช่วงอายุ โดยผสานธาตุชีวิต ดาวเจ้าชะตา ราศี ลัคนา และจังหวะวัยปัจจุบัน',
+    elementSummary: element.tone,
+    currentAgeRange: formatDomainAgeRange(activeBand),
+    domains: domains.map(function(domain){
+      var theme = themes[domain.key] || themes.luck || FALLBACK_LIFE_DOMAIN_FORECAST.domainThemes.luck;
+      var opportunities = upcomingBands.map(function(band){
+        var bandMap = ageOps[band.key] || {};
+        return {
+          ageRange: formatDomainAgeRange(band),
+          title: band.title || 'ช่วงอายุถัดไป',
+          text: bandMap[domain.key] || ('โอกาสด้าน' + domain.label + 'จะเปิดเมื่อใช้บทเรียนของช่วงวัยนี้ให้ถูกทาง')
+        };
+      });
+      return {
+        key: domain.key,
+        label: domain.label,
+        subtitle: domain.subtitle,
+        icon: domain.icon || '✦',
+        current: theme.current + ' · ตอนนี้อยู่ในช่วง ' + formatDomainAgeRange(activeBand) + ' (' + (activeBand.title || 'จังหวะชีวิตปัจจุบัน') + ') ' + element.tone,
+        warning: theme.warning + ' · ' + element.warning,
+        remedy: theme.remedy + ' · ' + element.remedy,
+        opportunities: opportunities
+      };
+    })
+  };
+}

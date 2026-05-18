@@ -233,6 +233,29 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     + '<div class="karma-ritual"><span>พิธีเล็ก ๆ 7 วัน:</span> ' + escapeHTML(karma.ritual) + '</div>'
     + '</div>';
 
+  var currentLifeBand = LIFE_BANDS[getLifeBandIndex(ageY)];
+  var nextLifeBands = LIFE_BANDS.slice(getLifeBandIndex(ageY) + 1, getLifeBandIndex(ageY) + 3);
+  var domainMatrix = buildLifeDomainMatrix(p, r, l, currentLifeBand, nextLifeBands);
+  var domainHtml = '<div class="domain-matrix">'
+    + '<div class="domain-kicker">Thai Life Blueprint</div>'
+    + '<div class="domain-title">✦ ' + escapeHTML(domainMatrix.title) + ' ✦</div>'
+    + '<div class="domain-desc">' + escapeHTML(domainMatrix.intro) + '</div>'
+    + '<div class="domain-current-chip">ช่วงวัยปัจจุบัน: ' + escapeHTML(domainMatrix.currentAgeRange) + '</div>'
+    + '<div class="domain-grid">';
+  domainMatrix.domains.forEach(function(domain){
+    domainHtml += '<div class="domain-card domain-' + escapeHTML(domain.key) + '">'
+      + '<div class="domain-head"><span class="domain-icon">' + escapeHTML(domain.icon) + '</span><div><div class="domain-label">' + escapeHTML(domain.label) + '</div><div class="domain-subtitle">' + escapeHTML(domain.subtitle) + '</div></div></div>'
+      + '<div class="domain-part"><strong>สถานการณ์ปัจจุบัน</strong><p>' + escapeHTML(domain.current) + '</p></div>'
+      + '<div class="domain-part"><strong>สัญญาณเตือน</strong><p>' + escapeHTML(domain.warning) + '</p></div>'
+      + '<div class="domain-part"><strong>วิธีเสริมให้ดีขึ้น</strong><p>' + escapeHTML(domain.remedy) + '</p></div>'
+      + '<div class="domain-part"><strong>โอกาสตามช่วงอายุ</strong><div class="domain-ages">';
+    domain.opportunities.forEach(function(opp){
+      domainHtml += '<div class="domain-age"><span class="domain-age-chip">' + escapeHTML(opp.ageRange) + '</span><span>' + escapeHTML(opp.text) + '</span></div>';
+    });
+    domainHtml += '</div></div></div>';
+  });
+  domainHtml += '</div></div>';
+
   var briefData = buildDailyBrief(p, dayOfWeek, { name: pe.c1n, hex: pe.c1 });
   var cosmicBriefHtml = '<div class="cosmic-brief">'
     + '<div class="cb-title">✦ สรุปพลังงานวันนี้ · Daily Cosmic Brief ✦</div>'
@@ -272,6 +295,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     +'</div></div>'
     + powerCardHtml 
     + karmaHtml
+    + domainHtml
     + cosmicBriefHtml
     + buildElementRadar(p, r, l)
     +'<div class="tabs-w"><div class="tabs" id="tt0"></div></div><div id="ts0"></div>';

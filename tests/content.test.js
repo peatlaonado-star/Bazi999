@@ -49,4 +49,19 @@ describe('Thai astrology content data', () => {
     expect(helpersIndex).toBeLessThan(sharedIndex);
     expect(sharedIndex).toBeLessThan(individualIndex);
   });
+
+  it('defines Life Domain Forecast content for six required domains', () => {
+    const content = loadThaiAstroContent();
+    expect(content.lifeDomainForecast).toBeTruthy();
+    expect(content.lifeDomainForecast.domains.map((domain) => domain.key)).toEqual([
+      'luck', 'money', 'health', 'relationship', 'career', 'supporters'
+    ]);
+    content.lifeDomainForecast.domains.forEach((domain) => {
+      expect(domain.label).toEqual(expect.any(String));
+      expect(domain.subtitle).toEqual(expect.any(String));
+    });
+    for (const element of ['ไฟ', 'ดิน', 'ลม', 'น้ำ']) {
+      expect(content.lifeDomainForecast.elementGuidance[element]).toBeTruthy();
+    }
+  });
 });

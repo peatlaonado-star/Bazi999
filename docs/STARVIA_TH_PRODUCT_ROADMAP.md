@@ -248,6 +248,7 @@ Goal: make the app feel richer without adding backend yet.
 - [x] Upgrade couple result into `Couple Dharma Map` (2026-05-17)
 - [x] Upgrade auspicious mode into `Personal Auspicious Calendar` (2026-05-17)
 - [x] Add daily `Thai Cosmic Brief` block (2026-05-17)
+- [x] Add `Life Domain Forecast Matrix` for โชค/การเงิน/สุขภาพ/ความสัมพันธ์/การงาน/บริวาร (2026-05-18)
 
 ### Phase 3 — Premium Readiness
 
@@ -298,23 +299,23 @@ STARVIA currently has **3 main reading modes** and several sub-readings:
 
 | Requirement | Current status | Gap |
 |---|---|---|
-| Read current life situation | **Partial** | Present tab reads the current age band, but not yet broken down by life domain. |
-| Give ways to improve / strengthen luck | **Partial** | Karma Mirror, Action Plan, Daily Brief, colors, numbers, and routines exist, but remedies are not yet domain-specific. |
-| Indicate incoming opportunities by age period | **Partial** | Past/Present/Future age-band timeline exists, but opportunities are generic and not mapped to each domain. |
-| โชค | **Partial** | Covered by lucky numbers/colors/days and general opportunity language; lacks age-band opportunity forecast. |
-| การเงิน | **Partial** | Wealth Blueprint exists; lacks current financial situation + age opportunities + remedies by age band. |
-| สุขภาพ | **Missing as a dedicated domain** | Only indirect wellness/routine guidance exists. Needs a proper health/vitality section. |
-| ความสัมพันธ์ | **Good / Partial** | Individual love and Couple Dharma Map exist; needs age-band relationship opportunities and current situation. |
-| การงาน | **Partial** | Career Blueprint exists; lacks current career situation + age opportunities + remedies by age band. |
-| บริวาร / ทีม / คนรอบตัว | **Missing as a dedicated domain** | Some language mentions people/team, but there is no explicit subordinate/supporter domain. |
+| Read current life situation | **Covered** | Life Domain Forecast Matrix now breaks current situation down by domain. |
+| Give ways to improve / strengthen luck | **Covered** | Each domain includes a practical `วิธีเสริมให้ดีขึ้น`, plus existing Karma Mirror, Daily Brief, colors, numbers, and routines. |
+| Indicate incoming opportunities by age period | **Covered** | Each domain now shows age-band opportunities from the next 1–2 life stages when available. |
+| โชค | **Covered** | Domain card includes current luck situation, warning, remedy, and age opportunities. |
+| การเงิน | **Covered** | Domain card includes current financial situation, warning, remedy, and age opportunities. |
+| สุขภาพ | **Covered** | New dedicated health/vitality domain exists. |
+| ความสัมพันธ์ | **Covered** | Individual relationship domain plus Couple Dharma Map; age opportunities included. |
+| การงาน | **Covered** | Domain card includes current career situation, warning, remedy, and age opportunities. |
+| บริวาร / ทีม / คนรอบตัว | **Covered** | New dedicated supporters/team/subordinates domain exists. |
 
-Conclusion: STARVIA is already a credible static astrology reading app, but the **next major product upgrade** should turn it from a personality/timing app into a more complete **life-situation and life-opportunity reading system**.
+Conclusion: STARVIA is now a more complete **life-situation and life-opportunity reading system** for the individual mode. The next product upgrades can focus on payment/backend, richer ephemeris accuracy, PDF/share cards, or user accounts.
 
 ---
 
-## 8. Immediate Next Build Slice
+## 8. Implemented Build Slice
 
-The next safe implementation slice should be:
+Implemented on 2026-05-18:
 
 > **Life Domain Forecast Matrix — สถานการณ์ปัจจุบัน + วิธีเสริม + โอกาสตามช่วงอายุ**
 

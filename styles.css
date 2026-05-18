@@ -937,6 +937,153 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   color: #C9A227;
 }
 
+/* Life Domain Forecast Matrix */
+.domain-matrix {
+  position: relative;
+  overflow: hidden;
+  margin: 14px 0 16px;
+  padding: 20px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(201,162,39,0.30);
+  background:
+    radial-gradient(circle at 88% 5%, rgba(91,63,166,0.22), transparent 34%),
+    linear-gradient(145deg, rgba(14,8,38,0.96), rgba(43,20,82,0.72) 48%, rgba(12,8,34,0.96));
+  box-shadow: 0 14px 36px rgba(0,0,0,0.34), inset 0 0 28px rgba(201,162,39,0.05);
+}
+.domain-matrix::before {
+  content: '✦';
+  position: absolute;
+  right: -4px;
+  top: -28px;
+  color: rgba(201,162,39,0.08);
+  font-size: 120px;
+  pointer-events: none;
+}
+.domain-kicker {
+  position: relative;
+  width: fit-content;
+  margin: 0 auto 8px;
+  padding: 4px 10px;
+  border-radius: 50px;
+  background: rgba(201,162,39,0.10);
+  color: var(--g);
+  font-size: 9px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+}
+.domain-title {
+  position: relative;
+  text-align: center;
+  color: var(--g2);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.45;
+  margin-bottom: 10px;
+}
+.domain-desc {
+  position: relative;
+  color: var(--tx2);
+  font-size: 12.5px;
+  line-height: 1.85;
+  text-align: center;
+  max-width: 660px;
+  margin: 0 auto 12px;
+}
+.domain-current-chip {
+  position: relative;
+  width: fit-content;
+  margin: 0 auto 14px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.24);
+  border: 1px solid rgba(201,162,39,0.18);
+  color: var(--g2);
+  font-size: 11px;
+}
+.domain-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.domain-card {
+  border: 1px solid rgba(201,162,39,0.14);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.018));
+  padding: 13px;
+  color: var(--tx);
+}
+.domain-head {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.domain-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(201,162,39,0.10);
+  color: var(--g2);
+  border: 1px solid rgba(201,162,39,0.16);
+  flex-shrink: 0;
+}
+.domain-label {
+  color: var(--g2);
+  font-weight: 700;
+  font-size: 13px;
+}
+.domain-subtitle {
+  color: var(--tx2);
+  font-size: 10.5px;
+  margin-top: 1px;
+}
+.domain-part {
+  margin-top: 9px;
+  padding-top: 9px;
+  border-top: 1px solid rgba(201,162,39,0.09);
+}
+.domain-part strong {
+  display: block;
+  color: var(--g);
+  font-size: 10.5px;
+  letter-spacing: .06em;
+  margin-bottom: 3px;
+}
+.domain-part p {
+  margin: 0;
+  color: var(--tx);
+  font-size: 12px;
+  line-height: 1.75;
+}
+.domain-ages {
+  display: grid;
+  gap: 6px;
+}
+.domain-age {
+  display: flex;
+  gap: 7px;
+  align-items: flex-start;
+  color: var(--tx);
+  font-size: 12px;
+  line-height: 1.65;
+}
+.domain-age-chip {
+  flex-shrink: 0;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(201,162,39,0.12);
+  color: var(--g2);
+  border: 1px solid rgba(201,162,39,0.14);
+  font-size: 10px;
+  white-space: nowrap;
+}
+@media(max-width:720px){.domain-grid{grid-template-columns:1fr}.domain-matrix{padding:18px 14px}.domain-age{display:block}.domain-age-chip{display:inline-block;margin-bottom:4px}}
+
 /* Daily Thai Cosmic Brief */
 .cosmic-brief {
   background: linear-gradient(90deg, rgba(201,162,39,0.04), rgba(91,63,166,0.08), rgba(201,162,39,0.04));
