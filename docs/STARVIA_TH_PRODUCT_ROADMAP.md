@@ -280,22 +280,88 @@ Goal: become recognizably better than generic horoscope sites.
 
 ---
 
-## 7. Immediate Next Build Slice
+## 7. Current Reading Coverage Audit
+
+Updated: 2026-05-18
+
+STARVIA currently has **3 main reading modes** and several sub-readings:
+
+1. **Know Yourself / Thai Life Blueprint** — individual life-map reading from name, gender label, birth date, and birth time.
+   - Includes: ดาวเจ้าชะตา, ธาตุ, ราศี, ลัคนา, อายุ, Element Radar, Power Elements, Karma Mirror, Daily Cosmic Brief.
+   - Detailed tabs currently cover: ตัวตน, เงาในใจ/บทเรียน, ความรัก, การงาน, การเงิน, อดีต, ปัจจุบัน, อนาคต.
+2. **Couple Reading / Couple Dharma Map** — relationship compatibility reading for two people.
+   - Includes: compatibility score, grade, pair archetype, element chemistry, planet harmony, sign angle, lagna match, and relationship action plan.
+3. **Auspicious Days / Personal Auspicious Calendar** — timing and daily-alignment reading.
+   - Includes: current-day lucky/work/avoid colors, element-based daily routine, weekly auspicious days, best days and time windows for activities.
+
+### Coverage against the product goal
+
+| Requirement | Current status | Gap |
+|---|---|---|
+| Read current life situation | **Partial** | Present tab reads the current age band, but not yet broken down by life domain. |
+| Give ways to improve / strengthen luck | **Partial** | Karma Mirror, Action Plan, Daily Brief, colors, numbers, and routines exist, but remedies are not yet domain-specific. |
+| Indicate incoming opportunities by age period | **Partial** | Past/Present/Future age-band timeline exists, but opportunities are generic and not mapped to each domain. |
+| โชค | **Partial** | Covered by lucky numbers/colors/days and general opportunity language; lacks age-band opportunity forecast. |
+| การเงิน | **Partial** | Wealth Blueprint exists; lacks current financial situation + age opportunities + remedies by age band. |
+| สุขภาพ | **Missing as a dedicated domain** | Only indirect wellness/routine guidance exists. Needs a proper health/vitality section. |
+| ความสัมพันธ์ | **Good / Partial** | Individual love and Couple Dharma Map exist; needs age-band relationship opportunities and current situation. |
+| การงาน | **Partial** | Career Blueprint exists; lacks current career situation + age opportunities + remedies by age band. |
+| บริวาร / ทีม / คนรอบตัว | **Missing as a dedicated domain** | Some language mentions people/team, but there is no explicit subordinate/supporter domain. |
+
+Conclusion: STARVIA is already a credible static astrology reading app, but the **next major product upgrade** should turn it from a personality/timing app into a more complete **life-situation and life-opportunity reading system**.
+
+---
+
+## 8. Immediate Next Build Slice
 
 The next safe implementation slice should be:
 
-> **Create Thai content architecture and add Karma Mirror MVP**
+> **Life Domain Forecast Matrix — สถานการณ์ปัจจุบัน + วิธีเสริม + โอกาสตามช่วงอายุ**
 
-Why this first:
-- Low risk
-- Keeps current static app structure
-- Makes product feel more unique immediately
-- Creates foundation for future modules
-- Can be tested without payment/backend changes
+Goal: every individual reading should clearly answer: **“ตอนนี้ชีวิตกำลังเจออะไร, ควรเสริม/ปรับอย่างไร, และช่วงอายุไหนจะมีโอกาสเรื่องอะไรเข้ามา”** across all required domains.
 
-Acceptance criteria:
-- New content data file exists
-- Individual report includes a clearly branded `Karma Mirror` / `กระจกกรรม` section
-- User input remains escaped
-- `npm test` and `npm run check:js` pass
-- Commit is made after implementation
+### Required domains
+
+The individual reading must cover all 6 domains:
+
+1. **โชค / จังหวะโอกาส**
+2. **การเงิน / ทรัพย์สิน**
+3. **สุขภาพ / พลังชีวิต**
+4. **ความสัมพันธ์ / คู่ครอง / ครอบครัว**
+5. **การงาน / ชื่อเสียง / ความก้าวหน้า**
+6. **บริวาร / ทีม / ผู้สนับสนุน / คนรอบตัว**
+
+### Proposed UX
+
+Add a new premium-looking section in the individual reading:
+
+> **Life Domain Forecast Matrix · แผนที่สถานการณ์ชีวิต**
+
+For each domain, render:
+
+- **สถานการณ์ปัจจุบันที่มักประสบอยู่** — derived from current age band + weekday planet + element + rasi/lagna.
+- **สัญญาณเตือน / จุดที่ทำให้ติดขัด** — practical, non-fear-based phrasing.
+- **วิธีเสริมให้ดีขึ้น** — action/remedy that can be done in real life; avoid scary superstition.
+- **โอกาสที่กำลังจะเปิด** — next 1–2 age bands, with likely opportunity themes.
+- **ช่วงอายุเด่น** — explicit age ranges such as `29–35`, `36–42`, `43–50`.
+
+### Implementation approach
+
+- Add structured content data under `data/thai-astrology-content.js` instead of hardcoding all copy in the renderer.
+- Add pure helper(s) in `js/reading-helpers.js`, for example:
+  - `buildLifeDomainMatrix(p, r, l, ageY, ageM)`
+  - `getDomainForecast(domainKey, p, r, l, currentBand, nextBands)`
+- Render the section from `js/renderer-individual.js` after `Karma Mirror` or before the detailed tabs.
+- Keep all user input escaped with `escapeHTML()`.
+- Use TDD: add failing Vitest tests before production code.
+
+### Acceptance criteria
+
+- Individual reading output contains all 6 domain labels: โชค, การเงิน, สุขภาพ, ความสัมพันธ์, การงาน, บริวาร.
+- Each domain has all 4 required parts: current situation, warning/blockage, remedy/action, age-band opportunities.
+- At least two future age bands are shown when available.
+- The section adapts based on at least element and current age band; it must not be one static paragraph for everyone.
+- Existing tabs and premium lock behavior continue to work.
+- XSS/security tests continue to pass.
+- `npm test`, `npm run check:js`, and `npm run build` pass.
+- Commit is made after implementation.
