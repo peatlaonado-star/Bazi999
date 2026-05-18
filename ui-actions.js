@@ -104,6 +104,36 @@ function setPremiumUnlocked(unlocked, token) {
 // DEPRECATED: ใช้ isPremiumUnlocked() แทน — จะลบออกหลังย้าย backend
 window.isPremiumUnlocked = false;
 
+function getStarviaConfig() {
+  var cfg = (window && window.STARVIA_CONFIG) ? window.STARVIA_CONFIG : {};
+  return {
+    demoMode: cfg.demoMode === false ? false : true,
+    demoPins: Array.isArray(cfg.demoPins) && cfg.demoPins.length ? cfg.demoPins : ['STAR199'],
+    apiBaseUrl: (cfg.apiBaseUrl || '').replace(/\/$/, '')
+  };
+}
+
+function callPremiumVerifyApi(pin, cfg) {
+  return fetch(cfg.apiBaseUrl + '/premium/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ pin: pin })
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    if (data && data.success) {
+      onPremiumVerified(data.token || null);
+    } else {
+      onPremiumFailed();
+    }
+    return data;
+  })
+  .catch(function() {
+    onPremiumFailed();
+    return { success: false, error: 'NETWORK_ERROR' };
+  });
+}
+
 // 1. เปิดป๊อปอัปชำระเงิน (เวอร์ชันกระตุ้นยอดขายขั้นสุด)
 function openPayment() {
   var overlay = document.getElementById('payment-modal');
@@ -163,42 +193,19 @@ function closePayment() {
 // Production ต้องเรียก backend API แทน
 function verifyPin() {
   var pin = document.getElementById('pdf-pin').value.trim().toUpperCase(); 
-  var btn = document.getElementById('confirm-pay-btn');
-  var err = document.getElementById('pin-error');
+  var cfg = getStarviaConfig();
   
-  // ===== DEMO MODE: โค้ดด้านล่างนี้จะถูกลบเมื่อ backend พร้อม =====
-  // TODO: แทนที่ส่วนนี้ด้วย API call
-  // POST /api/premium/verify { pin: pin, userId: ... }
-  // Response: { success: true, token: 'xxx', expiresIn: 86400 }
-  var DEMO_PINS = ['STAR199']; // DEMO ONLY — will be removed
-  var isDemoMode = true; // SET TO false WHEN BACKEND IS READY
-  
-  if (isDemoMode) {
-    // Demo: check against local pins
-    if (DEMO_PINS.indexOf(pin) !== -1) {
+  if (cfg.demoMode) {
+    // Demo: check against configured local pins. Do not use demo mode for production.
+    if (cfg.demoPins.indexOf(pin) !== -1) {
       onPremiumVerified(null);
     } else {
       onPremiumFailed();
     }
-    return;
+    return Promise.resolve({ success: cfg.demoPins.indexOf(pin) !== -1, mode: 'demo' });
   }
-  // ===== END DEMO MODE =====
   
-  // Production: call backend
-  // fetch('/api/premium/verify', {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify({ pin: pin })
-  // })
-  // .then(function(res) { return res.json(); })
-  // .then(function(data) {
-  //   if (data.success) {
-  //     onPremiumVerified(data.token);
-  //   } else {
-  //     onPremiumFailed();
-  //   }
-  // })
-  // .catch(function() { onPremiumFailed(); });
+  return callPremiumVerifyApi(pin, cfg);
 }
 
 function onPremiumVerified(token) {

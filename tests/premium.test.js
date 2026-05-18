@@ -92,4 +92,70 @@ describe('Premium state abstraction', () => {
     ctx.verifyPin();
     expect(failed).toBe(true);
   });
+
+  it('verifyPin posts to backend when demoMode is false', async () => {
+    let verifiedToken = null;
+    let fetchUrl = null;
+    let fetchOptions = null;
+    const ctx = loadUiContext({
+      window: {
+        isPremiumUnlocked: false,
+        STARVIA_CONFIG: { demoMode: false, apiBaseUrl: 'https://api.example.test/v1' },
+      },
+      fetch: (url, options) => {
+        fetchUrl = url;
+        fetchOptions = options;
+        return Promise.resolve({ json: () => Promise.resolve({ success: true, token: 'token-123' }) });
+      },
+      document: {
+        getElementById: (id) => {
+          if (id === 'pdf-pin') return { value: 'abc123' };
+          if (id === 'confirm-pay-btn') return { innerHTML: '', style: {}, disabled: false };
+          if (id === 'pin-error') return { style: { display: 'none' } };
+          return null;
+        },
+        querySelectorAll: () => [],
+        querySelector: () => null,
+        createElement: () => ({ style: {}, appendChild: () => {} }),
+        body: { appendChild: () => {} },
+      },
+    });
+    ctx.onPremiumVerified = function(token) { verifiedToken = token; };
+
+    await ctx.verifyPin();
+
+    expect(fetchUrl).toBe('https://api.example.test/v1/premium/verify');
+    expect(fetchOptions.method).toBe('POST');
+    expect(fetchOptions.headers['Content-Type']).toBe('application/json');
+    expect(JSON.parse(fetchOptions.body)).toEqual({ pin: 'ABC123' });
+    expect(verifiedToken).toBe('token-123');
+  });
+
+  it('verifyPin calls onPremiumFailed when backend rejects the PIN', async () => {
+    let failed = false;
+    const ctx = loadUiContext({
+      window: {
+        isPremiumUnlocked: false,
+        STARVIA_CONFIG: { demoMode: false, apiBaseUrl: 'https://api.example.test/v1' },
+      },
+      fetch: () => Promise.resolve({ json: () => Promise.resolve({ success: false, error: 'INVALID_PIN' }) }),
+      document: {
+        getElementById: (id) => {
+          if (id === 'pdf-pin') return { value: 'wrong' };
+          if (id === 'confirm-pay-btn') return { innerHTML: '', style: {}, disabled: false };
+          if (id === 'pin-error') return { style: { display: 'none' } };
+          return null;
+        },
+        querySelectorAll: () => [],
+        querySelector: () => null,
+        createElement: () => ({ style: {}, appendChild: () => {} }),
+        body: { appendChild: () => {} },
+      },
+    });
+    ctx.onPremiumFailed = function() { failed = true; };
+
+    await ctx.verifyPin();
+
+    expect(failed).toBe(true);
+  });
 });

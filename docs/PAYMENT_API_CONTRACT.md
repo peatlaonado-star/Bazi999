@@ -8,7 +8,21 @@
 ## Overview
 
 API สำหรับระบบชำระเงินและยืนยัน Premium ของ STARVIA
-Frontend ปัจจุบันใช้ demo mode (hardcoded PIN) — เมื่อ backend พร้อม ให้แทนที่ fetch calls ที่ comment ไว้ใน `ui-actions.js`
+Frontend ปัจจุบันรองรับ 2 mode:
+- Local/demo: ไม่ตั้งค่า `window.STARVIA_CONFIG` หรือ `demoMode !== false` จะใช้ PIN demo สำหรับทดสอบ
+- Production adapter: ตั้ง `demoMode: false` เพื่อให้ frontend เรียก backend จริงที่ `/premium/verify`
+
+ตัวอย่าง production config:
+```html
+<script>
+window.STARVIA_CONFIG = {
+  demoMode: false,
+  apiBaseUrl: 'https://api.starvia.app/v1'
+};
+</script>
+```
+
+เมื่อ backend พร้อม ให้ตั้ง config นี้ก่อนโหลด `ui-actions.js` หรือฝังใน shell สำหรับ production build
 
 ---
 
