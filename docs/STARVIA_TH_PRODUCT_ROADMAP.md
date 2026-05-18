@@ -259,7 +259,9 @@ Goal: prepare for monetization without insecure client-side bypass.
 - [x] Add backend placeholder docs (2026-05-17: docs/BACKEND_ARCHITECTURE.md)
 - [x] Prepare premium state abstraction: `isPremiumUnlocked()` instead of direct global flag (2026-05-17)
 - [x] Add production premium API adapter controlled by `window.STARVIA_CONFIG` (2026-05-18)
-- [ ] Build/deploy actual backend service for `/premium/verify` and `/premium/status`
+- [x] Build actual backend service slice for `/premium/verify` (2026-05-18: `api/premium-service.mjs`, `api/server.mjs`)
+- [ ] Add `/premium/status` token validation endpoint
+- [ ] Replace env PIN list with database/payment-gateway-backed one-time PIN repository
 
 ### Phase 4 — Modern App Foundation
 
@@ -311,7 +313,7 @@ STARVIA currently has **3 main reading modes** and several sub-readings:
 | การงาน | **Covered** | Domain card includes current career situation, warning, remedy, and age opportunities. |
 | บริวาร / ทีม / คนรอบตัว | **Covered** | New dedicated supporters/team/subordinates domain exists. |
 
-Conclusion: STARVIA is now a more complete **life-situation and life-opportunity reading system** for the individual mode. The premium frontend is also ready to call a real `/premium/verify` backend when production config disables demo mode. The next product upgrades can focus on building/deploying the actual backend service, richer ephemeris accuracy, PDF/share cards, or user accounts.
+Conclusion: STARVIA is now a more complete **life-situation and life-opportunity reading system** for the individual mode. The premium frontend can call a real backend when production config disables demo mode, and the repo now includes the first backend service slice for `POST /v1/premium/verify`. The next product upgrades can focus on `/premium/status`, one-time PIN storage/payment webhook integration, richer ephemeris accuracy, PDF/share cards, or user accounts.
 
 ---
 

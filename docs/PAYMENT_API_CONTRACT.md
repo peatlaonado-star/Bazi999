@@ -12,6 +12,11 @@ Frontend ปัจจุบันรองรับ 2 mode:
 - Local/demo: ไม่ตั้งค่า `window.STARVIA_CONFIG` หรือ `demoMode !== false` จะใช้ PIN demo สำหรับทดสอบ
 - Production adapter: ตั้ง `demoMode: false` เพื่อให้ frontend เรียก backend จริงที่ `/premium/verify`
 
+Backend slice แรกมีแล้วใน repo:
+- `api/premium-service.mjs` — logic ตรวจ PIN และออก token
+- `api/server.mjs` — Node HTTP server สำหรับ `POST /v1/premium/verify`
+- ใช้ environment variables: `STARVIA_PREMIUM_PINS`, `STARVIA_JWT_SECRET`, optional `STARVIA_PREMIUM_PLAN`, `STARVIA_TOKEN_TTL_SECONDS`, `PORT`
+
 ตัวอย่าง production config:
 ```html
 <script>
@@ -176,23 +181,39 @@ Webhook สำหรับ payment gateway แจ้งผลการชำร�
 ---
 
 ## Frontend Integration
-
 ### ui-actions.js — สถานะปัจจุบัน
 
-```js
-// DEMO MODE (ปัจจุบัน)
-var isDemoMode = true;
-var DEMO_PINS = ['STAR199'];
+Frontend เลือก mode จาก `window.STARVIA_CONFIG`:
 
-// PRODUCTION (เมื่อ backend พร้อม)
-// เปลี่ยน isDemoMode = false แล้ว uncomment fetch call
+```js
+window.STARVIA_CONFIG = {
+  demoMode: false,
+  apiBaseUrl: 'https://api.starvia.app/v1'
+};
 ```
 
-### ขั้นตอนการย้าย
+ถ้า `demoMode: false` จะเรียก `POST {apiBaseUrl}/premium/verify` พร้อม body `{ "pin": "..." }`
 
-1. Deploy backend API
-2. สร้าง JWT secret key
-3. ตั้ง `isDemoMode = false` ใน ui-actions.js
-4. Uncomment production fetch call
-5. ลบ `DEMO_PINS` array
-6. ทดสอบ end-to-end
+### Backend local start
+
+```bash
+STARVIA_PREMIUM_PINS="STAR199,LUCKY777" \
+STARVIA_JWT_SECRET="replace-with-long-random-secret" \
+PORT=8787 \
+npm run api:start
+```
+
+Local endpoint:
+
+```text
+POST http://localhost:8787/v1/premium/verify
+```
+
+### ขั้นตอนการย้ายขึ้น production
+
+1. สร้าง secret จริงและตั้งใน hosting environment เป็น `STARVIA_JWT_SECRET`
+2. ตั้งรายการ PIN ที่สร้างจากระบบชำระเงินใน `STARVIA_PREMIUM_PINS` หรือเปลี่ยนเป็น database-backed repository ในเฟสถัดไป
+3. Deploy `api/server.mjs` เป็น Node service หลัง HTTPS/reverse proxy
+4. ตั้ง frontend `window.STARVIA_CONFIG.demoMode = false` และ `apiBaseUrl` เป็น production API
+5. ทดสอบ end-to-end: กรอก PIN → ได้ token → ปลดล็อก Premium
+
