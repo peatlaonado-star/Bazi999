@@ -86,8 +86,10 @@ Staging:    https://staging-api.starvia.app/v1
     {
       "pinHash": "<sha256-of-normalized-pin>",
       "plan": "premium_199",
+      "createdAt": "2026-05-19T12:00:00.000Z",
       "expiresAt": "2026-06-01T00:00:00.000Z",
-      "usedAt": null
+      "usedAt": null,
+      "note": "manual transfer/order reference"
     }
   ]
 }
@@ -98,6 +100,17 @@ Staging:    https://staging-api.starvia.app/v1
 ```bash
 node -e "const crypto=require('node:crypto'); const pin=process.argv[1].trim().toUpperCase(); console.log(crypto.createHash('sha256').update(pin).digest('hex'))" STAR199
 ```
+
+หรือออก PIN สำหรับ manual payment ด้วย CLI:
+
+```bash
+npm run pin:issue -- \
+  --store ./data/premium-pins.json \
+  --days 7 \
+  --note "manual transfer ORD-001"
+```
+
+CLI จะพิมพ์ PIN จริงเพื่อส่งให้ลูกค้า แต่ใน store จะเก็บเฉพาะ `pinHash` เท่านั้น
 
 ---
 

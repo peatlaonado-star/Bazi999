@@ -28,13 +28,13 @@ STARVIA ตอนนี้มีตัวเว็บที่ใช้งาน
    - `GET /v1/premium/status`
    - ตรวจ PIN จาก env demo หรือ file-backed persistent store (`STARVIA_PIN_STORE_FILE`)
    - ออก token ให้ผู้ใช้ Premium
-   - บันทึก `usedAt` เพื่อกัน PIN ใช้ซ้ำ
+   - `pin:issue` CLI สำหรับแอดมินออก PIN หลังรับโอน manual payment
 6. ระบบทดสอบและ build ผ่านล่าสุด
-   - `npm test`: 69 tests ผ่าน
+   - `npm test`: 73 tests ผ่าน
    - `npm run check:js`: ผ่าน
    - `npm run build`: ผ่าน
 7. Commit ล่าสุด
-   - `feat: add persistent premium pin store`
+   - `feat: add manual premium pin issuer`
 
 ## ขั้นตอนที่เหลือ แบ่งแบบภาษาคนทั่วไป
 
@@ -48,7 +48,6 @@ STARVIA ตอนนี้มีตัวเว็บที่ใช้งาน
 
 งานถัดไป:
 - ยกระดับจาก file store ไป SQLite/Postgres/Supabase เมื่อมีผู้ใช้จริงหรือ deploy หลาย instance
-- เพิ่มเครื่องมือออก PIN อัตโนมัติจากรายการโอนเงิน/แอดมิน
 - เพิ่ม audit log แยกสำหรับออก PIN / ใช้ PIN / หมดอายุ
 
 ### C. เชื่อมการชำระเงินจริง
@@ -57,7 +56,7 @@ STARVIA ตอนนี้มีตัวเว็บที่ใช้งาน
 
 งานถัดไป:
 - เลือกช่องทางรับเงิน เช่น PromptPay/QR, payment gateway, หรือเริ่มแบบ manual ก่อน
-- ถ้า manual: ลูกค้าโอนเงิน → แอดมินออก PIN ให้
+- ถ้า manual: ลูกค้าโอนเงิน → แอดมินใช้ `npm run pin:issue -- --store ./data/premium-pins.json --note "ORDER-..."` เพื่อออก PIN ให้ลูกค้า
 - ถ้า automatic: gateway แจ้ง webhook → ระบบสร้าง PIN/สิทธิ์ให้อัตโนมัติ
 
 ### D. นำเว็บและ backend ขึ้นออนไลน์
@@ -127,9 +126,9 @@ STARVIA ตอนนี้มีตัวเว็บที่ใช้งาน
 
 ลำดับที่เหมาะที่สุด:
 
-1. เลือกวิธีรับเงิน: manual ก่อนหรือ payment gateway
+1. ทดสอบ manual payment flow จริง: โอนเงิน → ออก PIN ด้วย `pin:issue` → ลูกค้ากรอก PIN → reload แล้วยังเป็น Premium
 2. Deploy frontend + backend ขึ้นออนไลน์แบบ staging
-3. ทดสอบเส้นทางจริง: ลูกค้าจ่ายเงิน → ได้ PIN ใน store → เปิด Premium → reload แล้วยังเป็น Premium
+3. เพิ่ม privacy policy / terms / ข้อความอธิบาย Premium ก่อนขายจริง
 4. ถ้าเริ่มมีผู้ใช้หลายคน/หลาย instance ค่อยย้าย PIN store เป็น SQLite/Postgres/Supabase
 
 ## ไฟล์สำคัญสำหรับกลับมาทำต่อ

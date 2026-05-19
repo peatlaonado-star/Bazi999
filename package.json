@@ -8,8 +8,9 @@
     "build": "vite build && node scripts/copy-static-assets.mjs",
     "preview": "vite preview",
     "api:start": "node api/server.mjs",
+    "pin:issue": "node scripts/issue-premium-pin.mjs",
     "test": "vitest run",
-    "check:js": "node --check app.js && node --check astrology-core.js && node --check data/thai-astrology-content.js && node --check js/reading-helpers.js && node --check js/renderer-shared.js && node --check js/renderer-individual.js && node --check js/renderer-couple.js && node --check js/renderer-auspicious.js && node --check ui-actions.js && node --check api/premium-service.mjs && node --check api/server.mjs"
+    "check:js": "node --check app.js && node --check astrology-core.js && node --check data/thai-astrology-content.js && node --check js/reading-helpers.js && node --check js/renderer-shared.js && node --check js/renderer-individual.js && node --check js/renderer-couple.js && node --check js/renderer-auspicious.js && node --check ui-actions.js && node --check api/premium-service.mjs && node --check api/server.mjs && node --check scripts/copy-static-assets.mjs && node --check scripts/issue-premium-pin.mjs"
   },
   "devDependencies": {
     "jsdom": "^24.1.3",
