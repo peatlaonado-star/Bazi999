@@ -29,6 +29,31 @@ function loadUiContext(overrides = {}) {
   return context;
 }
 
+function loadBrowserGlobalUiContext(overrides = {}) {
+  const source = fs.readFileSync(path.resolve('ui-actions.js'), 'utf8');
+  const context = {
+    document: {
+      getElementById: () => null,
+      querySelector: () => null,
+      querySelectorAll: () => [],
+      createElement: () => ({ style: {}, appendChild: () => {} }),
+      body: { appendChild: () => {} },
+    },
+    setTimeout: () => {},
+    html2canvas: () => Promise.resolve({ toDataURL: () => '' }),
+    localStorage: {
+      getItem: () => null,
+      setItem: () => {},
+      removeItem: () => {},
+    },
+    ...overrides,
+  };
+  context.window = context;
+  vm.createContext(context);
+  vm.runInContext(source, context, { filename: 'ui-actions.js' });
+  return context;
+}
+
 describe('Premium state abstraction', () => {
   it('isPremiumUnlocked() returns false by default', () => {
     const ctx = loadUiContext();
@@ -41,10 +66,11 @@ describe('Premium state abstraction', () => {
     expect(ctx.isPremiumUnlocked()).toBe(true);
   });
 
-  it('setPremiumUnlocked syncs backward-compat global flag', () => {
+  it('setPremiumUnlocked syncs backward-compat global flag without replacing the function', () => {
     const ctx = loadUiContext();
     ctx.setPremiumUnlocked(true, 'tok');
-    expect(ctx.window.isPremiumUnlocked).toBe(true);
+    expect(ctx.window.isPremiumUnlockedFlag).toBe(true);
+    expect(ctx.isPremiumUnlocked()).toBe(true);
   });
 
   it('setPremiumUnlocked(false) resets state', () => {
@@ -52,7 +78,24 @@ describe('Premium state abstraction', () => {
     ctx.setPremiumUnlocked(true, 'tok');
     ctx.setPremiumUnlocked(false);
     expect(ctx.isPremiumUnlocked()).toBe(false);
-    expect(ctx.window.isPremiumUnlocked).toBe(false);
+    expect(ctx.window.isPremiumUnlockedFlag).toBe(false);
+  });
+
+  it('does not overwrite the browser-global isPremiumUnlocked function', () => {
+    const ctx = loadBrowserGlobalUiContext();
+    expect(typeof ctx.isPremiumUnlocked).toBe('function');
+    ctx.setPremiumUnlocked(true, 'tok');
+    expect(typeof ctx.isPremiumUnlocked).toBe('function');
+    expect(ctx.isPremiumUnlocked()).toBe(true);
+    expect(ctx.isPremiumUnlockedFlag).toBe(true);
+  });
+
+  it('initializes premium state even when language bootstrap has not defined CL yet', () => {
+    const ctx = loadBrowserGlobalUiContext({ CL: undefined });
+
+    expect(typeof ctx.isPremiumUnlocked).toBe('function');
+    expect(ctx.isPremiumUnlocked()).toBe(false);
+    expect(ctx._premiumState).toEqual({ unlocked: false, token: null });
   });
 
   it('verifyPin calls onPremiumVerified with demo PIN STAR199', () => {
