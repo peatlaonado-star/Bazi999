@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>นโยบายความเป็นส่วนตัว · STARVIA</title>
+<meta name="description" content="นโยบายความเป็นส่วนตัวของ STARVIA สำหรับการอ่านแผนที่ชีวิตด้วยโหราศาสตร์ไทย">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="w" style="max-width:820px">
+  <div class="hd">
+    <div class="hd-tag">✦ Privacy & Trust ✦</div>
+    <h1>นโยบายความเป็นส่วนตัว</h1>
+    <div class="hd-sub">STARVIA · Know your stars. Know yourself.</div>
+    <div class="dl"></div>
+  </div>
+
+  <main class="card" style="line-height:1.85;color:var(--tx);font-size:14px">
+    <p><strong>อัปเดตล่าสุด:</strong> 19 พฤษภาคม 2026</p>
+    <p>STARVIA ให้ความสำคัญกับความเป็นส่วนตัวของผู้ใช้ โดยออกแบบให้การอ่านดวงพื้นฐานใช้ข้อมูลเท่าที่จำเป็น และลดการเก็บข้อมูลส่วนตัวให้มากที่สุด</p>
+
+    <h2 style="color:var(--g);font-size:18px">1. ข้อมูลที่ใช้ในการอ่านผล</h2>
+    <p>ข้อมูลวันเกิดประมวลผลบนอุปกรณ์ของผู้ใช้ เช่น ชื่อ วันเกิด เวลาเกิด และเพศ/ตัวตนที่ผู้ใช้กรอก ใช้เพื่อคำนวณและแสดงผลบนหน้าเว็บเท่านั้นในโหมด static frontend ปัจจุบัน</p>
+
+    <h2 style="color:var(--g);font-size:18px">2. ข้อมูล Premium</h2>
+    <p>เมื่อผู้ใช้ปลดล็อก Premium ผ่าน backend ระบบจะเก็บ token แบบ opaque ในเบราว์เซอร์ที่ <code>localStorage.starviaPremiumToken</code> เพื่อให้โหลดหน้าใหม่แล้วยังคงสถานะ Premium ได้จนกว่า token จะหมดอายุหรือถูกล้างออก</p>
+    <p>ระบบ backend อาจเก็บสถานะ PIN ในรูปแบบ hash เช่น <code>pinHash</code>, วันหมดอายุ และเวลาที่ใช้ PIN แล้ว เพื่อป้องกันการใช้ PIN ซ้ำ โดยไม่จำเป็นต้องเก็บ PIN จริงในฐานข้อมูลหรือไฟล์ store</p>
+
+    <h2 style="color:var(--g);font-size:18px">3. สิ่งที่ STARVIA ไม่ทำ</h2>
+    <ul>
+      <li>STARVIA ไม่ขายข้อมูลส่วนตัวของผู้ใช้</li>
+      <li>ไม่ใช้ข้อมูลวันเกิดเพื่อระบุตัวตนจริงนอกเหนือจากการอ่านผลที่ผู้ใช้ร้องขอ</li>
+      <li>ไม่เก็บ raw PIN ใน persistent store ฝั่ง backend เมื่อใช้ระบบ PIN store</li>
+    </ul>
+
+    <h2 style="color:var(--g);font-size:18px">4. การลบข้อมูลบนเครื่องผู้ใช้</h2>
+    <p>ผู้ใช้สามารถล้างสถานะ Premium บนเครื่องตัวเองได้โดยลบข้อมูลเว็บไซต์ในเบราว์เซอร์ หรือ clear localStorage ของเว็บไซต์นี้</p>
+
+    <h2 style="color:var(--g);font-size:18px">5. การเปลี่ยนแปลงนโยบาย</h2>
+    <p>เมื่อ STARVIA เพิ่มระบบบัญชีผู้ใช้ การชำระเงินอัตโนมัติ หรือบริการจากผู้ให้บริการภายนอก นโยบายนี้จะถูกปรับปรุงให้สอดคล้องกับระบบจริงก่อนเปิดใช้งานสาธารณะ</p>
+  </main>
+
+  <div style="text-align:center;margin:24px 0 40px;font-size:12px">
+    <a href="index.html" style="color:var(--g);text-decoration:none">← กลับหน้า STARVIA</a>
+    <span style="opacity:.45;margin:0 8px">·</span>
+    <a href="terms.html" style="color:var(--tx2);text-decoration:none">ข้อตกลงการใช้งาน</a>
+  </div>
+</div>
+</body>
+</html>

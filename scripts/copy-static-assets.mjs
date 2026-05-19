@@ -17,6 +17,8 @@ const files = [
   'assets/html2canvas.min.js',
   'assets/og-image.png',
   'assets/qr-payment.jpg',
+  'privacy.html',
+  'terms.html',
 ];
 
 for (const file of files) {
