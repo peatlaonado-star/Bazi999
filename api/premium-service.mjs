@@ -6,7 +6,7 @@ const JSON_HEADERS = {
   'Content-Type': 'application/json; charset=utf-8',
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
 };
 
 export function loadPremiumConfig(env = process.env) {
@@ -62,6 +62,34 @@ export function verifyPremiumPin(input = {}, config) {
   };
 }
 
+export function checkPremiumStatus(input = {}, config) {
+  assertUsableConfig(config);
+
+  const token = extractBearerToken(input.authorization);
+  if (!token) {
+    return premiumStatusError(401, 'TOKEN_REQUIRED', 'กรุณาเข้าสู่ระบบ Premium อีกครั้ง');
+  }
+
+  const verified = verifyPremiumToken(token, config.jwtSecret);
+  if (!verified.valid) {
+    return premiumStatusError(401, verified.error || 'TOKEN_INVALID', 'Token Premium ไม่ถูกต้อง');
+  }
+
+  const now = Number(config.now ? config.now() : Math.floor(Date.now() / 1000));
+  if (Number(verified.payload.exp) <= now) {
+    return premiumStatusError(401, 'TOKEN_EXPIRED', 'สิทธิ์ Premium หมดอายุแล้ว');
+  }
+
+  return {
+    status: 200,
+    body: {
+      active: true,
+      plan: verified.payload.plan || config.plan || DEFAULT_PLAN,
+      expiresAt: new Date(Number(verified.payload.exp) * 1000).toISOString(),
+    },
+  };
+}
+
 export function createPremiumRequestHandler(config) {
   assertUsableConfig(config);
 
@@ -83,6 +111,12 @@ export function createPremiumRequestHandler(config) {
           message: 'รูปแบบคำขอไม่ถูกต้อง',
         });
       }
+      return;
+    }
+
+    if (req.method === 'GET' && getPathname(req.url) === '/v1/premium/status') {
+      const result = checkPremiumStatus({ authorization: req.headers.authorization || '' }, config);
+      writeJson(res, result.status, result.body);
       return;
     }
 
@@ -144,6 +178,55 @@ function buildSubjectFromPin(pin) {
 
 function base64UrlEncode(value) {
   return Buffer.from(value).toString('base64url');
+}
+
+function extractBearerToken(value = '') {
+  const match = String(value).match(/^Bearer\s+(.+)$/i);
+  return match ? match[1].trim() : '';
+}
+
+function verifyPremiumToken(token, secret) {
+  const parts = String(token || '').split('.');
+  if (parts.length !== 3) {
+    return { valid: false, error: 'TOKEN_INVALID' };
+  }
+
+  const [encodedHeader, encodedPayload, signature] = parts;
+  const expectedSignature = crypto
+    .createHmac('sha256', secret)
+    .update(`${encodedHeader}.${encodedPayload}`)
+    .digest('base64url');
+
+  if (!constantTimeEqual(signature, expectedSignature)) {
+    return { valid: false, error: 'TOKEN_INVALID' };
+  }
+
+  try {
+    const payload = JSON.parse(Buffer.from(encodedPayload, 'base64url').toString('utf8'));
+    return { valid: true, payload };
+  } catch (error) {
+    return { valid: false, error: 'TOKEN_INVALID' };
+  }
+}
+
+function premiumStatusError(status, error, message) {
+  return {
+    status,
+    body: {
+      active: false,
+      error,
+      message,
+    },
+  };
+}
+
+function constantTimeEqual(a, b) {
+  const aBuffer = Buffer.from(String(a));
+  const bBuffer = Buffer.from(String(b));
+  if (aBuffer.length !== bBuffer.length) {
+    return false;
+  }
+  return crypto.timingSafeEqual(aBuffer, bBuffer);
 }
 
 function getPathname(url = '/') {

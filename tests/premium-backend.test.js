@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import http from 'node:http';
 
 import {
+  checkPremiumStatus,
   createPremiumRequestHandler,
   loadPremiumConfig,
   verifyPremiumPin,
@@ -57,6 +58,40 @@ describe('Premium verify service', () => {
   });
 });
 
+describe('Premium status service', () => {
+  it('accepts a valid bearer token and returns active premium metadata', () => {
+    const verifyResult = verifyPremiumPin({ pin: 'STAR199' }, validConfig);
+    const status = checkPremiumStatus({ authorization: `Bearer ${verifyResult.body.token}` }, validConfig);
+
+    expect(status.status).toBe(200);
+    expect(status.body.active).toBe(true);
+    expect(status.body.plan).toBe('premium_199');
+    expect(status.body.expiresAt).toBe('2027-01-16T08:00:00.000Z');
+  });
+
+  it('rejects expired premium tokens', () => {
+    const verifyResult = verifyPremiumPin({ pin: 'STAR199' }, validConfig);
+    const status = checkPremiumStatus(
+      { authorization: `Bearer ${verifyResult.body.token}` },
+      { ...validConfig, now: () => 1_800_086_401 }
+    );
+
+    expect(status.status).toBe(401);
+    expect(status.body).toEqual({
+      active: false,
+      error: 'TOKEN_EXPIRED',
+      message: 'สิทธิ์ Premium หมดอายุแล้ว',
+    });
+  });
+
+  it('rejects missing or malformed bearer tokens', () => {
+    const status = checkPremiumStatus({ authorization: '' }, validConfig);
+
+    expect(status.status).toBe(401);
+    expect(status.body.error).toBe('TOKEN_REQUIRED');
+  });
+});
+
 describe('Premium verify HTTP handler', () => {
   it('handles POST /v1/premium/verify with JSON body', async () => {
     const { baseUrl, close } = await startTestServer(validConfig);
@@ -72,6 +107,25 @@ describe('Premium verify HTTP handler', () => {
       expect(response.status).toBe(200);
       expect(body.success).toBe(true);
       expect(body.token).toMatch(/\./);
+    } finally {
+      await close();
+    }
+  });
+
+  it('handles GET /v1/premium/status with a bearer token', async () => {
+    const { baseUrl, close } = await startTestServer(validConfig);
+    const verifyResult = verifyPremiumPin({ pin: 'STAR199' }, validConfig);
+
+    try {
+      const response = await fetch(`${baseUrl}/v1/premium/status`, {
+        headers: { Authorization: `Bearer ${verifyResult.body.token}` },
+      });
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(body.active).toBe(true);
+      expect(body.plan).toBe('premium_199');
+      expect(body.expiresAt).toBe('2027-01-16T08:00:00.000Z');
     } finally {
       await close();
     }

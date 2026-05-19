@@ -88,6 +88,7 @@ initDailyMantra();
 // ===== PREMIUM STATE ABSTRACTION =====
 // ใช้ isPremiumUnlocked() แทนการเช็ค window.isPremiumUnlocked โดยตรง
 // เมื่อย้ายไป backend จริง ให้เปลี่ยนแค่ฟังก์ชันนี้
+var PREMIUM_TOKEN_STORAGE_KEY = 'starviaPremiumToken';
 var _premiumState = { unlocked: false, token: null };
 
 function isPremiumUnlocked() {
@@ -101,6 +102,59 @@ function setPremiumUnlocked(unlocked, token) {
   window.isPremiumUnlocked = _premiumState.unlocked;
 }
 
+function persistPremiumToken(token) {
+  if (!token) return;
+  var storage = getPremiumStorage();
+  if (storage) storage.setItem(PREMIUM_TOKEN_STORAGE_KEY, token);
+}
+
+function clearPremiumToken() {
+  var storage = getPremiumStorage();
+  if (storage) storage.removeItem(PREMIUM_TOKEN_STORAGE_KEY);
+}
+
+function getSavedPremiumToken() {
+  var storage = getPremiumStorage();
+  return storage ? storage.getItem(PREMIUM_TOKEN_STORAGE_KEY) : null;
+}
+
+function getPremiumStorage() {
+  try {
+    if (typeof localStorage !== 'undefined') return localStorage;
+    if (window && window.localStorage) return window.localStorage;
+  } catch (error) {
+    return null;
+  }
+  return null;
+}
+
+function restorePremiumStatus() {
+  var cfg = getStarviaConfig();
+  var token = getSavedPremiumToken();
+  if (cfg.demoMode || !token) {
+    return Promise.resolve({ active: false, mode: cfg.demoMode ? 'demo' : 'none' });
+  }
+
+  return fetch(cfg.apiBaseUrl + '/premium/status', {
+    method: 'GET',
+    headers: { Authorization: 'Bearer ' + token }
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    if (data && data.active) {
+      setPremiumUnlocked(true, token);
+      return data;
+    }
+    clearPremiumToken();
+    setPremiumUnlocked(false);
+    return data || { active: false };
+  })
+  .catch(function() {
+    setPremiumUnlocked(false);
+    return { active: false, error: 'NETWORK_ERROR' };
+  });
+}
+
 // DEPRECATED: ใช้ isPremiumUnlocked() แทน — จะลบออกหลังย้าย backend
 window.isPremiumUnlocked = false;
 
@@ -112,6 +166,8 @@ function getStarviaConfig() {
     apiBaseUrl: (cfg.apiBaseUrl || '').replace(/\/$/, '')
   };
 }
+
+restorePremiumStatus();
 
 function callPremiumVerifyApi(pin, cfg) {
   return fetch(cfg.apiBaseUrl + '/premium/verify', {
@@ -209,6 +265,8 @@ function verifyPin() {
 }
 
 function onPremiumVerified(token) {
+  if (token) persistPremiumToken(token);
+
   var btn = document.getElementById('confirm-pay-btn');
   var err = document.getElementById('pin-error');
   

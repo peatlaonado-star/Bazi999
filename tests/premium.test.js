@@ -17,6 +17,11 @@ function loadUiContext(overrides = {}) {
     setTimeout: () => {},
     CL: 'th',
     html2canvas: () => Promise.resolve({ toDataURL: () => '' }),
+    localStorage: {
+      getItem: () => null,
+      setItem: () => {},
+      removeItem: () => {},
+    },
     ...overrides,
   };
   vm.createContext(context);
@@ -157,5 +162,105 @@ describe('Premium state abstraction', () => {
     await ctx.verifyPin();
 
     expect(failed).toBe(true);
+  });
+
+  it('onPremiumVerified persists backend tokens for later status checks', () => {
+    const saved = {};
+    const ctx = loadUiContext({
+      localStorage: {
+        getItem: (key) => saved[key] || null,
+        setItem: (key, value) => { saved[key] = value; },
+        removeItem: (key) => { delete saved[key]; },
+      },
+      document: {
+        getElementById: (id) => {
+          if (id === 'confirm-pay-btn') return { innerHTML: '', style: {}, disabled: false };
+          if (id === 'pin-error') return { style: { display: 'none' } };
+          if (id === 'payment-modal') return { style: {} };
+          return null;
+        },
+        querySelectorAll: () => [],
+        querySelector: () => null,
+        createElement: () => ({ style: {}, appendChild: () => {} }),
+        body: { appendChild: () => {} },
+      },
+    });
+
+    ctx.onPremiumVerified('token-abc');
+
+    expect(saved.starviaPremiumToken).toBe('token-abc');
+  });
+
+  it('restorePremiumStatus calls backend status and unlocks when saved token is active', async () => {
+    let fetchUrl = null;
+    let authHeader = null;
+    const ctx = loadUiContext({
+      window: {
+        isPremiumUnlocked: false,
+        STARVIA_CONFIG: { demoMode: false, apiBaseUrl: 'https://api.example.test/v1' },
+      },
+      localStorage: {
+        getItem: (key) => key === 'starviaPremiumToken' ? 'token-abc' : null,
+        setItem: () => {},
+        removeItem: () => {},
+      },
+      fetch: (url, options) => {
+        fetchUrl = url;
+        authHeader = options.headers.Authorization;
+        return Promise.resolve({ json: () => Promise.resolve({ active: true, plan: 'premium_199' }) });
+      },
+    });
+
+    const result = await ctx.restorePremiumStatus();
+
+    expect(fetchUrl).toBe('https://api.example.test/v1/premium/status');
+    expect(authHeader).toBe('Bearer token-abc');
+    expect(result.active).toBe(true);
+    expect(ctx.isPremiumUnlocked()).toBe(true);
+  });
+
+  it('restorePremiumStatus clears saved token when backend says inactive', async () => {
+    const removed = [];
+    const ctx = loadUiContext({
+      window: {
+        isPremiumUnlocked: false,
+        STARVIA_CONFIG: { demoMode: false, apiBaseUrl: 'https://api.example.test/v1' },
+      },
+      localStorage: {
+        getItem: (key) => key === 'starviaPremiumToken' ? 'expired-token' : null,
+        setItem: () => {},
+        removeItem: (key) => { removed.push(key); },
+      },
+      fetch: () => Promise.resolve({ json: () => Promise.resolve({ active: false, error: 'TOKEN_EXPIRED' }) }),
+    });
+
+    const result = await ctx.restorePremiumStatus();
+
+    expect(result.active).toBe(false);
+    expect(removed).toContain('starviaPremiumToken');
+    expect(ctx.isPremiumUnlocked()).toBe(false);
+  });
+
+  it('automatically restores a saved production token on page load', async () => {
+    let fetchCount = 0;
+    loadUiContext({
+      window: {
+        isPremiumUnlocked: false,
+        STARVIA_CONFIG: { demoMode: false, apiBaseUrl: 'https://api.example.test/v1' },
+      },
+      localStorage: {
+        getItem: (key) => key === 'starviaPremiumToken' ? 'token-abc' : null,
+        setItem: () => {},
+        removeItem: () => {},
+      },
+      fetch: () => {
+        fetchCount += 1;
+        return Promise.resolve({ json: () => Promise.resolve({ active: true, plan: 'premium_199' }) });
+      },
+    });
+
+    await Promise.resolve();
+
+    expect(fetchCount).toBe(1);
   });
 });

@@ -36,14 +36,9 @@ STARVIA ตอนนี้มีตัวเว็บที่ใช้งาน
 
 ## ขั้นตอนที่เหลือ แบ่งแบบภาษาคนทั่วไป
 
-### A. ทำให้ระบบ Premium จำสถานะได้จริง
+### A. ทำให้ระบบ Premium จำสถานะได้จริง — เสร็จแล้ว
 
-ตอนนี้เว็บรับ PIN แล้วได้ token แล้ว แต่ยังควรมี API ตรวจว่า token นี้ยังใช้ได้ไหม
-
-งานถัดไป:
-- เพิ่ม `GET /v1/premium/status`
-- ให้เว็บถาม backend ว่า token ยัง active หรือหมดอายุแล้ว
-- ช่วยให้ผู้ใช้กลับมาเปิดเว็บแล้วสถานะ Premium ยังอยู่ ไม่ต้องกรอก PIN ซ้ำบ่อยเกินไป
+เพิ่ม `GET /v1/premium/status` และ frontend เก็บ token/ตรวจสถานะตอน reload แล้ว
 
 ### B. ทำระบบ PIN แบบใช้งานจริง ไม่ใช่ใส่รายการใน environment
 
@@ -130,11 +125,10 @@ STARVIA ตอนนี้มีตัวเว็บที่ใช้งาน
 
 ลำดับที่เหมาะที่สุด:
 
-1. เพิ่ม `/premium/status`
-2. ทำระบบเก็บ PIN/สิทธิ์แบบ persistent
-3. เลือกวิธีรับเงิน: manual ก่อนหรือ payment gateway
-4. Deploy frontend + backend ขึ้นออนไลน์แบบ staging
-5. ทดสอบเส้นทางจริง: ลูกค้าจ่ายเงิน → ได้ PIN/token → เปิด Premium
+1. ทำระบบเก็บ PIN/สิทธิ์แบบ persistent
+2. เลือกวิธีรับเงิน: manual ก่อนหรือ payment gateway
+3. Deploy frontend + backend ขึ้นออนไลน์แบบ staging
+4. ทดสอบเส้นทางจริง: ลูกค้าจ่ายเงิน → ได้ PIN/token → เปิด Premium → reload แล้วยังเป็น Premium
 
 ## ไฟล์สำคัญสำหรับกลับมาทำต่อ
 

@@ -14,7 +14,7 @@ Frontend ปัจจุบันรองรับ 2 mode:
 
 Backend slice แรกมีแล้วใน repo:
 - `api/premium-service.mjs` — logic ตรวจ PIN และออก token
-- `api/server.mjs` — Node HTTP server สำหรับ `POST /v1/premium/verify`
+- `api/server.mjs` — Node HTTP server สำหรับ `POST /v1/premium/verify` และ `GET /v1/premium/status`
 - ใช้ environment variables: `STARVIA_PREMIUM_PINS`, `STARVIA_JWT_SECRET`, optional `STARVIA_PREMIUM_PLAN`, `STARVIA_TOKEN_TTL_SECONDS`, `PORT`
 
 ตัวอย่าง production config:
@@ -183,7 +183,7 @@ Webhook สำหรับ payment gateway แจ้งผลการชำร�
 ## Frontend Integration
 ### ui-actions.js — สถานะปัจจุบัน
 
-Frontend เลือก mode จาก `window.STARVIA_CONFIG`:
+Frontend เลือก mode จาก `window.STARVIA_CONFIG` และใน production จะเก็บ token ไว้ที่ `localStorage.starviaPremiumToken` หลัง verify สำเร็จ จากนั้นโหลดหน้าใหม่จะเรียก `GET {apiBaseUrl}/premium/status` เพื่อคืนสถานะ Premium โดยอัตโนมัติ:
 
 ```js
 window.STARVIA_CONFIG = {
@@ -215,5 +215,5 @@ POST http://localhost:8787/v1/premium/verify
 2. ตั้งรายการ PIN ที่สร้างจากระบบชำระเงินใน `STARVIA_PREMIUM_PINS` หรือเปลี่ยนเป็น database-backed repository ในเฟสถัดไป
 3. Deploy `api/server.mjs` เป็น Node service หลัง HTTPS/reverse proxy
 4. ตั้ง frontend `window.STARVIA_CONFIG.demoMode = false` และ `apiBaseUrl` เป็น production API
-5. ทดสอบ end-to-end: กรอก PIN → ได้ token → ปลดล็อก Premium
+5. ทดสอบ end-to-end: กรอก PIN → ได้ token → ปลดล็อก Premium → reload หน้า → `GET /premium/status` คืนสถานะ Premium
 
