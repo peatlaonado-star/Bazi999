@@ -15,7 +15,7 @@ Frontend ปัจจุบันรองรับ 2 mode:
 Backend slice แรกมีแล้วใน repo:
 - `api/premium-service.mjs` — logic ตรวจ PIN และออก token
 - `api/server.mjs` — Node HTTP server สำหรับ `POST /v1/premium/verify` และ `GET /v1/premium/status`
-- ใช้ environment variables: `STARVIA_PREMIUM_PINS`, `STARVIA_JWT_SECRET`, optional `STARVIA_PREMIUM_PLAN`, `STARVIA_TOKEN_TTL_SECONDS`, `PORT`
+- ใช้ environment variables: `STARVIA_JWT_SECRET`, `STARVIA_PREMIUM_PINS` หรือ `STARVIA_PIN_STORE_FILE`, optional `STARVIA_PREMIUM_PLAN`, `STARVIA_TOKEN_TTL_SECONDS`, `PORT`
 
 ตัวอย่าง production config:
 ```html
@@ -74,9 +74,30 @@ Staging:    https://staging-api.starvia.app/v1
 
 **Error codes:**
 - `INVALID_PIN` — PIN ไม่ถูกต้อง
-- `PIN_EXPIRED` — PIN หมดอายุ (7 วันหลังสร้าง)
+- `PIN_EXPIRED` — PIN หมดอายุ
 - `PIN_USED` — PIN ถูกใช้ไปแล้ว (1-time use)
 - `RATE_LIMITED` — กรอกผิดเกิน 5 ครั้งใน 15 นาที
+
+**Persistent PIN store:** ตั้ง `STARVIA_PIN_STORE_FILE=/path/to/pins.json` เพื่อใช้ store แบบ file-backed โดยไม่ต้องใส่ PIN จริงใน environment และระบบจะ mark `usedAt` หลัง verify สำเร็จ ทำให้ PIN ใช้ได้ครั้งเดียว
+
+```json
+{
+  "pins": [
+    {
+      "pinHash": "<sha256-of-normalized-pin>",
+      "plan": "premium_199",
+      "expiresAt": "2026-06-01T00:00:00.000Z",
+      "usedAt": null
+    }
+  ]
+}
+```
+
+สร้าง hash ด้วย Node:
+
+```bash
+node -e "const crypto=require('node:crypto'); const pin=process.argv[1].trim().toUpperCase(); console.log(crypto.createHash('sha256').update(pin).digest('hex'))" STAR199
+```
 
 ---
 
@@ -197,6 +218,15 @@ window.STARVIA_CONFIG = {
 ### Backend local start
 
 ```bash
+STARVIA_PIN_STORE_FILE="./data/premium-pins.json" \
+STARVIA_JWT_SECRET="replace-with-long-random-secret" \
+PORT=8787 \
+npm run api:start
+```
+
+หรือใช้ env PIN แบบทดลอง:
+
+```bash
 STARVIA_PREMIUM_PINS="STAR199,LUCKY777" \
 STARVIA_JWT_SECRET="replace-with-long-random-secret" \
 PORT=8787 \
@@ -212,7 +242,7 @@ POST http://localhost:8787/v1/premium/verify
 ### ขั้นตอนการย้ายขึ้น production
 
 1. สร้าง secret จริงและตั้งใน hosting environment เป็น `STARVIA_JWT_SECRET`
-2. ตั้งรายการ PIN ที่สร้างจากระบบชำระเงินใน `STARVIA_PREMIUM_PINS` หรือเปลี่ยนเป็น database-backed repository ในเฟสถัดไป
+2. ตั้ง `STARVIA_PIN_STORE_FILE` ชี้ไปยังไฟล์ store ที่เก็บ `pinHash` เพื่อให้ PIN ใช้ครั้งเดียวและไม่เก็บรหัสจริงใน environment
 3. Deploy `api/server.mjs` เป็น Node service หลัง HTTPS/reverse proxy
 4. ตั้ง frontend `window.STARVIA_CONFIG.demoMode = false` และ `apiBaseUrl` เป็น production API
 5. ทดสอบ end-to-end: กรอก PIN → ได้ token → ปลดล็อก Premium → reload หน้า → `GET /premium/status` คืนสถานะ Premium

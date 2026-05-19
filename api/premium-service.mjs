@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import fs from 'node:fs';
 
 const DEFAULT_PLAN = 'premium_199';
 const DEFAULT_TOKEN_TTL_SECONDS = 24 * 60 * 60;
@@ -11,8 +12,9 @@ const JSON_HEADERS = {
 
 export function loadPremiumConfig(env = process.env) {
   const allowedPins = parseAllowedPins(env.STARVIA_PREMIUM_PINS);
-  if (!allowedPins.length) {
-    throw new Error('STARVIA_PREMIUM_PINS is required');
+  const pinStoreFile = env.STARVIA_PIN_STORE_FILE || '';
+  if (!allowedPins.length && !pinStoreFile) {
+    throw new Error('STARVIA_PREMIUM_PINS or STARVIA_PIN_STORE_FILE is required');
   }
 
   if (!env.STARVIA_JWT_SECRET) {
@@ -21,6 +23,7 @@ export function loadPremiumConfig(env = process.env) {
 
   return {
     allowedPins,
+    pinStoreFile,
     jwtSecret: env.STARVIA_JWT_SECRET,
     plan: env.STARVIA_PREMIUM_PLAN || DEFAULT_PLAN,
     tokenTtlSeconds: Number(env.STARVIA_TOKEN_TTL_SECONDS || DEFAULT_TOKEN_TTL_SECONDS),
@@ -36,17 +39,25 @@ export function verifyPremiumPin(input = {}, config) {
     return invalidPinResponse(400);
   }
 
-  const allowedPins = new Set(config.allowedPins.map(normalizePin));
-  if (!allowedPins.has(normalizedPin)) {
-    return invalidPinResponse(401);
+  const issuedAt = Number(config.now ? config.now() : Math.floor(Date.now() / 1000));
+  const storedPinResult = config.pinStoreFile ? consumeStoredPin(normalizedPin, config, issuedAt) : null;
+  if (storedPinResult && !storedPinResult.success) {
+    return storedPinResult.response;
   }
 
-  const issuedAt = Number(config.now ? config.now() : Math.floor(Date.now() / 1000));
+  if (!storedPinResult) {
+    const allowedPins = new Set((config.allowedPins || []).map(normalizePin));
+    if (!allowedPins.has(normalizedPin)) {
+      return invalidPinResponse(401);
+    }
+  }
+
   const expiresIn = Number(config.tokenTtlSeconds || DEFAULT_TOKEN_TTL_SECONDS);
   const expiresAt = issuedAt + expiresIn;
+  const plan = (storedPinResult && storedPinResult.record.plan) || config.plan || DEFAULT_PLAN;
   const token = signPremiumToken({
     sub: buildSubjectFromPin(normalizedPin),
-    plan: config.plan || DEFAULT_PLAN,
+    plan,
     iat: issuedAt,
     exp: expiresAt,
   }, config.jwtSecret);
@@ -57,7 +68,7 @@ export function verifyPremiumPin(input = {}, config) {
       success: true,
       token,
       expiresIn,
-      plan: config.plan || DEFAULT_PLAN,
+      plan,
     },
   };
 }
@@ -140,8 +151,8 @@ function normalizePin(pin) {
 }
 
 function assertUsableConfig(config) {
-  if (!config || !Array.isArray(config.allowedPins) || !config.allowedPins.length) {
-    throw new Error('Premium API config requires allowedPins');
+  if (!config || ((!Array.isArray(config.allowedPins) || !config.allowedPins.length) && !config.pinStoreFile)) {
+    throw new Error('Premium API config requires allowedPins or pinStoreFile');
   }
   if (!config.jwtSecret) {
     throw new Error('Premium API config requires jwtSecret');
@@ -155,6 +166,61 @@ function invalidPinResponse(status) {
       success: false,
       error: 'INVALID_PIN',
       message: 'รหัสผ่านไม่ถูกต้อง',
+    },
+  };
+}
+
+function consumeStoredPin(normalizedPin, config, issuedAt) {
+  const store = readPinStore(config.pinStoreFile);
+  const pinHash = hashStoredPin(normalizedPin);
+  const recordIndex = store.pins.findIndex((record) => record.pinHash === pinHash);
+  if (recordIndex === -1) {
+    return { success: false, response: invalidPinResponse(401) };
+  }
+
+  const record = store.pins[recordIndex];
+  if (record.usedAt) {
+    return { success: false, response: pinStoreError(409, 'PIN_USED', 'รหัสนี้ถูกใช้งานไปแล้ว') };
+  }
+
+  if (record.expiresAt && Date.parse(record.expiresAt) <= issuedAt * 1000) {
+    return { success: false, response: pinStoreError(410, 'PIN_EXPIRED', 'รหัสนี้หมดอายุแล้ว') };
+  }
+
+  const usedAt = new Date(issuedAt * 1000).toISOString();
+  store.pins[recordIndex] = {
+    ...record,
+    plan: record.plan || config.plan || DEFAULT_PLAN,
+    usedAt,
+  };
+  writePinStore(config.pinStoreFile, store);
+
+  return { success: true, record: store.pins[recordIndex] };
+}
+
+function readPinStore(filePath) {
+  const parsed = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  return {
+    ...parsed,
+    pins: Array.isArray(parsed.pins) ? parsed.pins : [],
+  };
+}
+
+function writePinStore(filePath, store) {
+  fs.writeFileSync(filePath, `${JSON.stringify(store, null, 2)}\n`);
+}
+
+function hashStoredPin(pin) {
+  return crypto.createHash('sha256').update(normalizePin(pin)).digest('hex');
+}
+
+function pinStoreError(status, error, message) {
+  return {
+    status,
+    body: {
+      success: false,
+      error,
+      message,
     },
   };
 }

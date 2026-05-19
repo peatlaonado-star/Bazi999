@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import crypto from 'node:crypto';
+import fs from 'node:fs';
 import http from 'node:http';
+import os from 'node:os';
+import path from 'node:path';
 
 import {
   checkPremiumStatus,
@@ -52,9 +56,62 @@ describe('Premium verify service', () => {
     expect(result.body.error).toBe('INVALID_PIN');
   });
 
-  it('requires production PIN and JWT secret config', () => {
-    expect(() => loadPremiumConfig({})).toThrow(/STARVIA_PREMIUM_PINS/);
+  it('requires production PIN source and JWT secret config', () => {
+    expect(() => loadPremiumConfig({})).toThrow(/STARVIA_PREMIUM_PINS|STARVIA_PIN_STORE_FILE/);
     expect(() => loadPremiumConfig({ STARVIA_PREMIUM_PINS: 'STAR199' })).toThrow(/STARVIA_JWT_SECRET/);
+  });
+});
+
+describe('Persistent premium PIN store', () => {
+  it('loads config from STARVIA_PIN_STORE_FILE without env PINs', () => {
+    const storeFile = writePinStore([{ pin: 'STAR199', plan: 'premium_199' }]);
+
+    const config = loadPremiumConfig({
+      STARVIA_PIN_STORE_FILE: storeFile,
+      STARVIA_JWT_SECRET: 'test-secret-with-enough-length',
+    });
+
+    expect(config.pinStoreFile).toBe(storeFile);
+    expect(config.allowedPins).toEqual([]);
+  });
+
+  it('accepts an unused stored PIN and marks it used for one-time access', () => {
+    const storeFile = writePinStore([{ pin: 'STAR199', plan: 'premium_199' }]);
+    const config = {
+      allowedPins: [],
+      pinStoreFile: storeFile,
+      jwtSecret: 'test-secret-with-enough-length',
+      plan: 'premium_199',
+      tokenTtlSeconds: 86400,
+      now: () => 1_800_000_000,
+    };
+
+    const first = verifyPremiumPin({ pin: ' star199 ' }, config);
+    const second = verifyPremiumPin({ pin: 'STAR199' }, config);
+    const stored = JSON.parse(fs.readFileSync(storeFile, 'utf8'));
+
+    expect(first.status).toBe(200);
+    expect(first.body.plan).toBe('premium_199');
+    expect(stored.pins[0].usedAt).toBe('2027-01-15T08:00:00.000Z');
+    expect(second.status).toBe(409);
+    expect(second.body.error).toBe('PIN_USED');
+  });
+
+  it('rejects expired stored PINs before issuing tokens', () => {
+    const storeFile = writePinStore([{ pin: 'OLD199', expiresAt: '2027-01-15T07:59:59.000Z' }]);
+    const config = {
+      allowedPins: [],
+      pinStoreFile: storeFile,
+      jwtSecret: 'test-secret-with-enough-length',
+      plan: 'premium_199',
+      tokenTtlSeconds: 86400,
+      now: () => 1_800_000_000,
+    };
+
+    const result = verifyPremiumPin({ pin: 'OLD199' }, config);
+
+    expect(result.status).toBe(410);
+    expect(result.body.error).toBe('PIN_EXPIRED');
   });
 });
 
@@ -107,6 +164,31 @@ describe('Premium verify HTTP handler', () => {
       expect(response.status).toBe(200);
       expect(body.success).toBe(true);
       expect(body.token).toMatch(/\./);
+    } finally {
+      await close();
+    }
+  });
+
+  it('handles POST /v1/premium/verify against the persistent store and prevents PIN reuse', async () => {
+    const storeFile = writePinStore([{ pin: 'LUCKY777', plan: 'premium_199' }]);
+    const { baseUrl, close } = await startTestServer({ ...validConfig, allowedPins: [], pinStoreFile: storeFile });
+
+    try {
+      const first = await fetch(`${baseUrl}/v1/premium/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: 'LUCKY777' }),
+      });
+      const second = await fetch(`${baseUrl}/v1/premium/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: 'LUCKY777' }),
+      });
+      const secondBody = await second.json();
+
+      expect(first.status).toBe(200);
+      expect(second.status).toBe(409);
+      expect(secondBody.error).toBe('PIN_USED');
     } finally {
       await close();
     }
@@ -172,4 +254,22 @@ function startTestServer(config) {
       });
     });
   });
+}
+
+function writePinStore(records) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'starvia-pin-store-'));
+  const storeFile = path.join(dir, 'pins.json');
+  fs.writeFileSync(storeFile, JSON.stringify({
+    pins: records.map((record) => ({
+      pinHash: hashPin(record.pin),
+      plan: record.plan || 'premium_199',
+      expiresAt: record.expiresAt || null,
+      usedAt: record.usedAt || null,
+    })),
+  }, null, 2));
+  return storeFile;
+}
+
+function hashPin(pin) {
+  return crypto.createHash('sha256').update(String(pin).trim().toUpperCase()).digest('hex');
 }

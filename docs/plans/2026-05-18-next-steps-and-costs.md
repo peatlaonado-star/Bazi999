@@ -25,14 +25,16 @@ STARVIA ตอนนี้มีตัวเว็บที่ใช้งาน
    - Production mode เรียก backend จริงได้ผ่าน config
 5. Backend API slice แรก
    - `POST /v1/premium/verify`
-   - ตรวจ PIN จาก environment variable
+   - `GET /v1/premium/status`
+   - ตรวจ PIN จาก env demo หรือ file-backed persistent store (`STARVIA_PIN_STORE_FILE`)
    - ออก token ให้ผู้ใช้ Premium
+   - บันทึก `usedAt` เพื่อกัน PIN ใช้ซ้ำ
 6. ระบบทดสอบและ build ผ่านล่าสุด
-   - `npm test`: 57 tests ผ่าน
+   - `npm test`: 69 tests ผ่าน
    - `npm run check:js`: ผ่าน
    - `npm run build`: ผ่าน
 7. Commit ล่าสุด
-   - `88e3108 feat: add premium verify backend api`
+   - `feat: add persistent premium pin store`
 
 ## ขั้นตอนที่เหลือ แบ่งแบบภาษาคนทั่วไป
 
@@ -40,14 +42,14 @@ STARVIA ตอนนี้มีตัวเว็บที่ใช้งาน
 
 เพิ่ม `GET /v1/premium/status` และ frontend เก็บ token/ตรวจสถานะตอน reload แล้ว
 
-### B. ทำระบบ PIN แบบใช้งานจริง ไม่ใช่ใส่รายการใน environment
+### B. ทำระบบ PIN แบบใช้งานจริง ไม่ใช่ใส่รายการใน environment — MVP เสร็จแล้ว
 
-ตอนนี้ backend รับ PIN จาก `STARVIA_PREMIUM_PINS` เหมาะกับ demo/ทดลองขายช่วงแรก แต่ถ้าขายจริงควรมีที่เก็บ PIN
+เพิ่ม file-backed persistent store ผ่าน `STARVIA_PIN_STORE_FILE` แล้ว โดยเก็บ `pinHash` แทน PIN จริง ตรวจวันหมดอายุ และบันทึก `usedAt` หลังใช้สำเร็จ ทำให้ PIN หนึ่งรหัสใช้ได้ครั้งเดียว
 
 งานถัดไป:
-- ทำที่เก็บ PIN เช่น SQLite/Postgres/Supabase
-- PIN หนึ่งรหัสใช้ได้ครั้งเดียว หรือใช้ตามอายุที่กำหนด
-- บันทึกว่า PIN ไหนใช้แล้ว ใช้เมื่อไร หมดอายุเมื่อไร
+- ยกระดับจาก file store ไป SQLite/Postgres/Supabase เมื่อมีผู้ใช้จริงหรือ deploy หลาย instance
+- เพิ่มเครื่องมือออก PIN อัตโนมัติจากรายการโอนเงิน/แอดมิน
+- เพิ่ม audit log แยกสำหรับออก PIN / ใช้ PIN / หมดอายุ
 
 ### C. เชื่อมการชำระเงินจริง
 
@@ -125,10 +127,10 @@ STARVIA ตอนนี้มีตัวเว็บที่ใช้งาน
 
 ลำดับที่เหมาะที่สุด:
 
-1. ทำระบบเก็บ PIN/สิทธิ์แบบ persistent
-2. เลือกวิธีรับเงิน: manual ก่อนหรือ payment gateway
-3. Deploy frontend + backend ขึ้นออนไลน์แบบ staging
-4. ทดสอบเส้นทางจริง: ลูกค้าจ่ายเงิน → ได้ PIN/token → เปิด Premium → reload แล้วยังเป็น Premium
+1. เลือกวิธีรับเงิน: manual ก่อนหรือ payment gateway
+2. Deploy frontend + backend ขึ้นออนไลน์แบบ staging
+3. ทดสอบเส้นทางจริง: ลูกค้าจ่ายเงิน → ได้ PIN ใน store → เปิด Premium → reload แล้วยังเป็น Premium
+4. ถ้าเริ่มมีผู้ใช้หลายคน/หลาย instance ค่อยย้าย PIN store เป็น SQLite/Postgres/Supabase
 
 ## ไฟล์สำคัญสำหรับกลับมาทำต่อ
 
