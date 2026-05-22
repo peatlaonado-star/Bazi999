@@ -60,6 +60,16 @@ describe('Premium verify service', () => {
     expect(() => loadPremiumConfig({})).toThrow(/STARVIA_PREMIUM_PINS|STARVIA_PIN_STORE_FILE/);
     expect(() => loadPremiumConfig({ STARVIA_PREMIUM_PINS: 'STAR199' })).toThrow(/STARVIA_JWT_SECRET/);
   });
+
+  it('loads configured CORS origins for staging and production deploys', () => {
+    const config = loadPremiumConfig({
+      STARVIA_PREMIUM_PINS: 'STAR199',
+      STARVIA_JWT_SECRET: 'test-secret-with-enough-length',
+      STARVIA_ALLOWED_ORIGINS: 'https://starvia.app, https://staging.starvia.app',
+    });
+
+    expect(config.allowedOrigins).toEqual(['https://starvia.app', 'https://staging.starvia.app']);
+  });
 });
 
 describe('Persistent premium PIN store', () => {
@@ -222,6 +232,47 @@ describe('Premium verify HTTP handler', () => {
       expect(response.status).toBe(204);
       expect(response.headers.get('access-control-allow-origin')).toBe('*');
       expect(response.headers.get('access-control-allow-methods')).toContain('POST');
+    } finally {
+      await close();
+    }
+  });
+
+  it('echoes an allowed CORS origin and omits disallowed origins', async () => {
+    const { baseUrl, close } = await startTestServer({
+      ...validConfig,
+      allowedOrigins: ['https://starvia.app', 'https://staging.starvia.app'],
+    });
+
+    try {
+      const allowed = await fetch(`${baseUrl}/v1/premium/verify`, {
+        method: 'OPTIONS',
+        headers: { Origin: 'https://staging.starvia.app' },
+      });
+      const disallowed = await fetch(`${baseUrl}/v1/premium/verify`, {
+        method: 'OPTIONS',
+        headers: { Origin: 'https://evil.example' },
+      });
+
+      expect(allowed.status).toBe(204);
+      expect(allowed.headers.get('access-control-allow-origin')).toBe('https://staging.starvia.app');
+      expect(allowed.headers.get('vary')).toContain('Origin');
+      expect(disallowed.status).toBe(204);
+      expect(disallowed.headers.get('access-control-allow-origin')).toBeNull();
+    } finally {
+      await close();
+    }
+  });
+
+  it('handles GET /v1/health for deployment health checks', async () => {
+    const { baseUrl, close } = await startTestServer(validConfig);
+
+    try {
+      const response = await fetch(`${baseUrl}/v1/health`);
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(response.headers.get('cache-control')).toBe('no-store');
+      expect(body).toEqual({ ok: true, service: 'starvia-premium-api' });
     } finally {
       await close();
     }

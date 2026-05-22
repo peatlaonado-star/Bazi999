@@ -5,7 +5,6 @@ const DEFAULT_PLAN = 'premium_199';
 const DEFAULT_TOKEN_TTL_SECONDS = 24 * 60 * 60;
 const JSON_HEADERS = {
   'Content-Type': 'application/json; charset=utf-8',
-  'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
 };
@@ -27,6 +26,7 @@ export function loadPremiumConfig(env = process.env) {
     jwtSecret: env.STARVIA_JWT_SECRET,
     plan: env.STARVIA_PREMIUM_PLAN || DEFAULT_PLAN,
     tokenTtlSeconds: Number(env.STARVIA_TOKEN_TTL_SECONDS || DEFAULT_TOKEN_TTL_SECONDS),
+    allowedOrigins: parseAllowedOrigins(env.STARVIA_ALLOWED_ORIGINS),
     now: () => Math.floor(Date.now() / 1000),
   };
 }
@@ -106,7 +106,14 @@ export function createPremiumRequestHandler(config) {
 
   return async function premiumRequestHandler(req, res) {
     if (req.method === 'OPTIONS') {
-      writeJson(res, 204, null);
+      writeJson(res, 204, null, config, req);
+      return;
+    }
+
+    if (req.method === 'GET' && getPathname(req.url) === '/v1/health') {
+      writeJson(res, 200, { ok: true, service: 'starvia-premium-api' }, config, req, {
+        'Cache-Control': 'no-store',
+      });
       return;
     }
 
@@ -114,20 +121,20 @@ export function createPremiumRequestHandler(config) {
       try {
         const body = await readJsonBody(req);
         const result = verifyPremiumPin(body, config);
-        writeJson(res, result.status, result.body);
+        writeJson(res, result.status, result.body, config, req);
       } catch (error) {
         writeJson(res, 400, {
           success: false,
           error: 'BAD_REQUEST',
           message: 'รูปแบบคำขอไม่ถูกต้อง',
-        });
+        }, config, req);
       }
       return;
     }
 
     if (req.method === 'GET' && getPathname(req.url) === '/v1/premium/status') {
       const result = checkPremiumStatus({ authorization: req.headers.authorization || '' }, config);
-      writeJson(res, result.status, result.body);
+      writeJson(res, result.status, result.body, config, req);
       return;
     }
 
@@ -135,7 +142,7 @@ export function createPremiumRequestHandler(config) {
       success: false,
       error: 'NOT_FOUND',
       message: 'ไม่พบ endpoint ที่เรียก',
-    });
+    }, config, req);
   };
 }
 
@@ -143,6 +150,13 @@ function parseAllowedPins(value = '') {
   return String(value)
     .split(',')
     .map(normalizePin)
+    .filter(Boolean);
+}
+
+function parseAllowedOrigins(value = '') {
+  return String(value)
+    .split(',')
+    .map((origin) => origin.trim())
     .filter(Boolean);
 }
 
@@ -321,11 +335,29 @@ function readJsonBody(req) {
   });
 }
 
-function writeJson(res, status, body) {
-  res.writeHead(status, JSON_HEADERS);
+function writeJson(res, status, body, config = {}, req = {}, extraHeaders = {}) {
+  res.writeHead(status, buildResponseHeaders(config, req, extraHeaders));
   if (body === null) {
     res.end();
     return;
   }
   res.end(JSON.stringify(body));
+}
+
+function buildResponseHeaders(config = {}, req = {}, extraHeaders = {}) {
+  const headers = { ...JSON_HEADERS, ...extraHeaders };
+  const allowedOrigins = Array.isArray(config.allowedOrigins) ? config.allowedOrigins : [];
+  const requestOrigin = req.headers ? req.headers.origin : '';
+
+  if (!allowedOrigins.length) {
+    headers['Access-Control-Allow-Origin'] = '*';
+    return headers;
+  }
+
+  headers.Vary = 'Origin';
+  if (requestOrigin && allowedOrigins.includes(requestOrigin)) {
+    headers['Access-Control-Allow-Origin'] = requestOrigin;
+  }
+
+  return headers;
 }

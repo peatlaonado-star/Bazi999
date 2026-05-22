@@ -14,8 +14,8 @@ Frontend ปัจจุบันรองรับ 2 mode:
 
 Backend slice แรกมีแล้วใน repo:
 - `api/premium-service.mjs` — logic ตรวจ PIN และออก token
-- `api/server.mjs` — Node HTTP server สำหรับ `POST /v1/premium/verify` และ `GET /v1/premium/status`
-- ใช้ environment variables: `STARVIA_JWT_SECRET`, `STARVIA_PREMIUM_PINS` หรือ `STARVIA_PIN_STORE_FILE`, optional `STARVIA_PREMIUM_PLAN`, `STARVIA_TOKEN_TTL_SECONDS`, `PORT`
+- `api/server.mjs` — Node HTTP server สำหรับ `POST /v1/premium/verify`, `GET /v1/premium/status`, และ `GET /v1/health`
+- ใช้ environment variables: `STARVIA_JWT_SECRET`, `STARVIA_PREMIUM_PINS` หรือ `STARVIA_PIN_STORE_FILE`, optional `STARVIA_PREMIUM_PLAN`, `STARVIA_TOKEN_TTL_SECONDS`, `STARVIA_ALLOWED_ORIGINS`, `PORT`
 
 ตัวอย่าง production config:
 ```html
@@ -138,6 +138,25 @@ Authorization: Bearer <token>
   "active": false,
   "error": "TOKEN_EXPIRED"
 }
+```
+
+---
+
+### GET /v1/health
+
+Health check สำหรับ hosting provider / uptime probe ไม่ต้องใช้ token
+
+**Response:**
+```json
+{
+  "ok": true,
+  "service": "starvia-premium-api"
+}
+```
+
+**Headers:**
+```text
+Cache-Control: no-store
 ```
 
 ---
