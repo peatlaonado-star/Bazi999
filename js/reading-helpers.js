@@ -182,6 +182,51 @@ function buildMonthlyDayAdvice(tone, label){
   return 'วันนี้ควรใช้จังหวะนี้กับ' + label + 'แบบค่อยเป็นค่อยไป';
 }
 
+function padLuckyNumber(value){
+  var normalized = Math.abs(parseInt(value, 10) || 0) % 100;
+  return normalized < 10 ? ('0' + normalized) : String(normalized);
+}
+
+function buildWindfallLuckGuide(p, birthDate, dayOfWeek){
+  var birth = birthDate ? new Date(birthDate) : new Date();
+  var bornDay = birth && !isNaN(birth.getTime()) ? birth.getDate() : 1;
+  var bornMonth = birth && !isNaN(birth.getTime()) ? birth.getMonth() + 1 : 1;
+  var planetIndex = p && typeof p.ei === 'number' ? p.ei : 0;
+  var weekday = typeof dayOfWeek === 'number' ? dayOfWeek : (birth && !isNaN(birth.getTime()) ? birth.getDay() : 0);
+  var elementKey = p && p.el ? p.el : 'ไฟ';
+  var planetName = p && p.n ? p.n : 'ดาวเจ้าชะตา';
+  var elementMap = {
+    'ไฟ': { direction: 'ทิศตะวันออก', time: 'หลังพระอาทิตย์ขึ้นถึง 09:09 น.', omen: 'เลขจากไฟ แสง ป้ายสีแดง รถสีสว่าง หรือเลขที่เห็นตอนกำลังรีบ', offering: 'แสงไฟอุ่น ๆ หรือเทียนสีขาว 1 ดวง' },
+    'ดิน': { direction: 'ทิศตะวันออกเฉียงเหนือ', time: 'ช่วง 08:08–10:10 น.', omen: 'เลขบ้าน ที่ดิน ใบเสร็จ ของหนัก ของเก่า หรือเลขที่เจอในที่ทำงาน', offering: 'เหรียญ 9 บาทหรือข้าวสารหยิบมือเล็ก ๆ' },
+    'ลม': { direction: 'ทิศเหนือ', time: 'ช่วง 11:11–13:13 น.', omen: 'เลขจากแชต เบอร์โทร ป้ายรถ ข่าวบอกต่อ หรือเลขที่ได้ยินซ้ำสองครั้ง', offering: 'น้ำเปล่า 1 แก้วและการพูดดี 1 ประโยคก่อนออกจากบ้าน' },
+    'น้ำ': { direction: 'ทิศตะวันตก', time: 'ช่วง 18:18–21:21 น.', omen: 'เลขจากความฝัน น้ำ ฝน กระจก เพลง หรือชื่อคนที่แวบเข้ามาในใจ', offering: 'น้ำสะอาด 1 แก้ว วางไว้ 9 นาทีแล้วอธิษฐานเงียบ ๆ' }
+  };
+  var profile = elementMap[elementKey] || elementMap['ไฟ'];
+  var base = bornDay + (bornMonth * 3) + ((planetIndex + 1) * 7) + weekday;
+  var luckyNumbers = [
+    padLuckyNumber(base),
+    padLuckyNumber((bornDay * 2) + bornMonth + planetIndex + 9),
+    padLuckyNumber((base + bornDay + (weekday * 11)))
+  ];
+
+  return {
+    title: 'สูตรเปิดดวงลาภลอย',
+    subtitle: 'กิมมิกสายมูสำหรับหวย ลอตเตอรี่ และตัวเลขที่ควรลองแบบพอดีมือ',
+    luckyNumbers: luckyNumbers,
+    lotteryFocus: 'หวย / ลอตเตอรี่: ให้ลองจับคู่เลขชุดแรกกับเลขที่เจอซ้ำในชีวิตจริง อย่าซื้อเพราะโลภ ให้ซื้อเพราะเลขนั้นสะดุดใจแล้วใจนิ่ง',
+    sacredTime: profile.time,
+    direction: profile.direction,
+    omen: profile.omen,
+    ritualSteps: [
+      'หันหน้าไปทาง' + profile.direction + ' วาง ' + profile.offering + ' แล้วตั้งนะโม 3 จบ',
+      'เขียนเลข ' + luckyNumbers.join(' · ') + ' ลงกระดาษเล็ก ๆ พับเข้าหาตัว 3 ครั้ง แล้วพูดว่า “สาธุ ขอให้โชคที่เป็นของข้าพเจ้าเปิดทางมาอย่างปลอดภัย”',
+      'ก่อนซื้อ ให้ตั้งงบก่อนเสี่ยง ห้ามเพิ่มเงินตามอารมณ์ ถ้าใจร้อนให้หยุดทันที ถือว่าเจ้าที่เจ้าทางเตือนแล้ว'
+    ],
+    mantra: 'โอม ศรีโชค ลาภะ มหาเฮง ' + planetName + ' เปิดทางทรัพย์ สาธุ',
+    avoid: 'งดซื้อเพราะประชดชีวิต งดตามเลขคนอื่นทั้งชุด และงดทุ่มเงินเกินงบ เพราะดวงเฮงชอบคนใจนิ่ง ไม่ชอบคนใจร้อน'
+  };
+}
+
 function buildMonthlyLifeMap(p, r, l, birthDate, today){
   var content = (typeof THAI_ASTRO_CONTENT !== 'undefined') ? THAI_ASTRO_CONTENT : null;
   var cfg = content && content.monthlyLifeMap ? content.monthlyLifeMap : FALLBACK_MONTHLY_LIFE_MAP;

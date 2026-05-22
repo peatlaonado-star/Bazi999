@@ -304,6 +304,50 @@ describe('Life Domain Forecast Matrix', () => {
   });
 });
 
+describe('Windfall Luck gimmick section', () => {
+  it('builds a deterministic Thai lottery and windfall guide', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div>');
+    const context = loadContext(dom);
+
+    const guide = context.buildWindfallLuckGuide(samplePlanet('ไฟ'), '2000-06-15', 1);
+
+    expect(guide.title).toContain('ลาภลอย');
+    expect(guide.luckyNumbers).toHaveLength(3);
+    guide.luckyNumbers.forEach((number) => expect(number).toMatch(/^\d{2}$/));
+    expect(guide.lotteryFocus).toMatch(/หวย|ลอตเตอรี่|ตัวเลข/);
+    expect(guide.ritualSteps).toHaveLength(3);
+    expect(guide.ritualSteps.join(' ')).toContain('สาธุ');
+  });
+
+  it('renders the windfall luck section as a locked premium teaser with full DOM behind the overlay', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div>');
+    const context = loadContext(dom);
+
+    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const output = dom.window.document.getElementById('r0').innerHTML;
+
+    expect(output).toContain('สูตรเปิดดวงลาภลอย');
+    expect(output).toContain('เลขที่ควรลอง');
+    expect(output).toContain('หวย / ลอตเตอรี่');
+    expect(output).toContain('พิธีเปิดทางโชค');
+    expect(output).toContain('ปลดล็อกรีพอร์ตฉบับเต็ม');
+    expect(dom.window.document.querySelector('.windfall-luck.is-locked')).toBeTruthy();
+  });
+
+  it('reveals the windfall luck guide for premium readers', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div>');
+    const context = loadContext(dom, { isPremiumUnlocked: () => true });
+
+    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const output = dom.window.document.getElementById('r0').innerHTML;
+
+    expect(output).toContain('สูตรเปิดดวงลาภลอย');
+    expect(output).toContain('คาถาเรียกโชค');
+    expect(output).toContain('ตั้งงบก่อนเสี่ยง');
+    expect(dom.window.document.querySelector('.windfall-luck.is-locked')).toBeNull();
+  });
+});
+
 describe('Monthly Life Map UX clarity', () => {
   it('removes highlighted free days for locked readers', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div>');

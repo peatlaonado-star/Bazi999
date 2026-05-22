@@ -24,6 +24,35 @@ function buildDailyBrief(p, dayOfWeek, personalColor) {
 
 
 
+function buildWindfallLuckHtml(guide, premiumUnlocked){
+  var html = '<div class="windfall-luck' + (premiumUnlocked ? '' : ' is-locked') + '">'
+    + '<div class="wfl-kicker">หวย · ลอตเตอรี่ · ลาภลอย</div>'
+    + '<div class="wfl-title">✦ ' + escapeHTML(guide.title) + ' ✦</div>'
+    + '<div class="wfl-desc">' + escapeHTML(guide.subtitle) + '</div>'
+    + '<div class="wfl-numbers"><span>เลขที่ควรลอง</span>'
+    + guide.luckyNumbers.map(function(number){ return '<strong>' + escapeHTML(number) + '</strong>'; }).join('')
+    + '</div>'
+    + '<div class="wfl-grid">'
+    + '<div class="wfl-box"><small>จังหวะเฮง</small><b>' + escapeHTML(guide.sacredTime) + '</b></div>'
+    + '<div class="wfl-box"><small>ทิศเปิดโชค</small><b>' + escapeHTML(guide.direction) + '</b></div>'
+    + '</div>'
+    + '<div class="wfl-line"><strong>หวย / ลอตเตอรี่:</strong> ' + escapeHTML(guide.lotteryFocus) + '</div>'
+    + '<div class="wfl-line"><strong>สัญญาณเลข:</strong> ' + escapeHTML(guide.omen) + '</div>'
+    + '<div class="wfl-section"><strong>พิธีเปิดทางโชค</strong><ol>'
+    + guide.ritualSteps.map(function(step){ return '<li>' + escapeHTML(step) + '</li>'; }).join('')
+    + '</ol></div>'
+    + '<div class="wfl-mantra"><span>คาถาเรียกโชค</span>“' + escapeHTML(guide.mantra) + '”</div>'
+    + '<div class="wfl-avoid"><strong>กันโชครั่ว:</strong> ' + escapeHTML(guide.avoid) + '</div>';
+  if (!premiumUnlocked) {
+    html += buildPremiumLockOverlay(
+      'ปลดล็อกสูตรลาภลอยเฉพาะตัว',
+      'ดูเลขที่ควรลอง จังหวะซื้อหวย/ลอตเตอรี่ ทิศเปิดโชค คาถา และพิธีเสริมดวงแบบสายมูเต็มรูปแบบ'
+    );
+  }
+  html += '</div>';
+  return html;
+}
+
 function buildMonthlyLifeMapHtml(model, premiumUnlocked){
   var html = '<div class="monthly-life-map' + (premiumUnlocked ? '' : ' is-locked') + '">'
     + '<div class="mlm-kicker">แผนที่ชีวิตรายเดือน</div>'
@@ -333,6 +362,8 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
 
   var monthlyLifeMap = buildMonthlyLifeMap(p, r, l, ds);
   var monthlyLifeMapHtml = buildMonthlyLifeMapHtml(monthlyLifeMap, premiumUnlocked);
+  var windfallLuckGuide = buildWindfallLuckGuide(p, ds, dayOfWeek);
+  var windfallLuckHtml = buildWindfallLuckHtml(windfallLuckGuide, premiumUnlocked);
 
   var briefData = buildDailyBrief(p, dayOfWeek, { name: pe.c1n, hex: pe.c1 });
   var cosmicBriefHtml = '<div class="cosmic-brief">'
@@ -379,6 +410,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     + karmaHtml
     + domainHtml
     + monthlyLifeMapHtml
+    + windfallLuckHtml
     + cosmicBriefHtml
     + buildElementRadar(p, r, l)
     +'<div class="tabs-w"><div class="tabs" id="tt0"></div></div><div id="ts0"></div>';
