@@ -16,6 +16,21 @@ describe('Legal and trust pages', () => {
     expect(index).toContain('ข้อตกลงการใช้งาน');
   });
 
+
+
+  it('keeps the landing page Thai-only until the language button is ready', () => {
+    const index = read('index.html');
+
+    expect(index).not.toContain('id="lbtn"');
+    [
+      'Self-discovery through the stars',
+      'EXCLUSIVE EARLY ACCESS',
+      '1-on-1 Personalized',
+      'Beta Tester',
+      'Know your stars. Know yourself.'
+    ].forEach((phrase) => expect(index).not.toContain(phrase));
+  });
+
   it('privacy page explains client-side birth data processing and premium token storage', () => {
     const privacy = read('privacy.html');
 

@@ -24,7 +24,8 @@ describe('Life Domain Forecast helper', () => {
 
     const matrix = context.buildLifeDomainMatrix({ el: 'ไฟ', n: 'อาทิตย์' }, { n: 'เมษ' }, { n: 'ตุลย์' }, currentBand, nextBands);
 
-    expect(matrix.title).toContain('Life Domain Forecast Matrix');
+    expect(matrix.title).toContain('แผนที่สถานการณ์ชีวิต');
+    expect(matrix.title).not.toContain('Life Domain Forecast Matrix');
     expect(matrix.domains).toHaveLength(6);
     matrix.domains.forEach((domain) => {
       expect(domain.current).toEqual(expect.any(String));

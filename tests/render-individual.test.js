@@ -112,13 +112,13 @@ describe('Thai Life Blueprint header card', () => {
     expect(output).toContain('blueprint-card');
   });
 
-  it('contains the kicker text "Thai Life Blueprint"', () => {
+  it('contains only Thai kicker text while the language switch is not visible', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
     const context = loadContext(dom);
     context.renderInd('เบล', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const output = dom.window.document.getElementById('r0').innerHTML;
-    expect(output).toContain('Thai Life Blueprint');
     expect(output).toContain('พิมพ์เขียวชีวิตไทย');
+    expect(output).not.toContain('Thai Life Blueprint');
   });
 
   it('shows the user escaped name', () => {
@@ -176,13 +176,13 @@ describe('Daily Thai Cosmic Brief', () => {
     expect(output).toContain('cosmic-brief');
   });
 
-  it('contains the Daily Cosmic Brief title text', () => {
+  it('contains the Thai daily brief title text only', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
     const context = loadContext(dom);
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const output = dom.window.document.getElementById('r0').innerHTML;
-    expect(output).toContain('Daily Cosmic Brief');
     expect(output).toContain('สรุปพลังงานวันนี้');
+    expect(output).not.toContain('Daily Cosmic Brief');
   });
 
   it('shows only 2 free cb-line elements before premium unlock', () => {
@@ -220,7 +220,7 @@ describe('Daily Thai Cosmic Brief', () => {
     expect(output).not.toContain('โฟกัส:');
     expect(output).not.toContain('ระวัง:');
     expect(output).not.toContain('สิ่งที่ควรทำวันนี้:');
-    expect(output).toContain('Daily Brief ฉบับเต็ม');
+    expect(output).toContain('สรุปพลังงานวันนี้ฉบับเต็ม');
   });
 
   it('contains full energy, focus, warning, and action text for premium readers', () => {
@@ -243,8 +243,8 @@ describe('Life Domain Forecast Matrix', () => {
     context.renderInd('Test', 'หญิง', '1990-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
 
     const output = dom.window.document.getElementById('r0').innerHTML;
-    expect(output).toContain('Life Domain Forecast Matrix');
     expect(output).toContain('แผนที่สถานการณ์ชีวิต');
+    expect(output).not.toContain('Life Domain Forecast Matrix');
     for (const label of ['โชค', 'การเงิน', 'สุขภาพ', 'ความสัมพันธ์', 'การงาน', 'บริวาร']) {
       expect(output).toContain(label);
     }
@@ -328,7 +328,7 @@ describe('Monthly Life Map UX clarity', () => {
 
     expect(output).not.toContain('3 วันเด่นประจำเดือน');
     expect(output).toContain('ปฏิทินวันดีรายเดือน');
-    expect(output).toContain('Weekly Brief 4 สัปดาห์');
+    expect(output).toContain('สรุปรายสัปดาห์ 4 สัปดาห์');
     expect(dom.window.document.querySelectorAll('.mlm-day').length).toBe(0);
     expect(dom.window.document.querySelectorAll('.mlm-cal-day').length).toBeGreaterThanOrEqual(28);
   });
@@ -365,13 +365,13 @@ describe('Monthly Life Map subscription feature', () => {
     context.renderInd('Test', 'หญิง', '2000-01-01', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const output = dom.window.document.getElementById('r0').innerHTML;
 
-    expect(output).toContain('STARVIA Monthly Life Map');
+    expect(output).toContain('แผนที่ชีวิตรายเดือน STARVIA');
     expect(output).not.toContain('3 วันเด่นประจำเดือน');
     expect(dom.window.document.querySelectorAll('.mlm-day').length).toBe(0);
     expect(output).toContain('คะแนน');
     expect(output).toContain('ควร');
     expect(output).toContain('ปลดล็อกรีพอร์ตฉบับเต็ม');
-    expect(output).not.toContain('Weekly Brief 4 สัปดาห์');
+    expect(output).not.toContain('สรุปรายสัปดาห์ 4 สัปดาห์');
     expect(output).not.toContain('ภารกิจเสริมดวง 7 วัน');
     expect(dom.window.document.querySelector('.monthly-life-map.is-locked')).toBeTruthy();
   });
@@ -383,7 +383,7 @@ describe('Monthly Life Map subscription feature', () => {
     context.renderInd('Test', 'หญิง', '2000-01-01', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const output = dom.window.document.getElementById('r0').innerHTML;
 
-    expect(output).toContain('Weekly Brief 4 สัปดาห์');
+    expect(output).toContain('สรุปรายสัปดาห์ 4 สัปดาห์');
     expect(output).toContain('ภารกิจเสริมดวง 7 วัน');
     expect(output).toContain('ปฏิทินวันดีรายเดือน');
     expect(output).toContain('วันที่ควรระวัง');

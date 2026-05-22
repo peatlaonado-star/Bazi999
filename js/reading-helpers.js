@@ -27,7 +27,7 @@ function buildKarmaMirror(p, dayOfWeek){
   var shadow = weekdayShadows[dayOfWeek] || weekdayShadows[0] || FALLBACK_KARMA_MIRROR.weekdayShadows[0];
 
   return {
-    title: 'กระจกกรรม · Karma Mirror',
+    title: 'กระจกกรรม',
     intro: km.intro || FALLBACK_KARMA_MIRROR.intro,
     pattern: element.pattern,
     lesson: element.lesson,
@@ -114,7 +114,7 @@ function buildLifeDomainMatrix(p, r, l, currentBand, nextBands){
   if (!upcomingBands.length) upcomingBands = [activeBand];
 
   return {
-    title: 'Life Domain Forecast Matrix · แผนที่สถานการณ์ชีวิต',
+    title: 'แผนที่สถานการณ์ชีวิต',
     intro: 'อ่านสถานการณ์ปัจจุบัน วิธีเสริมให้ดีขึ้น และโอกาสที่จะเปิดตามช่วงอายุ โดยผสานธาตุชีวิต ดาวเจ้าชะตา ราศี ลัคนา และจังหวะวัยปัจจุบัน',
     elementSummary: element.tone,
     currentAgeRange: formatDomainAgeRange(activeBand),
@@ -220,7 +220,7 @@ function buildMonthlyLifeMap(p, r, l, birthDate, today){
   if (freeDays.length < 3) freeDays = calendarDays.slice(0, 3);
 
   return {
-    title: 'STARVIA Monthly Life Map · ' + monthName + ' ' + buddhistYear,
+    title: 'แผนที่ชีวิตรายเดือน STARVIA · ' + monthName + ' ' + buddhistYear,
     monthName: monthName,
     year: buddhistYear,
     elementFocus: guide.focus,

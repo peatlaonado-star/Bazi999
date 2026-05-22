@@ -120,8 +120,8 @@ function buildElementRadar(p, r, l) {
        'Flexible, Communicative, Highly Adaptable, and free-thinking.', 
        'Intuitive, Sensitive, Empathetic, and emotionally deep.'];
   
-  var elDomTxt = isTH ? 'ธาตุเด่น (Dominant)' : 'Dominant Element';
-  var elBalTxt = isTH ? 'สัดส่วนและสมดุลธาตุ' : 'Element Balance';
+  var elDomTxt = isTH ? 'ธาตุเด่น' : 'ธาตุเด่น';
+  var elBalTxt = isTH ? 'สัดส่วนและสมดุลธาตุ' : 'สมดุลธาตุ';
 
   // คำแนะนำสำหรับปรับสมดุลธาตุ (ไม่มีสัญลักษณ์แปลกตา)
   var remedyTxt = isTH 

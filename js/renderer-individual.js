@@ -26,13 +26,13 @@ function buildDailyBrief(p, dayOfWeek, personalColor) {
 
 function buildMonthlyLifeMapHtml(model, premiumUnlocked){
   var html = '<div class="monthly-life-map' + (premiumUnlocked ? '' : ' is-locked') + '">'
-    + '<div class="mlm-kicker">Monthly Astrology Companion</div>'
+    + '<div class="mlm-kicker">แผนที่ชีวิตรายเดือน</div>'
     + '<div class="mlm-title">✦ ' + escapeHTML(model.title) + ' ✦</div>'
     + '<div class="mlm-summary"><strong>พลังงานหลักของเดือนนี้:</strong> ' + escapeHTML(model.elementFocus) + '</div>'
     + '<div class="mlm-grid">'
     + '<div class="mlm-pill"><span>โฟกัส</span>' + escapeHTML(model.elementFocus) + '</div>'
     + '<div class="mlm-pill"><span>วันที่ควรระวัง</span>' + escapeHTML(model.elementWarning) + '</div>'
-    + '<div class="mlm-pill"><span>Lucky Action</span>' + escapeHTML(model.elementAction) + '</div>'
+    + '<div class="mlm-pill"><span>สิ่งที่ควรทำ</span>' + escapeHTML(model.elementAction) + '</div>'
     + '</div>';
 
   html += '<div class="mlm-section-title">' + (premiumUnlocked ? 'พรีวิว 4 ด้านเดือนนี้' : 'พรีวิว 4 ด้านประจำเดือน') + '</div><div class="mlm-domains">';
@@ -54,7 +54,7 @@ function buildMonthlyLifeMapHtml(model, premiumUnlocked){
     });
     html += '</div>';
 
-    html += '<div class="mlm-section-title">Weekly Brief 4 สัปดาห์</div><div class="mlm-weeks">';
+    html += '<div class="mlm-section-title">สรุปรายสัปดาห์ 4 สัปดาห์</div><div class="mlm-weeks">';
     model.weeklyBriefs.forEach(function(week){
       html += '<div class="mlm-week"><strong>' + escapeHTML(week.title) + '</strong><p>' + escapeHTML(week.brief) + '</p><span>' + escapeHTML(week.action) + '</span></div>';
     });
@@ -67,7 +67,7 @@ function buildMonthlyLifeMapHtml(model, premiumUnlocked){
     html += '</div>';
   } else {
     html += buildPremiumLockOverlay(
-      'ปลดล็อก Monthly Life Map ฉบับเต็ม',
+      'ปลดล็อกแผนที่ชีวิตรายเดือนฉบับเต็ม',
       'ดูดวงรายเดือนครบทุกด้าน ปฏิทินวันดีทั้งเดือน สรุปรายสัปดาห์ และภารกิจส่วนตัวตลอด 7 วัน'
     );
   }
@@ -88,19 +88,19 @@ function go0(){
   var r=RA2[ri], l=RA2[li];
   document.getElementById('fc0').style.display='none';
   showLoad();
-  
+
   // 💡 กลยุทธ์ Illusion of Labor (เปลี่ยนข้อความบิ้วด์อารมณ์)
   var loadTxt = document.getElementById('load-txt');
   loadTxt.innerHTML = '✨ กำลังคำนวณตำแหน่งดวงดาว...';
-  
+
   setTimeout(function(){ loadTxt.innerHTML = '🔮 กำลังถอดรหัสราศีและลัคนา...'; }, 1000);
   setTimeout(function(){ loadTxt.innerHTML = '📜 กำลังสร้างพิมพ์เขียวชีวิตของคุณ...'; }, 2000);
 
   // ยืดเวลาโหลดเป็น 3 วินาทีเพื่อให้ลูกค้ารู้สึกว่าระบบทำงานลึกซึ้งจริงๆ
-  setTimeout(function(){ 
-    hideLoad(); 
+  setTimeout(function(){
+    hideLoad();
     loadTxt.innerHTML = u.ld; // คืนค่าเดิม
-    renderInd(nm,gd,ds,ts,p,r,l,ri,li,u); 
+    renderInd(nm,gd,ds,ts,p,r,l,ri,li,u);
   }, 3200);
 }
 
@@ -187,7 +187,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
   var td=escapeHTML(fmtDate(ds));
   var tDisp = ts ? (escapeHTML(u.ti)+' '+ts+escapeHTML(u.tu)) : '';
   var dayOfWeek = new Date(ds).getDay();
-  
+
   // คำนวณอายุ (ปี และ เดือน)
   var today = new Date();
   var bday = new Date(ds);
@@ -197,9 +197,9 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
   if (today.getDate() < bday.getDate()) { ageM--; if (ageM < 0) ageM = 11; }
   var ageTxt = (CL === 'th') ? ('อายุ ' + ageY + ' ปี ' + ageM + ' เดือน') : ('Age ' + ageY + ' yrs ' + ageM + ' mos');
   var premiumUnlocked = premiumIsUnlocked();
-  
-  
-  // 1. ทักษาปกรณ์ (Golden Trait / Shadow Self)
+
+
+  // 1. ทักษาปกรณ์
   var THAKSA = [
     { sri: 'ทักษะการสื่อสาร การใช้สติปัญญา และการเจรจาต่อรอง (พลังของดาวพุธ)', kala: 'การรักความสบายจนเกินพอดี หรือการยึดติดในวัตถุ (พลังเงาของดาวศุกร์)' }, // 0
     { sri: 'ความอดทน การมีวินัย และการวางแผนระยะยาวที่รอบคอบ (พลังของดาวเสาร์)', kala: 'อีโก้ ความใจร้อน และการอยากเป็นศูนย์กลาง (พลังเงาของดาวอาทิตย์)' }, // 1
@@ -210,9 +210,9 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     { sri: 'ความมุ่งมั่น พลังงานที่ล้นเหลือ และการกล้าลงมือทำ (พลังของดาวอังคาร)', kala: 'คำพูดที่ทำร้ายผู้อื่นโดยไม่ตั้งใจ และการคิดไวทำไวเกินไป (พลังเงาของดาวพุธ)' } // 6
   ];
   var tk = THAKSA[dayOfWeek];
-  var thaksaHtml = '<strong class="hl-gold">✦ พรสวรรค์หนุนดวง (Golden Trait):</strong><br>'
+  var thaksaHtml = '<strong class="hl-gold">✦ พรสวรรค์หนุนดวง :</strong><br>'
     + 'จุดแข็งที่จะเป็นแม่เหล็กดึงดูดความสำเร็จและสิริมงคลเข้ามาในชีวิตคุณคือ <span class="hl-purple">' + tk.sri + '</span> ยิ่งคุณใช้สิ่งนี้มากเท่าไหร่ เส้นทางของคุณจะยิ่งราบรื่นขึ้น<br><br>'
-    + '<strong class="hl-gold">✦ เงาในใจที่ต้องก้าวข้าม (Shadow Self):</strong><br>'
+    + '<strong class="hl-gold">✦ เงาในใจที่ต้องก้าวข้าม :</strong><br>'
     + 'อุปสรรคที่แท้จริงไม่ได้มาจากภายนอก แต่มาจาก <span class="hl-purple">' + tk.kala + '</span> หากคุณรู้เท่าทันและปรับสมดุลจุดนี้ได้ ชีวิตคุณจะก้าวกระโดดอย่างมหาศาล';
 
   // 2. พิมพ์เขียวปรับฐานชีวิต (Action Plan)
@@ -237,15 +237,15 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     + '</div>'
     + '<div class="action-plan-card">'
     + '<div class="ap-title">✦ พิมพ์เขียวเพื่อปรับฐานชีวิต ✦</div>'
-    + '<div style="text-align:center; font-size:11px; color:#7a6a9a; margin-bottom:20px; letter-spacing:0.05em;">(THE STARVIA TRANSFORMATION BLUEPRINT)</div>'
-    + '<div class="ap-step"><div class="ap-num">1</div><div class="ap-content"><h4><span style="font-size:15px; margin-right:4px;">👁️</span> สติรับรู้ (The Awakening)</h4><p>เมื่อไหร่ก็ตามที่คุณเริ่มรู้สึกว่า <strong class="hl-purple">"' + tk.kala + '"</strong> กำลังก่อตัวขึ้น ให้ถือว่านั่นคือสัญญาณเตือนจากดวงดาว <span style="font-size:13px">🔔</span> อย่ากล่าวโทษตัวเอง แต่ให้รับรู้ว่าเงามืดกำลังพยายามเข้ามาควบคุมพวงมาลัยชีวิตคุณ</p></div></div>'
-    + '<div class="ap-step"><div class="ap-num">2</div><div class="ap-content"><h4><span style="font-size:15px; margin-right:4px;">🧭</span> ลงมือปรับจูน (The Recalibration)</h4><p><span class="hl-gold">✧</span> ' + p.wkfix + '<br><br><span class="hl-gold">✧</span> นอกจากนี้ กุญแจสำคัญของคนธาตุ' + p.el + 'คือ <strong>' + elementAction + '</strong> <span style="font-size:13px">⏳</span> เริ่มต้นทำสิ่งนี้ให้เป็นนิสัยใน 21 วันข้างหน้า</p></div></div>'
-    + '<div class="ap-step"><div class="ap-num">3</div><div class="ap-content"><h4><span style="font-size:15px; margin-right:4px;">🦋</span> ยกระดับจิตวิญญาณ (The Evolution)</h4><p>เมื่อคุณปรับสมดุลข้อ 1 และ 2 ได้ พลังงานแห่งความขัดแย้งจะถูกเปลี่ยนเป็น <strong class="hl-gold">✨ ' + tk.sri + '</strong> โดยอัตโนมัติ คุณจะพบว่าผู้คน โอกาส และโชคลาภ <span style="font-size:13px">🕊️</span> จะถูกดึงดูดเข้ามาหาคุณอย่างเป็นธรรมชาติ เพราะฐานชีวิตคุณมั่นคงแล้ว</p></div></div>'
+    + '<div style="text-align:center; font-size:11px; color:#7a6a9a; margin-bottom:20px; letter-spacing:0.05em;"></div>'
+    + '<div class="ap-step"><div class="ap-num">1</div><div class="ap-content"><h4><span style="font-size:15px; margin-right:4px;">👁️</span> สติรับรู้</h4><p>เมื่อไหร่ก็ตามที่คุณเริ่มรู้สึกว่า <strong class="hl-purple">"' + tk.kala + '"</strong> กำลังก่อตัวขึ้น ให้ถือว่านั่นคือสัญญาณเตือนจากดวงดาว <span style="font-size:13px">🔔</span> อย่ากล่าวโทษตัวเอง แต่ให้รับรู้ว่าเงามืดกำลังพยายามเข้ามาควบคุมพวงมาลัยชีวิตคุณ</p></div></div>'
+    + '<div class="ap-step"><div class="ap-num">2</div><div class="ap-content"><h4><span style="font-size:15px; margin-right:4px;">🧭</span> ลงมือปรับจูน </h4><p><span class="hl-gold">✧</span> ' + p.wkfix + '<br><br><span class="hl-gold">✧</span> นอกจากนี้ กุญแจสำคัญของคนธาตุ' + p.el + 'คือ <strong>' + elementAction + '</strong> <span style="font-size:13px">⏳</span> เริ่มต้นทำสิ่งนี้ให้เป็นนิสัยใน 21 วันข้างหน้า</p></div></div>'
+    + '<div class="ap-step"><div class="ap-num">3</div><div class="ap-content"><h4><span style="font-size:15px; margin-right:4px;">🦋</span> ยกระดับจิตวิญญาณ </h4><p>เมื่อคุณปรับสมดุลข้อ 1 และ 2 ได้ พลังงานแห่งความขัดแย้งจะถูกเปลี่ยนเป็น <strong class="hl-gold">✨ ' + tk.sri + '</strong> โดยอัตโนมัติ คุณจะพบว่าผู้คน โอกาส และโชคลาภ <span style="font-size:13px">🕊️</span> จะถูกดึงดูดเข้ามาหาคุณอย่างเป็นธรรมชาติ เพราะฐานชีวิตคุณมั่นคงแล้ว</p></div></div>'
     + '<div class="ap-quote">"จุดอ่อนที่ถูกเยียวยา จะกลายเป็นจุดแข็งที่แข็งแกร่งที่สุดของคุณ <span style="font-style:normal">🤍</span>"</div>'
     + '</div>';
 
-  // 3. พลังแห่งราศี (Zodiac Power)
-  var rasiHtml = '<strong class="hl-gold">✦ พลังแห่งราศี' + r.n + ' (Zodiac Power):</strong><br>'
+  // 3. พลังแห่งราศี
+  var rasiHtml = '<strong class="hl-gold">✦ พลังแห่งราศี' + r.n + ' :</strong><br>'
     + 'จักรราศีมอบ <span class="hl-purple">"' + (r.trait || 'พลังประจำตัว') + '"</span> ให้เป็นอาวุธประจำตัวของคุณ คุณสมบัติเด่นที่คุณควรดึงออกมาใช้ให้เกิดประโยชน์สูงสุดคือ <strong style="color:var(--tx);">' + (r.apply || 'ความเป็นตัวของตัวเอง') + '</strong><br><br>'
     + '<span style="font-size:12px; color:var(--tx2);">' + (r.add || '') + '</span>';
 
@@ -262,9 +262,9 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
   var pe = POWER_ELEMENTS[dayOfWeek];
   var powerTip = premiumUnlocked
     ? '<div class="pc-desc"><span class="hl-gold">เคล็ดลับ:</span> ใช้เลข <strong>' + pe.num + '</strong> ต่อท้ายชื่อไลน์/รหัสผ่าน และใช้สี <strong>' + pe.c1n + '/' + pe.c2n + '</strong> เป็นภาพพื้นหลังมือถือในวันสำคัญ เพื่อปรับคลื่นพลังงานดึงดูดความสำเร็จ</div>'
-    : '<div class="pc-desc"><span class="hl-gold">ฟรี:</span> เลขและสีมงคลสำหรับแชร์หรือใช้เป็นแรงบันดาลใจประจำวัน · ปลดล็อก Premium เพื่อดูวิธีใช้เชิงลึก</div>';
+    : '<div class="pc-desc"><span class="hl-gold">ฟรี:</span> เลขและสีมงคลสำหรับแชร์หรือใช้เป็นแรงบันดาลใจประจำวัน · ปลดล็อกพรีเมียม เพื่อดูวิธีใช้เชิงลึก</div>';
   var powerCardHtml = '<div class="power-card">'
-    + '<div class="pc-header"><span style="font-size:16px;">✨</span> พลังงานเสริมดวง (Power Elements)</div>'
+    + '<div class="pc-header"><span style="font-size:16px;">✨</span> พลังงานเสริมดวง</div>'
     + '<div class="pc-grid">'
     + '<div class="pc-item"><div class="pc-title">🔢 เลขขับเคลื่อนชีวิต</div><div class="pc-value">' + pe.num + '</div></div>'
     + '<div class="pc-item"><div class="pc-title">🎨 สีเสริมออร่า</div>'
@@ -279,7 +279,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
 
   var karma = buildKarmaMirror(p, dayOfWeek);
   var karmaFull = '<div class="karma-card' + (premiumUnlocked ? '' : ' is-locked') + '">'
-    + '<div class="karma-kicker">Thai Life Blueprint</div>'
+    + '<div class="karma-kicker">พิมพ์เขียวชีวิตไทย</div>'
     + '<div class="karma-title">✦ ' + escapeHTML(karma.title) + ' ✦</div>'
     + '<div class="karma-desc">' + escapeHTML(karma.intro) + '</div>'
     + '<div class="karma-grid">'
@@ -303,9 +303,9 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
   var domainMatrix = buildLifeDomainMatrix(p, r, l, currentLifeBand, nextLifeBands);
   var domainIntro = premiumUnlocked
     ? domainMatrix.intro
-    : 'พรีวิวหัวข้อชีวิต 6 ด้านที่ STARVIA จะวิเคราะห์ให้ละเอียดในรีพอร์ต Premium';
+    : 'พรีวิวหัวข้อชีวิต 6 ด้านที่ STARVIA จะวิเคราะห์ให้ละเอียดในรีพอร์ตพรีเมียม';
   var domainHtml = '<div class="domain-matrix' + (premiumUnlocked ? '' : ' is-locked') + '">'
-    + '<div class="domain-kicker">Thai Life Blueprint</div>'
+    + '<div class="domain-kicker">พิมพ์เขียวชีวิตไทย</div>'
     + '<div class="domain-title">✦ ' + escapeHTML(domainMatrix.title) + ' ✦</div>'
     + '<div class="domain-desc">' + escapeHTML(domainIntro) + '</div>'
     + '<div class="domain-current-chip">ช่วงวัยปัจจุบัน: ' + escapeHTML(domainMatrix.currentAgeRange) + '</div>'
@@ -325,7 +325,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
   });
   if (!premiumUnlocked) {
     domainHtml += '</div>' + buildPremiumLockOverlay(
-      'ปลดล็อก Life Domain Forecast Matrix',
+      'ปลดล็อก แผนที่สถานการณ์ชีวิต',
       'วิเคราะห์ 6 ด้าน: โชค การเงิน สุขภาพ ความรัก การงาน และบริวาร พร้อมคำแนะนำแบบลงมือทำได้'
     );
   }
@@ -336,7 +336,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
 
   var briefData = buildDailyBrief(p, dayOfWeek, { name: pe.c1n, hex: pe.c1 });
   var cosmicBriefHtml = '<div class="cosmic-brief">'
-    + '<div class="cb-title">✦ สรุปพลังงานวันนี้ · Daily Cosmic Brief ✦</div>'
+    + '<div class="cb-title">✦ สรุปพลังงานวันนี้ ✦</div>'
     + '<div class="cb-line"><div class="cb-dot" style="background:' + briefData.colorHex + '"></div><div>' + briefData.energy + '</div></div>'
     + '<div class="cb-line"><div class="cb-dot" style="background:' + briefData.colorHex + '"></div><div>สีมงคลวันนี้: <strong style="color:' + briefData.colorHex + '">' + briefData.colorName + '</strong></div></div>';
   if (premiumUnlocked) {
@@ -344,14 +344,14 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
       + '<div class="cb-line"><div class="cb-dot" style="background:#E8534A"></div><div>' + briefData.warning + '</div></div>'
       + '<div class="cb-line"><div class="cb-dot" style="background:var(--g)"></div><div>' + briefData.action + '</div></div>';
   } else {
-    cosmicBriefHtml += '<div class="cb-premium-note">🔒 Daily Brief ฉบับเต็ม: ดูโฟกัส คำเตือน และสิ่งที่ควรทำวันนี้หลังปลดล็อก Premium</div>';
+    cosmicBriefHtml += '<div class="cb-premium-note">🔒 สรุปพลังงานวันนี้ฉบับเต็ม: ดูโฟกัส คำเตือน และสิ่งที่ควรทำวันนี้หลังปลดล็อกพรีเมียม</div>';
   }
   cosmicBriefHtml += '</div>';
 
   // 5. ประกอบร่างการแสดงผล (Info + Power Elements + Radar)
   // Blueprint Header Card
   var blueprintCardHtml = '<div class="blueprint-card">'
-    + '<div class="bp-kicker">Thai Life Blueprint · พิมพ์เขียวชีวิตไทย</div>'
+    + '<div class="bp-kicker">พิมพ์เขียวชีวิตไทย</div>'
     + '<div class="bp-title">✦ ' + nm + ' ✦</div>'
     + '<div class="bp-grid">'
     + '<div class="bp-item"><div class="bp-icon" style="color:' + p.c + '">' + p.s + '</div><div class="bp-label">ดาวเจ้าชะตา</div><div class="bp-value" style="color:' + p.c + '">' + p.n + '</div></div>'
@@ -375,7 +375,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     +'<div class="ci"><div class="ci-l">'+u.el+'</div><div class="ci-v">ธาตุ'+p.el+'</div><div class="ci-s">'+u.es+'</div></div>'
     +'<div class="ci"><div class="ci-l">'+u.ge+'</div><div class="ci-v">'+gd+'</div><div class="ci-s">'+nm+'</div></div>'
     +'</div></div>'
-    + powerCardHtml 
+    + powerCardHtml
     + karmaHtml
     + domainHtml
     + monthlyLifeMapHtml
@@ -417,10 +417,10 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
   ];
 
   buildTabs('tt0','ts0','s0_',TB,p,u);
-  
+
   // 7. กล่องนัดหมายส่วนตัว (ลิงก์ Inbox ของคุณ)
   var consultHtml = '<div class="private-consult-card">'
-    + '<div class="pcc-subtitle">1-on-1 Private Reading</div>'
+    + '<div class="pcc-subtitle">การอ่านส่วนตัวแบบเจาะลึก</div>'
     + '<div class="pcc-title">✦ ปลดล็อกดวงชะตาแบบเจาะลึก ✦</div>'
     + '<div class="pcc-desc">ผลทำนายที่คุณเพิ่งอ่านเป็นเพียงเศษเสี้ยวของจักรวาลในตัวคุณ หากคุณกำลังเผชิญทางแยกของชีวิต หรือต้องการคำแนะนำแบบเจาะลึกเพื่อก้าวข้ามอุปสรรค... ให้ดวงดาวและเราช่วยนำทาง</div>'
     + '<a href="https://m.me/61573341702581" target="_blank" class="pcc-btn">จองคิวปรึกษาส่วนตัว</a>'
@@ -429,7 +429,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
   document.getElementById('ts0').insertAdjacentHTML('beforeend',
     '<div class="mc"><div class="mc-l">✦ '+u.mn+' · '+nm+' ✦</div>'
     +'<div class="mc-t">"'+p.man+'"</div></div>'
-    + consultHtml 
+    + consultHtml
     +'<div class="rbt"><button class="rbtn" data-action="reset-mode" data-mode="0">'+u.r0+'</button></div>'
   );
 }
