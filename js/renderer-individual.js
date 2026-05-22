@@ -35,17 +35,6 @@ function buildMonthlyLifeMapHtml(model, premiumUnlocked){
     + '<div class="mlm-pill"><span>Lucky Action</span>' + escapeHTML(model.elementAction) + '</div>'
     + '</div>';
 
-  if (!premiumUnlocked) {
-    html += '<div class="mlm-section-title">3 วันเด่นประจำเดือน</div><div class="mlm-days">';
-    model.freeDays.forEach(function(day){
-      html += '<div class="mlm-day"><div class="mlm-day-num">' + day.day + '</div>'
-        + '<div class="mlm-day-label">' + escapeHTML(day.label) + '</div>'
-        + '<div class="mlm-day-text">' + escapeHTML(day.simpleText || day.text || '') + '</div>'
-        + '<div class="mlm-day-advice"><strong>คำแนะนำ:</strong> ' + escapeHTML(day.advice || '') + '</div></div>';
-    });
-    html += '</div>';
-  }
-
   html += '<div class="mlm-section-title">' + (premiumUnlocked ? 'พรีวิว 4 ด้านเดือนนี้' : 'พรีวิว 4 ด้านประจำเดือน') + '</div><div class="mlm-domains">';
   model.domains.forEach(function(domain){
     html += '<div class="mlm-domain"><div class="mlm-domain-head"><span>' + escapeHTML(domain.icon) + '</span>' + escapeHTML(domain.label) + '</div>'
@@ -289,11 +278,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     + '<div class="share-btn-wrap"><button class="share-btn" data-action="save-image" data-target="power-card" data-filename="Lucky_Elements">📸 เซฟรูปภาพเลขมงคล</button></div>';
 
   var karma = buildKarmaMirror(p, dayOfWeek);
-  var karmaTeaser = '<div class="karma-kicker">Thai Life Blueprint</div>'
-    + '<div class="karma-title">✦ ' + escapeHTML(karma.title) + ' ✦</div>'
-    + '<div class="karma-desc">' + escapeHTML(karma.intro) + '</div>'
-    + '<div class="karma-item"><strong>ตัวอย่าง:</strong><br>กระจกกรรมจะช่วยชี้รูปแบบชีวิตที่วนซ้ำ บทเรียนของดาว และสิ่งที่ควรปรับในเดือนนี้</div>';
-  var karmaFull = '<div class="karma-card">'
+  var karmaFull = '<div class="karma-card' + (premiumUnlocked ? '' : ' is-locked') + '">'
     + '<div class="karma-kicker">Thai Life Blueprint</div>'
     + '<div class="karma-title">✦ ' + escapeHTML(karma.title) + ' ✦</div>'
     + '<div class="karma-desc">' + escapeHTML(karma.intro) + '</div>'
@@ -305,12 +290,13 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     + '</div>'
     + '<div class="karma-ritual"><span>พิธีเล็ก ๆ 7 วัน:</span> ' + escapeHTML(karma.ritual) + '</div>'
     + '</div>';
-  var karmaHtml = premiumUnlocked ? karmaFull : premiumLockedCard(
-    'karma-card',
-    karmaTeaser,
-    'ปลดล็อกกระจกกรรมเฉพาะตัว',
-    'ดูแพตเทิร์นชีวิต บทเรียนของดาว เงาจากวันเกิด คำแนะนำรายเดือน และ ritual ส่วนตัว 7 วัน'
-  );
+  var karmaHtml = karmaFull;
+  if (!premiumUnlocked) {
+    karmaHtml = karmaFull.slice(0, -6) + buildPremiumLockOverlay(
+      'ปลดล็อกกระจกกรรมเฉพาะตัว',
+      'ดูแพตเทิร์นชีวิต บทเรียนของดาว เงาจากวันเกิด คำแนะนำรายเดือน และ ritual ส่วนตัว 7 วัน'
+    ) + '</div>';
+  }
 
   var currentLifeBand = LIFE_BANDS[getLifeBandIndex(ageY)];
   var nextLifeBands = LIFE_BANDS.slice(getLifeBandIndex(ageY) + 1, getLifeBandIndex(ageY) + 3);
@@ -327,18 +313,14 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
   domainMatrix.domains.forEach(function(domain){
     domainHtml += '<div class="domain-card domain-' + escapeHTML(domain.key) + '">'
       + '<div class="domain-head"><span class="domain-icon">' + escapeHTML(domain.icon) + '</span><div><div class="domain-label">' + escapeHTML(domain.label) + '</div><div class="domain-subtitle">' + escapeHTML(domain.subtitle) + '</div></div></div>';
-    if (premiumUnlocked) {
-      domainHtml += '<div class="domain-part"><strong>สถานการณ์ปัจจุบัน</strong><p>' + escapeHTML(domain.current) + '</p></div>'
-        + '<div class="domain-part"><strong>สัญญาณเตือน</strong><p>' + escapeHTML(domain.warning) + '</p></div>'
-        + '<div class="domain-part"><strong>วิธีเสริมให้ดีขึ้น</strong><p>' + escapeHTML(domain.remedy) + '</p></div>'
-        + '<div class="domain-part"><strong>โอกาสตามช่วงอายุ</strong><div class="domain-ages">';
-      domain.opportunities.forEach(function(opp){
-        domainHtml += '<div class="domain-age"><span class="domain-age-chip">' + escapeHTML(opp.ageRange) + '</span><span>' + escapeHTML(opp.text) + '</span></div>';
-      });
-      domainHtml += '</div></div>';
-    } else {
-      domainHtml += '<div class="domain-part domain-teaser"><p>ล็อกไว้ใน Premium: อ่านรายละเอียดเฉพาะด้านนี้ พร้อมคำเตือน วิธีปรับ และจังหวะโอกาสตามวัย</p></div>';
-    }
+    domainHtml += '<div class="domain-part"><strong>สถานการณ์ปัจจุบัน</strong><p>' + escapeHTML(domain.current) + '</p></div>'
+      + '<div class="domain-part"><strong>สัญญาณเตือน</strong><p>' + escapeHTML(domain.warning) + '</p></div>'
+      + '<div class="domain-part"><strong>วิธีเสริมให้ดีขึ้น</strong><p>' + escapeHTML(domain.remedy) + '</p></div>'
+      + '<div class="domain-part"><strong>โอกาสตามช่วงอายุ</strong><div class="domain-ages">';
+    domain.opportunities.forEach(function(opp){
+      domainHtml += '<div class="domain-age"><span class="domain-age-chip">' + escapeHTML(opp.ageRange) + '</span><span>' + escapeHTML(opp.text) + '</span></div>';
+    });
+    domainHtml += '</div></div>';
     domainHtml += '</div>';
   });
   if (!premiumUnlocked) {

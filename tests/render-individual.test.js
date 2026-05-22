@@ -67,10 +67,27 @@ describe('Individual reading Karma Mirror render', () => {
     const output = dom.window.document.getElementById('r0').innerHTML;
     expect(output).toContain('กระจกกรรม');
     expect(output).toContain('ปลดล็อกรีพอร์ตฉบับเต็ม');
-    expect(output).not.toContain('รูปแบบที่มักวนซ้ำ');
-    expect(output).not.toContain('พิธีเล็ก ๆ 7 วัน');
+    expect(output).toContain('รูปแบบที่มักวนซ้ำ');
+    expect(output).toContain('พิธีเล็ก ๆ 7 วัน');
     expect(dom.window.document.querySelector('.karma-card')).toBeTruthy();
     expect(dom.window.document.querySelector('.karma-card.is-locked')).toBeTruthy();
+  });
+
+  it('reveals full Karma Mirror content when PIN unlock removes the lock overlay', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div>');
+    const context = loadContext(dom);
+
+    context.renderInd('คาร่า', 'หญิง', '2000-01-01', '06:00', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+
+    const karma = dom.window.document.querySelector('.karma-card');
+    expect(karma.classList.contains('is-locked')).toBe(true);
+
+    karma.classList.remove('is-locked');
+    karma.querySelector('.lock-overlay').remove();
+
+    expect(karma.textContent).toContain('รูปแบบที่มักวนซ้ำ');
+    expect(karma.textContent).toContain('พิธีเล็ก ๆ 7 วัน');
+    expect(karma.querySelector('.lock-overlay')).toBeNull();
   });
 
   it('renders full Thai Karma Mirror content for premium readers', () => {
@@ -232,7 +249,7 @@ describe('Life Domain Forecast Matrix', () => {
       expect(output).toContain(label);
     }
     for (const part of ['สถานการณ์ปัจจุบัน', 'สัญญาณเตือน', 'วิธีเสริม', 'โอกาสตามช่วงอายุ']) {
-      expect(output).not.toContain(part);
+      expect(output).toContain(part);
     }
     expect(output).toContain('วิเคราะห์ 6 ด้าน');
     expect(dom.window.document.querySelectorAll('.domain-card').length).toBe(6);
@@ -257,6 +274,10 @@ describe('Life Domain Forecast Matrix', () => {
 
     expect(matrix.classList.contains('is-locked')).toBe(false);
     expect(matrix.querySelector('.lock-overlay')).toBeNull();
+    expect(matrix.textContent).toContain('สถานการณ์ปัจจุบัน');
+    expect(matrix.textContent).toContain('สัญญาณเตือน');
+    expect(matrix.textContent).toContain('วิธีเสริม');
+    expect(matrix.textContent).toContain('โอกาสตามช่วงอายุ');
   });
 
   it('renders all required life-domain guidance parts for premium readers', () => {
@@ -284,17 +305,17 @@ describe('Life Domain Forecast Matrix', () => {
 });
 
 describe('Monthly Life Map UX clarity', () => {
-  it('shows 3 highlighted free days for locked readers', () => {
+  it('removes highlighted free days for locked readers', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div>');
     const context = loadContext(dom);
 
     context.renderInd('Test', 'หญิง', '2000-01-01', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const output = dom.window.document.getElementById('r0').innerHTML;
 
-    expect(output).toContain('3 วันเด่นประจำเดือน');
+    expect(output).not.toContain('3 วันเด่นประจำเดือน');
     expect(output).toContain('ปลดล็อกรีพอร์ตฉบับเต็ม');
     expect(output).not.toContain('ปฏิทินวันดีรายเดือน');
-    expect(dom.window.document.querySelectorAll('.mlm-day').length).toBe(3);
+    expect(dom.window.document.querySelectorAll('.mlm-day').length).toBe(0);
     expect(dom.window.document.querySelectorAll('.mlm-cal-day').length).toBe(0);
   });
 
@@ -345,9 +366,8 @@ describe('Monthly Life Map subscription feature', () => {
     const output = dom.window.document.getElementById('r0').innerHTML;
 
     expect(output).toContain('STARVIA Monthly Life Map');
-    expect(output).toContain('3 วันเด่นประจำเดือน');
-    expect(output).toContain('วันนี้เหมาะกับ');
-    expect(output).toContain('คำแนะนำ:');
+    expect(output).not.toContain('3 วันเด่นประจำเดือน');
+    expect(dom.window.document.querySelectorAll('.mlm-day').length).toBe(0);
     expect(output).toContain('คะแนน');
     expect(output).toContain('ควร');
     expect(output).toContain('ปลดล็อกรีพอร์ตฉบับเต็ม');
