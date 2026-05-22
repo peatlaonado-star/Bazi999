@@ -262,6 +262,35 @@ describe('Life Domain Forecast Matrix', () => {
   });
 });
 
+describe('Monthly Life Map UX clarity', () => {
+  it('shows 3 highlighted free days for locked readers', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div>');
+    const context = loadContext(dom);
+
+    context.renderInd('Test', 'หญิง', '2000-01-01', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const output = dom.window.document.getElementById('r0').innerHTML;
+
+    expect(output).toContain('3 วันเด่นประจำเดือน');
+    expect(output).toContain('ปลดล็อกรีพอร์ตฉบับเต็ม');
+    expect(output).not.toContain('ปฏิทินวันดีรายเดือน');
+    expect(dom.window.document.querySelectorAll('.mlm-day').length).toBe(3);
+    expect(dom.window.document.querySelectorAll('.mlm-cal-day').length).toBe(0);
+  });
+
+  it('renders full monthly calendar and removes 3-day preview for premium readers', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div>');
+    const context = loadContext(dom, { isPremiumUnlocked: () => true });
+
+    context.renderInd('Test', 'หญิง', '2000-01-01', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const output = dom.window.document.getElementById('r0').innerHTML;
+
+    expect(output).not.toContain('3 วันเด่นประจำเดือน');
+    expect(output).toContain('ปฏิทินวันดีรายเดือน');
+    expect(output).toContain('Weekly Brief 4 สัปดาห์');
+    expect(dom.window.document.querySelectorAll('.mlm-day').length).toBe(0);
+    expect(dom.window.document.querySelectorAll('.mlm-cal-day').length).toBeGreaterThanOrEqual(28);
+  });
+});
 describe('Monthly Life Map subscription feature', () => {
   it('builds a deterministic monthly model with calendar, weekly briefs, and ritual', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div>');
@@ -295,7 +324,7 @@ describe('Monthly Life Map subscription feature', () => {
     const output = dom.window.document.getElementById('r0').innerHTML;
 
     expect(output).toContain('STARVIA Monthly Life Map');
-    expect(output).toContain('วันเด่นฟรี 3 วัน');
+    expect(output).toContain('3 วันเด่นประจำเดือน');
     expect(output).toContain('วันนี้เหมาะกับ');
     expect(output).toContain('คำแนะนำ:');
     expect(output).toContain('คะแนน');
