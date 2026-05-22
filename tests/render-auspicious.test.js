@@ -19,6 +19,7 @@ function loadContext(dom, overrides = {}) {
     CL: 'th',
     setTimeout: () => {},
     scrollTo: () => {},
+    isPremiumUnlocked: () => false,
     ...overrides,
   };
   vm.createContext(context);
@@ -115,7 +116,7 @@ describe('Auspicious mode rendering', () => {
     expect(output).toContain('data-mode="2"');
   });
 
-  it('shows color recommendation section', () => {
+  it('shows color recommendation while locking Cosmic Routine for free readers', () => {
     const dom = new JSDOM('<!doctype html><div id="r2"></div>');
     const context = loadContext(dom, {
       PLC: [
@@ -134,6 +135,32 @@ describe('Auspicious mode rendering', () => {
     const output = dom.window.document.getElementById('r2').innerHTML;
     expect(output).toContain('พลังงานสี');
     expect(output).toContain('Cosmic Routine');
+    expect(output).toContain('ปลดล็อกรีพอร์ตฉบับเต็ม');
+    expect(output).not.toContain('Ignite (ปลุกพลัง)');
+    expect(dom.window.document.querySelector('.cosmic-routine-card.is-locked')).toBeTruthy();
+  });
+
+  it('shows Cosmic Routine and activity time windows for premium readers', () => {
+    const dom = new JSDOM('<!doctype html><div id="r2"></div>');
+    const context = loadContext(dom, {
+      PLC: [
+        [85, 70, 60, 90, 75, 80, 65],
+        [70, 85, 80, 65, 90, 60, 75],
+        [60, 80, 85, 75, 65, 90, 70],
+        [90, 65, 75, 85, 70, 60, 80],
+        [75, 90, 65, 70, 85, 80, 60],
+        [80, 60, 90, 80, 65, 75, 85],
+        [65, 75, 70, 80, 80, 85, 85],
+      ],
+      isPremiumUnlocked: () => true,
+    });
+    const p = planet();
+    context.renderAusp('ทดสอบ', p, 0, auspiciousUi());
+
+    const output = dom.window.document.getElementById('r2').innerHTML;
+    expect(output).toContain('Ignite (ปลุกพลัง)');
+    expect(output).toContain('act-time-window');
+    expect(dom.window.document.querySelector('.cosmic-routine-card.is-locked')).toBeNull();
   });
 });
 
@@ -172,9 +199,9 @@ describe('Auspicious mode personal upgrades', () => {
     expect(output).toContain('ธาตุไฟ');
   });
 
-  it('activity recommendations contain time window indicators', () => {
+  it('activity recommendations contain time window indicators for premium readers', () => {
     const dom = new JSDOM('<!doctype html><div id="r2"></div>');
-    const context = loadContext(dom, { PLC: PLC_DATA });
+    const context = loadContext(dom, { PLC: PLC_DATA, isPremiumUnlocked: () => true });
     context.renderAusp('Test', planet(), 0, auspiciousUi());
     const output = dom.window.document.getElementById('r2').innerHTML;
     expect(output).toContain('act-time-window');

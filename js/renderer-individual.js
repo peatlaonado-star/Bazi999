@@ -142,6 +142,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
   if (ageM < 0 || (ageM === 0 && today.getDate() < bday.getDate())) { ageY--; ageM += 12; }
   if (today.getDate() < bday.getDate()) { ageM--; if (ageM < 0) ageM = 11; }
   var ageTxt = (CL === 'th') ? ('อายุ ' + ageY + ' ปี ' + ageM + ' เดือน') : ('Age ' + ageY + ' yrs ' + ageM + ' mos');
+  var premiumUnlocked = premiumIsUnlocked();
   
   
   // 1. ทักษาปกรณ์ (Golden Trait / Shadow Self)
@@ -205,6 +206,9 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     { num: '3·7·8', c1: '#2196F3', c1n: 'ฟ้า', c2: '#F44336', c2n: 'แดง' }  // 6
   ];
   var pe = POWER_ELEMENTS[dayOfWeek];
+  var powerTip = premiumUnlocked
+    ? '<div class="pc-desc"><span class="hl-gold">เคล็ดลับ:</span> ใช้เลข <strong>' + pe.num + '</strong> ต่อท้ายชื่อไลน์/รหัสผ่าน และใช้สี <strong>' + pe.c1n + '/' + pe.c2n + '</strong> เป็นภาพพื้นหลังมือถือในวันสำคัญ เพื่อปรับคลื่นพลังงานดึงดูดความสำเร็จ</div>'
+    : '<div class="pc-desc"><span class="hl-gold">ฟรี:</span> เลขและสีมงคลสำหรับแชร์หรือใช้เป็นแรงบันดาลใจประจำวัน · ปลดล็อก Premium เพื่อดูวิธีใช้เชิงลึก</div>';
   var powerCardHtml = '<div class="power-card">'
     + '<div class="pc-header"><span style="font-size:16px;">✨</span> พลังงานเสริมดวง (Power Elements)</div>'
     + '<div class="pc-grid">'
@@ -215,12 +219,16 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     + '<div class="pc-color-wrap"><div class="pc-color-dot" style="background:' + pe.c2 + ';"></div><div class="pc-color-name">' + pe.c2n + '</div></div>'
     + '</div></div>'
     + '</div>'
-    + '<div class="pc-desc"><span class="hl-gold">เคล็ดลับ:</span> ใช้เลข <strong>' + pe.num + '</strong> ต่อท้ายชื่อไลน์/รหัสผ่าน และใช้สี <strong>' + pe.c1n + '/' + pe.c2n + '</strong> เป็นภาพพื้นหลังมือถือในวันสำคัญ เพื่อปรับคลื่นพลังงานดึงดูดความสำเร็จ</div>'
+    + powerTip
     + '</div>' // ปิด power-card
     + '<div class="share-btn-wrap"><button class="share-btn" data-action="save-image" data-target="power-card" data-filename="Lucky_Elements">📸 เซฟรูปภาพเลขมงคล</button></div>';
 
   var karma = buildKarmaMirror(p, dayOfWeek);
-  var karmaHtml = '<div class="karma-card">'
+  var karmaTeaser = '<div class="karma-kicker">Thai Life Blueprint</div>'
+    + '<div class="karma-title">✦ ' + escapeHTML(karma.title) + ' ✦</div>'
+    + '<div class="karma-desc">' + escapeHTML(karma.intro) + '</div>'
+    + '<div class="karma-item"><strong>ตัวอย่าง:</strong><br>กระจกกรรมจะช่วยชี้รูปแบบชีวิตที่วนซ้ำ บทเรียนของดาว และสิ่งที่ควรปรับในเดือนนี้</div>';
+  var karmaFull = '<div class="karma-card">'
     + '<div class="karma-kicker">Thai Life Blueprint</div>'
     + '<div class="karma-title">✦ ' + escapeHTML(karma.title) + ' ✦</div>'
     + '<div class="karma-desc">' + escapeHTML(karma.intro) + '</div>'
@@ -232,39 +240,63 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     + '</div>'
     + '<div class="karma-ritual"><span>พิธีเล็ก ๆ 7 วัน:</span> ' + escapeHTML(karma.ritual) + '</div>'
     + '</div>';
+  var karmaHtml = premiumUnlocked ? karmaFull : premiumLockedCard(
+    'karma-card',
+    karmaTeaser,
+    'ปลดล็อกกระจกกรรมเฉพาะตัว',
+    'ดูแพตเทิร์นชีวิต บทเรียนของดาว เงาจากวันเกิด คำแนะนำรายเดือน และ ritual ส่วนตัว 7 วัน'
+  );
 
   var currentLifeBand = LIFE_BANDS[getLifeBandIndex(ageY)];
   var nextLifeBands = LIFE_BANDS.slice(getLifeBandIndex(ageY) + 1, getLifeBandIndex(ageY) + 3);
   var domainMatrix = buildLifeDomainMatrix(p, r, l, currentLifeBand, nextLifeBands);
+  var domainIntro = premiumUnlocked
+    ? domainMatrix.intro
+    : 'พรีวิวหัวข้อชีวิต 6 ด้านที่ STARVIA จะวิเคราะห์ให้ละเอียดในรีพอร์ต Premium';
   var domainHtml = '<div class="domain-matrix">'
     + '<div class="domain-kicker">Thai Life Blueprint</div>'
     + '<div class="domain-title">✦ ' + escapeHTML(domainMatrix.title) + ' ✦</div>'
-    + '<div class="domain-desc">' + escapeHTML(domainMatrix.intro) + '</div>'
+    + '<div class="domain-desc">' + escapeHTML(domainIntro) + '</div>'
     + '<div class="domain-current-chip">ช่วงวัยปัจจุบัน: ' + escapeHTML(domainMatrix.currentAgeRange) + '</div>'
     + '<div class="domain-grid">';
   domainMatrix.domains.forEach(function(domain){
     domainHtml += '<div class="domain-card domain-' + escapeHTML(domain.key) + '">'
-      + '<div class="domain-head"><span class="domain-icon">' + escapeHTML(domain.icon) + '</span><div><div class="domain-label">' + escapeHTML(domain.label) + '</div><div class="domain-subtitle">' + escapeHTML(domain.subtitle) + '</div></div></div>'
-      + '<div class="domain-part"><strong>สถานการณ์ปัจจุบัน</strong><p>' + escapeHTML(domain.current) + '</p></div>'
-      + '<div class="domain-part"><strong>สัญญาณเตือน</strong><p>' + escapeHTML(domain.warning) + '</p></div>'
-      + '<div class="domain-part"><strong>วิธีเสริมให้ดีขึ้น</strong><p>' + escapeHTML(domain.remedy) + '</p></div>'
-      + '<div class="domain-part"><strong>โอกาสตามช่วงอายุ</strong><div class="domain-ages">';
-    domain.opportunities.forEach(function(opp){
-      domainHtml += '<div class="domain-age"><span class="domain-age-chip">' + escapeHTML(opp.ageRange) + '</span><span>' + escapeHTML(opp.text) + '</span></div>';
-    });
-    domainHtml += '</div></div></div>';
+      + '<div class="domain-head"><span class="domain-icon">' + escapeHTML(domain.icon) + '</span><div><div class="domain-label">' + escapeHTML(domain.label) + '</div><div class="domain-subtitle">' + escapeHTML(domain.subtitle) + '</div></div></div>';
+    if (premiumUnlocked) {
+      domainHtml += '<div class="domain-part"><strong>สถานการณ์ปัจจุบัน</strong><p>' + escapeHTML(domain.current) + '</p></div>'
+        + '<div class="domain-part"><strong>สัญญาณเตือน</strong><p>' + escapeHTML(domain.warning) + '</p></div>'
+        + '<div class="domain-part"><strong>วิธีเสริมให้ดีขึ้น</strong><p>' + escapeHTML(domain.remedy) + '</p></div>'
+        + '<div class="domain-part"><strong>โอกาสตามช่วงอายุ</strong><div class="domain-ages">';
+      domain.opportunities.forEach(function(opp){
+        domainHtml += '<div class="domain-age"><span class="domain-age-chip">' + escapeHTML(opp.ageRange) + '</span><span>' + escapeHTML(opp.text) + '</span></div>';
+      });
+      domainHtml += '</div></div>';
+    } else {
+      domainHtml += '<div class="domain-part domain-teaser"><p>ล็อกไว้ใน Premium: อ่านรายละเอียดเฉพาะด้านนี้ พร้อมคำเตือน วิธีปรับ และจังหวะโอกาสตามวัย</p></div>';
+    }
+    domainHtml += '</div>';
   });
-  domainHtml += '</div></div>';
+  if (!premiumUnlocked) {
+    domainHtml += '</div>' + buildPremiumLockOverlay(
+      'ปลดล็อก Life Domain Forecast Matrix',
+      'วิเคราะห์ 6 ด้าน: โชค การเงิน สุขภาพ ความรัก การงาน และบริวาร พร้อมคำแนะนำแบบลงมือทำได้'
+    );
+  }
+  domainHtml += '</div>';
 
   var briefData = buildDailyBrief(p, dayOfWeek, { name: pe.c1n, hex: pe.c1 });
   var cosmicBriefHtml = '<div class="cosmic-brief">'
     + '<div class="cb-title">✦ สรุปพลังงานวันนี้ · Daily Cosmic Brief ✦</div>'
     + '<div class="cb-line"><div class="cb-dot" style="background:' + briefData.colorHex + '"></div><div>' + briefData.energy + '</div></div>'
-    + '<div class="cb-line"><div class="cb-dot" style="background:' + briefData.colorHex + '"></div><div>สีมงคลวันนี้: <strong style="color:' + briefData.colorHex + '">' + briefData.colorName + '</strong></div></div>'
-    + '<div class="cb-line"><div class="cb-dot" style="background:#E8A0CF"></div><div>' + briefData.focus + '</div></div>'
-    + '<div class="cb-line"><div class="cb-dot" style="background:#E8534A"></div><div>' + briefData.warning + '</div></div>'
-    + '<div class="cb-line"><div class="cb-dot" style="background:var(--g)"></div><div>' + briefData.action + '</div></div>'
-    + '</div>';
+    + '<div class="cb-line"><div class="cb-dot" style="background:' + briefData.colorHex + '"></div><div>สีมงคลวันนี้: <strong style="color:' + briefData.colorHex + '">' + briefData.colorName + '</strong></div></div>';
+  if (premiumUnlocked) {
+    cosmicBriefHtml += '<div class="cb-line"><div class="cb-dot" style="background:#E8A0CF"></div><div>' + briefData.focus + '</div></div>'
+      + '<div class="cb-line"><div class="cb-dot" style="background:#E8534A"></div><div>' + briefData.warning + '</div></div>'
+      + '<div class="cb-line"><div class="cb-dot" style="background:var(--g)"></div><div>' + briefData.action + '</div></div>';
+  } else {
+    cosmicBriefHtml += '<div class="cb-premium-note">🔒 Daily Brief ฉบับเต็ม: ดูโฟกัส คำเตือน และสิ่งที่ควรทำวันนี้หลังปลดล็อก Premium</div>';
+  }
+  cosmicBriefHtml += '</div>';
 
   // 5. ประกอบร่างการแสดงผล (Info + Power Elements + Radar)
   // Blueprint Header Card

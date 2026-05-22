@@ -82,6 +82,7 @@ describe('Couple Dharma Map', () => {
       PLC: [[78, 78], [78, 78]],
       getELD: () => [['ไฟเจอไฟ ความรักชัด แรง และต้องฝึกผ่อนจังหวะกัน']],
       rasiAngle: () => [78, 'มุมสัมพันธ์ที่สะท้อนกันและกัน'],
+      isPremiumUnlocked: () => true,
     });
     const ra = sign('เมษ', '♈', 0);
     const rb = sign('สิงห์', '♌', 0);

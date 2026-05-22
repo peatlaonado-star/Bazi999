@@ -25,6 +25,7 @@ function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2){
   var wrap=document.getElementById('r1');
   na = escapeHTML(na);
   nb = escapeHTML(nb);
+  var premiumUnlocked = premiumIsUnlocked();
   var elS=ELC[pa.ei][pb.ei];
   var piA=getPL().indexOf(pa), piB=getPL().indexOf(pb);
   var plS=PLC[piA>=0?piA:0][piB>=0?piB:0];
@@ -45,7 +46,11 @@ function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2){
                                'Karmic Lesson (คู่เวรคู่กรรม/บทเรียนสำคัญ)';
 
   var dharma = getCoupleDharmaType(total, elS, pa.ei === pb.ei);
-  var dharmaHtml = '<div class="dharma-card">'
+  var dharmaTeaser = '<div class="dharma-kicker">Couple Dharma Map</div>'
+    + '<div class="dharma-label">' + escapeHTML(dharma.label) + '</div>'
+    + '<div class="dharma-title">' + escapeHTML(dharma.title) + '</div>'
+    + '<div class="dharma-intro">ปลดล็อกเพื่ออ่านบทเรียนร่วมกัน วิธีดูแลความสัมพันธ์ และแผนที่ความสัมพันธ์ฉบับเต็ม</div>';
+  var dharmaFull = '<div class="dharma-card">'
     + '<div class="dharma-kicker">Couple Dharma Map</div>'
     + '<div class="dharma-label">' + escapeHTML(dharma.label) + '</div>'
     + '<div class="dharma-title">' + escapeHTML(dharma.title) + '</div>'
@@ -55,6 +60,12 @@ function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2){
     + '<div><strong>วิธีดูแลความสัมพันธ์</strong><br>' + escapeHTML(dharma.advice) + '</div>'
     + '</div>'
     + '</div>';
+  var dharmaHtml = premiumUnlocked ? dharmaFull : premiumLockedCard(
+    'dharma-card',
+    dharmaTeaser,
+    'ปลดล็อก Couple Dharma Map',
+    'ดูบทเรียนความสัมพันธ์ คะแนนย่อย 4 ด้าน และแผนดูแลความรักแบบเต็ม'
+  );
 
   // สร้าง Viral Matrix Card
   var matrixHtml = '<div class="matrix-card">'
@@ -78,14 +89,17 @@ function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2){
     + '</div>' // ปิด matrix-card
     + '<div class="share-btn-wrap"><button class="share-btn" data-action="save-image" data-target="matrix-card" data-filename="Soulmate_Matrix" style="color:#C9A227; border-color:rgba(201,162,39,0.4);">📸 เซฟรูปคะแนนคู่รัก</button></div>';
 
-  wrap.innerHTML = matrixHtml
-    + dharmaHtml
-    +'<div class="cg2">'
+  var scoreBreakdownHtml = '<div class="cg2' + (premiumUnlocked ? '' : ' is-locked') + '">'
     +'<div class="ci2"><div class="ci2l">'+u.ec+'</div><div class="ci2s">'+pa.el+' + '+pb.el+'</div><div class="ci2v">'+elS+'%</div></div>'
     +'<div class="ci2"><div class="ci2l">'+u.pc+'</div><div class="ci2s">'+pa.s+' + '+pb.s+'</div><div class="ci2v">'+plS+'%</div></div>'
     +'<div class="ci2"><div class="ci2l">'+u.rc+'</div><div class="ci2s">'+ra.s+' + '+rb.s+'</div><div class="ci2v">'+angS+'%</div></div>'
     +'<div class="ci2"><div class="ci2l">'+u.lc+'</div><div class="ci2s">'+RA2[lia].s+' + '+RA2[lib].s+'</div><div class="ci2v">'+lgS+'%</div></div>'
-    +'</div>'
+    + (premiumUnlocked ? '' : buildPremiumLockOverlay('ปลดล็อกคะแนนย่อย 4 ด้าน', 'ดูเคมีธาตุ ดาวคู่ ราศีคู่ และลัคนาคู่ พร้อมคำอธิบายเต็ม'))
+    +'</div>';
+
+  wrap.innerHTML = matrixHtml
+    + dharmaHtml
+    + scoreBreakdownHtml
     +'<div class="tabs-w"><div class="tabs" id="tt1"></div></div><div id="ts1"></div>';
 
   // สร้าง Action Plan สำหรับคู่รัก
@@ -98,9 +112,16 @@ function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2){
     + '<div class="ap-step"><div class="ap-num">2</div><div class="ap-content"><h4>หลุมพรางที่ต้องระวัง</h4><p>สิ่งที่ดาวเตือนคือ <strong>' + strW + '</strong> เมื่อเกิดปัญหานี้ ให้หยุดพัก 15 นาทีก่อนคุยต่อเพื่อลดการใช้อารมณ์</p></div></div>'
     + '<div class="ap-step"><div class="ap-num">3</div><div class="ap-content"><h4>คำแนะนำจากดวงดาว</h4><p>ความสัมพันธ์ที่ยั่งยืนไม่ได้เกิดจากดวงที่สมบูรณ์แบบ แต่เกิดจากคนสองคนที่ไม่ยอมแพ้ต่อกัน หมั่นสื่อสารความต้องการอย่างตรงไปตรงมาและให้เกียรติกันเสมอ</p></div></div>'
     + '</div>';
+  var visibleActionPlanHtml = premiumUnlocked ? actionPlanHtml : premiumLockedCard(
+    'action-plan-card',
+    '<div class="ap-title">✦ แผนความสัมพันธ์ Premium ✦</div><p style="text-align:center;color:var(--tx2);line-height:1.7;">ปลดล็อกเพื่อดูจุดแข็ง หลุมพราง และคำแนะนำเฉพาะคู่</p>',
+    'ปลดล็อกแผนความสัมพันธ์',
+    'อ่านแผน 3 ขั้นสำหรับรักษาจุดแข็ง ระวังหลุมพราง และสื่อสารให้ดีขึ้น'
+  );
+  wrap.insertAdjacentHTML('beforeend', visibleActionPlanHtml);
 
   var CT=[
-    {lb:u.ct[0], secs:[{t:'ผลวิเคราะห์เคมีคู่รัก', c:actionPlanHtml, rf:'หลักดวงสมพงศ์ (Synastry) ผสมผสานหลักจิตวิทยาความสัมพันธ์'}]},
+    {lb:u.ct[0], secs:[{t:'ผลวิเคราะห์เคมีคู่รัก', c:(premiumUnlocked ? actionPlanHtml : '<p>ปลดล็อก Premium เพื่ออ่านแผนความสัมพันธ์ฉบับเต็ม</p>'), rf:'หลักดวงสมพงศ์ (Synastry) ผสมผสานหลักจิตวิทยาความสัมพันธ์'}]},
     {lb:u.ct[1], secs:[{t:u.cs[1], c:elDesc, rf:'Four Elements | '+pa.el+' + '+pb.el+' | Score: '+elS+'%'}]},
     {lb:u.ct[2], secs:[{t:u.cs[2], c:ra.n+' meets '+rb.n+' — '+angD, rf:'Sign synastry | '+ra.n+' + '+rb.n+' | Score: '+angS+'%'}]},
     {lb:u.ct[3], secs:[{t:u.cs[3], c:'ลัคนาของ'+na+'ตกในราศี'+RA2[lia].n+' — '+RA2[lia].add+'<br><br>ลัคนาของ'+nb+'ตกในราศี'+RA2[lib].n+' — '+RA2[lib].add, rf:'Lagna '+RA2[lia].n+' + '+RA2[lib].n+' | Score: '+lgS+'%'}]}

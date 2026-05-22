@@ -14,6 +14,7 @@ function go2(){
 function renderAusp(nm,p,pw,u){
   var wrap=document.getElementById('r2');
   nm = escapeHTML(nm);
+  var premiumUnlocked = premiumIsUnlocked();
   // Personal header card
   var elementEmoji = p.el === 'ไฟ' ? '🔥' : p.el === 'ดิน' ? '🪨' : p.el === 'ลม' ? '💨' : '💧';
   var connectionMsg = 'พลังงานจากดาว' + p.n + ' (' + p.el + ') เสริมจังหวะชีวิตของคุณ';
@@ -80,12 +81,17 @@ function renderAusp(nm,p,pw,u){
     ]
   };
   var myRoutine = routines[p.el];
-  var routineHtml = '<div class="wellness-card">'
+  var routineHtml = '<div class="wellness-card cosmic-routine-card' + (premiumUnlocked ? '' : ' is-locked') + '">'
     + '<div class="wc-title"><span style="font-size:16px;">⏳</span> นาฬิกาชีวิตธาตุ'+p.el+' (Cosmic Routine)</div>'
     + '<div style="font-size:11.5px; color:var(--tx2); margin-bottom:16px; text-align:center; line-height:1.6;">ตารางเวลาที่สอดคล้องกับพลังงานดวงดาวของคุณ ปรับใช้เพื่อดึงศักยภาพออกมาได้สูงสุดและลดความเหนื่อยล้า</div>';
-  myRoutine.forEach(function(rt){
-    routineHtml += '<div class="time-block"><div class="tb-time">'+rt.t+'</div><div class="tb-desc">'+rt.d+'</div></div>';
-  });
+  if (premiumUnlocked) {
+    myRoutine.forEach(function(rt){
+      routineHtml += '<div class="time-block"><div class="tb-time">'+rt.t+'</div><div class="tb-desc">'+rt.d+'</div></div>';
+    });
+  } else {
+    routineHtml += '<div class="time-block"><div class="tb-time">Premium</div><div class="tb-desc">ปลดล็อกเพื่อดูตารางนาฬิกาชีวิตรายช่วงเวลาและคำแนะนำเฉพาะธาตุของคุณ</div></div>'
+      + buildPremiumLockOverlay('ปลดล็อก Cosmic Routine', 'ดูตารางชีวิตตามธาตุ ช่วงเวลาพลังสูง และช่วงเวลาพักฟื้นที่เหมาะกับคุณ');
+  }
   routineHtml += '</div>';
 
   // 3. ปฏิทินวันมงคล (Auspicious Days)
@@ -109,9 +115,18 @@ function renderAusp(nm,p,pw,u){
   var ah='';
   ACTS_TH.forEach(function(a, aIdx){
     ah+='<div class="hi"><div class="hn" style="width:auto;border-radius:7px;padding:0 8px;font-size:10px">'+a[0]+'</div>'
-      +'<div class="ht" style="font-size:12px;">'+u.ab+' <strong style="color:#C9A227">'+u.ad+DN[a[1]]+'</strong> <span style="font-size:10px;color:var(--tx2);">(รองลงมา: '+u.ad+DN[a[2]]+')</span>'
-      +'<span class="act-time-window">⏰ '+actTimes[aIdx]+'</span></div></div>';
+      +'<div class="ht" style="font-size:12px;">';
+    if (premiumUnlocked) {
+      ah += u.ab+' <strong style="color:#C9A227">'+u.ad+DN[a[1]]+'</strong> <span style="font-size:10px;color:var(--tx2);">(รองลงมา: '+u.ad+DN[a[2]]+')</span>'
+        +'<span class="act-time-window">⏰ '+actTimes[aIdx]+'</span>';
+    } else {
+      ah += 'ปลดล็อก Premium เพื่อดูวันหลัก วันรอง และช่วงเวลาที่เหมาะกับกิจกรรมนี้';
+    }
+    ah += '</div></div>';
   });
+  if (!premiumUnlocked) {
+    ah += buildPremiumLockOverlay('ปลดล็อกเวลาดีรายกิจกรรม', 'ดูวันและช่วงเวลาที่เหมาะกับการเริ่มงาน เจรจา พบผู้ใหญ่ การเงิน และความรัก');
+  }
 
   // รวบรวมข้อมูลทั้งหมดแสดงผล
   wrap.innerHTML=

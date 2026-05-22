@@ -20,6 +20,7 @@ function loadContext(dom, overrides = {}) {
     setTimeout: () => {},
     scrollTo: () => {},
     getPL: () => [],
+    isPremiumUnlocked: () => false,
     ...overrides,
   };
   vm.createContext(context);
@@ -141,4 +142,56 @@ describe('Couple mode rendering', () => {
     expect(ts1.innerHTML).toContain('data-action="reset-mode"');
     expect(ts1.innerHTML).toContain('data-mode="1"');
   });
+
+  it('locks couple dharma details, score breakdown, and action plan for free readers', () => {
+    const dom = new JSDOM('<!doctype html><div id="r1"></div><div id="tt1"></div><div id="ts1"></div>');
+    const pa = planet('อาทิตย์', 'ไฟ', 0);
+    const pb = planet('เสาร์', 'ไฟ', 0);
+    const context = loadContext(dom, {
+      getPL: () => [pa, pb],
+      ELC: [[78]],
+      PLC: [[78, 78], [78, 78]],
+      getELD: () => [['ไฟเจอไฟ']],
+      rasiAngle: () => [78, 'มุม'],
+    });
+    const ra = sign('เมษ');
+    const rb = sign('สิงห์');
+    const RA2 = [ra, rb];
+
+    context.renderCouple('A', pa, ra, ra, 0, 0, 'B', pb, rb, rb, 1, 1, coupleUi(), RA2);
+
+    const output = dom.window.document.getElementById('r1').innerHTML;
+    expect(output).toContain('Compatibility Matrix');
+    expect(output).toContain('คู่');
+    expect(output).toContain('ปลดล็อกรีพอร์ตฉบับเต็ม');
+    expect(output).not.toContain('สิ่งที่คู่นี้มาเรียนรู้ร่วมกัน');
+    expect(output).not.toContain('พิมพ์เขียวความสัมพันธ์');
+    expect(dom.window.document.querySelector('.cg2.is-locked')).toBeTruthy();
+    expect(dom.window.document.querySelector('.dharma-card.is-locked')).toBeTruthy();
+  });
+
+  it('shows couple premium details after unlock', () => {
+    const dom = new JSDOM('<!doctype html><div id="r1"></div><div id="tt1"></div><div id="ts1"></div>');
+    const pa = planet('อาทิตย์', 'ไฟ', 0);
+    const pb = planet('เสาร์', 'ไฟ', 0);
+    const context = loadContext(dom, {
+      getPL: () => [pa, pb],
+      ELC: [[78]],
+      PLC: [[78, 78], [78, 78]],
+      getELD: () => [['ไฟเจอไฟ']],
+      rasiAngle: () => [78, 'มุม'],
+      isPremiumUnlocked: () => true,
+    });
+    const ra = sign('เมษ');
+    const rb = sign('สิงห์');
+    const RA2 = [ra, rb];
+
+    context.renderCouple('A', pa, ra, ra, 0, 0, 'B', pb, rb, rb, 1, 1, coupleUi(), RA2);
+
+    const output = dom.window.document.getElementById('r1').innerHTML;
+    expect(output).toContain('สิ่งที่คู่นี้มาเรียนรู้ร่วมกัน');
+    expect(output).toContain('พิมพ์เขียวความสัมพันธ์');
+    expect(dom.window.document.querySelector('.cg2.is-locked')).toBeNull();
+  });
+
 });

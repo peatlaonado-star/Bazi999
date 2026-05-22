@@ -4,7 +4,7 @@ import path from 'node:path';
 import vm from 'node:vm';
 import { JSDOM } from 'jsdom';
 
-function loadContext(dom) {
+function loadContext(dom, overrides = {}) {
   const contentSource = fs.readFileSync(path.resolve('data/thai-astrology-content.js'), 'utf8');
   const helperSource = fs.readFileSync(path.resolve('js/reading-helpers.js'), 'utf8');
   const rendererSources = [
@@ -26,6 +26,7 @@ function loadContext(dom) {
     setTimeout: () => {},
     scrollTo: () => {},
     isPremiumUnlocked: () => false,
+    ...overrides,
   };
   vm.createContext(context);
   vm.runInContext(contentSource, context, { filename: 'data/thai-astrology-content.js' });
@@ -57,7 +58,7 @@ function sampleUi() {
 }
 
 describe('Individual reading Karma Mirror render', () => {
-  it('renders a premium Thai Karma Mirror card in the individual report', () => {
+  it('locks the Thai Karma Mirror card for free readers', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div>');
     const context = loadContext(dom);
 
@@ -65,10 +66,23 @@ describe('Individual reading Karma Mirror render', () => {
 
     const output = dom.window.document.getElementById('r0').innerHTML;
     expect(output).toContain('กระจกกรรม');
-    expect(output).toContain('สิ่งที่ชีวิตมักพากลับมาเรียนรู้');
+    expect(output).toContain('ปลดล็อกรีพอร์ตฉบับเต็ม');
+    expect(output).not.toContain('รูปแบบที่มักวนซ้ำ');
+    expect(output).not.toContain('พิธีเล็ก ๆ 7 วัน');
+    expect(dom.window.document.querySelector('.karma-card')).toBeTruthy();
+    expect(dom.window.document.querySelector('.karma-card.is-locked')).toBeTruthy();
+  });
+
+  it('renders full Thai Karma Mirror content for premium readers', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div>');
+    const context = loadContext(dom, { isPremiumUnlocked: () => true });
+
+    context.renderInd('คาร่า', 'หญิง', '2000-01-01', '06:00', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+
+    const output = dom.window.document.getElementById('r0').innerHTML;
     expect(output).toContain('รูปแบบที่มักวนซ้ำ');
     expect(output).toContain('พิธีเล็ก ๆ 7 วัน');
-    expect(dom.window.document.querySelector('.karma-card')).toBeTruthy();
+    expect(dom.window.document.querySelector('.karma-card.is-locked')).toBeNull();
   });
 });
 
@@ -154,12 +168,12 @@ describe('Daily Thai Cosmic Brief', () => {
     expect(output).toContain('สรุปพลังงานวันนี้');
   });
 
-  it('contains 5 cb-line elements', () => {
+  it('shows only 2 free cb-line elements before premium unlock', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
     const context = loadContext(dom);
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const lines = dom.window.document.querySelectorAll('.cb-line');
-    expect(lines.length).toBe(5);
+    expect(lines.length).toBe(2);
   });
 
   it('shows personal color name', () => {
@@ -180,9 +194,21 @@ describe('Daily Thai Cosmic Brief', () => {
     expect(karmaIndex).toBeLessThan(briefIndex);
   });
 
-  it('contains energy, focus, warning, and action text', () => {
+  it('locks focus, warning, and action text before premium unlock', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
     const context = loadContext(dom);
+    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const output = dom.window.document.getElementById('r0').innerHTML;
+    expect(output).toContain('พลังงานวัน');
+    expect(output).not.toContain('โฟกัส:');
+    expect(output).not.toContain('ระวัง:');
+    expect(output).not.toContain('สิ่งที่ควรทำวันนี้:');
+    expect(output).toContain('Daily Brief ฉบับเต็ม');
+  });
+
+  it('contains full energy, focus, warning, and action text for premium readers', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+    const context = loadContext(dom, { isPremiumUnlocked: () => true });
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const output = dom.window.document.getElementById('r0').innerHTML;
     expect(output).toContain('พลังงานวัน');
@@ -193,7 +219,7 @@ describe('Daily Thai Cosmic Brief', () => {
 });
 
 describe('Life Domain Forecast Matrix', () => {
-  it('renders all required life domains with required guidance parts', () => {
+  it('shows domain labels but locks detailed life-domain guidance for free readers', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
     const context = loadContext(dom);
 
@@ -206,14 +232,27 @@ describe('Life Domain Forecast Matrix', () => {
       expect(output).toContain(label);
     }
     for (const part of ['สถานการณ์ปัจจุบัน', 'สัญญาณเตือน', 'วิธีเสริม', 'โอกาสตามช่วงอายุ']) {
+      expect(output).not.toContain(part);
+    }
+    expect(output).toContain('วิเคราะห์ 6 ด้าน');
+    expect(dom.window.document.querySelectorAll('.domain-card').length).toBe(6);
+  });
+
+  it('renders all required life-domain guidance parts for premium readers', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+    const context = loadContext(dom, { isPremiumUnlocked: () => true });
+
+    context.renderInd('Test', 'หญิง', '1990-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+
+    const output = dom.window.document.getElementById('r0').innerHTML;
+    for (const part of ['สถานการณ์ปัจจุบัน', 'สัญญาณเตือน', 'วิธีเสริม', 'โอกาสตามช่วงอายุ']) {
       expect(output).toContain(part);
     }
-    expect(dom.window.document.querySelectorAll('.domain-card').length).toBe(6);
   });
 
   it('shows explicit age-band opportunities for future life stages', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
-    const context = loadContext(dom);
+    const context = loadContext(dom, { isPremiumUnlocked: () => true });
 
     context.renderInd('Test', 'หญิง', '1990-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
 
