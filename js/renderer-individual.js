@@ -318,7 +318,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
   var domainIntro = premiumUnlocked
     ? domainMatrix.intro
     : 'พรีวิวหัวข้อชีวิต 6 ด้านที่ STARVIA จะวิเคราะห์ให้ละเอียดในรีพอร์ต Premium';
-  var domainHtml = '<div class="domain-matrix">'
+  var domainHtml = '<div class="domain-matrix' + (premiumUnlocked ? '' : ' is-locked') + '">'
     + '<div class="domain-kicker">Thai Life Blueprint</div>'
     + '<div class="domain-title">✦ ' + escapeHTML(domainMatrix.title) + ' ✦</div>'
     + '<div class="domain-desc">' + escapeHTML(domainIntro) + '</div>'

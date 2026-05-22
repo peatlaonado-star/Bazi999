@@ -236,6 +236,27 @@ describe('Life Domain Forecast Matrix', () => {
     }
     expect(output).toContain('วิเคราะห์ 6 ด้าน');
     expect(dom.window.document.querySelectorAll('.domain-card').length).toBe(6);
+    expect(dom.window.document.querySelector('.domain-matrix.is-locked')).toBeTruthy();
+  });
+
+  it('unlocks domain matrix when is-locked class is removed (simulates PIN unlock)', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+    const context = loadContext(dom);
+
+    context.renderInd('Test', 'หญิง', '1990-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+
+    const matrix = dom.window.document.querySelector('.domain-matrix');
+    expect(matrix.classList.contains('is-locked')).toBe(true);
+
+    // Simulate onPremiumVerified behavior
+    dom.window.document.querySelectorAll('.is-locked').forEach((el) => {
+      el.classList.remove('is-locked');
+      const overlay = el.querySelector('.lock-overlay');
+      if (overlay) overlay.remove();
+    });
+
+    expect(matrix.classList.contains('is-locked')).toBe(false);
+    expect(matrix.querySelector('.lock-overlay')).toBeNull();
   });
 
   it('renders all required life-domain guidance parts for premium readers', () => {
