@@ -22,6 +22,63 @@ function buildDailyBrief(p, dayOfWeek, personalColor) {
   return { energy: energy, colorName: colorName, colorHex: colorHex, focus: focus, warning: warning, action: action };
 }
 
+
+
+function buildMonthlyLifeMapHtml(model, premiumUnlocked){
+  var html = '<div class="monthly-life-map' + (premiumUnlocked ? '' : ' is-locked') + '">'
+    + '<div class="mlm-kicker">Monthly Astrology Companion</div>'
+    + '<div class="mlm-title">✦ ' + escapeHTML(model.title) + ' ✦</div>'
+    + '<div class="mlm-summary"><strong>พลังงานหลักของเดือนนี้:</strong> ' + escapeHTML(model.elementFocus) + '</div>'
+    + '<div class="mlm-grid">'
+    + '<div class="mlm-pill"><span>โฟกัส</span>' + escapeHTML(model.elementFocus) + '</div>'
+    + '<div class="mlm-pill"><span>วันที่ควรระวัง</span>' + escapeHTML(model.elementWarning) + '</div>'
+    + '<div class="mlm-pill"><span>Lucky Action</span>' + escapeHTML(model.elementAction) + '</div>'
+    + '</div>';
+
+  html += '<div class="mlm-section-title">วันเด่นฟรี 3 วัน</div><div class="mlm-days">';
+  model.freeDays.forEach(function(day){
+    html += '<div class="mlm-day"><div class="mlm-day-num">' + day.day + '</div><div class="mlm-day-label">' + escapeHTML(day.label) + '</div></div>';
+  });
+  html += '</div>';
+
+  html += '<div class="mlm-section-title">พรีวิว 4 ด้านประจำเดือน</div><div class="mlm-domains">';
+  model.domains.forEach(function(domain){
+    html += '<div class="mlm-domain"><div class="mlm-domain-head"><span>' + escapeHTML(domain.icon) + '</span>' + escapeHTML(domain.label) + '</div>'
+      + '<p>' + escapeHTML(premiumUnlocked ? domain.forecast : domain.teaser) + '</p>'
+      + (premiumUnlocked ? '<div class="mlm-goal">เป้าหมาย: ' + escapeHTML(domain.goal) + '</div>' : '')
+      + '</div>';
+  });
+  html += '</div>';
+
+  if (premiumUnlocked) {
+    html += '<div class="mlm-section-title">ปฏิทินวันดีรายเดือน</div><div class="mlm-calendar">';
+    model.calendarDays.forEach(function(day){
+      html += '<div class="mlm-cal-day mlm-' + escapeHTML(day.tone) + '"><strong>' + day.day + '</strong><span>' + escapeHTML(day.label) + '</span></div>';
+    });
+    html += '</div>';
+
+    html += '<div class="mlm-section-title">Weekly Brief 4 สัปดาห์</div><div class="mlm-weeks">';
+    model.weeklyBriefs.forEach(function(week){
+      html += '<div class="mlm-week"><strong>' + escapeHTML(week.title) + '</strong><p>' + escapeHTML(week.brief) + '</p><span>' + escapeHTML(week.action) + '</span></div>';
+    });
+    html += '</div>';
+
+    html += '<div class="mlm-section-title">ภารกิจเสริมดวง 7 วัน</div><div class="mlm-rituals">';
+    model.rituals.forEach(function(ritual, index){
+      html += '<div class="mlm-ritual"><span>Day ' + (index + 1) + '</span>' + escapeHTML(ritual) + '</div>';
+    });
+    html += '</div>';
+  } else {
+    html += buildPremiumLockOverlay(
+      'ปลดล็อก Monthly Life Map ฉบับเต็ม',
+      'ดูดวงรายเดือนครบทุกด้าน ปฏิทินวันดีทั้งเดือน สรุปรายสัปดาห์ และภารกิจส่วนตัวตลอด 7 วัน'
+    );
+  }
+
+  html += '</div>';
+  return html;
+}
+
 // ===== MODE 0: Individual =====
 function go0(){
   var ds=document.getElementById('d0').value; if(!ds)return;
@@ -284,6 +341,9 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
   }
   domainHtml += '</div>';
 
+  var monthlyLifeMap = buildMonthlyLifeMap(p, r, l, ds);
+  var monthlyLifeMapHtml = buildMonthlyLifeMapHtml(monthlyLifeMap, premiumUnlocked);
+
   var briefData = buildDailyBrief(p, dayOfWeek, { name: pe.c1n, hex: pe.c1 });
   var cosmicBriefHtml = '<div class="cosmic-brief">'
     + '<div class="cb-title">✦ สรุปพลังงานวันนี้ · Daily Cosmic Brief ✦</div>'
@@ -328,6 +388,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     + powerCardHtml 
     + karmaHtml
     + domainHtml
+    + monthlyLifeMapHtml
     + cosmicBriefHtml
     + buildElementRadar(p, r, l)
     +'<div class="tabs-w"><div class="tabs" id="tt0"></div></div><div id="ts0"></div>';

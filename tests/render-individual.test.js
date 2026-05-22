@@ -261,3 +261,47 @@ describe('Life Domain Forecast Matrix', () => {
     expect(chips.some((text) => /\d+–\d+ ปี/.test(text))).toBe(true);
   });
 });
+
+describe('Monthly Life Map subscription feature', () => {
+  it('builds a deterministic monthly model with calendar, weekly briefs, and ritual', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div>');
+    const context = loadContext(dom);
+    const model = context.buildMonthlyLifeMap(samplePlanet('ไฟ'), sampleSign(), sampleSign(), '2000-01-01', new Date('2026-06-15T00:00:00Z'));
+
+    expect(model.title).toContain('มิถุนายน 2569');
+    expect(model.freeDays).toHaveLength(3);
+    expect(model.calendarDays.length).toBeGreaterThanOrEqual(28);
+    expect(model.weeklyBriefs).toHaveLength(4);
+    expect(model.rituals).toHaveLength(7);
+    expect(model.domains.map((domain) => domain.key)).toEqual(['career', 'money', 'relationship', 'health']);
+  });
+
+  it('shows free monthly preview but locks detailed monthly planning', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div>');
+    const context = loadContext(dom);
+
+    context.renderInd('Test', 'หญิง', '2000-01-01', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const output = dom.window.document.getElementById('r0').innerHTML;
+
+    expect(output).toContain('STARVIA Monthly Life Map');
+    expect(output).toContain('วันเด่นฟรี 3 วัน');
+    expect(output).toContain('ปลดล็อกรีพอร์ตฉบับเต็ม');
+    expect(output).not.toContain('Weekly Brief 4 สัปดาห์');
+    expect(output).not.toContain('ภารกิจเสริมดวง 7 วัน');
+    expect(dom.window.document.querySelector('.monthly-life-map.is-locked')).toBeTruthy();
+  });
+
+  it('renders full monthly planner for premium readers', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div>');
+    const context = loadContext(dom, { isPremiumUnlocked: () => true });
+
+    context.renderInd('Test', 'หญิง', '2000-01-01', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const output = dom.window.document.getElementById('r0').innerHTML;
+
+    expect(output).toContain('Weekly Brief 4 สัปดาห์');
+    expect(output).toContain('ภารกิจเสริมดวง 7 วัน');
+    expect(output).toContain('ปฏิทินวันดีรายเดือน');
+    expect(output).toContain('วันที่ควรระวัง');
+    expect(dom.window.document.querySelector('.monthly-life-map.is-locked')).toBeNull();
+  });
+});

@@ -141,3 +141,93 @@ function buildLifeDomainMatrix(p, r, l, currentBand, nextBands){
     })
   };
 }
+
+var THAI_MONTH_NAMES = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+
+var FALLBACK_MONTHLY_LIFE_MAP = {
+  domains: [
+    { key: 'career', label: 'การงาน', icon: '◈', teaser: 'เลือกงานหลักแล้วปิดให้เห็นผล' },
+    { key: 'money', label: 'การเงิน', icon: '💰', teaser: 'วางระบบเงินให้ชัด' },
+    { key: 'relationship', label: 'ความรัก', icon: '♡', teaser: 'คุยด้วยความจริงใจและมีขอบเขต' },
+    { key: 'health', label: 'สุขภาพ', icon: '🫀', teaser: 'พักให้พอและดูแล routine เล็ก ๆ' }
+  ],
+  elementGuidance: {
+    'ไฟ': { focus: 'ลงมือเรื่องสำคัญ', warning: 'ระวังใจร้อน', action: 'เลือกเป้าหมายหลักหนึ่งเรื่อง' }
+  },
+  weeklyThemes: [
+    { title: 'สัปดาห์ที่ 1 · ตั้งเจตนา', brief: 'ตั้งเป้าหมายเดือนนี้' },
+    { title: 'สัปดาห์ที่ 2 · เร่งจังหวะ', brief: 'ลงมือกับงานหลัก' },
+    { title: 'สัปดาห์ที่ 3 · ปรับสมดุล', brief: 'ทบทวนและปรับแผน' },
+    { title: 'สัปดาห์ที่ 4 · เก็บเกี่ยว', brief: 'ปิดงานและสรุปบทเรียน' }
+  ],
+  rituals: ['เขียนเป้าหมายเดือนนี้','เคลียร์พื้นที่','เลือกสีมงคล','ขอบคุณผู้สนับสนุน','พักใจ','จดบทเรียน','ตั้งเจตนาเดือนถัดไป'],
+  activityLabels: { career: 'งาน/โปรเจกต์', money: 'เงิน/ลงทุน', love: 'รัก/ความสัมพันธ์', rest: 'พัก/เคลียร์ใจ', caution: 'วันที่ควรระวัง' }
+};
+
+function getDaysInMonth(year, monthIndex){
+  return new Date(year, monthIndex + 1, 0).getDate();
+}
+
+function buildMonthlyLifeMap(p, r, l, birthDate, today){
+  var content = (typeof THAI_ASTRO_CONTENT !== 'undefined') ? THAI_ASTRO_CONTENT : null;
+  var cfg = content && content.monthlyLifeMap ? content.monthlyLifeMap : FALLBACK_MONTHLY_LIFE_MAP;
+  var now = today || new Date();
+  var year = now.getFullYear();
+  var monthIndex = now.getMonth();
+  var monthName = THAI_MONTH_NAMES[monthIndex] || '';
+  var buddhistYear = year + 543;
+  var elementKey = p && p.el ? p.el : 'ไฟ';
+  var guide = (cfg.elementGuidance && (cfg.elementGuidance[elementKey] || cfg.elementGuidance['ไฟ'])) || FALLBACK_MONTHLY_LIFE_MAP.elementGuidance['ไฟ'];
+  var daysInMonth = getDaysInMonth(year, monthIndex);
+  var bornDay = birthDate ? new Date(birthDate).getDate() : 1;
+  if (!bornDay || isNaN(bornDay)) bornDay = 1;
+  var planetIndex = p && typeof p.ei === 'number' ? p.ei : 0;
+  var labels = cfg.activityLabels || FALLBACK_MONTHLY_LIFE_MAP.activityLabels;
+  var calendarDays = [];
+  var activityKeys = ['career', 'money', 'love', 'rest'];
+
+  for (var d = 1; d <= daysInMonth; d++) {
+    var seed = (d + bornDay + planetIndex + monthIndex) % 9;
+    var key = activityKeys[(d + planetIndex + monthIndex) % activityKeys.length];
+    var tone = seed === 0 || seed === 4 ? 'caution' : key;
+    if (d % 10 === 0) tone = 'caution';
+    calendarDays.push({
+      day: d,
+      tone: tone,
+      label: labels[tone] || labels[key] || 'จังหวะชีวิต',
+      text: tone === 'caution' ? 'ชะลอการตัดสินใจใหญ่และทบทวนข้อมูลให้ครบ' : 'เหมาะกับ' + (labels[key] || 'เรื่องสำคัญ')
+    });
+  }
+
+  var freeDays = calendarDays.filter(function(day){ return day.tone !== 'caution'; }).slice(0, 3);
+  if (freeDays.length < 3) freeDays = calendarDays.slice(0, 3);
+
+  return {
+    title: 'STARVIA Monthly Life Map · ' + monthName + ' ' + buddhistYear,
+    monthName: monthName,
+    year: buddhistYear,
+    elementFocus: guide.focus,
+    elementWarning: guide.warning,
+    elementAction: guide.action,
+    domains: (cfg.domains || FALLBACK_MONTHLY_LIFE_MAP.domains).map(function(domain){
+      return {
+        key: domain.key,
+        label: domain.label,
+        icon: domain.icon || '✦',
+        teaser: domain.teaser,
+        forecast: domain.teaser + ' · ธาตุ' + elementKey + 'บอกให้เดือนนี้ ' + guide.action,
+        goal: 'ตั้งเป้าเรื่อง' + domain.label + 'ให้ชัด 1 ข้อ แล้วเช็กความคืบหน้าทุกสัปดาห์'
+      };
+    }),
+    calendarDays: calendarDays,
+    freeDays: freeDays,
+    weeklyBriefs: (cfg.weeklyThemes || FALLBACK_MONTHLY_LIFE_MAP.weeklyThemes).map(function(week, index){
+      return {
+        title: week.title,
+        brief: week.brief + ' · โฟกัสส่วนตัว: ' + guide.focus,
+        action: index === 0 ? 'ตั้งเป้า' : index === 1 ? 'ลงมือ' : index === 2 ? 'ปรับแผน' : 'สรุปผล'
+      };
+    }),
+    rituals: (cfg.rituals || FALLBACK_MONTHLY_LIFE_MAP.rituals).slice(0, 7)
+  };
+}

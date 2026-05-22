@@ -50,6 +50,23 @@ describe('Thai astrology content data', () => {
     expect(sharedIndex).toBeLessThan(individualIndex);
   });
 
+  it('defines Monthly Life Map content for subscription retention', () => {
+    const content = loadThaiAstroContent();
+    expect(content.monthlyLifeMap).toBeTruthy();
+    expect(content.monthlyLifeMap.domains.map((domain) => domain.key)).toEqual([
+      'career', 'money', 'relationship', 'health'
+    ]);
+    expect(content.monthlyLifeMap.weeklyThemes).toHaveLength(4);
+    expect(content.monthlyLifeMap.rituals).toHaveLength(7);
+    for (const element of ['ไฟ', 'ดิน', 'ลม', 'น้ำ']) {
+      expect(content.monthlyLifeMap.elementGuidance[element]).toMatchObject({
+        focus: expect.any(String),
+        warning: expect.any(String),
+        action: expect.any(String),
+      });
+    }
+  });
+
   it('defines Life Domain Forecast content for six required domains', () => {
     const content = loadThaiAstroContent();
     expect(content.lifeDomainForecast).toBeTruthy();
