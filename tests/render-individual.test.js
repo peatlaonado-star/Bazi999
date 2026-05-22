@@ -349,9 +349,12 @@ describe('Monthly Life Map subscription feature', () => {
     expect(model.calendarDays.length).toBeGreaterThanOrEqual(28);
     expect(model.weeklyBriefs).toHaveLength(4);
     expect(model.rituals).toHaveLength(7);
-    expect(model.domains.map((domain) => domain.key)).toEqual(['career', 'money', 'relationship', 'health']);
+    expect(model.domains.map((domain) => domain.key)).toEqual(['career', 'money', 'windfall', 'relationship', 'health']);
+    const windfall = model.domains.find((domain) => domain.key === 'windfall');
+    expect(windfall.forecast).toMatch(/โชคลอย|ลาภลอย/);
+    expect(windfall.action).toContain('ควร');
     model.domains.forEach((domain) => {
-      expect(domain.icon).toMatch(/[◈💰♡🫀]/u);
+      expect(domain.icon).toMatch(/[◈💰🎲♡🫀]/u);
       expect(domain.score).toBeGreaterThanOrEqual(55);
       expect(domain.score).toBeLessThanOrEqual(99);
       expect(domain.action).toContain('ควร');

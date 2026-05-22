@@ -35,7 +35,7 @@ function buildMonthlyLifeMapHtml(model, premiumUnlocked){
     + '<div class="mlm-pill"><span>สิ่งที่ควรทำ</span>' + escapeHTML(model.elementAction) + '</div>'
     + '</div>';
 
-  html += '<div class="mlm-section-title">' + (premiumUnlocked ? 'พรีวิว 4 ด้านเดือนนี้' : 'พรีวิว 4 ด้านประจำเดือน') + '</div><div class="mlm-domains">';
+  html += '<div class="mlm-section-title">' + (premiumUnlocked ? 'พรีวิว 5 ด้านเดือนนี้' : 'พรีวิว 5 ด้านประจำเดือน') + '</div><div class="mlm-domains">';
   model.domains.forEach(function(domain){
     html += '<div class="mlm-domain"><div class="mlm-domain-head"><span>' + escapeHTML(domain.icon) + '</span>' + escapeHTML(domain.label) + '</div>'
       + '<div class="mlm-score-row"><span>คะแนนความเด่น</span><strong>' + escapeHTML(String(domain.score || 0)) + '/100</strong></div>'

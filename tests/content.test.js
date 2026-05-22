@@ -54,8 +54,11 @@ describe('Thai astrology content data', () => {
     const content = loadThaiAstroContent();
     expect(content.monthlyLifeMap).toBeTruthy();
     expect(content.monthlyLifeMap.domains.map((domain) => domain.key)).toEqual([
-      'career', 'money', 'relationship', 'health'
+      'career', 'money', 'windfall', 'relationship', 'health'
     ]);
+    const windfall = content.monthlyLifeMap.domains.find((domain) => domain.key === 'windfall');
+    expect(windfall.label).toContain('ลาภลอย');
+    expect(windfall.teaser).toMatch(/โชคลอย|ลาภลอย/);
     expect(content.monthlyLifeMap.weeklyThemes).toHaveLength(4);
     expect(content.monthlyLifeMap.rituals).toHaveLength(7);
     for (const element of ['ไฟ', 'ดิน', 'ลม', 'น้ำ']) {
@@ -77,6 +80,8 @@ describe('Thai astrology content data', () => {
       expect(domain.label).toEqual(expect.any(String));
       expect(domain.subtitle).toEqual(expect.any(String));
     });
+    expect(content.lifeDomainForecast.domainThemes.luck.current).toMatch(/โชคลอย|ลาภลอย/);
+    expect(content.lifeDomainForecast.domainThemes.luck.remedy).toContain('เลข');
     for (const element of ['ไฟ', 'ดิน', 'ลม', 'น้ำ']) {
       expect(content.lifeDomainForecast.elementGuidance[element]).toBeTruthy();
     }
