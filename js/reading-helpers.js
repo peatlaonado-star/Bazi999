@@ -168,6 +168,19 @@ function getDaysInMonth(year, monthIndex){
   return new Date(year, monthIndex + 1, 0).getDate();
 }
 
+function clampMonthlyScore(value){
+  return Math.max(55, Math.min(99, value));
+}
+
+function buildMonthlyDayAdvice(tone, label){
+  if (tone === 'caution') return 'วันนี้ควรชะลอเรื่องใหญ่ อ่านรายละเอียดซ้ำ และอย่ารีบตอบตกลงทันที';
+  if (tone === 'career') return 'วันนี้ควรเลือกงานสำคัญ 1 เรื่อง แล้วทำให้มีความคืบหน้าชัดเจน';
+  if (tone === 'money') return 'วันนี้ควรตรวจเงินเข้าออก แยกเงินจำเป็น และค่อยตัดสินใจเรื่องลงทุน';
+  if (tone === 'love') return 'วันนี้ควรคุยด้วยน้ำเสียงนุ่มนวล ถามให้ชัด และอย่าเดาใจแทนกัน';
+  if (tone === 'rest') return 'วันนี้ควรพักใจ เคลียร์พื้นที่เล็ก ๆ และอย่าฝืนใช้พลังเกินจำเป็น';
+  return 'วันนี้ควรใช้จังหวะนี้กับ' + label + 'แบบค่อยเป็นค่อยไป';
+}
+
 function buildMonthlyLifeMap(p, r, l, birthDate, today){
   var content = (typeof THAI_ASTRO_CONTENT !== 'undefined') ? THAI_ASTRO_CONTENT : null;
   var cfg = content && content.monthlyLifeMap ? content.monthlyLifeMap : FALLBACK_MONTHLY_LIFE_MAP;
@@ -195,7 +208,11 @@ function buildMonthlyLifeMap(p, r, l, birthDate, today){
       day: d,
       tone: tone,
       label: labels[tone] || labels[key] || 'จังหวะชีวิต',
-      text: tone === 'caution' ? 'ชะลอการตัดสินใจใหญ่และทบทวนข้อมูลให้ครบ' : 'เหมาะกับ' + (labels[key] || 'เรื่องสำคัญ')
+      text: tone === 'caution' ? 'ชะลอการตัดสินใจใหญ่และทบทวนข้อมูลให้ครบ' : 'เหมาะกับ' + (labels[key] || 'เรื่องสำคัญ'),
+      simpleText: tone === 'caution'
+        ? 'วันนี้เหมาะกับการทบทวน ไม่ควรรีบตัดสินใจเรื่องใหญ่'
+        : 'วันนี้เหมาะกับ' + (labels[key] || 'เรื่องสำคัญ') + ' เพราะพลังเดือนนี้ช่วยให้เรื่องนี้เดินง่ายขึ้น',
+      advice: buildMonthlyDayAdvice(tone, labels[key] || 'เรื่องสำคัญ')
     });
   }
 
@@ -209,13 +226,22 @@ function buildMonthlyLifeMap(p, r, l, birthDate, today){
     elementFocus: guide.focus,
     elementWarning: guide.warning,
     elementAction: guide.action,
-    domains: (cfg.domains || FALLBACK_MONTHLY_LIFE_MAP.domains).map(function(domain){
+    domains: (cfg.domains || FALLBACK_MONTHLY_LIFE_MAP.domains).map(function(domain, index){
+      var score = clampMonthlyScore(62 + ((planetIndex + 1) * 7 + (monthIndex + 1) * 3 + (index + 1) * 8) % 34);
+      var actionMap = {
+        career: 'ควรเลือกงานหลัก 1 เรื่อง ปิดให้จบก่อนเริ่มเรื่องใหม่ และจดสิ่งที่ต้องส่งมอบให้ชัด',
+        money: 'ควรแยกเงินจำเป็น เงินสำรอง และเงินโอกาส แล้วหลีกเลี่ยงการใช้เงินตามอารมณ์',
+        relationship: 'ควรพูดความต้องการให้ตรงแต่สุภาพ นัดคุยตอนใจนิ่ง และไม่เดาใจแทนกัน',
+        health: 'ควรวางเวลานอน พักสายตา และทำ routine เล็ก ๆ ให้ต่อเนื่องอย่างน้อย 7 วัน'
+      };
       return {
         key: domain.key,
         label: domain.label,
         icon: domain.icon || '✦',
+        score: score,
         teaser: domain.teaser,
         forecast: domain.teaser + ' · ธาตุ' + elementKey + 'บอกให้เดือนนี้ ' + guide.action,
+        action: actionMap[domain.key] || ('ควรตั้งเป้าเรื่อง' + domain.label + 'ให้ชัดและลงมือทีละขั้น'),
         goal: 'ตั้งเป้าเรื่อง' + domain.label + 'ให้ชัด 1 ข้อ แล้วเช็กความคืบหน้าทุกสัปดาห์'
       };
     }),

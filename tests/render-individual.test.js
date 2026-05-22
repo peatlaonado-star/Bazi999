@@ -270,10 +270,21 @@ describe('Monthly Life Map subscription feature', () => {
 
     expect(model.title).toContain('มิถุนายน 2569');
     expect(model.freeDays).toHaveLength(3);
+    model.freeDays.forEach((day) => {
+      expect(day.simpleText).toContain('เหมาะกับ');
+      expect(day.advice).toEqual(expect.any(String));
+      expect(day.advice.length).toBeGreaterThan(12);
+    });
     expect(model.calendarDays.length).toBeGreaterThanOrEqual(28);
     expect(model.weeklyBriefs).toHaveLength(4);
     expect(model.rituals).toHaveLength(7);
     expect(model.domains.map((domain) => domain.key)).toEqual(['career', 'money', 'relationship', 'health']);
+    model.domains.forEach((domain) => {
+      expect(domain.icon).toMatch(/[◈💰♡🫀]/u);
+      expect(domain.score).toBeGreaterThanOrEqual(55);
+      expect(domain.score).toBeLessThanOrEqual(99);
+      expect(domain.action).toContain('ควร');
+    });
   });
 
   it('shows free monthly preview but locks detailed monthly planning', () => {
@@ -285,6 +296,10 @@ describe('Monthly Life Map subscription feature', () => {
 
     expect(output).toContain('STARVIA Monthly Life Map');
     expect(output).toContain('วันเด่นฟรี 3 วัน');
+    expect(output).toContain('วันนี้เหมาะกับ');
+    expect(output).toContain('คำแนะนำ:');
+    expect(output).toContain('คะแนน');
+    expect(output).toContain('ควร');
     expect(output).toContain('ปลดล็อกรีพอร์ตฉบับเต็ม');
     expect(output).not.toContain('Weekly Brief 4 สัปดาห์');
     expect(output).not.toContain('ภารกิจเสริมดวง 7 วัน');
