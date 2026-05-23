@@ -201,14 +201,16 @@ describe('Daily Thai Cosmic Brief', () => {
     expect(output).toContain('สีมงคลวันนี้');
   });
 
-  it('cosmic brief appears after karma card in DOM order', () => {
+  it('cosmic brief appears before locked premium sections to give free readers immediate value', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
     const context = loadContext(dom);
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const output = dom.window.document.getElementById('r0').innerHTML;
-    const karmaIndex = output.indexOf('karma-card');
     const briefIndex = output.indexOf('cosmic-brief');
-    expect(karmaIndex).toBeLessThan(briefIndex);
+    const windfallIndex = output.indexOf('windfall-luck');
+    const karmaIndex = output.indexOf('karma-card');
+    expect(briefIndex).toBeLessThan(windfallIndex);
+    expect(briefIndex).toBeLessThan(karmaIndex);
   });
 
   it('locks focus, warning, and action text before premium unlock', () => {
@@ -345,6 +347,59 @@ describe('Windfall Luck gimmick section', () => {
     expect(output).toContain('คาถาเรียกโชค');
     expect(output).toContain('ตั้งงบก่อนเสี่ยง');
     expect(dom.window.document.querySelector('.windfall-luck.is-locked')).toBeNull();
+  });
+});
+
+
+describe('Free reader conversion reading order', () => {
+  it('orders the free result page from quick value to lottery hook, monthly plan, then deeper premium proof', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+    const context = loadContext(dom);
+
+    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const output = dom.window.document.getElementById('r0').innerHTML;
+    const order = [
+      'blueprint-card',
+      'conversion-roadmap',
+      'cosmic-brief',
+      'power-card',
+      'windfall-luck',
+      'monthly-life-map',
+      'domain-matrix',
+      'karma-card',
+      'detail-tabs-card'
+    ].map((needle) => output.indexOf(needle));
+
+    order.forEach((index) => expect(index).toBeGreaterThan(-1));
+    for (let i = 1; i < order.length; i += 1) {
+      expect(order[i - 1]).toBeLessThan(order[i]);
+    }
+  });
+
+  it('adds a clear premium path card before the locked sections', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+    const context = loadContext(dom);
+
+    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const roadmap = dom.window.document.querySelector('.conversion-roadmap');
+
+    expect(roadmap).toBeTruthy();
+    expect(roadmap.textContent).toContain('เริ่มอ่านตรงนี้');
+    expect(roadmap.textContent).toContain('สูตรลาภลอย');
+    expect(roadmap.textContent).toContain('ปลดล็อก');
+  });
+
+  it('wraps detailed tabs in a guided card with shorter readable tab labels', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+    const context = loadContext(dom);
+
+    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const tabsCard = dom.window.document.querySelector('.detail-tabs-card');
+    const labels = Array.from(dom.window.document.querySelectorAll('#tt0 .tab')).map((node) => node.textContent);
+
+    expect(tabsCard).toBeTruthy();
+    expect(tabsCard.textContent).toContain('อ่านรายละเอียดพื้นฐาน');
+    expect(labels).toEqual(['ตัวตนฟรี', 'เงาใจ', 'ความรัก', 'งานเงิน', 'อดีต', 'ตอนนี้', 'อนาคต']);
   });
 });
 

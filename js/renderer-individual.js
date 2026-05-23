@@ -392,6 +392,22 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     + '<div class="bp-item"><div class="bp-icon">🎂</div><div class="bp-label">อายุ</div><div class="bp-value">' + ageTxt + '</div></div>'
     + '</div></div>';
 
+  var conversionRoadmapHtml = '<div class="conversion-roadmap">'
+    + '<div class="cr-kicker">เริ่มอ่านตรงนี้</div>'
+    + '<div class="cr-title">อ่านฟรีให้รู้สึกว่า “ตรง” แล้วค่อยไหลไปปลดล็อกส่วนที่อยากรู้ที่สุด</div>'
+    + '<div class="cr-steps">'
+    + '<div class="cr-step"><span>1</span><strong>พลังวันนี้</strong><small>ดูอารมณ์ สี และเลขที่ใช้ได้ทันที</small></div>'
+    + '<div class="cr-step cr-hot"><span>2</span><strong>สูตรลาภลอย</strong><small>หัวข้อสายมูที่ล็อกไว้ให้กดซื้อ</small></div>'
+    + '<div class="cr-step"><span>3</span><strong>แผนชีวิตรายเดือน</strong><small>เห็นภาพว่าพรีเมียมมีรายละเอียดแค่ไหน</small></div>'
+    + '</div>'
+    + '<button class="cr-cta" data-action="open-payment">ปลดล็อกรีพอร์ตฉบับเต็ม 199 THB</button>'
+    + '</div>';
+
+  var detailTabsShellHtml = '<div class="detail-tabs-card">'
+    + '<div class="detail-tabs-head"><div><span>อ่านรายละเอียดพื้นฐาน</span><small>แท็บแรกอ่านฟรี ส่วนแท็บต่อไปคือเนื้อหาลึกสำหรับพรีเมียม จัดเป็นหมวดสั้น ๆ ให้กดง่าย</small></div></div>'
+    + '<div class="tabs-w"><div class="tabs" id="tt0"></div></div><div id="ts0"></div>'
+    + '</div>';
+
   wrap.innerHTML = blueprintCardHtml
     + '<div class="brow"><span style="font-size:15px;color:'+p.c+'">'+p.s+'</span>'
     +'<span style="font-size:11px;color:#c8b87a"><strong style="color:#C9A227">'+nm+'</strong>'
@@ -406,14 +422,15 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     +'<div class="ci"><div class="ci-l">'+u.el+'</div><div class="ci-v">ธาตุ'+p.el+'</div><div class="ci-s">'+u.es+'</div></div>'
     +'<div class="ci"><div class="ci-l">'+u.ge+'</div><div class="ci-v">'+gd+'</div><div class="ci-s">'+nm+'</div></div>'
     +'</div></div>'
-    + powerCardHtml
-    + karmaHtml
-    + domainHtml
-    + monthlyLifeMapHtml
-    + windfallLuckHtml
+    + conversionRoadmapHtml
     + cosmicBriefHtml
+    + powerCardHtml
+    + windfallLuckHtml
+    + monthlyLifeMapHtml
+    + domainHtml
+    + karmaHtml
     + buildElementRadar(p, r, l)
-    +'<div class="tabs-w"><div class="tabs" id="tt0"></div></div><div id="ts0"></div>';
+    + detailTabsShellHtml;
 
   // 6. อ้างอิงและเนื้อหาใน Tabs
   var refDesc = {
@@ -429,23 +446,23 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
   };
 
   var TB=[
-    {lb:u.t0[0], secs:[
+    {lb:'ตัวตนฟรี', secs:[
       {t:u.s0[0], c:p.p, rf:refDesc.p_r_l},
       {t:'สไตล์การแสดงออก (ราศีเกิด)', c:rasiHtml, rf:'วิเคราะห์จากราศีเกิด ('+r.n+') ซึ่งเป็นรูปแบบพลังงานที่คุณใช้ขับเคลื่อนตัวเองบนโลกใบนี้'},
       {t:'รหัสผ่านชีวิต (ทักษาปกรณ์)', c:thaksaHtml, rf:refDesc.thaksa},
       {t:u.s0[1], c:p.str, rf:'วิเคราะห์จากพลังงานธาตุ'+p.el+' และลักษณะเด่นของดาว'+p.n}
     ]},
-    {lb:'✦ ถอดรหัสเงาในใจ', secs:[
+    {lb:'เงาใจ', secs:[
       {t:u.s0[2], c:wkFull, rf:refDesc.wk}
     ]},
-    {lb:u.t0[1], secs:[{t:u.s0[3], c:p.lv, rf:refDesc.lv}]},
-    {lb:u.t0[2], secs:[
+    {lb:'ความรัก', secs:[{t:u.s0[3], c:p.lv, rf:refDesc.lv}]},
+    {lb:'งานเงิน', secs:[
       {t:u.s0[4], c:p.ca, rf:refDesc.ca},
       {t:u.s0[5], c:p.mn, rf:refDesc.mn}
     ]},
-    {lb:u.t0[3], secs:[{t:u.s0[6], c:buildLifeTimeline('past', p, ageY, ageM), rf:refDesc.past}]},
-    {lb:u.t0[4], secs:[{t:u.s0[7], c:buildLifeTimeline('present', p, ageY, ageM), rf:refDesc.pres}]},
-    {lb:u.t0[5], secs:[{t:u.s0[8], c:buildLifeTimeline('future', p, ageY, ageM), rf:refDesc.fut}]}
+    {lb:'อดีต', secs:[{t:u.s0[6], c:buildLifeTimeline('past', p, ageY, ageM), rf:refDesc.past}]},
+    {lb:'ตอนนี้', secs:[{t:u.s0[7], c:buildLifeTimeline('present', p, ageY, ageM), rf:refDesc.pres}]},
+    {lb:'อนาคต', secs:[{t:u.s0[8], c:buildLifeTimeline('future', p, ageY, ageM), rf:refDesc.fut}]}
   ];
 
   buildTabs('tt0','ts0','s0_',TB,p,u);
