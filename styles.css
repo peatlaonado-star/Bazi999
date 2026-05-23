@@ -1402,19 +1402,24 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   letter-spacing: .03em;
 }
 .section-body {
+  position: relative;
   border: 1px solid rgba(201,162,39,0.14);
   border-top: none;
   border-radius: 0 0 12px 12px;
   overflow: hidden;
-  transition: max-height .4s ease, opacity .3s, padding .3s;
+  transition: max-height .4s ease, opacity .3s;
   max-height: 5000px;
   opacity: 1;
 }
 .collapsible-section.collapsed .section-body {
   max-height: 0;
   opacity: 0;
-  padding: 0;
-  border-bottom: none;
+  visibility: hidden;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin: 0;
+  border: none;
+  overflow: hidden;
 }
 .collapsible-section.collapsed .section-toggle {
   border-radius: 12px;
