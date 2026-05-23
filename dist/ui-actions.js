@@ -290,6 +290,16 @@ function onPremiumVerified(token) {
   }, 800);
 }
 
+// ===== COLLAPSIBLE SECTIONS =====
+function initCollapsibleSections() {
+  document.querySelectorAll('.section-toggle').forEach(function(toggle) {
+    toggle.addEventListener('click', function() {
+      var section = this.closest('.collapsible-section');
+      if (section) section.classList.toggle('collapsed');
+    });
+  });
+}
+
 function onPremiumFailed() {
   var btn = document.getElementById('confirm-pay-btn');
   var err = document.getElementById('pin-error');

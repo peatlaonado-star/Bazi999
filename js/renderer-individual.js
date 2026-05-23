@@ -239,6 +239,13 @@ function buildLifeTimeline(kind, p, ageY, ageM){
   return html;
 }
 
+function wrapCollapsible(label, hint, content) {
+  return '<div class="collapsible-section">'
+    + '<div class="section-toggle"><span class="section-toggle-arrow">▼</span><span class="section-toggle-label">' + label + '</span><span class="section-toggle-hint">' + hint + '</span></div>'
+    + '<div class="section-body">' + content + '</div>'
+    + '</div>';
+}
+
 function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
   var wrap=document.getElementById('r0');
   nm = escapeHTML(nm);
@@ -335,7 +342,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     + '</div>'
     + powerTip
     + '</div>' // ปิด power-card
-    + '<div class="share-btn-wrap"><button class="share-btn" data-action="save-image" data-target="power-card" data-filename="Lucky_Elements">📸 เซฟรูปภาพเลขมงคล</button></div>';
+    // ปุ่มเซฟรูปภาพถูกเอาออกตามคำขอผู้ใช้
 
   var karma = buildKarmaMirror(p, dayOfWeek);
   var karmaFull = '<div class="karma-card' + (premiumUnlocked ? '' : ' is-locked') + '">'
@@ -400,15 +407,15 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
   var cosmicBriefHtml = '<div class="cosmic-brief">'
     + '<div class="cb-title">✦ สรุปพลังงานวันนี้ ✦</div>'
     + '<div class="cb-line"><div class="cb-dot" style="background:' + briefData.colorHex + '"></div><div>' + briefData.energy + '</div></div>'
-    + '<div class="cb-line"><div class="cb-dot" style="background:' + briefData.colorHex + '"></div><div>สีมงคลวันนี้: <strong style="color:' + briefData.colorHex + '">' + briefData.colorName + '</strong></div></div>';
-  if (premiumUnlocked) {
-    cosmicBriefHtml += '<div class="cb-line"><div class="cb-dot" style="background:#E8A0CF"></div><div>' + briefData.focus + '</div></div>'
-      + '<div class="cb-line"><div class="cb-dot" style="background:#E8534A"></div><div>' + briefData.warning + '</div></div>'
-      + '<div class="cb-line"><div class="cb-dot" style="background:var(--g)"></div><div>' + briefData.action + '</div></div>';
-  } else {
-    cosmicBriefHtml += '<div class="cb-premium-note">🔒 สรุปพลังงานวันนี้ฉบับเต็ม: ดูโฟกัส คำเตือน และสิ่งที่ควรทำวันนี้หลังปลดล็อกพรีเมียม</div>';
-  }
-  cosmicBriefHtml += '</div>';
+    + '<div class="cb-line"><div class="cb-dot" style="background:' + briefData.colorHex + '"></div><div>สีมงคลวันนี้: <strong style="color:' + briefData.colorHex + '">' + briefData.colorName + '</strong></div></div>'
+    // Always render premium lines in DOM so onPremiumVerified can reveal them
+    + '<div class="cosmic-brief-premium' + (premiumUnlocked ? '' : ' is-locked') + '">'
+    + (premiumUnlocked ? '' : '<div class="lock-overlay"><div class="lock-badge">🔒 Premium</div><p>สรุปพลังงานวันนี้ฉบับเต็ม: ดูโฟกัส คำเตือน และสิ่งที่ควรทำวันนี้หลังปลดล็อกพรีเมียม</p></div>')
+    + '<div class="cb-line"><div class="cb-dot" style="background:#E8A0CF"></div><div>' + briefData.focus + '</div></div>'
+    + '<div class="cb-line"><div class="cb-dot" style="background:#E8534A"></div><div>' + briefData.warning + '</div></div>'
+    + '<div class="cb-line"><div class="cb-dot" style="background:var(--g)"></div><div>' + briefData.action + '</div></div>'
+    + '</div>'
+  + '</div>';
 
   // 5. ประกอบร่างการแสดงผล (Info + Power Elements + Radar)
   // Blueprint Header Card
@@ -454,12 +461,12 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     +'<div class="ci"><div class="ci-l">'+u.ge+'</div><div class="ci-v">'+gd+'</div><div class="ci-s">'+nm+'</div></div>'
     +'</div></div>'
     + conversionRoadmapHtml
-    + cosmicBriefHtml
-    + powerCardHtml
-    + windfallLuckHtml
-    + monthlyLifeMapHtml
-    + domainHtml
-    + karmaHtml
+    + wrapCollapsible("✦ สรุปพลังงานวันนี้ ✦", "อารมณ์ สี เลข ฉบับย่อ", cosmicBriefHtml)
+    + wrapCollapsible("✨ พลังงานเสริมดวง", "เลขและสีมงคลประจำวัน", powerCardHtml)
+    + wrapCollapsible("✦ สูตรเปิดดวงลาภลอย ✦", "เลขเด็ด หวย ทิศ คาถา สายมู", windfallLuckHtml)
+    + wrapCollapsible("📅 แผนที่ชีวิตรายเดือน", "5 ด้าน พร้อมพรีวิวรายเดือน", monthlyLifeMapHtml)
+    + wrapCollapsible("📊 แผนที่สถานการณ์ชีวิต", "6 ด้าน วิเคราะห์สถานการณ์ปัจจุบันและอนาคต", domainHtml)
+    + wrapCollapsible("🪞 กระจกกรรม", "บทเรียนและรูปแบบที่ชีวิตพาซ้ำ", karmaHtml)
     + buildElementRadar(p, r, l)
     + detailTabsShellHtml;
 
@@ -506,6 +513,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     + '<a href="https://m.me/61573341702581" target="_blank" class="pcc-btn">จองคิวปรึกษาส่วนตัว</a>'
     + '</div>';
 
+  if (typeof initCollapsibleSections === 'function') initCollapsibleSections();
   document.getElementById('ts0').insertAdjacentHTML('beforeend',
     '<div class="mc"><div class="mc-l">✦ '+u.mn+' · '+nm+' ✦</div>'
     +'<div class="mc-t">"'+p.man+'"</div></div>'

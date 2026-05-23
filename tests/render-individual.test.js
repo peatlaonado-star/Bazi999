@@ -185,12 +185,14 @@ describe('Daily Thai Cosmic Brief', () => {
     expect(output).not.toContain('Daily Cosmic Brief');
   });
 
-  it('shows only 2 free cb-line elements before premium unlock', () => {
+  it('shows all 5 cb-line elements in DOM (2 visible free + 3 behind is-locked)', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
     const context = loadContext(dom);
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const lines = dom.window.document.querySelectorAll('.cb-line');
-    expect(lines.length).toBe(2);
+    expect(lines.length).toBe(5);
+    const lockedLines = dom.window.document.querySelectorAll('.cosmic-brief-premium.is-locked .cb-line');
+    expect(lockedLines.length).toBe(3);
   });
 
   it('shows personal color name', () => {
@@ -213,19 +215,24 @@ describe('Daily Thai Cosmic Brief', () => {
     expect(briefIndex).toBeLessThan(karmaIndex);
   });
 
-  it('locks focus, warning, and action text before premium unlock', () => {
+  it('renders premium cosmic brief content behind is-locked overlay before unlock', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
     const context = loadContext(dom);
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const output = dom.window.document.getElementById('r0').innerHTML;
     expect(output).toContain('พลังงานวัน');
-    expect(output).not.toContain('โฟกัส:');
-    expect(output).not.toContain('ระวัง:');
-    expect(output).not.toContain('สิ่งที่ควรทำวันนี้:');
+    expect(output).toContain('โฟกัส:');
+    expect(output).toContain('ระวัง:');
+    expect(output).toContain('สิ่งที่ควรทำวันนี้:');
     expect(output).toContain('สรุปพลังงานวันนี้ฉบับเต็ม');
+    // Premium content is in DOM but hidden behind .is-locked + lock-overlay
+    const premiumWrap = dom.window.document.querySelector('.cosmic-brief-premium');
+    expect(premiumWrap).toBeTruthy();
+    expect(premiumWrap.classList.contains('is-locked')).toBe(true);
+    expect(premiumWrap.querySelector('.lock-overlay')).toBeTruthy();
   });
 
-  it('contains full energy, focus, warning, and action text for premium readers', () => {
+  it('reveals full cosmic brief content without is-locked for premium readers', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
     const context = loadContext(dom, { isPremiumUnlocked: () => true });
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
@@ -234,6 +241,11 @@ describe('Daily Thai Cosmic Brief', () => {
     expect(output).toContain('โฟกัส:');
     expect(output).toContain('ระวัง:');
     expect(output).toContain('สิ่งที่ควรทำวันนี้:');
+    // No .is-locked overlay for premium readers
+    const premiumWrap = dom.window.document.querySelector('.cosmic-brief-premium');
+    expect(premiumWrap).toBeTruthy();
+    expect(premiumWrap.classList.contains('is-locked')).toBe(false);
+    expect(premiumWrap.querySelector('.lock-overlay')).toBeFalsy();
   });
 });
 

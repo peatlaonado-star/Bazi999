@@ -87,7 +87,7 @@ function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2){
     + '<div class="chem-desc">' + elDesc + '</div>'
     + '</div>' // ปิด chem-box
     + '</div>' // ปิด matrix-card
-    + '<div class="share-btn-wrap"><button class="share-btn" data-action="save-image" data-target="matrix-card" data-filename="Soulmate_Matrix" style="color:#C9A227; border-color:rgba(201,162,39,0.4);">📸 เซฟรูปคะแนนคู่รัก</button></div>';
+    // ปุ่มเซฟรูปภาพถูกเอาออกตามคำขอผู้ใช้
 
   var scoreBreakdownHtml = '<div class="cg2' + (premiumUnlocked ? '' : ' is-locked') + '">'
     +'<div class="ci2"><div class="ci2l">'+u.ec+'</div><div class="ci2s">'+pa.el+' + '+pb.el+'</div><div class="ci2v">'+elS+'%</div></div>'
