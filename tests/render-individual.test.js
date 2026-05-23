@@ -321,19 +321,48 @@ describe('Windfall Luck gimmick section', () => {
     expect(guide.ritualSteps.join(' ')).toContain('สาธุ');
   });
 
-  it('renders the windfall luck section as a locked premium teaser with full DOM behind the overlay', () => {
+  it('renders the windfall luck section as a locked premium teaser with masked lucky numbers', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div>');
     const context = loadContext(dom);
 
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const output = dom.window.document.getElementById('r0').innerHTML;
+    const windfall = dom.window.document.querySelector('.windfall-luck');
+    const maskedNumbers = Array.from(windfall.querySelectorAll('.wfl-mask-number')).map((node) => node.textContent);
+    const fullNumbers = Array.from(windfall.querySelectorAll('.wfl-full-number')).map((node) => node.textContent);
 
     expect(output).toContain('สูตรเปิดดวงลาภลอย');
     expect(output).toContain('เลขที่ควรลอง');
     expect(output).toContain('หวย / ลอตเตอรี่');
     expect(output).toContain('พิธีเปิดทางโชค');
     expect(output).toContain('ปลดล็อกรีพอร์ตฉบับเต็ม');
+    expect(maskedNumbers).toHaveLength(3);
+    maskedNumbers.forEach((number) => expect(number).toMatch(/^\d●$|^●\d$/));
+    expect(fullNumbers).toHaveLength(3);
+    fullNumbers.forEach((number) => expect(number).toMatch(/^\d{2}$/));
+    const maskedDetail = windfall.querySelector('.wfl-mask-detail').textContent;
+    fullNumbers.forEach((number) => expect(maskedDetail).not.toContain(number));
+    maskedNumbers.forEach((number) => expect(maskedDetail).toContain(number));
     expect(dom.window.document.querySelector('.windfall-luck.is-locked')).toBeTruthy();
+  });
+
+  it('keeps masked lucky numbers ready to reveal when the premium lock is removed', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div>');
+    const context = loadContext(dom);
+
+    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const windfall = dom.window.document.querySelector('.windfall-luck');
+
+    expect(windfall.querySelectorAll('.wfl-mask-number').length).toBe(3);
+    expect(windfall.querySelectorAll('.wfl-full-number').length).toBe(3);
+    expect(windfall.querySelector('.wfl-mask-detail')).toBeTruthy();
+    expect(windfall.querySelector('.wfl-full-detail')).toBeTruthy();
+
+    windfall.classList.remove('is-locked');
+    windfall.querySelector('.lock-overlay').remove();
+
+    expect(windfall.querySelector('.lock-overlay')).toBeNull();
+    expect(windfall.querySelectorAll('.wfl-full-number').length).toBe(3);
   });
 
   it('reveals the windfall luck guide for premium readers', () => {
@@ -346,6 +375,8 @@ describe('Windfall Luck gimmick section', () => {
     expect(output).toContain('สูตรเปิดดวงลาภลอย');
     expect(output).toContain('คาถาเรียกโชค');
     expect(output).toContain('ตั้งงบก่อนเสี่ยง');
+    expect(dom.window.document.querySelectorAll('.wfl-mask-number').length).toBe(0);
+    expect(dom.window.document.querySelectorAll('.wfl-full-number').length).toBe(3);
     expect(dom.window.document.querySelector('.windfall-luck.is-locked')).toBeNull();
   });
 });

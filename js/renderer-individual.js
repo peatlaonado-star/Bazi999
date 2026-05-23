@@ -24,13 +24,44 @@ function buildDailyBrief(p, dayOfWeek, personalColor) {
 
 
 
+function maskWindfallNumber(number, index){
+  var text = String(number || '00');
+  if (index % 2 === 0) return text.charAt(0) + '●';
+  return '●' + text.charAt(1);
+}
+
+function buildWindfallNumberHtml(number, index, premiumUnlocked){
+  var fullNumber = escapeHTML(number);
+  if (premiumUnlocked) return '<strong class="wfl-full-number">' + fullNumber + '</strong>';
+  return '<strong class="wfl-mask-number">' + escapeHTML(maskWindfallNumber(number, index)) + '</strong>'
+    + '<strong class="wfl-full-number" aria-hidden="true">' + fullNumber + '</strong>';
+}
+
+function maskWindfallText(text, luckyNumbers){
+  var maskedText = String(text || '');
+  luckyNumbers.forEach(function(number, index){
+    maskedText = maskedText.split(number).join(maskWindfallNumber(number, index));
+  });
+  return maskedText;
+}
+
+function buildWindfallDetailHtml(guide, premiumUnlocked){
+  var fullStepsHtml = guide.ritualSteps.map(function(step){ return '<li>' + escapeHTML(step) + '</li>'; }).join('');
+  if (premiumUnlocked) return '<ol>' + fullStepsHtml + '</ol>';
+  var maskedStepsHtml = guide.ritualSteps.map(function(step){
+    return '<li>' + escapeHTML(maskWindfallText(step, guide.luckyNumbers)) + '</li>';
+  }).join('');
+  return '<ol class="wfl-mask-detail">' + maskedStepsHtml + '</ol>'
+    + '<ol class="wfl-full-detail" aria-hidden="true">' + fullStepsHtml + '</ol>';
+}
+
 function buildWindfallLuckHtml(guide, premiumUnlocked){
   var html = '<div class="windfall-luck' + (premiumUnlocked ? '' : ' is-locked') + '">'
     + '<div class="wfl-kicker">หวย · ลอตเตอรี่ · ลาภลอย</div>'
     + '<div class="wfl-title">✦ ' + escapeHTML(guide.title) + ' ✦</div>'
     + '<div class="wfl-desc">' + escapeHTML(guide.subtitle) + '</div>'
     + '<div class="wfl-numbers"><span>เลขที่ควรลอง</span>'
-    + guide.luckyNumbers.map(function(number){ return '<strong>' + escapeHTML(number) + '</strong>'; }).join('')
+    + guide.luckyNumbers.map(function(number, index){ return buildWindfallNumberHtml(number, index, premiumUnlocked); }).join('')
     + '</div>'
     + '<div class="wfl-grid">'
     + '<div class="wfl-box"><small>จังหวะเฮง</small><b>' + escapeHTML(guide.sacredTime) + '</b></div>'
@@ -38,9 +69,9 @@ function buildWindfallLuckHtml(guide, premiumUnlocked){
     + '</div>'
     + '<div class="wfl-line"><strong>หวย / ลอตเตอรี่:</strong> ' + escapeHTML(guide.lotteryFocus) + '</div>'
     + '<div class="wfl-line"><strong>สัญญาณเลข:</strong> ' + escapeHTML(guide.omen) + '</div>'
-    + '<div class="wfl-section"><strong>พิธีเปิดทางโชค</strong><ol>'
-    + guide.ritualSteps.map(function(step){ return '<li>' + escapeHTML(step) + '</li>'; }).join('')
-    + '</ol></div>'
+    + '<div class="wfl-section"><strong>พิธีเปิดทางโชค</strong>'
+    + buildWindfallDetailHtml(guide, premiumUnlocked)
+    + '</div>'
     + '<div class="wfl-mantra"><span>คาถาเรียกโชค</span>“' + escapeHTML(guide.mantra) + '”</div>'
     + '<div class="wfl-avoid"><strong>กันโชครั่ว:</strong> ' + escapeHTML(guide.avoid) + '</div>';
   if (!premiumUnlocked) {
