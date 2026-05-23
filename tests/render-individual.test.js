@@ -185,14 +185,15 @@ describe('Daily Thai Cosmic Brief', () => {
     expect(output).not.toContain('Daily Cosmic Brief');
   });
 
-  it('shows all 5 cb-line elements in DOM (2 visible free + 3 behind is-locked)', () => {
+  it('shows all 5 cb-line elements freely (no premium lock)', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
     const context = loadContext(dom);
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const lines = dom.window.document.querySelectorAll('.cb-line');
     expect(lines.length).toBe(5);
-    const lockedLines = dom.window.document.querySelectorAll('.cosmic-brief-premium.is-locked .cb-line');
-    expect(lockedLines.length).toBe(3);
+    // No .cosmic-brief-premium wrapper since section is fully free
+    expect(dom.window.document.querySelector('.cosmic-brief-premium')).toBeNull();
+    expect(dom.window.document.querySelector('.cosmic-brief .lock-overlay')).toBeNull();
   });
 
   it('shows personal color name', () => {
@@ -215,37 +216,31 @@ describe('Daily Thai Cosmic Brief', () => {
     expect(briefIndex).toBeLessThan(karmaIndex);
   });
 
-  it('renders premium cosmic brief content behind is-locked overlay before unlock', () => {
+  it('shows full cosmic brief content for free readers (no premium lock)', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
     const context = loadContext(dom);
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const output = dom.window.document.getElementById('r0').innerHTML;
-    expect(output).toContain('พลังงานวัน');
-    expect(output).toContain('โฟกัส:');
-    expect(output).toContain('ระวัง:');
-    expect(output).toContain('สิ่งที่ควรทำวันนี้:');
-    expect(output).toContain('สรุปพลังงานวันนี้ฉบับเต็ม');
-    // Premium content is in DOM but hidden behind .is-locked + lock-overlay
-    const premiumWrap = dom.window.document.querySelector('.cosmic-brief-premium');
-    expect(premiumWrap).toBeTruthy();
-    expect(premiumWrap.classList.contains('is-locked')).toBe(true);
-    expect(premiumWrap.querySelector('.lock-overlay')).toBeTruthy();
+    // 2000-06-15 is Thursday (dayOfWeek=4) — check for Thursday-specific mysticism
+    expect(output).toContain('แรงครู');  // Thursday energy
+    expect(output).toContain('ท่องพระคาถา');  // Thursday focus
+    expect(output).toContain('พฤหัสบดีสูงส่ง');  // Thursday warning
+    expect(output).toContain('เปิดหนังสือ');  // Thursday ritual action
+    // No lock elements at all
+    expect(dom.window.document.querySelector('.cosmic-brief .is-locked')).toBeNull();
+    expect(dom.window.document.querySelector('.cosmic-brief .lock-overlay')).toBeNull();
   });
 
-  it('reveals full cosmic brief content without is-locked for premium readers', () => {
+  it('shows same full cosmic brief content for premium readers', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
     const context = loadContext(dom, { isPremiumUnlocked: () => true });
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const output = dom.window.document.getElementById('r0').innerHTML;
-    expect(output).toContain('พลังงานวัน');
-    expect(output).toContain('โฟกัส:');
-    expect(output).toContain('ระวัง:');
-    expect(output).toContain('สิ่งที่ควรทำวันนี้:');
-    // No .is-locked overlay for premium readers
-    const premiumWrap = dom.window.document.querySelector('.cosmic-brief-premium');
-    expect(premiumWrap).toBeTruthy();
-    expect(premiumWrap.classList.contains('is-locked')).toBe(false);
-    expect(premiumWrap.querySelector('.lock-overlay')).toBeFalsy();
+    expect(output).toContain('แรงครู');
+    expect(output).toContain('เปิดหนังสือ');
+    // No lock elements for premium either
+    expect(dom.window.document.querySelector('.cosmic-brief .is-locked')).toBeNull();
+    expect(dom.window.document.querySelector('.cosmic-brief .lock-overlay')).toBeNull();
   });
 });
 

@@ -408,13 +408,9 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     + '<div class="cb-title">✦ สรุปพลังงานวันนี้ ✦</div>'
     + '<div class="cb-line"><div class="cb-dot" style="background:' + briefData.colorHex + '"></div><div>' + briefData.energy + '</div></div>'
     + '<div class="cb-line"><div class="cb-dot" style="background:' + briefData.colorHex + '"></div><div>สีมงคลวันนี้: <strong style="color:' + briefData.colorHex + '">' + briefData.colorName + '</strong></div></div>'
-    // Always render premium lines in DOM so onPremiumVerified can reveal them
-    + '<div class="cosmic-brief-premium' + (premiumUnlocked ? '' : ' is-locked') + '">'
-    + (premiumUnlocked ? '' : '<div class="lock-overlay"><div class="lock-badge">🔒 Premium</div><p>สรุปพลังงานวันนี้ฉบับเต็ม: ดูโฟกัส คำเตือน และสิ่งที่ควรทำวันนี้หลังปลดล็อกพรีเมียม</p></div>')
     + '<div class="cb-line"><div class="cb-dot" style="background:#E8A0CF"></div><div>' + briefData.focus + '</div></div>'
     + '<div class="cb-line"><div class="cb-dot" style="background:#E8534A"></div><div>' + briefData.warning + '</div></div>'
     + '<div class="cb-line"><div class="cb-dot" style="background:var(--g)"></div><div>' + briefData.action + '</div></div>'
-    + '</div>'
   + '</div>';
 
   // 5. ประกอบร่างการแสดงผล (Info + Power Elements + Radar)
