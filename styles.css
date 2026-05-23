@@ -1424,3 +1424,107 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .collapsible-section.collapsed .section-toggle {
   border-radius: 12px;
 }
+
+/* ── กำลังวันประจำตัว (Weekday Power Card) ── */
+.weekday-power-card {
+  position: relative;
+  background: radial-gradient(ellipse at 50% 0%, rgba(184,144,60,.12), transparent 60%),
+              linear-gradient(180deg, rgba(20,12,40,.95), rgba(10,6,22,.98));
+  border: 1px solid rgba(184,144,60,.22);
+  border-radius: 16px;
+  padding: 18px 16px 14px;
+  margin-bottom: 14px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.03);
+}
+.wpc-badge-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.wpc-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(201,162,39,.16);
+  min-width: 64px;
+}
+.wpc-badge-label {
+  font-size: 8px;
+  letter-spacing: .14em;
+  color: var(--tx2);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.wpc-badge-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: .03em;
+}
+.wpc-badge-element {
+  border-color: rgba(201,162,39,.28);
+}
+.wpc-title {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 15px;
+  color: var(--g);
+  text-align: center;
+  letter-spacing: .06em;
+  margin-bottom: 8px;
+}
+.wpc-energy {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #e8dfc8;
+  text-align: center;
+  padding: 8px 12px;
+  background: rgba(201,162,39,.06);
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+.wpc-color-hint {
+  text-align: center;
+  font-size: 11px;
+  color: var(--tx2);
+  letter-spacing: .03em;
+  margin-bottom: 10px;
+}
+.wpc-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 7px;
+}
+@media (max-width: 500px) {
+  .wpc-actions {
+    grid-template-columns: 1fr;
+  }
+}
+.wpc-action {
+  background: rgba(255,255,255,.025);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 10px;
+  padding: 10px 9px;
+  text-align: left;
+}
+.wpc-action-icon {
+  font-size: 12px;
+  margin-right: 3px;
+}
+.wpc-action-label {
+  display: inline;
+  font-size: 10px;
+  letter-spacing: .1em;
+  color: var(--g);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.wpc-action p {
+  margin: 4px 0 0;
+  font-size: 11.5px;
+  line-height: 1.65;
+  color: var(--tx);
+}

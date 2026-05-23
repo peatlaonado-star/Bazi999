@@ -168,32 +168,34 @@ describe('Thai Life Blueprint header card', () => {
 });
 
 describe('Daily Thai Cosmic Brief', () => {
-  it('renders .cosmic-brief class in output', () => {
+  it('renders .weekday-power-card class in output', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
     const context = loadContext(dom);
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const output = dom.window.document.getElementById('r0').innerHTML;
-    expect(output).toContain('cosmic-brief');
+    expect(output).toContain('weekday-power-card');
   });
 
-  it('contains the Thai daily brief title text only', () => {
+  it('contains the Thai weekday power title', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
     const context = loadContext(dom);
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const output = dom.window.document.getElementById('r0').innerHTML;
-    expect(output).toContain('สรุปพลังงานวันนี้');
+    expect(output).toContain('กำลังวันประจำตัว');
     expect(output).not.toContain('Daily Cosmic Brief');
+    expect(output).not.toContain('สรุปพลังงานวันนี้');
   });
 
-  it('shows all 5 cb-line elements freely (no premium lock)', () => {
+  it('shows weekday power card with 3 action columns', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
     const context = loadContext(dom);
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
-    const lines = dom.window.document.querySelectorAll('.cb-line');
-    expect(lines.length).toBe(5);
-    // No .cosmic-brief-premium wrapper since section is fully free
-    expect(dom.window.document.querySelector('.cosmic-brief-premium')).toBeNull();
-    expect(dom.window.document.querySelector('.cosmic-brief .lock-overlay')).toBeNull();
+    const actions = dom.window.document.querySelectorAll('.wpc-action');
+    expect(actions.length).toBe(3);
+    // Badges show day, deity, and element
+    expect(dom.window.document.querySelector('.wpc-badge-day')).toBeTruthy();
+    expect(dom.window.document.querySelector('.wpc-badge-deity')).toBeTruthy();
+    expect(dom.window.document.querySelector('.wpc-badge-element')).toBeTruthy();
   });
 
   it('shows personal color name', () => {
@@ -201,46 +203,43 @@ describe('Daily Thai Cosmic Brief', () => {
     const context = loadContext(dom);
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const output = dom.window.document.getElementById('r0').innerHTML;
-    expect(output).toContain('สีมงคลวันนี้');
+    expect(output).toContain('สีมงคล');
   });
 
-  it('cosmic brief appears before locked premium sections to give free readers immediate value', () => {
+  it('weekday power card appears before locked premium sections', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
     const context = loadContext(dom);
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const output = dom.window.document.getElementById('r0').innerHTML;
-    const briefIndex = output.indexOf('cosmic-brief');
+    const briefIndex = output.indexOf('weekday-power-card');
     const windfallIndex = output.indexOf('windfall-luck');
     const karmaIndex = output.indexOf('karma-card');
+    expect(briefIndex).toBeGreaterThan(-1);
     expect(briefIndex).toBeLessThan(windfallIndex);
     expect(briefIndex).toBeLessThan(karmaIndex);
   });
 
-  it('shows full cosmic brief content for free readers (no premium lock)', () => {
+  it('shows weekday power card with Thursday deity and element for free readers', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
     const context = loadContext(dom);
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const output = dom.window.document.getElementById('r0').innerHTML;
-    // 2000-06-15 is Thursday (dayOfWeek=4) — check for Thursday-specific mysticism
+    // 2000-06-15 is Thursday (dayOfWeek=4)
+    expect(output).toContain('กำลังวันประจำตัว');
     expect(output).toContain('แรงครู');  // Thursday energy
-    expect(output).toContain('ท่องพระคาถา');  // Thursday focus
-    expect(output).toContain('พฤหัสบดีสูงส่ง');  // Thursday warning
-    expect(output).toContain('เปิดหนังสือ');  // Thursday ritual action
-    // No lock elements at all
-    expect(dom.window.document.querySelector('.cosmic-brief .is-locked')).toBeNull();
-    expect(dom.window.document.querySelector('.cosmic-brief .lock-overlay')).toBeNull();
+    expect(output).toContain('พระราหู');  // Thursday deity
+    expect(output).toContain('ดิน');  // Thursday element
+    expect(output).toContain('สีมงคล');
   });
 
-  it('shows same full cosmic brief content for premium readers', () => {
+  it('shows same weekday power card for premium readers', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
     const context = loadContext(dom, { isPremiumUnlocked: () => true });
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const output = dom.window.document.getElementById('r0').innerHTML;
-    expect(output).toContain('แรงครู');
-    expect(output).toContain('เปิดหนังสือ');
-    // No lock elements for premium either
-    expect(dom.window.document.querySelector('.cosmic-brief .is-locked')).toBeNull();
-    expect(dom.window.document.querySelector('.cosmic-brief .lock-overlay')).toBeNull();
+    expect(output).toContain('กำลังวันประจำตัว');
+    expect(output).toContain('พระราหู');
+    expect(output).toContain('ดิน');
   });
 });
 
@@ -399,7 +398,7 @@ describe('Free reader conversion reading order', () => {
     const order = [
       'blueprint-card',
       'conversion-roadmap',
-      'cosmic-brief',
+      'weekday-power-card',
       'power-card',
       'windfall-luck',
       'monthly-life-map',

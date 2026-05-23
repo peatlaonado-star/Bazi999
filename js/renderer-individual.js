@@ -7,19 +7,25 @@ function buildDailyBrief(p, dayOfWeek, personalColor) {
   var db = content && content.dailyBrief ? content.dailyBrief : null;
   if (!db) {
     db = {
+      weekdayLabel: ['อา.', 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.'],
+      weekdayDeity: ['-', '-', '-', '-', '-', '-', '-'],
+      weekdayElement: ['-', '-', '-', '-', '-', '-', '-'],
       weekdayEnergy: ['พลังงานวันนี้: มีพลังงานดีสำหรับการเริ่มต้นใหม่'],
       weekdayFocus: ['โฟกัส: สิ่งที่สำคัญที่สุดวันนี้'],
       weekdayWarning: ['ระวัง: อย่ารีบตัดสินใจ'],
       weekdayAction: ['สิ่งที่ควรทำวันนี้: หยุดพักสักครู่']
     };
   }
+  var label = db.weekdayLabel[dayOfWeek] || db.weekdayLabel[0];
+  var deity = db.weekdayDeity[dayOfWeek] || db.weekdayDeity[0];
+  var elName = db.weekdayElement[dayOfWeek] || db.weekdayElement[0];
   var energy = db.weekdayEnergy[dayOfWeek] || db.weekdayEnergy[0];
   var focus = db.weekdayFocus[dayOfWeek] || db.weekdayFocus[0];
   var warning = db.weekdayWarning[dayOfWeek] || db.weekdayWarning[0];
   var action = db.weekdayAction[dayOfWeek] || db.weekdayAction[0];
   var colorName = personalColor ? personalColor.name : '';
   var colorHex = personalColor ? personalColor.hex : '#C9A227';
-  return { energy: energy, colorName: colorName, colorHex: colorHex, focus: focus, warning: warning, action: action };
+  return { label: label, deity: deity, element: elName, energy: energy, colorName: colorName, colorHex: colorHex, focus: focus, warning: warning, action: action };
 }
 
 
@@ -404,13 +410,28 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
   var windfallLuckHtml = buildWindfallLuckHtml(windfallLuckGuide, premiumUnlocked);
 
   var briefData = buildDailyBrief(p, dayOfWeek, { name: pe.c1n, hex: pe.c1 });
-  var cosmicBriefHtml = '<div class="cosmic-brief">'
-    + '<div class="cb-title">✦ สรุปพลังงานวันนี้ ✦</div>'
-    + '<div class="cb-line"><div class="cb-dot" style="background:' + briefData.colorHex + '"></div><div>' + briefData.energy + '</div></div>'
-    + '<div class="cb-line"><div class="cb-dot" style="background:' + briefData.colorHex + '"></div><div>สีมงคลวันนี้: <strong style="color:' + briefData.colorHex + '">' + briefData.colorName + '</strong></div></div>'
-    + '<div class="cb-line"><div class="cb-dot" style="background:#E8A0CF"></div><div>' + briefData.focus + '</div></div>'
-    + '<div class="cb-line"><div class="cb-dot" style="background:#E8534A"></div><div>' + briefData.warning + '</div></div>'
-    + '<div class="cb-line"><div class="cb-dot" style="background:var(--g)"></div><div>' + briefData.action + '</div></div>'
+  // กำลังวันประจำตัว — compact identity card
+  var elementColors = { 'ไฟ': '#E8534A', 'น้ำ': '#5B9BD5', 'ลม': '#B8A8D8', 'ดิน': '#A0A060' };
+  var ec = elementColors[briefData.element] || 'var(--g)';
+  var cosmicBriefHtml = '<div class="weekday-power-card">'
+    // Header badge — day + deity + element
+    + '<div class="wpc-badge-row">'
+    + '<div class="wpc-badge wpc-badge-day"><span class="wpc-badge-label">วันเกิด</span><span class="wpc-badge-value">' + briefData.label + '</span></div>'
+    + '<div class="wpc-badge wpc-badge-deity"><span class="wpc-badge-label">เทวดาประจำวัน</span><span class="wpc-badge-value">' + briefData.deity + '</span></div>'
+    + '<div class="wpc-badge wpc-badge-element" style="border-color:' + ec + '"><span class="wpc-badge-label">ธาตุ</span><span class="wpc-badge-value" style="color:' + ec + '">' + briefData.element + '</span></div>'
+    + '</div>'
+    // Title
+    + '<div class="wpc-title">✦ กำลังวันประจำตัว ✦</div>'
+    // Energy line — prominent
+    + '<div class="wpc-energy">⚡ ' + briefData.energy + '</div>'
+    // Color hint
+    + '<div class="wpc-color-hint">🎨 สีมงคล: <strong style="color:' + briefData.colorHex + '">' + briefData.colorName + '</strong></div>'
+    // Three action items in a compact row
+    + '<div class="wpc-actions">'
+    + '<div class="wpc-action"><span class="wpc-action-icon">🎯</span><span class="wpc-action-label">โฟกัส</span><p>' + briefData.focus + '</p></div>'
+    + '<div class="wpc-action"><span class="wpc-action-icon">⚠️</span><span class="wpc-action-label">ระวัง</span><p>' + briefData.warning + '</p></div>'
+    + '<div class="wpc-action"><span class="wpc-action-icon">🙏</span><span class="wpc-action-label">ปฏิบัติ</span><p>' + briefData.action + '</p></div>'
+    + '</div>'
   + '</div>';
 
   // 5. ประกอบร่างการแสดงผล (Info + Power Elements + Radar)
@@ -457,7 +478,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     +'<div class="ci"><div class="ci-l">'+u.ge+'</div><div class="ci-v">'+gd+'</div><div class="ci-s">'+nm+'</div></div>'
     +'</div></div>'
     + conversionRoadmapHtml
-    + wrapCollapsible("✦ สรุปพลังงานวันนี้ ✦", "อารมณ์ สี เลข ฉบับย่อ", cosmicBriefHtml)
+    + wrapCollapsible("✦ กำลังวันประจำตัว ✦", "วันเกิด · เทวดา · ธาตุ · สีมงคล", cosmicBriefHtml)
     + wrapCollapsible("✨ พลังงานเสริมดวง", "เลขและสีมงคลประจำวัน", powerCardHtml)
     + wrapCollapsible("✦ สูตรเปิดดวงลาภลอย ✦", "เลขเด็ด หวย ทิศ คาถา สายมู", windfallLuckHtml)
     + wrapCollapsible("📅 แผนที่ชีวิตรายเดือน", "5 ด้าน พร้อมพรีวิวรายเดือน", monthlyLifeMapHtml)
