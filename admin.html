@@ -215,7 +215,7 @@ function loadPins() {
       var actions = p.status === 'active' ?
         '<button class="btn btn-sm btn-danger" onclick="expirePin(\'' + esc(p.note) + '\')" title="หมดอายุ">✕</button>' : '';
       return '<tr>' +
-        '<td><span class="pin-value" onclick="copyPin('\'' + esc(p.pin) + '\'')" title="คลิกคัดลอก">' + esc(p.pin) + '</span></td>' +
+        "<td><span class=\"pin-value\" onclick=\"copyPin('" + esc(p.pin) + "')\" title=\"คลิกคัดลอก\">" + esc(p.pin) + "</span></td>" +
         '<td>' + esc(p.plan) + '</td>' +
         '<td>' + fmtDate(p.created) + '</td>' +
         '<td>' + fmtDate(p.expires) + '</td>' +
