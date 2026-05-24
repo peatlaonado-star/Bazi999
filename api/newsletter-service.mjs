@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { sendWelcomeEmail } from './email-service.mjs';
 
 const SUBSCRIBERS_FILE = path.resolve(process.cwd(), 'data', 'newsletter-subscribers.json');
 
@@ -82,6 +83,11 @@ export function subscribe(data) {
   subscribers.push(newSubscriber);
   
   if (saveSubscribers(subscribers)) {
+    // Send welcome email asynchronously (don't block the response)
+    sendWelcomeEmail(normalizedEmail, birthdate).catch(err => {
+      console.error('Failed to send welcome email:', err.message);
+    });
+    
     return { success: true, message: 'สมัครสำเร็จ!' };
   } else {
     return { success: false, error: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล' };
