@@ -315,18 +315,19 @@ function getPathname(url = '/') {
 
 function readJsonBody(req) {
   return new Promise((resolve, reject) => {
-    let rawBody = '';
-    req.setEncoding('utf8');
+    const chunks = [];
     req.on('data', (chunk) => {
-      rawBody += chunk;
-      if (rawBody.length > 10_000) {
+      chunks.push(chunk);
+      const totalLen = chunks.reduce((s, c) => s + c.length, 0);
+      if (totalLen > 10_000) {
         reject(new Error('Request body too large'));
         req.destroy();
       }
     });
     req.on('end', () => {
       try {
-        resolve(rawBody ? JSON.parse(rawBody) : {});
+        const raw = Buffer.concat(chunks).toString('utf8');
+        resolve(raw ? JSON.parse(raw) : {});
       } catch (error) {
         reject(error);
       }

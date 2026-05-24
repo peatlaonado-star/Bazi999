@@ -297,11 +297,17 @@ function parseQuery(url) {
 }
 
 function handleJson(req, onSuccess, onError) {
-  let raw = '';
-  req.setEncoding('utf8');
-  req.on('data', (chunk) => { raw += chunk; if (raw.length > 10_000) { req.destroy(); onError(); } });
+  const chunks = [];
+  req.on('data', (chunk) => {
+    chunks.push(chunk);
+    const totalLen = chunks.reduce((s, c) => s + c.length, 0);
+    if (totalLen > 10_000) { req.destroy(); onError(); }
+  });
   req.on('end', () => {
-    try { onSuccess(raw ? JSON.parse(raw) : {}); } catch { onError(); }
+    try {
+      const raw = Buffer.concat(chunks).toString('utf8');
+      onSuccess(raw ? JSON.parse(raw) : {});
+    } catch { onError(); }
   });
   req.on('error', onError);
 }
