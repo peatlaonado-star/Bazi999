@@ -5,7 +5,7 @@
 ### 1.1 สร้าง project
 - ไปที่ https://railway.app
 - New Project → Deploy from GitHub repo
-- เลือก repo `starvia-split`
+- เลือก repo `peatlaonado-star/Starvia`
 
 ### 1.2 ตั้งค่า Environment Variables
 ใน Railway dashboard → Variables:
