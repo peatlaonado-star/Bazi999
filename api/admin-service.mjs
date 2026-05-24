@@ -93,6 +93,7 @@ export function listPins(query, config) {
 
 function makePinPublic(record) {
   return {
+    pin: record.pin || '',
     created: record.createdAt || '',
     expires: record.expiresAt || '',
     used: record.usedAt || null,
@@ -124,6 +125,7 @@ export function issuePins(body, config) {
     } while (store.pins.some((r) => r.pinHash === pinHash && !r.usedAt));
 
     const record = {
+      pin,
       pinHash,
       plan,
       createdAt: nowDate.toISOString(),
