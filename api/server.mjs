@@ -4,6 +4,7 @@ import path from 'node:path';
 
 import { createPremiumRequestHandler, loadPremiumConfig } from './premium-service.mjs';
 import { createAdminRequestHandler, loadAdminConfig } from './admin-service.mjs';
+import { subscribe, getSubscribers, getSubscriberCount, unsubscribe } from './newsletter-service.mjs';
 
 const port = Number(process.env.PORT || process.env.STARVIA_API_PORT || 8787);
 const host = process.env.HOST || '0.0.0.0';
@@ -37,6 +38,76 @@ try {
 }
 
 const premiumHandler = createPremiumRequestHandler(premiumConfig);
+
+// ── Helper: Read JSON body ──
+function readJsonBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    req.on('data', chunk => chunks.push(chunk));
+    req.on('end', () => {
+      try {
+        const body = Buffer.concat(chunks).toString('utf8');
+        resolve(JSON.parse(body));
+      } catch (err) {
+        reject(err);
+      }
+    });
+    req.on('error', reject);
+  });
+}
+
+// ── Helper: Write JSON response ──
+function writeJson(res, status, data) {
+  res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
+  res.end(JSON.stringify(data));
+}
+
+// ── Newsletter Handler ──
+async function handleNewsletter(req, res) {
+  const url = req.url || '/';
+  
+  // POST /v1/newsletter/subscribe
+  if (req.method === 'POST' && url === '/v1/newsletter/subscribe') {
+    try {
+      const body = await readJsonBody(req);
+      const result = subscribe(body);
+      return writeJson(res, result.success ? 200 : 400, result);
+    } catch (err) {
+      return writeJson(res, 400, { success: false, error: 'ข้อมูลไม่ถูกต้อง' });
+    }
+  }
+  
+  // GET /v1/newsletter/subscribers (admin only)
+  if (req.method === 'GET' && url === '/v1/newsletter/subscribers') {
+    // Simple auth check - require admin token
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return writeJson(res, 401, { success: false, error: 'Unauthorized' });
+    }
+    
+    const subscribers = getSubscribers();
+    return writeJson(res, 200, { success: true, subscribers, count: subscribers.length });
+  }
+  
+  // GET /v1/newsletter/count
+  if (req.method === 'GET' && url === '/v1/newsletter/count') {
+    const count = getSubscriberCount();
+    return writeJson(res, 200, { success: true, count });
+  }
+  
+  // POST /v1/newsletter/unsubscribe
+  if (req.method === 'POST' && url === '/v1/newsletter/unsubscribe') {
+    try {
+      const body = await readJsonBody(req);
+      const result = unsubscribe(body.email);
+      return writeJson(res, result.success ? 200 : 400, result);
+    } catch (err) {
+      return writeJson(res, 400, { success: false, error: 'ข้อมูลไม่ถูกต้อง' });
+    }
+  }
+  
+  return writeJson(res, 404, { success: false, error: 'Not found' });
+}
 
 // ── Static file server ──
 
@@ -81,7 +152,7 @@ function serveStatic(req, res) {
   });
 }
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
   const url = req.url || '/';
 
   // CORS for API routes
@@ -97,9 +168,15 @@ const server = http.createServer((req, res) => {
     }
 
     // Route admin paths to admin handler
-  if (adminHandler && url.startsWith('/v1/admin')) {
-    return adminHandler(req, res);
+    if (adminHandler && url.startsWith('/v1/admin')) {
+      return adminHandler(req, res);
     }
+    
+    // Route newsletter paths
+    if (url.startsWith('/v1/newsletter')) {
+      return handleNewsletter(req, res);
+    }
+    
     // Everything else goes to premium handler
     return premiumHandler(req, res);
   }
