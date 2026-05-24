@@ -128,6 +128,13 @@
   <div class="toast" id="toast"></div>
 </div>
 
+<!-- STARVIA ADMIN CONFIG -->
+<script>
+  window.STARVIA_ADMIN_CONFIG = {
+    apiBaseUrl: 'http://localhost:8787/v1/admin'
+  };
+</script>
+
 <script>
 // ── Config ──
 var API_BASE = (window.STARVIA_ADMIN_CONFIG && window.STARVIA_ADMIN_CONFIG.apiBaseUrl) || 'http://localhost:8787/v1/admin';
