@@ -1,6 +1,7 @@
 // STARVIA Admin Service — PIN management + dashboard
 import crypto from 'node:crypto';
 import fs from 'node:fs';
+import path from 'node:path';
 
 const DEFAULT_ADMIN_TOKEN_TTL = 12 * 60 * 60; // 12 hours
 
@@ -52,7 +53,7 @@ function readPinStore(filePath) {
 
 function writePinStore(filePath, store) {
   if (!filePath) { console.warn('[admin] pinStoreFile not configured, skipping write'); return; }
-  fs.mkdirSync(require('node:path').dirname(filePath), { recursive: true });
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(filePath, `${JSON.stringify(store, null, 2)}\n`);
 }
 
