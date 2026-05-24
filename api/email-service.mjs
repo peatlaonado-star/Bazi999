@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const NEWSLETTER_FROM = process.env.NEWSLETTER_FROM || 'STARVIA <newsletter@starvia.app>';
+const NEWSLETTER_FROM = process.env.NEWSLETTER_FROM || 'STARVIA ⭐ <noreply@starvia.website>';
 const SUBSCRIBERS_FILE = path.resolve(process.cwd(), 'data', 'newsletter-subscribers.json');
 
 // Load active subscribers
@@ -122,7 +122,7 @@ function generateDailyHoroscopeHTML(email, birthdate) {
               
               <!-- CTA -->
               <div style="margin: 25px 0;">
-                <a href="https://starvia-production.up.railway.app/" style="display: inline-block; background: linear-gradient(135deg, #C9A227, #8B6914); color: #05030f; text-decoration: none; padding: 12px 30px; border-radius: 9px; font-weight: 700; font-size: 14px; letter-spacing: 0.08em;">
+                <a href="https://starvia.website/" style="display: inline-block; background: linear-gradient(135deg, #C9A227, #8B6914); color: #05030f; text-decoration: none; padding: 12px 30px; border-radius: 9px; font-weight: 700; font-size: 14px; letter-spacing: 0.08em;">
                   ✦ ดูดวงเต็มรูปแบบ ✦
                 </a>
               </div>
@@ -131,7 +131,7 @@ function generateDailyHoroscopeHTML(email, birthdate) {
               <div style="font-size: 10px; color: #5a4a7a; margin-top: 20px;">
                 <p>ได้รับอีเมลนี้เพราะสมัครรับดวงรายวันจาก STARVIA</p>
                 <p style="margin-top: 10px;">
-                  <a href="https://starvia-production.up.railway.app/unsubscribe?email=${encodeURIComponent(email)}" style="color: #8c7bb3; text-decoration: underline;">
+                  <a href="https://starvia.website/unsubscribe?email=${encodeURIComponent(email)}" style="color: #8c7bb3; text-decoration: underline;">
                     ยกเลิกการสมัคร
                   </a>
                 </p>
@@ -261,7 +261,7 @@ export async function sendWelcomeEmail(email, birthdate) {
               </div>
               
               <div style="margin: 25px 0;">
-                <a href="https://starvia-production.up.railway.app/" style="display: inline-block; background: linear-gradient(135deg, #C9A227, #8B6914); color: #05030f; text-decoration: none; padding: 12px 30px; border-radius: 9px; font-weight: 700; font-size: 14px; letter-spacing: 0.08em;">
+                <a href="https://starvia.website/" style="display: inline-block; background: linear-gradient(135deg, #C9A227, #8B6914); color: #05030f; text-decoration: none; padding: 12px 30px; border-radius: 9px; font-weight: 700; font-size: 14px; letter-spacing: 0.08em;">
                   ✦ ดูดวงเต็มรูปแบบ ✦
                 </a>
               </div>
@@ -269,7 +269,7 @@ export async function sendWelcomeEmail(email, birthdate) {
               <div style="font-size: 10px; color: #5a4a7a; margin-top: 20px;">
                 <p>ดาวไม่ได้ตัดสินชีวิตคุณ — ดาวช่วยให้คุณมองเห็นตัวเองชัดขึ้น</p>
                 <p style="margin-top: 10px;">
-                  <a href="https://starvia-production.up.railway.app/unsubscribe?email=${encodeURIComponent(email)}" style="color: #8c7bb3; text-decoration: underline;">
+                  <a href="https://starvia.website/unsubscribe?email=${encodeURIComponent(email)}" style="color: #8c7bb3; text-decoration: underline;">
                     ยกเลิกการสมัคร
                   </a>
                 </p>
