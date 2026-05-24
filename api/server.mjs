@@ -97,8 +97,8 @@ const server = http.createServer((req, res) => {
     }
 
     // Route admin paths to admin handler
-    if (adminHandler && url.startsWith('/v1/admin')) {
-      return adminHandler(req, res);
+  if (adminHandler && url.startsWith('/v1/admin')) {
+    return adminHandler(req, res);
     }
     // Everything else goes to premium handler
     return premiumHandler(req, res);

@@ -51,7 +51,7 @@ function readPinStore(filePath) {
 }
 
 function writePinStore(filePath, store) {
-  if (!filePath) throw new Error('pinStoreFile is not configured');
+  if (!filePath) { console.warn('[admin] pinStoreFile not configured, skipping write'); return; }
   fs.mkdirSync(require('node:path').dirname(filePath), { recursive: true });
   fs.writeFileSync(filePath, `${JSON.stringify(store, null, 2)}\n`);
 }
