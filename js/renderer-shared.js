@@ -22,11 +22,13 @@ function premiumLockedCard(className, teaserHtml, title, description){
 
 function buildTabs(tid,sid,pre,TB,p,u){
   var tt=document.getElementById(tid), ts2=document.getElementById(sid);
+  // Icon map for each tab position
+  var tabIcons = ['👤', '🌑', '💕', '💼', '⏮️', '🎯', '🔮'];
   
   TB.forEach(function(tb,i){
     var btn=document.createElement('button');
     btn.className='tab'+(i===0?' on':'');
-    btn.textContent=tb.lb;
+    btn.innerHTML = '<span class="tab-icon">' + (tabIcons[i] || '✦') + '</span><span class="tab-text">' + tb.lb + '</span>';
     btn.addEventListener('click', function(){
       document.querySelectorAll('#'+tid+' .tab').forEach(function(t){t.classList.remove('on');});
       document.querySelectorAll('#'+sid+' .sec').forEach(function(s){s.classList.remove('on');});
@@ -39,28 +41,25 @@ function buildTabs(tid,sid,pre,TB,p,u){
     sec.className='sec'+(i===0?' on':'');
     sec.id=pre+i;
 
-    // 💡 กำหนดแท็บที่จะล็อค: 
-    // i === 0 คือแท็บแรก (ตัวตนและบุคลิกภาพ) จะปล่อยฟรีเสมอ!
-    // i > 0 คือตั้งแต่แท็บที่ 2 เป็นต้นไป (จุดอ่อน, ความรัก, การงาน, อดีตชาติ ฯลฯ) จะถูกล็อค
-    var isPremiumTab = false;
-    if (i > 0) isPremiumTab = true; 
-
-    // ใส่คลาสเบลอ ถ้าเป็นแท็บพรีเมียมและยังไม่ได้จ่ายเงิน
+    var isPremiumTab = (i > 0);
     if (isPremiumTab && !premiumIsUnlocked()) {
        sec.classList.add('is-locked');
     }
 
-    var html='<div class="orn">✦ · ✦ · ✦</div>';
+    var html='';
     tb.secs.forEach(function(s){
-      html+='<div class="st">'+s.t+'</div>';
+      html += '<div class="tab-section-card">'
+        + '<div class="tsc-header"><span class="tsc-icon">✦</span><span class="tsc-title">' + s.t + '</span></div>'
+        + '<div class="tsc-body">';
       if(s.c==='habits'){
         p.hb.forEach(function(h,n){ html+='<div class="hi"><div class="hn">'+(n+1)+'</div><div class="ht">'+h+'</div></div>'; });
       } else {
-        html+='<div class="rb">'+s.c+'<div class="ref">'+u.rf+' '+s.rf+'</div></div>';
+        html += '<div class="rb">'+s.c+'</div>';
       }
+      html += '<div class="tsc-ref"><span class="tsc-ref-dot">🔍</span>' + u.rf + ' ' + s.rf + '</div>'
+        + '</div></div>';
     });
 
-    // วาดกล่องแม่กุญแจทับเนื้อหาที่เบลอไว้
     if (isPremiumTab && !premiumIsUnlocked()) {
         html += buildPremiumLockOverlay(
           'เนื้อหาเจาะลึกเฉพาะคุณ (Premium)',
