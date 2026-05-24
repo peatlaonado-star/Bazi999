@@ -258,9 +258,13 @@ export function createAdminRequestHandler(config) {
 
     if (req.method === 'POST' && pathname(req.url) === '/v1/admin/pins/issue') {
       handleJson(req, (body) => {
-        const result = issuePins(body, config);
-        writeJson(res, result.status, result.body);
-      }, () => writeJson(res, 400, { success: false, error: 'BAD_REQUEST' }));
+        try {
+          const result = issuePins(body, config);
+          writeJson(res, result.status, result.body);
+        } catch (e) {
+          writeJson(res, 400, { success: false, error: 'ISSUE_ERROR', message: e.message });
+        }
+      }, () => writeJson(res, 400, { success: false, error: 'BAD_REQUEST', message: 'Invalid JSON body' }));
       return;
     }
 
