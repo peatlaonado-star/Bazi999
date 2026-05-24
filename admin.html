@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>STARVIA Admin · จัดการ PIN</title>
+<style>
+  :root { --bg:#0b0618; --fg:#e8dfc8; --g:#C9A227; --g2:#7a6a9a; --tx2:#b8a8d8; --card:rgba(255,255,255,.03); --border:rgba(201,162,39,.16); }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Leelawadee UI','Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--fg);min-height:100vh}
+  .container{max-width:900px;margin:0 auto;padding:20px 16px}
+  h1{font-size:22px;color:var(--g);text-align:center;margin-bottom:4px;letter-spacing:.04em}
+  .subtitle{text-align:center;font-size:11px;color:var(--tx2);margin-bottom:24px;letter-spacing:.08em}
+  .hidden{display:none!important}
+
+  /* Login */
+  .login-box{max-width:360px;margin:80px auto;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px}
+  .login-box input{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;background:rgba(0,0,0,.3);color:var(--fg);font-size:15px;margin-bottom:12px;outline:none}
+  .login-box input:focus{border-color:var(--g)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .2s;font-family:inherit}
+  .btn-gold{background:linear-gradient(135deg,#C9A227,#A07D1A);color:#0b0618;width:100%}
+  .btn-outline{background:transparent;border:1px solid var(--border);color:var(--g)}
+  .btn-sm{padding:6px 12px;font-size:11px}
+  .btn-danger{background:rgba(244,67,54,.2);border:1px solid rgba(244,67,54,.4);color:#F44336}
+  .btn-danger:hover{background:rgba(244,67,54,.3)}
+
+  /* Dashboard */
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px}
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+  @media(max-width:500px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
+  .stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
+  .stat-num{font-size:28px;font-weight:800;color:var(--g)}
+  .stat-label{font-size:10px;color:var(--tx2);letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
+
+  .section{margin-bottom:20px}
+  .section-title{font-size:14px;color:var(--g);font-weight:700;margin-bottom:10px;letter-spacing:.03em}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:10px}
+  .row input,.row select{padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:rgba(0,0,0,.3);color:var(--fg);font-size:13px;font-family:inherit;outline:none}
+  .row input:focus,.row select:focus{border-color:var(--g)}
+  .row input{flex:1;min-width:120px}
+
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{text-align:left;padding:8px 6px;color:var(--tx2);font-size:10px;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+  td{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+  .pin-value{font-family:monospace;font-size:13px;color:var(--g);cursor:pointer;user-select:all}
+  .badge{display:inline-block;padding:3px 8px;border-radius:20px;font-size:9px;letter-spacing:.08em;font-weight:700}
+  .badge-active{background:rgba(76,175,80,.15);color:#4CAF50}
+  .badge-used{background:rgba(33,150,243,.15);color:#2196F3}
+  .badge-expired{background:rgba(244,67,54,.15);color:#F44336}
+
+  .toast{position:fixed;bottom:20px;right:20px;background:var(--g);color:#0b0618;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:700;z-index:999;opacity:0;transform:translateY(10px);transition:all .3s}
+  .toast.show{opacity:1;transform:translateY(0)}
+  .toast.error{background:#F44336;color:#fff}
+
+  .loading{text-align:center;padding:20px;color:var(--tx2);font-size:13px}
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen">
+    <h1>✦ STARVIA Admin ✦</h1>
+    <div class="subtitle">ระบบจัดการ PIN Premium</div>
+    <div class="login-box">
+      <input type="password" id="login-password" placeholder="รหัสผ่าน Admin" autofocus>
+      <button class="btn btn-gold" onclick="doLogin()">เข้าสู่ระบบ</button>
+      <div id="login-error" style="color:#F44336;font-size:12px;margin-top:8px;display:none">รหัสผ่านไม่ถูกต้อง</div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="hidden">
+    <div class="topbar">
+      <div><h1 style="font-size:18px">✦ STARVIA Admin ✦</h1><span style="font-size:10px;color:var(--tx2)">จัดการ PIN</span></div>
+      <div style="display:flex;gap:6px">
+        <span id="api-url" style="font-size:10px;color:var(--tx2);align-self:center"></span>
+        <button class="btn btn-outline btn-sm" onclick="doLogout()">ออกจากระบบ</button>
+        <button class="btn btn-outline btn-sm" onclick="refreshAll()">🔄 รีเฟรช</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid" id="stats">
+      <div class="stat-card"><div class="stat-num" id="stat-total">-</div><div class="stat-label">ทั้งหมด</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-unused">-</div><div class="stat-label">พร้อมใช้</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-used">-</div><div class="stat-label">ใช้แล้ว</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-expired">-</div><div class="stat-label">หมดอายุ</div></div>
+    </div>
+
+    <!-- Issue PINs -->
+    <div class="section">
+      <div class="section-title">🎫 ออก PIN ใหม่</div>
+      <div class="card">
+        <div class="row">
+          <input type="number" id="issue-count" value="1" min="1" max="50" placeholder="จำนวน" style="max-width:80px">
+          <input type="number" id="issue-days" value="7" min="1" max="365" placeholder="จำนวนวัน" style="max-width:80px">
+          <input id="issue-note" placeholder="หมายเหตุ (เช่น ชื่อลูกค้า, ORDER)" style="flex:2">
+          <button class="btn btn-gold" style="width:auto" onclick="issuePins()">ออก PIN</button>
+        </div>
+        <div id="issue-result" class="hidden" style="margin-top:12px;padding:10px;background:rgba(201,162,39,.06);border-radius:8px;font-size:12px;max-height:200px;overflow-y:auto"></div>
+      </div>
+    </div>
+
+    <!-- PIN List -->
+    <div class="section">
+      <div class="section-title">📋 รายการ PIN</div>
+      <div class="card">
+        <div class="row">
+          <select id="pin-filter" onchange="loadPins()">
+            <option value="">ทั้งหมด</option>
+            <option value="unused">พร้อมใช้</option>
+            <option value="used">ใช้แล้ว</option>
+            <option value="expired">หมดอายุ</option>
+          </select>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th>PIN</th><th>แผน</th><th>สร้าง</th><th>หมดอายุ</th><th>ใช้เมื่อ</th><th>หมายเหตุ</th><th>สถานะ</th><th></th></tr></thead>
+            <tbody id="pin-table"><tr><td colspan="8" class="loading">กำลังโหลด...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+// ── Config ──
+var API_BASE = (window.STARVIA_ADMIN_CONFIG && window.STARVIA_ADMIN_CONFIG.apiBaseUrl) || 'http://localhost:8787/v1/admin';
+var TOKEN_KEY = 'starvia_admin_token';
+var token = localStorage.getItem(TOKEN_KEY);
+
+// ── Init ──
+if (token) { showDashboard(); refreshAll(); }
+
+// ── Auth ──
+function doLogin() {
+  var pw = document.getElementById('login-password').value;
+  fetch(API_BASE + '/login', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({password:pw})
+  }).then(function(r){ return r.json(); }).then(function(d){
+    if (d.success) {
+      token = d.token;
+      localStorage.setItem(TOKEN_KEY, token);
+      document.getElementById('login-error').style.display = 'none';
+      showDashboard();
+      refreshAll();
+    } else {
+      document.getElementById('login-error').style.display = 'block';
+    }
+  }).catch(function(){ toast('เชื่อมต่อ API ไม่ได้', true); });
+}
+
+function doLogout() {
+  localStorage.removeItem(TOKEN_KEY);
+  token = null;
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('dashboard').classList.add('hidden');
+}
+
+function showDashboard() {
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('dashboard').classList.remove('hidden');
+  document.getElementById('api-url').textContent = API_BASE;
+}
+
+function api(path, options) {
+  var opts = options || {};
+  opts.headers = opts.headers || {};
+  opts.headers['Authorization'] = 'Bearer ' + token;
+  return fetch(API_BASE + path, opts).then(function(r){
+    if (r.status === 401) { doLogout(); throw new Error('Unauthorized'); }
+    return r.json();
+  });
+}
+
+// ── Data ──
+function refreshAll() { loadStats(); loadPins(); }
+
+function loadStats() {
+  api('/stats').then(function(d){
+    document.getElementById('stat-total').textContent = d.total;
+    document.getElementById('stat-unused').textContent = d.unused;
+    document.getElementById('stat-used').textContent = d.used;
+    document.getElementById('stat-expired').textContent = d.expired;
+  }).catch(function(){});
+}
+
+function loadPins() {
+  var filter = document.getElementById('pin-filter').value;
+  var qs = filter ? '?status=' + filter : '';
+  api('/pins' + qs).then(function(d){
+    var tbody = document.getElementById('pin-table');
+    if (!d.pins || !d.pins.length) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--tx2)">ไม่มี PIN</td></tr>';
+      return;
+    }
+    tbody.innerHTML = d.pins.map(function(p,i){
+      var statusBadge = p.status === 'active' ? '<span class="badge badge-active">พร้อมใช้</span>' :
+                        p.status === 'used' ? '<span class="badge badge-used">ใช้แล้ว</span>' :
+                        '<span class="badge badge-expired">หมดอายุ</span>';
+      var actions = p.status === 'active' ?
+        '<button class="btn btn-sm btn-danger" onclick="expirePin(\'' + esc(p.note) + '\')" title="หมดอายุ">✕</button>' : '';
+      // PIN is hashed in store — only available from issue result; for listing we show note as identifier
+      return '<tr>' +
+        '<td><span class="pin-value"><em>ซ่อน</em></span></td>' +
+        '<td>' + esc(p.plan) + '</td>' +
+        '<td>' + fmtDate(p.created) + '</td>' +
+        '<td>' + fmtDate(p.expires) + '</td>' +
+        '<td>' + (p.used ? fmtDate(p.used) : '-') + '</td>' +
+        '<td>' + esc(p.note) + '</td>' +
+        '<td>' + statusBadge + '</td>' +
+        '<td>' + actions + '</td>' +
+        '</tr>';
+    }).join('');
+  }).catch(function(){});
+}
+
+function issuePins() {
+  var count = Math.max(1, Math.min(50, Number(document.getElementById('issue-count').value) || 1));
+  var days = Math.max(1, Math.min(365, Number(document.getElementById('issue-days').value) || 7));
+  var note = document.getElementById('issue-note').value.trim();
+  api('/pins/issue', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({count:count, days:days, note:note, plan:'premium_199'})
+  }).then(function(d){
+    var resultDiv = document.getElementById('issue-result');
+    resultDiv.classList.remove('hidden');
+    resultDiv.innerHTML = '<strong>ออก PIN แล้ว ' + d.count + ' รหัส:</strong><br>' +
+      d.issued.map(function(p){ return '<span style="font-family:monospace;font-size:14px;color:var(--g);cursor:pointer" onclick="copyPin(\'' + esc(p.pin) + '\')" title="คลิกคัดลอก">' + esc(p.pin) + '</span> · หมดอายุ ' + fmtDate(p.expires) + (p.note ? ' · ' + esc(p.note) : ''); }).join('<br>');
+    toast('ออก PIN สำเร็จ ' + d.count + ' รหัส');
+    refreshAll();
+  }).catch(function(){});
+}
+
+function expirePin(note) {
+  if (!confirm('ต้องการหมดอายุ PIN: ' + note + ' ?')) return;
+  api('/pins/expire', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({note:note})
+  }).then(function(d){
+    if (d.success) { toast('หมดอายุแล้ว: ' + d.expired); refreshAll(); }
+    else { toast(d.message || 'ไม่สำเร็จ', true); }
+  }).catch(function(){});
+}
+
+// ── Helpers ──
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtDate(d) { if (!d) return '-'; try { return new Date(d).toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'}); } catch(e){ return d; } }
+function copyPin(pin) { navigator.clipboard.writeText(pin).then(function(){ toast('คัดลอก: ' + pin); }).catch(function(){ prompt('คัดลอก PIN:', pin); }); }
+function toast(msg, isError) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast' + (isError ? ' error' : '') + ' show';
+  clearTimeout(el._t); el._t = setTimeout(function(){ el.classList.remove('show'); }, 2500);
+}
+</script>
+</body>
+</html>

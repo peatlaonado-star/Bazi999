@@ -19,6 +19,7 @@ const files = [
   'assets/qr-payment.jpg',
   'privacy.html',
   'terms.html',
+  'admin.html',
 ];
 
 for (const file of files) {
