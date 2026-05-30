@@ -10,6 +10,7 @@ const files = [
   'ui-actions.js',
   'data/thai-astrology-content.js',
   'js/reading-helpers.js',
+  'js/life-graph.js',
   'js/renderer-shared.js',
   'js/renderer-individual.js',
   'js/renderer-couple.js',
