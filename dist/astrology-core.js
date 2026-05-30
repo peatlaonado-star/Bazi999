@@ -1,0 +1,245 @@
+// Astrology core helpers extracted from app.js
+// Helper functions
+function getPL(){ return CL==='th' ? PL : PL_EN; }
+function getRA(){ return CL==='th' ? RA_TH : RA_EN; }
+function getELD(){ return CL==='th' ? ELD_TH : ELD_EN; }
+
+function getRasi(ds){
+  var RA=getRA(),d=new Date(ds),m=d.getMonth()+1,dy=d.getDate();
+  for(var i=0;i<RA.length;i++){
+    var r=RA[i],sm=r.sm[0],sd=r.sm[1],em=r.em[0],ed=r.em[1];
+    if(sm<=em){if((m===sm&&dy>=sd)||(m===em&&dy<=ed)||(m>sm&&m<em))return i;}
+    else{if((m===sm&&dy>=sd)||(m===em&&dy<=ed)||m>sm||m<em)return i;}
+  }return 0;
+}
+function getLagna(ds,ts){
+  var ri=getRasi(ds),h=parseInt((ts||'06:00').split(':')[0]);
+  return (ri+Math.floor(((h-6+24)%24)/2))%12;
+}
+function fmtDate(ds){
+  if(CL==='th') return new Date(ds).toLocaleDateString('th-TH',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  return new Date(ds).toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+}
+function rasiAngle(a,b){
+  var d=Math.abs(a-b)%12,dd=Math.min(d,12-d);
+  if(dd===0) return [85, CL==='th'?'ราศีเดียวกัน — เหมือนกระจกสะท้อนกัน เข้าใจกันอย่างลึกซึ้ง':'Same sign — like mirrors reflecting each other, deeply familiar.'];
+  if(dd===4) return [95, CL==='th'?'ไตรโกณมงคล (120 องศา) — ตำราโหราฯ ถือว่าเป็นตำแหน่งที่ดีที่สุด เสริมพลังกันอย่างเป็นธรรมชาติ':'Grand Trine (120°) — Considered the finest position. They empower each other naturally.'];
+  if(dd===3||dd===9) return [75, CL==='th'?'จตุรัส (90 องศา) — ท้าทายและสร้างแรงเสียดทาน แต่หากผ่านได้จะทำให้ทั้งคู่เติบโตยิ่งขึ้น':'Square (90°) — Challenging and friction-creating, but the greatest catalyst for mutual growth.'];
+  if(dd===6) return [80, CL==='th'?'ตรงข้าม (180 องศา) — ดึงดูดและเติมเต็มกัน เหมือนสองด้านของดาวเดียว':'Opposition (180°) — Mutually attracting and completing, like two faces of one star.'];
+  return [78, CL==='th'?'ตำแหน่งปกติ — ความสัมพันธ์ที่ต้องใช้เวลาและความพยายามในการทำความเข้าใจ':'Neutral position — a relationship that benefits from time and genuine effort to understand each other.'];
+}
+function grade(total){
+  var u=U();
+  return total>=90?u.ga:total>=80?u.gb:total>=70?u.gc:total>=60?u.gd3:u.ge2;
+}
+function scoreTxt(total){
+  var u=U();
+  return total>=80?u.sa:total>=70?u.sb:u.sc;
+}
+
+// Mode control
+var curMode=0;
+function setMode(m){
+  curMode=m;
+  document.querySelectorAll('.mnb').forEach(function(b,i){b.classList.toggle('on',i===m);});
+  document.querySelectorAll('.mode').forEach(function(p,i){p.classList.toggle('on',i===m);});
+}
+
+// Button enable check
+function chkBtn(mode){
+  if(mode===0) document.getElementById('btn0').disabled=!document.getElementById('d0').value;
+  if(mode===1) document.getElementById('btn1').disabled=!(document.getElementById('d1a').value&&document.getElementById('d1b').value);
+  if(mode===2) document.getElementById('btn2').disabled=!document.getElementById('d2').value;
+}
+
+function showLoad(){ document.getElementById('load').style.display='block'; }
+function hideLoad(){ document.getElementById('load').style.display='none'; }
+
+// Language toggle
+function toggleLang(){
+  CL = CL==='th'?'en':'th';
+  var u=U();
+  document.getElementById('lbtn').textContent = CL==='th'?'🌐 EN':'🌐 TH';
+  // Update static UI
+  document.getElementById('hd-tag').textContent=u.tag;
+  document.getElementById('hd-ttl').textContent='STARVIA';
+  document.getElementById('hd-sub').textContent=u.sub;
+  document.getElementById('brand-promise').textContent=CL==='th'?'ดาวไม่ได้ตัดสินชีวิตคุณ — ดาวช่วยให้คุณมองเห็นตัวเองชัดขึ้น':'The stars don\'t define you — they help you see yourself more clearly.';
+  document.getElementById('mn0').textContent=u.m0;
+  document.getElementById('mn1').textContent=u.m1;
+  document.getElementById('mn2').textContent=u.m2;
+  document.getElementById('btn0').textContent=u.b0;
+  document.getElementById('btn1').textContent=u.b1;
+  document.getElementById('btn2').textContent=u.b2;
+  document.getElementById('phd1a').textContent=u.p1;
+  document.getElementById('phd1b').textContent=u.p2;
+  document.getElementById('cdiv1').textContent=u.meet;
+  document.getElementById('load-txt').textContent=u.ld;
+  // Update labels
+  ['lb-n0','lb-n1a','lb-n1b','lb-n2'].forEach(function(id){var e=document.getElementById(id);if(e)e.childNodes[0].textContent=u.nm+' ';});
+  ['lb-d0','lb-d1a','lb-d1b','lb-d2'].forEach(function(id){var e=document.getElementById(id);if(e)e.childNodes[0].textContent=u.db+' ';});
+  ['lb-t0','lb-t1a','lb-t1b'].forEach(function(id){var e=document.getElementById(id);if(e)e.childNodes[0].textContent=u.tm+' ';});
+  // Update optional label
+  document.querySelectorAll('.opt-label').forEach(function(el){el.textContent=u.opt;});
+  // Update gender options
+  [['g0m','g0f','g0o'],['g1am','g1af','g1ao'],['g1bm','g1bf','g1bo'],['g2m','g2f','g2o']].forEach(function(ids){
+    var e0=document.getElementById(ids[0]),e1=document.getElementById(ids[1]),e2=document.getElementById(ids[2]);
+    if(e0)e0.textContent=u.ml; if(e1)e1.textContent=u.fe; if(e2)e2.textContent=u.ot;
+  });
+  // Update placeholders
+  document.getElementById('n0').placeholder=CL==='th'?'ชื่อของคุณ':'Your name';
+  document.getElementById('n1a').placeholder=CL==='th'?'ชื่อคนที่หนึ่ง':'Person one name';
+  document.getElementById('n1b').placeholder=CL==='th'?'ชื่อคนที่สอง':'Person two name';
+  document.getElementById('n2').placeholder=CL==='th'?'ชื่อของคุณ':'Your name';
+  // Reset results
+  ['r0','r1','r2'].forEach(function(id){document.getElementById(id).innerHTML='';});
+  ['fc0','fc1','fc2'].forEach(function(id){document.getElementById(id).style.display='block';});
+  ['n0','d0','t0','n1a','d1a','t1a','n1b','d1b','t1b','n2','d2'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('btn0').disabled=true;
+  document.getElementById('btn1').disabled=true;
+  document.getElementById('btn2').disabled=true;
+}
+
+
+// ===== ELEMENT RADAR CHART (ยืดหยุ่นสุดขอบกราฟ & ถอดสัญลักษณ์ที่ดูคล้ายภาษาจีน) =====
+function buildElementRadar(p, r, l) {
+  var isTH = CL === 'th';
+  
+  // ใช้ชื่อธาตุแบบอ่านง่าย ไม่มีสัญลักษณ์
+  var elNames  = isTH ? ['ไฟ', 'ดิน', 'ลม', 'น้ำ'] : ['Fire', 'Earth', 'Wind', 'Water'];
+  var elColors = ['#E8534A', '#A8D8A8', '#F5A623', '#A8C8F8'];
+  
+  // คำอธิบายธาตุที่ได้มากที่สุด (แบบชัดเจนและเสริมพลัง)
+  var elDescs  = isTH
+    ? ['ผู้มีพลังริเริ่ม กล้าหาญ เป็นผู้นำโดยธรรมชาติ และชอบความท้าทาย', 
+       'ผู้มีความมั่นคง รอบคอบ ไว้ใจได้ และมีความอดทนต่อเป้าหมายสูง', 
+       'ผู้ที่มีความยืดหยุ่น สื่อสารเก่ง ปรับตัวไว และรักอิสระทางความคิด', 
+       'ผู้ที่มีความลึกซึ้ง อ่อนไหว สัญชาตญาณแม่นยำ และเข้าอกเข้าใจผู้อื่น']
+    : ['Bold, Pioneering, Natural Leadership, and thrives on challenges.', 
+       'Stable, Precise, Highly Reliable, and enduring.', 
+       'Flexible, Communicative, Highly Adaptable, and free-thinking.', 
+       'Intuitive, Sensitive, Empathetic, and emotionally deep.'];
+  
+  var elDomTxt = isTH ? 'ธาตุเด่น' : 'ธาตุเด่น';
+  var elBalTxt = isTH ? 'สัดส่วนและสมดุลธาตุ' : 'สมดุลธาตุ';
+
+  // คำแนะนำสำหรับปรับสมดุลธาตุ (ไม่มีสัญลักษณ์แปลกตา)
+  var remedyTxt = isTH 
+    ? [
+        '<span class="hl-gold">ข้อแนะนำเพื่อเติมไฟ:</span> ลองตั้งเป้าหมายเล็กๆ รายวัน ออกกำลังกาย หรือหาแพสชั่นใหม่ๆ เพื่อกระตุ้นพลังงานแห่งการลงมือทำ',
+        '<span class="hl-gold">ข้อแนะนำเพื่อเสริมดิน:</span> สร้างกิจวัตรประจำวันที่ชัดเจน จัดระเบียบพื้นที่ หรือสัมผัสธรรมชาติเพื่อเพิ่มความรู้สึกมั่นคง',
+        '<span class="hl-gold">ข้อแนะนำเพื่อเพิ่มลม:</span> เปิดรับมุมมองใหม่ๆ อ่านหนังสือ พูดคุยแลกเปลี่ยนความคิดเห็น หรือลองเดินทางระยะสั้นๆ',
+        '<span class="hl-gold">ข้อแนะนำเพื่อเติมน้ำ:</span> อนุญาตให้ตัวเองสัมผัสอารมณ์ ทำสมาธิ หรือทำงานศิลปะเพื่อเชื่อมต่อกับความรู้สึกเบื้องลึก'
+      ]
+    : [
+        'Ignite Fire: Set small daily goals, exercise, or find new passions to stimulate initiative.',
+        'Ground Earth: Create routines, organize your space, or connect with nature for stability.',
+        'Catch Wind: Embrace new perspectives, read, converse, or take short trips.',
+        'Flow Water: Allow yourself to feel, meditate, or create art to connect deeply.'
+      ];
+
+  // คำนวณคะแนนธาตุ
+  var sc = [10, 10, 10, 10];
+  sc[p.ei] += 40; sc[r.el] += 30; sc[l.el] += 20;
+  var tot = sc[0]+sc[1]+sc[2]+sc[3];
+  
+  // สัดส่วนจริง 0-1
+  var nm = sc.map(function(s){ return s/tot; });
+
+  // หาเปอร์เซ็นต์สูงสุด เพื่อนำไปดึงสเกลกราฟให้สุดขอบ
+  var maxNm = Math.max.apply(null, nm);
+
+  // หาธาตุที่เด่นที่สุด และ อ่อนที่สุด
+  var domIdx = 0, weakIdx = 0;
+  for(var i=1;i<4;i++){ 
+    if(nm[i]>nm[domIdx]) domIdx=i; 
+    if(nm[i]<nm[weakIdx]) weakIdx=i;
+  }
+
+  var cx=110, cy=115, R=68;
+  var axes = [{a:-90,i:0},{a:0,i:2},{a:90,i:3},{a:180,i:1}];
+  
+  function toXY(ang, rad) {
+    var rd = ang * Math.PI / 180;
+    return {x: cx + rad*Math.cos(rd), y: cy + rad*Math.sin(rd)};
+  }
+
+  // วาดเส้นกริด
+  var grid = [.25,.5,.75,1].map(function(lv){
+    var pts = axes.map(function(ax){ var p=toXY(ax.a,lv*R); return p.x+','+p.y; }).join(' ');
+    var op = lv===1 ? '0.25' : '0.12';
+    return '<polygon points="'+pts+'" fill="none" stroke="rgba(91,63,166,'+op+')" stroke-width="'+(lv===1?'1':'0.6')+'"/>';
+  }).join('');
+
+  // วาดเส้นแกน
+  var axLines = axes.map(function(ax){
+    var pt=toXY(ax.a,R);
+    return '<line x1="'+cx+'" y1="'+cy+'" x2="'+pt.x+'" y2="'+pt.y+'" stroke="rgba(201,162,39,0.18)" stroke-width="0.7"/>';
+  }).join('');
+
+  // วาดรูปร่างกราฟ (ปรับสัดส่วนโดยเทียบกับ maxNm ทำให้ธาตุที่สูงสุดแตะขอบเสมอ)
+  var dataPts = axes.map(function(ax){ 
+    var visualRatio = nm[ax.i] / maxNm; // สูตรดันกราฟให้ตึงสุดขอบ
+    var pt = toXY(ax.a, visualRatio * R); 
+    return pt.x+','+pt.y; 
+  }).join(' ');
+
+  // ป้ายชื่อแกนธาตุ
+  var lblOffset = 20;
+  var axLabels = axes.map(function(ax){
+    var pt  = toXY(ax.a, R+lblOffset);
+    var dot = toXY(ax.a, R+5);
+    var pct = Math.round(nm[ax.i]*100); // เปอร์เซ็นต์จริงยังคงเท่าเดิม
+    var anchor = ax.a===0?'start':ax.a===180?'end':'middle';
+    return '<circle cx="'+dot.x+'" cy="'+dot.y+'" r="2.5" fill="'+elColors[ax.i]+'" opacity="0.7"/>'
+      +'<text x="'+pt.x+'" y="'+(pt.y-4)+'" text-anchor="'+anchor+'" fill="'+elColors[ax.i]+'" font-size="10" font-family="Leelawadee UI,Segoe UI,Tahoma,sans-serif" font-weight="600">'+elNames[ax.i]+'</text>'
+      +'<text x="'+pt.x+'" y="'+(pt.y+8)+'" text-anchor="'+anchor+'" fill="rgba(201,162,39,0.75)" font-size="9" font-family="Leelawadee UI,Segoe UI,Tahoma,sans-serif">'+pct+'%</text>';
+  }).join('');
+
+  var centerGlow = '<circle cx="'+cx+'" cy="'+cy+'" r="5" fill="rgba(201,162,39,0.15)"/>'
+    +'<circle cx="'+cx+'" cy="'+cy+'" r="2.5" fill="rgba(201,162,39,0.55)"/>';
+
+  var svg = '<svg viewBox="0 0 220 230" width="100%" style="max-width:230px;display:block;margin:0 auto">'
+    +'<defs><linearGradient id="rf0" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#C9A227" stop-opacity="0.4"/><stop offset="100%" stop-color="#5B3FA6" stop-opacity="0.25"/></linearGradient><filter id="glow"><feGaussianBlur stdDeviation="2.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>'
+    + grid + axLines
+    +'<polygon class="radar-polygon" points="'+dataPts+'" fill="url(#rf0)" stroke="#C9A227" stroke-width="1.8" stroke-linejoin="round" filter="url(#glow)"/>'
+    + centerGlow + axLabels
+    +'</svg>';
+
+  var barOrder = [0,1,2,3];
+  var bars = barOrder.map(function(bi){
+    var pct = Math.round(nm[bi]*100);
+    var isDom = bi===domIdx;
+    var hint = isTH ? '(คลิกเพื่ออ่าน)' : '(Tap to read)';
+    
+    return '<div class="el-bar-item" style="'+(isDom?'border:1px solid rgba(201,162,39,.22);':'')+'background:rgba(255,255,255,.03)">'
+      +'<div class="el-bar-label"><span class="el-bar-name" style="color:'+elColors[bi]+'">ธาตุ'+elNames[bi]+' <span class="click-hint">'+hint+'</span></span><span class="el-bar-pct" style="color:'+elColors[bi]+'">'+pct+'%</span></div>'
+      +'<div class="el-bar-track"><div class="el-bar-fill" data-w="'+pct+'" style="width:0%;background:'+elColors[bi]+'"></div></div>'
+      // ซ่อนคำอธิบายไว้ด้านล่างหลอดเปอร์เซ็นต์
+      +'<div class="el-bar-desc">'+elDescs[bi]+'</div>'
+      +'</div>';
+  }).join('');
+
+  var html = '<div class="card radar-wrap" style="padding:18px;margin-bottom:16px">'
+    +'<div class="st">'+elBalTxt+'</div>'
+    + svg
+    +'<div class="el-badge">'
+    +'<div class="el-dot" style="background:'+elColors[domIdx]+'"></div>'
+    +'<div><div class="el-label">'+elDomTxt+'</div>'
+    +'<div class="el-name" style="font-size:13px; color:var(--g); font-weight:600; margin-bottom:2px;">ธาตุ'+elNames[domIdx]+'</div>'
+    +'<div class="el-desc" style="color:var(--tx2); line-height: 1.6;">'+elDescs[domIdx]+'</div></div></div>'
+    
+    // กล่องแนะนำการปรับสมดุลธาตุที่อ่อนที่สุด
+    +'<div class="el-badge el-remedy" style="margin-top:8px;">'
+    +'<div class="el-dot" style="background:'+elColors[weakIdx]+'; opacity:0.6;"></div>'
+    +'<div><div class="el-label">★ ปรับสมดุลฐานชีวิต</div>'
+    +'<div class="el-desc" style="line-height: 1.6; margin-top:4px;">'+remedyTxt[weakIdx]+'</div></div></div>'
+    +'<div class="el-bar-row">'+bars+'</div></div>';
+
+  setTimeout(function(){
+    document.querySelectorAll('.el-bar-fill').forEach(function(el){ el.style.width = el.getAttribute('data-w')+'%'; });
+  }, 200);
+
+  return html;
+}
+
