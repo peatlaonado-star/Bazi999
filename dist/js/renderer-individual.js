@@ -245,8 +245,9 @@ function buildLifeTimeline(kind, p, ageY, ageM){
   return html;
 }
 
-function wrapCollapsible(label, hint, content) {
-  return '<div class="collapsible-section">'
+function wrapCollapsible(label, hint, content, startCollapsed) {
+  var collapsedClass = startCollapsed ? ' collapsed' : '';
+  return '<div class="collapsible-section' + collapsedClass + '">'
     + '<div class="section-toggle"><span class="section-toggle-arrow">▼</span><span class="section-toggle-label">' + label + '</span><span class="section-toggle-hint">' + hint + '</span></div>'
     + '<div class="section-body">' + content + '</div>'
     + '</div>';
@@ -483,8 +484,8 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     +'<div class="ci"><div class="ci-l">'+u.ge+'</div><div class="ci-v">'+gd+'</div><div class="ci-s">'+nm+'</div></div>'
     +'</div></div>'
     + conversionRoadmapHtml
-    + wrapCollapsible("✦ กำลังวันประจำตัว ✦", "วันเกิด · เทวดา · ธาตุ · สีมงคล", cosmicBriefHtml)
-    + wrapCollapsible("✨ พลังงานเสริมดวง", "เลขและสีมงคลประจำวัน", powerCardHtml)
+    + wrapCollapsible("✦ กำลังวันประจำตัว ✦", "วันเกิด · เทวดา · ธาตุ · สีมงคล", cosmicBriefHtml, true)
+    + wrapCollapsible("✨ พลังงานเสริมดวง", "เลขและสีมงคลประจำวัน", powerCardHtml, true)
     + wrapCollapsible("✦ สูตรเปิดดวงลาภลอย ✦", "เลขเด็ด หวย ทิศ คาถา สายมู", windfallLuckHtml)
     + wrapCollapsible("📅 แผนที่ชีวิตรายเดือน", "5 ด้าน พร้อมพรีวิวรายเดือน", monthlyLifeMapHtml)
     + wrapCollapsible("📊 แผนที่สถานการณ์ชีวิต", "6 ด้าน วิเคราะห์สถานการณ์ปัจจุบันและอนาคต", domainHtml)

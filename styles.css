@@ -748,6 +748,59 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   user-select: none;
   transition: all 0.5s ease;
 }
+/* Domain Matrix — แผนที่สถานการณ์ชีวิต (Premium) */
+.is-locked > .domain-kicker,
+.is-locked > .domain-title,
+.is-locked > .domain-desc,
+.is-locked > .domain-current-chip,
+.is-locked > .domain-grid {
+  filter: blur(8px);
+  opacity: 0.3;
+  pointer-events: none;
+  user-select: none;
+  transition: all 0.5s ease;
+}
+/* Monthly Life Map — แผนที่ชีวิตรายเดือน (Premium) */
+.is-locked > .mlm-kicker,
+.is-locked > .mlm-title,
+.is-locked > .mlm-summary,
+.is-locked > .mlm-grid,
+.is-locked > .mlm-section-title,
+.is-locked > .mlm-domains {
+  filter: blur(8px);
+  opacity: 0.3;
+  pointer-events: none;
+  user-select: none;
+  transition: all 0.5s ease;
+}
+/* Karma Mirror — กระจกกรรม (Premium) */
+.is-locked > .karma-kicker,
+.is-locked > .karma-title,
+.is-locked > .karma-desc,
+.is-locked > .karma-grid,
+.is-locked > .karma-ritual {
+  filter: blur(8px);
+  opacity: 0.3;
+  pointer-events: none;
+  user-select: none;
+  transition: all 0.5s ease;
+}
+/* Windfall Luck — สูตรลาภลอย (Premium) */
+.is-locked > .wfl-kicker,
+.is-locked > .wfl-title,
+.is-locked > .wfl-desc,
+.is-locked > .wfl-numbers,
+.is-locked > .wfl-grid,
+.is-locked > .wfl-line,
+.is-locked > .wfl-section,
+.is-locked > .wfl-mantra,
+.is-locked > .wfl-avoid {
+  filter: blur(8px);
+  opacity: 0.3;
+  pointer-events: none;
+  user-select: none;
+  transition: all 0.5s ease;
+}
 /* กล่องแม่กุญแจที่ทับอยู่ด้านบน */
 .lock-overlay {
   position: absolute; 
