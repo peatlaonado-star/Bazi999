@@ -584,11 +584,11 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
       + '<span>' + escapeHTML(domain.level) + '</span>'
       + '<span>' + domain.score + '/100</span>'
       + '</div>'
+      + '</div>'
       // Content sections
       + '<div class="domain-part"><strong>สถานการณ์ปัจจุบัน</strong><p>' + escapeHTML(domain.current) + '</p></div>'
       + '<div class="domain-part domain-warning"><strong>⚠️ สัญญาณเตือน</strong><p>' + escapeHTML(domain.warning) + '</p></div>'
-      + '<div class="domain-part domain-remedy"><strong>✨ วิธีเสริมให้ดีขึ้น</strong><p>' + escapeHTML(domain.remedy) + '</p></div>'
-      + '</div>';
+      + '<div class="domain-part domain-remedy"><strong>✨ วิธีเสริมให้ดีขึ้น</strong><p>' + escapeHTML(domain.remedy) + '</p></div>';
     // Current phase action
     if (domain.currentPhase) {
       domainHtml += '<div class="domain-part domain-current-phase"><strong>▸ สิ่งที่ทำได้ตอนนี้ (ช่วง ' + escapeHTML(domain.currentPhase.ageRange) + ')</strong>'

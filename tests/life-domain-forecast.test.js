@@ -6,10 +6,12 @@ import vm from 'node:vm';
 function loadContext() {
   const contentSource = fs.readFileSync(path.resolve('data/thai-astrology-content.js'), 'utf8');
   const helperSource = fs.readFileSync(path.resolve('js/reading-helpers.js'), 'utf8');
+  const lifeGraphSource = fs.readFileSync(path.resolve('js/life-graph.js'), 'utf8');
   const context = {};
   vm.createContext(context);
   vm.runInContext(contentSource, context, { filename: 'data/thai-astrology-content.js' });
   vm.runInContext(helperSource, context, { filename: 'js/reading-helpers.js' });
+  vm.runInContext(lifeGraphSource, context, { filename: 'js/life-graph.js' });
   return context;
 }
 
@@ -45,5 +47,27 @@ describe('Life Domain Forecast helper', () => {
     const water = context.buildLifeDomainMatrix({ el: 'น้ำ', n: 'จันทร์' }, {}, {}, band, nextBands);
 
     expect(fire.domains[0].current).not.toEqual(water.domains[0].current);
+  });
+
+  it('keeps V2 age opportunities near the current age instead of jumping to old age', () => {
+    const context = loadContext();
+    const currentAge = 35;
+    const planet = { el: 'ไฟ', n: 'อาทิตย์', s: '☉', c: '#FFD166' };
+    const graph = context.buildPersonalLifeGraphV2(15, 6, 2533, currentAge, planet);
+    const matrix = context.buildLifeDomainForecastV2(15, 6, 2533, currentAge, planet, graph);
+
+    matrix.domains.forEach((domain) => {
+      expect(domain.currentPhase).toBeTruthy();
+      expect(domain.opportunities.length).toBeGreaterThanOrEqual(2);
+
+      const ranges = domain.opportunities.map((opp) => opp.ageRange);
+      expect(ranges.join(' ')).not.toMatch(/80|∞|99/);
+
+      ranges.forEach((range) => {
+        const ages = range.match(/\d+/g).map(Number);
+        expect(ages[0]).toBeGreaterThanOrEqual(currentAge);
+        expect(ages[1]).toBeLessThanOrEqual(currentAge + 15);
+      });
+    });
   });
 });
