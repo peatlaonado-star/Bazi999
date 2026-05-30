@@ -166,14 +166,14 @@ describe('Thai Life Blueprint header card', () => {
     expect(card.textContent).toContain('อายุเป็นเพียงบริบทเสริม');
   });
 
-  it('blueprint card appears before the info card in DOM order', () => {
+  it('does not render the old duplicated equal-grid info card after the blueprint', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
     const context = loadContext(dom);
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
-    const output = dom.window.document.getElementById('r0').innerHTML;
-    const bpIndex = output.indexOf('blueprint-card');
-    const cardIndex = output.indexOf('class="card"');
-    expect(bpIndex).toBeLessThan(cardIndex);
+
+    expect(dom.window.document.querySelector('.blueprint-card')).toBeTruthy();
+    expect(dom.window.document.querySelector('.cgrid')).toBeNull();
+    expect(dom.window.document.querySelectorAll('.ci')).toHaveLength(0);
   });
 
   it('XSS: script tag in name is escaped inside blueprint card', () => {
@@ -275,11 +275,13 @@ describe('Life Domain Forecast Matrix', () => {
     for (const label of ['โชค', 'การเงิน', 'สุขภาพ', 'ความสัมพันธ์', 'การงาน', 'บริวาร']) {
       expect(output).toContain(label);
     }
-    for (const part of ['สถานการณ์ปัจจุบัน', 'สัญญาณเตือน', 'วิธีเสริม', 'โอกาสตามช่วงอายุ']) {
+    for (const part of ['สถานะตอนนี้', 'ระวัง', 'แก้เหตุ', 'เสริมให้ปัง', 'ภารกิจ 7 วัน', 'ดูจังหวะ 15 ปีข้างหน้า']) {
       expect(output).toContain(part);
     }
     expect(output).toContain('วิเคราะห์ 6 ด้าน');
     expect(dom.window.document.querySelectorAll('.domain-card').length).toBe(6);
+    expect(dom.window.document.querySelectorAll('.domain-compact-line').length).toBeGreaterThanOrEqual(18);
+    expect(dom.window.document.querySelectorAll('.domain-age-details').length).toBe(6);
     expect(dom.window.document.querySelector('.domain-premium.is-locked')).toBeTruthy();
   });
 
@@ -301,10 +303,10 @@ describe('Life Domain Forecast Matrix', () => {
 
     expect(matrix.classList.contains('is-locked')).toBe(false);
     expect(matrix.querySelector('.lock-overlay')).toBeNull();
-    expect(matrix.textContent).toContain('สถานการณ์ปัจจุบัน');
-    expect(matrix.textContent).toContain('สัญญาณเตือน');
-    expect(matrix.textContent).toContain('วิธีเสริม');
-    expect(matrix.textContent).toContain('โอกาสตามช่วงอายุ');
+    expect(matrix.textContent).toContain('สถานะตอนนี้');
+    expect(matrix.textContent).toContain('ระวัง');
+    expect(matrix.textContent).toContain('แก้เหตุ');
+    expect(matrix.textContent).toContain('ดูจังหวะ 15 ปีข้างหน้า');
   });
 
   it('renders all required life-domain guidance parts for premium readers', () => {
@@ -314,10 +316,14 @@ describe('Life Domain Forecast Matrix', () => {
     context.renderInd('Test', 'หญิง', '1990-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
 
     const output = dom.window.document.getElementById('r0').innerHTML;
-    for (const part of ['สถานการณ์ปัจจุบัน', 'สัญญาณเตือน', 'วิธีเสริม', 'โอกาสตามช่วงอายุ', 'แก้เหตุ เสริมดวง', 'รากเหตุ', 'ภารกิจ 7 วัน']) {
+    for (const part of ['สถานะตอนนี้', 'ระวัง', 'แก้เหตุ', 'เสริมให้ปัง', 'ภารกิจ 7 วัน', 'ดูจังหวะ 15 ปีข้างหน้า']) {
       expect(output).toContain(part);
     }
-    expect(dom.window.document.querySelectorAll('.domain-dhamma-remedy').length).toBe(6);
+    expect(output).not.toContain('วิธีเสริมให้ดีขึ้น');
+    expect(output).not.toContain('สิ่งที่ทำได้ตอนนี้');
+    expect(dom.window.document.querySelectorAll('.domain-dhamma-remedy').length).toBe(0);
+    expect(dom.window.document.querySelectorAll('.domain-compact-line').length).toBeGreaterThanOrEqual(30);
+    expect(dom.window.document.querySelectorAll('.domain-age-details').length).toBe(6);
   });
 
   it('shows explicit age-band opportunities for future life stages', () => {
@@ -326,9 +332,13 @@ describe('Life Domain Forecast Matrix', () => {
 
     context.renderInd('Test', 'หญิง', '1990-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
 
-    // V2 uses .domain-age-v2 instead of .domain-age
-    const chips = Array.from(dom.window.document.querySelectorAll('.domain-age-chip')).map((node) => node.textContent);
-    expect(chips.length).toBeGreaterThanOrEqual(0); // อาจไม่มีถ้าไม่มี pivot ages ข้างหน้า
+    // V2 keeps age windows available, but tucked behind a details control to reduce mobile text walls.
+    const details = Array.from(dom.window.document.querySelectorAll('.domain-age-details'));
+    expect(details).toHaveLength(6);
+    details.forEach((node) => {
+      expect(node.querySelector('summary').textContent).toContain('ดูจังหวะ 15 ปีข้างหน้า');
+      expect(node.querySelectorAll('.domain-age-chip').length).toBeGreaterThanOrEqual(2);
+    });
   });
 });
 

@@ -572,8 +572,14 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + '<div class="domain-premium' + (premiumUnlocked ? '' : ' is-locked') + '">'
     + '<div class="domain-grid">';
   domainMatrix.domains.forEach(function(domain){
+    var remedy = domain.dhammaRemedy || {
+      cause: domain.warning,
+      fix: domain.remedy,
+      boost: domain.currentPhase ? domain.currentPhase.text : domain.remedy,
+      practice: 'ภารกิจ 7 วัน: เลือก 1 เรื่องที่ควบคุมได้ แล้วทำให้ต่อเนื่อง'
+    };
+    var practiceText = String(remedy.practice || '').replace(/^ภารกิจ 7 วัน:\s*/, '');
     domainHtml += '<div class="domain-card domain-' + escapeHTML(domain.key) + '">'
-      // Header with score badge
       + '<div class="domain-head-v2">'
       + '<span class="domain-icon-v2">' + escapeHTML(domain.icon) + '</span>'
       + '<div class="domain-head-info">'
@@ -585,26 +591,16 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
       + '<span>' + domain.score + '/100</span>'
       + '</div>'
       + '</div>'
-      // Content sections
-      + '<div class="domain-part"><strong>สถานการณ์ปัจจุบัน</strong><p>' + escapeHTML(domain.current) + '</p></div>'
-      + '<div class="domain-part domain-warning"><strong>⚠️ สัญญาณเตือน</strong><p>' + escapeHTML(domain.warning) + '</p></div>'
-      + '<div class="domain-part domain-remedy"><strong>✨ วิธีเสริมให้ดีขึ้น</strong><p>' + escapeHTML(domain.remedy) + '</p></div>';
-    if (domain.dhammaRemedy) {
-      domainHtml += '<div class="domain-part domain-dhamma-remedy">'
-        + '<strong>🪷 แก้เหตุ เสริมดวง</strong>'
-        + '<p><b>รากเหตุ:</b> ' + escapeHTML(domain.dhammaRemedy.cause) + '</p>'
-        + '<p><b>วิธีแก้:</b> ' + escapeHTML(domain.dhammaRemedy.fix) + '</p>'
-        + '<p><b>เสริมให้ปัง:</b> ' + escapeHTML(domain.dhammaRemedy.boost) + '</p>'
-        + '<p><b>ภารกิจ 7 วัน:</b> ' + escapeHTML(domain.dhammaRemedy.practice.replace(/^ภารกิจ 7 วัน:\s*/, '')) + '</p>'
-        + '</div>';
-    }
-    // Current phase action
-    if (domain.currentPhase) {
-      domainHtml += '<div class="domain-part domain-current-phase"><strong>▸ สิ่งที่ทำได้ตอนนี้ (ช่วง ' + escapeHTML(domain.currentPhase.ageRange) + ')</strong>'
-        + '<p>' + escapeHTML(domain.currentPhase.text) + '</p></div>';
-    }
-    // Opportunities from Life Graph
-    domainHtml += '<div class="domain-part"><strong>📅 โอกาสตามช่วงอายุ</strong><div class="domain-ages">';
+      + '<div class="domain-compact-body">'
+      + '<div class="domain-compact-line domain-now"><b>สถานะตอนนี้</b><span>' + escapeHTML(domain.current) + '</span></div>'
+      + '<div class="domain-compact-line domain-caution"><b>ระวัง</b><span>' + escapeHTML(domain.warning) + '</span></div>'
+      + '<div class="domain-compact-line domain-cause"><b>แก้เหตุ</b><span>' + escapeHTML(remedy.fix) + '</span></div>'
+      + '<div class="domain-compact-line domain-boost"><b>เสริมให้ปัง</b><span>' + escapeHTML(remedy.boost) + '</span></div>'
+      + '<div class="domain-compact-line domain-practice"><b>ภารกิจ 7 วัน</b><span>' + escapeHTML(practiceText) + '</span></div>'
+      + '</div>'
+      + '<details class="domain-age-details">'
+      + '<summary>ดูจังหวะ 15 ปีข้างหน้า</summary>'
+      + '<div class="domain-ages">';
     domain.opportunities.forEach(function(opp){
       domainHtml += '<div class="domain-age-v2">'
         + '<span class="domain-age-chip" style="background:' + escapeHTML(opp.level === 'ปีทอง' ? '#FFD700' : opp.level === 'ปีดี' ? '#4CAF50' : opp.level === 'ปานกลาง' ? '#FFC107' : '#9E9E9E') + '20">' + escapeHTML(opp.ageRange) + '</span>'
@@ -614,7 +610,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
       }
       domainHtml += '</div>';
     });
-    domainHtml += '</div></div>'
+    domainHtml += '</div></details>'
       + '</div>';
   });
   if (!premiumUnlocked) {
@@ -690,19 +686,6 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + '</div>';
 
   wrap.innerHTML = blueprintCardHtml
-    + '<div class="brow"><span style="font-size:15px;color:'+p.c+'">'+p.s+'</span>'
-    +'<span style="font-size:11px;color:#c8b87a"><strong style="color:#C9A227">'+nm+'</strong>'
-    +' · <strong style="color:#C9A227">'+p.n+'</strong>'
-    +' · <strong style="color:'+r.c+'">'+r.n+'</strong>'
-    +' · <strong style="color:'+l.c+'">'+l.n+'</strong></span></div>'
-    +'<div class="card" style="padding:13px;margin-bottom:14px"><div class="cgrid">'
-    +'<div class="ci"><div class="ci-l">'+u.pl+'</div><div class="ci-v" style="color:'+p.c+'">'+p.s+' '+p.n+'</div><div class="ci-s">'+p.d+'</div></div>'
-    +'<div class="ci"><div class="ci-l">'+u.rl+'</div><div class="ci-v" style="color:'+r.c+'">'+r.s+' '+r.n+'</div><div class="ci-s">'+u.rl2+': '+r.rl+'</div></div>'
-    +'<div class="ci"><div class="ci-l">'+u.la+'</div><div class="ci-v" style="color:'+l.c+'">'+l.s+' '+l.n+'</div><div class="ci-s">'+u.ll+': '+l.rl+'</div></div>'
-    +'<div class="ci"><div class="ci-l">'+u.dob+'</div><div class="ci-v" style="font-size:9px">'+td+'</div><div class="ci-s">'+tDisp+(tDisp?'<br>':'')+'<span style="color:#C9A227">'+ageTxt+'</span></div></div>'
-    +'<div class="ci"><div class="ci-l">'+u.el+'</div><div class="ci-v">ธาตุ'+p.el+'</div><div class="ci-s">'+u.es+'</div></div>'
-    +'<div class="ci"><div class="ci-l">'+u.ge+'</div><div class="ci-v">'+gd+'</div><div class="ci-s">'+nm+'</div></div>'
-    +'</div></div>'
     + conversionRoadmapHtml
     + wrapCollapsible("✦ กำลังวันประจำตัว ✦", "วันเกิด · เทวดา · ธาตุ · สีมงคล", cosmicBriefHtml)
     + wrapCollapsible("✨ พลังงานเสริมดวง", "เลขและสีมงคลประจำวัน", powerCardHtml)
