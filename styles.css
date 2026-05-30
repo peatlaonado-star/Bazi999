@@ -1085,6 +1085,16 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   line-height: 1.6;
   margin: 0;
 }
+.bp-axis-hint {
+  font-size: 11px;
+  color: #FFC107;
+  line-height: 1.5;
+  margin: 0;
+  padding: 6px 8px;
+  background: rgba(255,193,7,.08);
+  border-radius: 8px;
+  border: 1px solid rgba(255,193,7,.15);
+}
 .bp-label {
   font-size: 10px;
   color: #b8a8d8;

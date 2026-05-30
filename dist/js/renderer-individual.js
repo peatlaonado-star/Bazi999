@@ -188,13 +188,13 @@ function go0(){
   var u=U(), PL2=getPL(), RA2=getRA();
   var nm=document.getElementById('n0').value||(u.pdef||'บุคคลนี้');
   var gd=document.getElementById('g0').value;
-  var ts=document.getElementById('t0').value||'06:00';
+  var ts=document.getElementById('t0').value||'';
   var bday = new Date(ds);
   var birthDay = bday.getDate();
   var birthMonth = bday.getMonth() + 1;
   var birthYearBE = bday.getFullYear() + 543;
   var p=PL2[new Date(ds).getDay()];
-  var ri=getRasi(ds), li=getLagna(ds,ts);
+  var ri=getRasi(ds), li=ts ? getLagna(ds,ts) : ri;
   var r=RA2[ri], l=RA2[li];
   document.getElementById('fc0').style.display='none';
   showLoad();
@@ -704,7 +704,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + '</div>'
     + '<div class="bp-axis-grid">'
     + '<div class="bp-axis-card"><span class="bp-axis-label">ตัวตนภายนอก</span><strong style="color:' + r.c + '">' + r.s + ' ' + r.n + '</strong><small>' + (r.trait || 'โทนบุคลิกและแรงขับหลัก') + '</small><p class="bp-axis-desc">' + (r.apply || '') + '</p></div>'
-    + '<div class="bp-axis-card"><span class="bp-axis-label">วิธีที่โลกมองเห็น</span><strong style="color:' + l.c + '">' + l.s + ' ' + l.n + '</strong><small>' + (l.trait || 'ภาพแรกที่คนอื่นสัมผัสได้') + '</small><p class="bp-axis-desc">' + (l.apply || '') + '</p></div>'
+    + '<div class="bp-axis-card"><span class="bp-axis-label">วิธีที่โลกมองเห็น</span><strong style="color:' + l.c + '">' + l.s + ' ' + l.n + '</strong><small>' + (l.trait || 'ภาพแรกที่คนอื่นสัมผัสได้') + '</small>' + (ts ? '<p class="bp-axis-desc">' + (l.apply || '') + '</p>' : '<p class="bp-axis-hint">⚠️ ใส่เวลาเกิดเพื่อดูลัคนาที่แม่นยำ</p>') + '</div>'
     + '</div>'
     + '<div class="bp-summary">พิมพ์เขียวนี้สรุปแรงขับเดิมของคุณก่อนอ่านดวงรายเดือน — อายุเป็นเพียงบริบทเสริม ไม่ใช่ตัวตัดสินดวงทั้งหมด</div>'
     + '</div>';

@@ -123,7 +123,16 @@ describe('Thai Life Blueprint header card', () => {
     expect(output).not.toContain('Thai Life Blueprint');
   });
 
-  it('shows the user escaped name', () => {
+  it('shows lagna hint when no birth time is provided', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+    const context = loadContext(dom);
+    context.renderInd('เบล', 'หญิง', '2000-06-15', '', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const output = dom.window.document.getElementById('r0').innerHTML;
+    expect(output).toContain('ใส่เวลาเกิดเพื่อดูลัคนาที่แม่นยำ');
+    expect(output).toContain('bp-axis-hint');
+  });
+
+  it('shows user escaped name', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
     const context = loadContext(dom);
     context.renderInd('คาร่า', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
