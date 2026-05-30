@@ -731,7 +731,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + wrapCollapsible("✨ พลังงานเสริมดวง", "เลขและสีมงคลประจำวัน", powerCardHtml)
     + wrapCollapsible("✦ สูตรเปิดดวงลาภลอย ✦", "เลขเด็ด หวย ทิศ คาถา สายมู 🔒 Premium", windfallLuckHtml, true)
     + wrapCollapsible("📅 แผนที่ชีวิตรายเดือน", "5 ด้าน พร้อมพรีวิวรายเดือน 🔒 Premium", monthlyLifeMapHtml, true)
-    + wrapCollapsible("✦ คัมภีร์แก้ดวง 6 ด้าน ✦", "กราฟชีวิต + 6 ด้าน วิเคราะห์สถานการณ์ 🔒 Premium", domainHtml, false)
+    + wrapCollapsible("✦ คัมภีร์แก้ดวง 6 ด้าน ✦", "กราฟชีวิต + 6 ด้าน วิเคราะห์สถานการณ์", domainHtml, false)
     + wrapCollapsible("🪞 กระจกกรรม", "บทเรียนและรูปแบบที่ชีวิตพาซ้ำ 🔒 Premium", karmaHtml, true)
     + buildElementRadar(p, r, l)
     + detailTabsShellHtml;
@@ -756,17 +756,11 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
       {t:'รหัสผ่านชีวิต (ทักษาปกรณ์)', c:thaksaHtml, rf:refDesc.thaksa},
       {t:u.s0[1], c:p.str, rf:'วิเคราะห์จากพลังงานธาตุ'+p.el+' และลักษณะเด่นของดาว'+p.n}
     ]},
-    {lb:'เงาใจ', secs:[
-      {t:u.s0[2], c:wkFull, rf:refDesc.wk}
-    ]},
     {lb:'ความรัก', secs:[{t:u.s0[3], c:p.lv, rf:refDesc.lv}]},
     {lb:'งานเงิน', secs:[
       {t:u.s0[4], c:p.ca, rf:refDesc.ca},
       {t:u.s0[5], c:p.mn, rf:refDesc.mn}
-    ]},
-    {lb:'อดีต', secs:[{t:u.s0[6], c:buildLifeTimeline('past', p, ageY, ageM), rf:refDesc.past}]},
-    {lb:'ตอนนี้', secs:[{t:u.s0[7], c:buildLifeTimeline('present', p, ageY, ageM), rf:refDesc.pres}]},
-    {lb:'อนาคต', secs:[{t:u.s0[8], c:buildLifeTimeline('future', p, ageY, ageM), rf:refDesc.fut}]}
+    ]}
   ];
 
   buildTabs('tt0','ts0','s0_',TB,p,u);

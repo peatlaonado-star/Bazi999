@@ -475,7 +475,7 @@ describe('Free reader conversion reading order', () => {
 
     expect(tabsCard).toBeTruthy();
     expect(tabsCard.textContent).toContain('อ่านรายละเอียดพื้นฐาน');
-    expect(labels).toEqual(['👤ตัวตนฟรี', '🌑เงาใจ', '💕ความรัก', '💼งานเงิน', '⏮️อดีต', '🎯ตอนนี้', '🔮อนาคต']);
+    expect(labels).toEqual(['👤ตัวตนฟรี', '🌑ความรัก', '💕งานเงิน']);
   });
 });
 
