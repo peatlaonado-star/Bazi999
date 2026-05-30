@@ -589,6 +589,15 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
       + '<div class="domain-part"><strong>สถานการณ์ปัจจุบัน</strong><p>' + escapeHTML(domain.current) + '</p></div>'
       + '<div class="domain-part domain-warning"><strong>⚠️ สัญญาณเตือน</strong><p>' + escapeHTML(domain.warning) + '</p></div>'
       + '<div class="domain-part domain-remedy"><strong>✨ วิธีเสริมให้ดีขึ้น</strong><p>' + escapeHTML(domain.remedy) + '</p></div>';
+    if (domain.dhammaRemedy) {
+      domainHtml += '<div class="domain-part domain-dhamma-remedy">'
+        + '<strong>🪷 แก้เหตุ เสริมดวง</strong>'
+        + '<p><b>รากเหตุ:</b> ' + escapeHTML(domain.dhammaRemedy.cause) + '</p>'
+        + '<p><b>วิธีแก้:</b> ' + escapeHTML(domain.dhammaRemedy.fix) + '</p>'
+        + '<p><b>เสริมให้ปัง:</b> ' + escapeHTML(domain.dhammaRemedy.boost) + '</p>'
+        + '<p><b>ภารกิจ 7 วัน:</b> ' + escapeHTML(domain.dhammaRemedy.practice.replace(/^ภารกิจ 7 วัน:\s*/, '')) + '</p>'
+        + '</div>';
+    }
     // Current phase action
     if (domain.currentPhase) {
       domainHtml += '<div class="domain-part domain-current-phase"><strong>▸ สิ่งที่ทำได้ตอนนี้ (ช่วง ' + escapeHTML(domain.currentPhase.ageRange) + ')</strong>'

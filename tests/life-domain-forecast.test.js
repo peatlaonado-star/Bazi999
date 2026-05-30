@@ -70,4 +70,24 @@ describe('Life Domain Forecast helper', () => {
       });
     });
   });
+
+  it('adds dhamma-based remedies for every V2 life domain', () => {
+    const context = loadContext();
+    const currentAge = 35;
+    const planet = { el: 'ไฟ', n: 'อาทิตย์', s: '☉', c: '#FFD166' };
+    const graph = context.buildPersonalLifeGraphV2(15, 6, 2533, currentAge, planet);
+    const matrix = context.buildLifeDomainForecastV2(15, 6, 2533, currentAge, planet, graph);
+
+    expect(matrix.domains).toHaveLength(6);
+    matrix.domains.forEach((domain) => {
+      expect(domain.dhammaRemedy).toEqual({
+        cause: expect.stringContaining('รากเหตุ'),
+        fix: expect.any(String),
+        boost: expect.any(String),
+        practice: expect.stringContaining('7 วัน')
+      });
+      expect(domain.dhammaRemedy.fix.length).toBeGreaterThan(12);
+      expect(domain.dhammaRemedy.boost.length).toBeGreaterThan(12);
+    });
+  });
 });

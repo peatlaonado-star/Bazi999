@@ -314,9 +314,10 @@ describe('Life Domain Forecast Matrix', () => {
     context.renderInd('Test', 'หญิง', '1990-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
 
     const output = dom.window.document.getElementById('r0').innerHTML;
-    for (const part of ['สถานการณ์ปัจจุบัน', 'สัญญาณเตือน', 'วิธีเสริม', 'โอกาสตามช่วงอายุ']) {
+    for (const part of ['สถานการณ์ปัจจุบัน', 'สัญญาณเตือน', 'วิธีเสริม', 'โอกาสตามช่วงอายุ', 'แก้เหตุ เสริมดวง', 'รากเหตุ', 'ภารกิจ 7 วัน']) {
       expect(output).toContain(part);
     }
+    expect(dom.window.document.querySelectorAll('.domain-dhamma-remedy').length).toBe(6);
   });
 
   it('shows explicit age-band opportunities for future life stages', () => {

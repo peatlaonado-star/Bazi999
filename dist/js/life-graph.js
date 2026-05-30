@@ -62,7 +62,7 @@ function buildPivotAges(lifePath, day, month, yearBE) {
 
   // Base spread: กำหนดช่วงอายุหลัก 6 จุดให้กระจายทั่วชีวิต
   // แต่ละคนจะมี offset ต่างกันตามวันเกิด
-  var baseAges = [7, 18, 30, 45, 60, 75];
+  var baseAges = [7, 18, 30, 42, 55, 68];
   var seed = lifePath * 100 + day * 10 + month;
 
   for (var i = 0; i < 6; i++) {
@@ -70,14 +70,14 @@ function buildPivotAges(lifePath, day, month, yearBE) {
     var digitOffset = (digits12[i] || 0) - 4.5; // -4.5 to +4.5
     var pivot = Math.round(baseAges[i] + digitOffset + (seededRandom(seed + i) * 4 - 2));
 
-    // Clamp 7-78
-    pivot = Math.min(78, Math.max(7, pivot));
+    // Clamp 7-72 — ไม่ให้กราฟดัน "ช่วงดี" ไปไกลจนเหมือนต้องรอแก่
+    pivot = Math.min(72, Math.max(7, pivot));
 
     // Ensure strictly increasing
     if (i > 0 && pivot <= pivots[i - 1]) {
       pivot = pivots[i - 1] + 4;
     }
-    if (pivot > 78) pivot = 78;
+    if (pivot > 72) pivot = 72;
 
     pivots.push(pivot);
   }
@@ -212,11 +212,11 @@ function buildPersonalLifeGraphV2(birthDay, birthMonth, birthYearBE, ageY, p) {
     });
     prevAge = pivotAges[i];
   }
-  // Final phase (ถึง 99)
+  // Final phase (วัย 70+): ใช้ 88 เป็นเพดานเชิงภาพ ไม่โชว์ 99/∞ ให้ดูห่างเกินจริง
   var finalIdx = (birthDay + 5) % PHASE_LABEL_POOLS[5].length;
   phases.push({
     from: prevAge,
-    to: 99,
+    to: 88,
     label: PHASE_LABEL_POOLS[5][finalIdx],
     insight: PHASE_INSIGHT_POOLS[5][finalIdx % PHASE_INSIGHT_POOLS[5].length],
     energy: calculateEnergyAtAge(prevAge + 5, lifePath, birthDay, birthMonth, birthYearBE)
@@ -308,7 +308,7 @@ function buildLifeGraphHtmlV2(graph) {
     var labelClass = isCurrent ? ' lg-phase-current' : '';
     html += '<span class="lg-phase-label' + labelClass + '">'
       + ph.icon + ' ' + ph.label
-      + '<small>' + ph.from + '–' + (ph.to >= 99 ? '∞' : ph.to) + '</small>'
+      + '<small>' + ph.from + '–' + (ph.to >= 88 ? '88+' : ph.to) + '</small>'
       + '</span>';
   }
   html += '</div>';
@@ -333,7 +333,7 @@ function buildLifeGraphHtmlV2(graph) {
   for (var j = 0; j < graph.phases.length; j++) {
     html += '<span>' + graph.phases[j].from + '</span>';
   }
-  html += '<span>∞</span>';
+  html += '<span>88+</span>';
   html += '</div>';
 
   // Current phase insight
@@ -342,7 +342,10 @@ function buildLifeGraphHtmlV2(graph) {
     + '<p class="lg-insight-text">' + graph.insight + '</p>';
 
   if (graph.nextPivotAge) {
-    html += '<div class="lg-next-pivot">จุดเปลี่ยนถัดไปที่อายุ <strong>' + graph.nextPivotAge + '</strong> ปี (อีก <strong>' + graph.yearsToNext + '</strong> ปี)</div>';
+    var nearText = graph.yearsToNext > 15
+      ? 'โฟกัส 5 ปีข้างหน้าก่อน — ไม่ต้องรอจุดไกล'
+      : 'อีก <strong>' + graph.yearsToNext + '</strong> ปี';
+    html += '<div class="lg-next-pivot">จุดเปลี่ยนถัดไปที่อายุ <strong>' + graph.nextPivotAge + '</strong> ปี (' + nearText + ')</div>';
   }
 
   html += '</div>';
@@ -503,6 +506,65 @@ var DOMAIN_CONTENT = {
   }
 };
 
+var DHAMMA_REMEDY_CONTENT = {
+  luck: {
+    cause: 'รากเหตุของโชคติดขัดคือใจร้อน โลภ หรือหวังผลเร็วเกินเหตุ',
+    fix: 'ให้ก่อน รับทีหลัง และไม่กู้เงินมาเสี่ยงโชค',
+    boost: 'ทำทานเล็ก ๆ แล้วตั้งงบเสี่ยงโชคที่เสียได้จริง',
+    practice: 'ภารกิจ 7 วัน: จดเลขที่เจอซ้ำ และทำทาน 1 ครั้งโดยไม่หวังผล'
+  },
+  money: {
+    cause: 'รากเหตุของเงินรั่วคือใช้เงินตามอารมณ์และไม่เห็นตัวเลขจริง',
+    fix: 'หยุดหนี้ฟุ่มเฟือย รู้ตัวก่อนจ่าย และแยกเงินจำเป็นก่อน',
+    boost: 'แบ่งเงินเป็น ใช้ ออม ลงทุน แล้วทำทานจากกำไรไม่ใช่จากหนี้',
+    practice: 'ภารกิจ 7 วัน: จดรายจ่ายทุกบาท แล้วตัดรายจ่ายรั่ว 1 อย่าง'
+  },
+  health: {
+    cause: 'รากเหตุของพลังตกคือฝืนร่างกาย นอนน้อย และปล่อยใจเครียดนาน',
+    fix: 'ไม่เบียดเบียนตัวเอง พักให้พอ และหยุดก่อนร่างกายพัง',
+    boost: 'เดินเบา ๆ สมาธิสั้น ๆ และกินพอดีตามจังหวะร่างกาย',
+    practice: 'ภารกิจ 7 วัน: นอนตรงเวลา ดื่มน้ำหลังตื่น และเดินวันละ 15 นาที'
+  },
+  relationship: {
+    cause: 'รากเหตุของรักสะดุดคือวาจาเร็ว คาดหวังสูง และฟังกันไม่จบ',
+    fix: 'พูดให้น้อยลง ฟังให้จบ และขอโทษก่อนเรื่องเล็กจะบานปลาย',
+    boost: 'ให้เวลา คำชม และความปลอดภัยทางใจแก่คนสำคัญ',
+    practice: 'ภารกิจ 7 วัน: ชมคนใกล้ตัววันละ 1 เรื่อง และงดตอบโต้ตอนโกรธ 10 นาที'
+  },
+  career: {
+    cause: 'รากเหตุของงานติดคือผัดวัน ประมาท หรือทำงานโดยไม่ชัดว่าคุณค่าอยู่ตรงไหน',
+    fix: 'ปิดงานค้างก่อนเริ่มงานใหม่ และรักษาคำพูดกับทีม',
+    boost: 'เพิ่มทักษะ 1 อย่าง ส่งงานตรงเวลา และให้เครดิตคนที่ช่วย',
+    practice: 'ภารกิจ 7 วัน: เคลียร์งานค้าง 1 ชิ้น และเรียนทักษะใหม่ 30 นาที'
+  },
+  supporters: {
+    cause: 'รากเหตุของบริวารไม่หนุนคือคาดหวังมากกว่าการให้ หรือไว้ใจคนผิดจังหวะ',
+    fix: 'เป็นผู้ให้ก่อน รักษาน้ำใจ และวางขอบเขตกับคนไม่น่าไว้ใจ',
+    boost: 'ขอบคุณ ตอบแทนน้ำใจ และเลือกทำงานกับคนซื่อสัตย์',
+    practice: 'ภารกิจ 7 วัน: ขอบคุณคนที่เคยช่วย 1 คน และช่วยใครสักคนโดยไม่หวังผล'
+  }
+};
+
+function buildDhammaRemedy(key, score, element) {
+  var base = DHAMMA_REMEDY_CONTENT[key] || DHAMMA_REMEDY_CONTENT.luck;
+  var elementBoost = {
+    'ไฟ': 'ธาตุไฟ: ลงมือไว แต่เช็กเจตนาก่อน',
+    'ดิน': 'ธาตุดิน: ทำซ้ำเล็ก ๆ ให้มั่นคง',
+    'ลม': 'ธาตุลม: พูดให้ชัด ฟังให้ครบ',
+    'น้ำ': 'ธาตุน้ำ: ฟังใจ แต่อย่าให้อารมณ์นำ'
+  };
+  var urgency = score < 35
+    ? ' เริ่มจากข้อเล็กที่สุดก่อน'
+    : (score >= 60 ? ' ทำต่อเนื่องเพื่อให้ผลลัพธ์ชัดขึ้น' : ' ทำสม่ำเสมอแล้วจังหวะจะนิ่งขึ้น');
+
+  return {
+    cause: base.cause,
+    fix: base.fix + urgency,
+    boost: base.boost + ' · ' + (elementBoost[element] || 'เลือกทำสิ่งที่ควบคุมได้ก่อน'),
+    practice: base.practice
+  };
+}
+
 /**
  * สร้างข้อมูล Life Domain Forecast เฉพาะบุคคล
  * เชื่อมโยงกับ Life Graph V2 — แต่ละ domain ได้คะแนนและเนื้อหาต่างกันตามวันเกิด
@@ -568,7 +630,7 @@ function buildLifeDomainForecastV2(birthDay, birthMonth, birthYearBE, ageY, p, l
       var actionPool = currentActions[key] || currentActions.luck;
       var actionIdx = (birthDay + d + ageY) % actionPool.length;
 
-      var phaseYears = cPhase.from + '–' + (cPhase.to >= 99 ? '∞' : cPhase.to) + ' ปี';
+      var phaseYears = cPhase.from + '–' + (cPhase.to >= 88 ? '88+' : cPhase.to) + ' ปี';
       var phaseYearsText = yearsLeft ? 'อีก ' + yearsLeft + ' ปีในช่วงนี้' : 'ช่วงปัจจุบัน';
 
       currentPhaseInfo = {
@@ -581,38 +643,43 @@ function buildLifeDomainForecastV2(birthDay, birthMonth, birthYearBE, ageY, p, l
       };
     }
 
-    // SECOND: Upcoming pivot ages (future opportunities)
-    if (lifeGraph && lifeGraph.pivotAges) {
-      for (var pa = 0; pa < lifeGraph.pivotAges.length; pa++) {
-        var pivotAge = lifeGraph.pivotAges[pa];
-        if (pivotAge > ageY && opportunities.length < 2) {
-          var oppScore = calculateDomainScore(pivotAge, lifePath, birthDay, birthMonth, d * 7 + pa, null);
-          var oppLevel = getEnergyLabel(oppScore);
-          var ageRange = pivotAge + '–' + Math.min(pivotAge + 8, 99) + ' ปี';
+    // SECOND: Near-term age windows (current + next 10-15 years)
+    // ไม่ดึง pivot ไกล ๆ เช่น 75–83/80 ปีมาโชว์ในช่องโอกาส เพราะทำให้ผู้ใช้หมดหวัง
+    var nearWindows = [
+      { start: ageY, end: Math.min(ageY + 5, 88), label: 'ตอนนี้–5 ปีข้างหน้า', isCurrent: true },
+      { start: ageY + 5, end: Math.min(ageY + 10, 88), label: '5–10 ปีข้างหน้า', isCurrent: false },
+      { start: ageY + 10, end: Math.min(ageY + 15, 88), label: '10–15 ปีข้างหน้า', isCurrent: false }
+    ];
 
-          var oppPool = oppScore >= 60 ? content.high : (oppScore >= 35 ? content.mid : content.low);
-          var oppIdx = (pa * birthMonth + birthDay) % oppPool.current.length;
+    for (var nw = 0; nw < nearWindows.length; nw++) {
+      var win = nearWindows[nw];
+      if (win.start >= 88 || win.end <= win.start) continue;
 
-          // Add preparation advice — what to do BEFORE the pivot
-          var prepPool = oppScore >= 60
-            ? ['สะสมทักษะและคอนเนกชั่นไว้ — พอโอกาสมาจะคว้าได้ทัน',
-               'เตรียมตัวให้พร้อม — จังหวะดี ๆ มักมาตอนที่คุณพร้อมแล้ว']
-            : ['สร้างฐานให้แข็งแรง — ยิ่งพร้อมยิ่งผ่านอุปสรรคได้ง่าย',
-               'เรียนรู้จากประสบการณ์ตอนนี้ — มันจะเป็นเกราะป้องกันในอนาคต'];
-          var prepIdx = (pa + birthDay) % prepPool.length;
+      var focusAge = Math.floor((win.start + win.end) / 2);
+      var oppScore = calculateDomainScore(focusAge, lifePath, birthDay, birthMonth, d * 11 + nw, lifeGraph);
+      var oppLevel = getEnergyLabel(oppScore);
+      var oppPool = oppScore >= 60 ? content.high : (oppScore >= 35 ? content.mid : content.low);
+      var oppIdx = (nw * birthMonth + birthDay + d) % oppPool.current.length;
+      var prepPool = win.isCurrent
+        ? ['ลงมือทีละเรื่องในสัปดาห์นี้ — ไม่ต้องรอจังหวะใหญ่',
+           'เลือก 1 สิ่งที่ควบคุมได้ แล้วทำให้สม่ำเสมอก่อน']
+        : (oppScore >= 60
+          ? ['สะสมทักษะและคอนเนกชั่นไว้ — พอโอกาสมาจะคว้าได้ทัน',
+             'เตรียมตัวให้พร้อม — จังหวะดี ๆ มักมาตอนที่คุณพร้อมแล้ว']
+          : ['สร้างฐานให้แข็งแรง — ยิ่งพร้อมยิ่งผ่านอุปสรรคได้ง่าย',
+             'เรียนรู้จากประสบการณ์ตอนนี้ — มันจะเป็นเกราะป้องกันในอนาคต']);
+      var prepIdx = (nw + birthDay + d) % prepPool.length;
 
-          opportunities.push({
-            ageRange: ageRange,
-            title: 'ช่วง ' + pivotAge + '–' + Math.min(pivotAge + 8, 99) + ' ปี',
-            text: oppLevel.icon + ' ' + oppLevel.level + ' — ' + oppPool.current[oppIdx],
-            preparation: '💡 เตรียมตัวตอนนี้: ' + prepPool[prepIdx],
-            score: oppScore,
-            level: oppLevel.level,
-            icon: oppLevel.icon,
-            isCurrent: false
-          });
-        }
-      }
+      opportunities.push({
+        ageRange: win.start + '–' + win.end + ' ปี',
+        title: win.label,
+        text: oppLevel.icon + ' ' + oppLevel.level + ' — ' + oppPool.current[oppIdx],
+        preparation: '💡 เตรียมตัวตอนนี้: ' + prepPool[prepIdx],
+        score: oppScore,
+        level: oppLevel.level,
+        icon: oppLevel.icon,
+        isCurrent: win.isCurrent
+      });
     }
     
     domains.push({
@@ -627,6 +694,7 @@ function buildLifeDomainForecastV2(birthDay, birthMonth, birthYearBE, ageY, p, l
       current: pool.current[currentIdx],
       warning: pool.warning[warnIdx],
       remedy: pool.remedy[remedyIdx],
+      dhammaRemedy: buildDhammaRemedy(key, score, el),
       currentPhase: currentPhaseInfo,
       opportunities: opportunities
     });
@@ -644,7 +712,7 @@ function buildLifeDomainForecastV2(birthDay, birthMonth, birthYearBE, ageY, p, l
   var currentAgeRange;
   if (lifeGraph && lifeGraph.phases && lifeGraph.currentPhase < lifeGraph.phases.length) {
     var cp = lifeGraph.phases[lifeGraph.currentPhase];
-    currentAgeRange = cp.from + '–' + (cp.to >= 99 ? '∞' : cp.to) + ' ปี';
+    currentAgeRange = cp.from + '–' + (cp.to >= 88 ? '88+' : cp.to) + ' ปี';
   } else {
     currentAgeRange = ageY + ' ปี';
   }
