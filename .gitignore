@@ -2,7 +2,7 @@ node_modules/
 .vitest/
 coverage/
 .DS_Store
-dist/
+#dist/
 .vite/
 .env
 .env.local
