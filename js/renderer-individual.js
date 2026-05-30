@@ -484,12 +484,12 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     +'<div class="ci"><div class="ci-l">'+u.ge+'</div><div class="ci-v">'+gd+'</div><div class="ci-s">'+nm+'</div></div>'
     +'</div></div>'
     + conversionRoadmapHtml
-    + wrapCollapsible("✦ กำลังวันประจำตัว ✦", "วันเกิด · เทวดา · ธาตุ · สีมงคล", cosmicBriefHtml, true)
-    + wrapCollapsible("✨ พลังงานเสริมดวง", "เลขและสีมงคลประจำวัน", powerCardHtml, true)
-    + wrapCollapsible("✦ สูตรเปิดดวงลาภลอย ✦", "เลขเด็ด หวย ทิศ คาถา สายมู", windfallLuckHtml)
-    + wrapCollapsible("📅 แผนที่ชีวิตรายเดือน", "5 ด้าน พร้อมพรีวิวรายเดือน", monthlyLifeMapHtml)
-    + wrapCollapsible("📊 แผนที่สถานการณ์ชีวิต", "6 ด้าน วิเคราะห์สถานการณ์ปัจจุบันและอนาคต", domainHtml)
-    + wrapCollapsible("🪞 กระจกกรรม", "บทเรียนและรูปแบบที่ชีวิตพาซ้ำ", karmaHtml)
+    + wrapCollapsible("✦ กำลังวันประจำตัว ✦", "วันเกิด · เทวดา · ธาตุ · สีมงคล", cosmicBriefHtml)
+    + wrapCollapsible("✨ พลังงานเสริมดวง", "เลขและสีมงคลประจำวัน", powerCardHtml)
+    + wrapCollapsible("✦ สูตรเปิดดวงลาภลอย ✦", "เลขเด็ด หวย ทิศ คาถา สายมู 🔒 Premium", windfallLuckHtml, true)
+    + wrapCollapsible("📅 แผนที่ชีวิตรายเดือน", "5 ด้าน พร้อมพรีวิวรายเดือน 🔒 Premium", monthlyLifeMapHtml, true)
+    + wrapCollapsible("📊 แผนที่สถานการณ์ชีวิต", "6 ด้าน วิเคราะห์สถานการณ์ปัจจุบันและอนาคต 🔒 Premium", domainHtml, true)
+    + wrapCollapsible("🪞 กระจกกรรม", "บทเรียนและรูปแบบที่ชีวิตพาซ้ำ 🔒 Premium", karmaHtml, true)
     + buildElementRadar(p, r, l)
     + detailTabsShellHtml;
 
