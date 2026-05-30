@@ -703,8 +703,8 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + '<div class="bp-age-meta"><span>เจ้าของดวง</span><strong>✦ ' + nm + ' ✦</strong><small>' + ageTxt + '</small></div>'
     + '</div>'
     + '<div class="bp-axis-grid">'
-    + '<div class="bp-axis-card"><span class="bp-axis-label">ตัวตนภายนอก</span><strong style="color:' + r.c + '">' + r.s + ' ' + r.n + '</strong><small>ราศีเกิดช่วยบอกโทนบุคลิกและแรงขับหลัก</small></div>'
-    + '<div class="bp-axis-card"><span class="bp-axis-label">วิธีที่โลกมองเห็น</span><strong style="color:' + l.c + '">' + l.s + ' ' + l.n + '</strong><small>ลัคนาช่วยบอกภาพแรกที่คนอื่นสัมผัสได้</small></div>'
+    + '<div class="bp-axis-card"><span class="bp-axis-label">ตัวตนภายนอก</span><strong style="color:' + r.c + '">' + r.s + ' ' + r.n + '</strong><small>' + (r.trait || 'โทนบุคลิกและแรงขับหลัก') + '</small><p class="bp-axis-desc">' + (r.apply || '') + '</p></div>'
+    + '<div class="bp-axis-card"><span class="bp-axis-label">วิธีที่โลกมองเห็น</span><strong style="color:' + l.c + '">' + l.s + ' ' + l.n + '</strong><small>' + (l.trait || 'ภาพแรกที่คนอื่นสัมผัสได้') + '</small><p class="bp-axis-desc">' + (l.apply || '') + '</p></div>'
     + '</div>'
     + '<div class="bp-summary">พิมพ์เขียวนี้สรุปแรงขับเดิมของคุณก่อนอ่านดวงรายเดือน — อายุเป็นเพียงบริบทเสริม ไม่ใช่ตัวตัดสินดวงทั้งหมด</div>'
     + '</div>';

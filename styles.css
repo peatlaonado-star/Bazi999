@@ -1073,9 +1073,17 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 }
 .bp-axis-card small {
   display: block;
-  color: #d8cfa7;
+  color: var(--g);
   font-size: 11px;
+  font-style: italic;
   line-height: 1.45;
+  margin-bottom: 5px;
+}
+.bp-axis-desc {
+  font-size: 12px;
+  color: var(--tx2);
+  line-height: 1.6;
+  margin: 0;
 }
 .bp-label {
   font-size: 10px;
