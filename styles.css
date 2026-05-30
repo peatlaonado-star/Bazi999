@@ -749,11 +749,11 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   transition: all 0.5s ease;
 }
 /* Domain Matrix — แผนที่สถานการณ์ชีวิต (Premium) */
-.is-locked > .domain-kicker,
-.is-locked > .domain-title,
-.is-locked > .domain-desc,
-.is-locked > .domain-current-chip,
-.is-locked > .domain-grid {
+.domain-premium.is-locked > .domain-grid,
+.domain-premium.is-locked > .domain-kicker,
+.domain-premium.is-locked > .domain-title,
+.domain-premium.is-locked > .domain-desc,
+.domain-premium.is-locked > .domain-current-chip {
   filter: blur(8px);
   opacity: 0.3;
   pointer-events: none;

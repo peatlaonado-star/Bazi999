@@ -562,13 +562,14 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
   var domainIntro = premiumUnlocked
     ? domainMatrix.intro
     : 'พรีวิวหัวข้อชีวิต 6 ด้านที่ STARVIA จะวิเคราะห์ให้ละเอียดในรีพอร์ตพรีเมียม';
-  var domainHtml = '<div class="domain-matrix' + (premiumUnlocked ? '' : ' is-locked') + '">'
+  var domainHtml = '<div class="domain-matrix">'
     + '<div class="domain-kicker">วิเคราะห์เฉพาะบุคคล</div>'
     + '<div class="domain-title">✦ ' + escapeHTML(domainMatrix.title) + ' ✦</div>'
     + '<div class="domain-desc">' + escapeHTML(domainIntro) + '</div>'
     + '<div class="domain-element-tone">' + escapeHTML(domainMatrix.elementSummary) + '</div>'
     + '<div class="domain-current-chip">🎯 วัยปัจจุบัน: ' + escapeHTML(domainMatrix.currentAgeRange) + '</div>'
     + lifeGraphHtml
+    + '<div class="domain-premium' + (premiumUnlocked ? '' : ' is-locked') + '">'
     + '<div class="domain-grid">';
   domainMatrix.domains.forEach(function(domain){
     domainHtml += '<div class="domain-card domain-' + escapeHTML(domain.key) + '">'
@@ -605,7 +606,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
       'วิเคราะห์ 6 ด้าน: โชค การเงิน สุขภาพ ความรัก การงาน และบริวาร พร้อมคำแนะนำแบบลงมือทำได้ — คำนวณเฉพาะบุคคลจากเลขชีวิตและวันเกิดของคุณ'
     );
   }
-  domainHtml += '</div>';
+  domainHtml += '</div></div>';
 
   var monthlyLifeMap = buildMonthlyLifeMap(p, r, l, ds);
   var monthlyLifeMapHtml = buildMonthlyLifeMapHtml(monthlyLifeMap, premiumUnlocked);

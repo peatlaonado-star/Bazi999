@@ -280,7 +280,7 @@ describe('Life Domain Forecast Matrix', () => {
     }
     expect(output).toContain('วิเคราะห์ 6 ด้าน');
     expect(dom.window.document.querySelectorAll('.domain-card').length).toBe(6);
-    expect(dom.window.document.querySelector('.domain-matrix.is-locked')).toBeTruthy();
+    expect(dom.window.document.querySelector('.domain-premium.is-locked')).toBeTruthy();
   });
 
   it('unlocks domain matrix when is-locked class is removed (simulates PIN unlock)', () => {
@@ -289,7 +289,7 @@ describe('Life Domain Forecast Matrix', () => {
 
     context.renderInd('Test', 'หญิง', '1990-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
 
-    const matrix = dom.window.document.querySelector('.domain-matrix');
+    const matrix = dom.window.document.querySelector('.domain-premium');
     expect(matrix.classList.contains('is-locked')).toBe(true);
 
     // Simulate onPremiumVerified behavior
