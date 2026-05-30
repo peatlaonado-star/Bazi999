@@ -2011,4 +2011,10 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .testimonials-strip{text-align:center;padding:0 4px}
 .testimonial-text{font-size:13px;line-height:1.65;color:#b8a8d8;font-style:italic;margin:0}
 .testimonial-author{display:inline-block;margin-left:4px;font-size:11px;color:#5a4a7a;font-style:normal;white-space:nowrap}
+
+/* Premium Mockup Showcase */
+.mockup-showcase{text-align:center;margin-bottom:20px}
+.mockup-img{max-width:100%;height:auto;border-radius:18px;border:1px solid rgba(201,162,39,.2);box-shadow:0 16px 48px rgba(0,0,0,.4),0 0 0 1px rgba(201,162,39,.06);transition:transform .3s}
+.mockup-img:hover{transform:translateY(-3px)}
+.mockup-caption{font-size:11px;color:#5a4a7a;letter-spacing:.08em;margin-top:10px}
 @media(max-width:640px){.bp-hero{grid-template-columns:1fr}.bp-age-meta{align-items:flex-start;white-space:normal}.bp-age-meta strong{max-width:100%}.bp-axis-grid{grid-template-columns:1fr}.brow{width:100%;border-radius:18px}}

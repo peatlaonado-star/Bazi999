@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{width:1200px;height:630px;overflow:hidden;font-family:"Leelawadee UI","Segoe UI",Tahoma,sans-serif;position:relative}
+.bg{position:absolute;inset:0;width:1200px;height:630px;object-fit:cover}
+.overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(9,6,28,.65),rgba(18,10,45,.55),rgba(9,6,28,.7))}
+.content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:40px}
+
+/* Constellation decoration */
+.constellation{position:absolute;top:60px;right:80px;width:200px;height:200px;opacity:.35}
+.constellation::before{content:"";position:absolute;inset:0;background:radial-gradient(circle,rgba(201,162,39,.15),transparent 70%)}
+
+.price-tag{display:inline-block;background:rgba(201,162,39,.18);border:1px solid rgba(201,162,39,.35);border-radius:50px;padding:8px 24px;font-size:18px;color:#D6AD45;letter-spacing:.08em;margin-bottom:28px;backdrop-filter:blur(10px)}
+
+.logo{font-family:Georgia,"Times New Roman",serif;font-size:72px;font-weight:700;background:linear-gradient(135deg,#8B6914,#C9A227 35%,#F4D987 55%,#C9A227);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.06em;line-height:1.1;margin-bottom:12px}
+
+.tagline{font-size:16px;letter-spacing:.5em;color:#8E72D8;text-transform:uppercase;margin-bottom:30px}
+
+.headline{font-size:31px;color:#F8F1DF;font-weight:600;letter-spacing:.02em;line-height:1.4;max-width:700px;margin-bottom:30px}
+.headline span{color:#D6AD45}
+
+.divider{width:120px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,162,39,.5),transparent);margin-bottom:30px}
+
+.subtitle{font-size:16px;color:#C9BDDF;letter-spacing:.06em;line-height:1.6;max-width:600px}
+
+.url{position:absolute;bottom:36px;left:0;right:0;text-align:center;font-size:12px;color:#5a4a7a;letter-spacing:.15em}
+
+/* Star accents */
+.star{position:absolute;color:rgba(201,162,39,.25);font-size:14px}
+.star:nth-child(1){top:80px;left:100px}
+.star:nth-child(2){top:140px;left:180px;font-size:10px}
+.star:nth-child(3){top:200px;right:160px;font-size:12px}
+.star:nth-child(4){bottom:120px;left:140px}
+.star:nth-child(5){bottom:160px;right:120px;font-size:10px}
+.star:nth-child(6){top:300px;right:300px;font-size:8px}
+</style>
+</head>
+<body>
+<img class="bg" src="bg-og.png" alt="">
+<div class="overlay"></div>
+
+<!-- Stars -->
+<div class="star">✦</div><div class="star">✧</div><div class="star">✦</div>
+<div class="star">✧</div><div class="star">✦</div><div class="star">✧</div>
+
+<div class="content">
+  <div class="price-tag">Premium 199 บาท/เดือน</div>
+  <div class="logo">STARVIA</div>
+  <div class="tagline">✦ ค้นพบตัวเองผ่านดวงดาว ✦</div>
+  <div class="headline">รู้จักตัวเองจาก<span> วันเกิด</span><br>ไม่ใช่แค่ดูดวง</div>
+  <div class="divider"></div>
+  <div class="subtitle">นพเคราะห์ · ราศีจักร · ลัคนา · ดวงชะตา<br>โหราศาสตร์ไทยโบราณที่อ่านง่าย ใช้งานได้จริง</div>
+</div>
+
+<div class="url">www.starvia.website</div>
+
+<script src="html2canvas.min.js"></script>
+<script>
+window.onload = function() {
+  setTimeout(function() {
+    html2canvas(document.body, { scale: 1, backgroundColor: null }).then(function(canvas) {
+      var link = document.createElement('a');
+      link.download = 'og-image.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      // Also log as base64 for server-side capture
+      console.log('OG_CAPTURE:' + canvas.toDataURL('image/png').substring(0, 100) + '...');
+    });
+  }, 500);
+};
+</script>
+</body>
+</html>
