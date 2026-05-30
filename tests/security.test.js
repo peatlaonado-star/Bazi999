@@ -6,6 +6,7 @@ import { JSDOM } from 'jsdom';
 
 function loadRenderersContext(overrides = {}) {
   const helperSource = fs.readFileSync(path.resolve('js/reading-helpers.js'), 'utf8');
+  const lifeGraphSource = fs.readFileSync(path.resolve('js/life-graph.js'), 'utf8');
   const rendererSources = [
     'js/renderer-shared.js',
     'js/renderer-individual.js',
@@ -25,6 +26,7 @@ function loadRenderersContext(overrides = {}) {
   };
   vm.createContext(context);
   vm.runInContext(helperSource, context, { filename: 'js/reading-helpers.js' });
+  vm.runInContext(lifeGraphSource, context, { filename: 'js/life-graph.js' });
   for (const [filename, source] of rendererSources) {
     vm.runInContext(source, context, { filename });
   }

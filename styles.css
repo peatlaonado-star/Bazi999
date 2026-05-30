@@ -2073,37 +2073,42 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .mockup-caption{font-size:11px;color:#5a4a7a;letter-spacing:.08em;margin-top:10px}
 @media(max-width:640px){.bp-hero{grid-template-columns:1fr}.bp-age-meta{align-items:flex-start;white-space:normal}.bp-age-meta strong{max-width:100%}.bp-axis-grid{grid-template-columns:1fr}.brow{width:100%;border-radius:18px}}
 
-/* ===== PERSONALIZED LIFE GRAPH ===== */
+/* ===== PERSONALIZED LIFE GRAPH V2 ===== */
 .life-graph-card{margin-bottom:16px;padding:18px;background:linear-gradient(145deg,rgba(20,10,55,.72),rgba(10,5,30,.62));border:1px solid rgba(201,162,39,.18);border-radius:18px}
-.lg-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.lg-header{display:flex;align-items:center;gap:12px;margin-bottom:10px}
 .lg-planet{font-size:28px;line-height:1}
 .lg-title{font-size:15px;font-weight:700;color:var(--g);letter-spacing:.04em}
 .lg-subtitle{font-size:10px;color:#7a6a9a;letter-spacing:.04em;margin-top:2px}
 
+/* Current year badge */
+.lg-current-badge{display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 16px;margin-bottom:12px;border:1px solid;border-radius:12px;background:rgba(9,6,28,.6)}
+.lg-current-icon{font-size:18px}
+.lg-current-level{font-size:15px;font-weight:700;letter-spacing:.04em}
+.lg-current-detail{font-size:10px;color:#7a6a9a;letter-spacing:.03em}
+
 /* Timeline bars */
-.lg-timeline{display:flex;align-items:flex-end;gap:2px;height:70px;padding:24px 2px 0;margin-bottom:4px}
-.lg-bar{flex:1;min-width:12px;border-radius:3px 3px 0 0;position:relative;transition:all .3s;opacity:.7}
+.lg-timeline{display:flex;align-items:flex-end;gap:2px;height:75px;padding:28px 2px 0;margin-bottom:2px}
+.lg-bar{flex:1;min-width:12px;border-radius:3px 3px 0 0;position:relative;transition:all .3s;opacity:.75}
 .lg-bar:hover{opacity:1}
-.lg-bar-current{opacity:1;box-shadow:0 0 12px rgba(201,162,39,.4);position:relative}
-.lg-marker{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--g);white-space:nowrap;font-weight:700;background:rgba(9,6,28,.85);padding:2px 10px;border-radius:10px;border:1px solid rgba(201,162,39,.3);animation:pulse 2s infinite;z-index:5}
+.lg-bar-current{opacity:1;box-shadow:0 0 14px rgba(201,162,39,.45);position:relative;z-index:2}
+.lg-bar-current.lg-golden{box-shadow:0 0 18px rgba(255,215,0,.6)}
+.lg-bar-current.lg-challenge{box-shadow:0 0 14px rgba(255,152,0,.5)}
+.lg-marker{position:absolute;top:-26px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--g);white-space:nowrap;font-weight:700;background:rgba(9,6,28,.9);padding:2px 10px;border-radius:10px;border:1px solid rgba(201,162,39,.35);animation:pulse 2s infinite;z-index:5}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
 
 /* Age labels */
-.lg-ages{display:flex;justify-content:space-between;font-size:9px;color:#5a4a7a;letter-spacing:.04em;margin-bottom:14px}
-
-/* Current phase */
-.lg-current{text-align:center;margin-bottom:10px}
-.lg-current-badge{display:inline-block;padding:3px 14px;border-radius:50px;font-size:11px;font-weight:700;color:#fff;letter-spacing:.06em;margin-bottom:6px}
-.lg-current-age{font-size:11px;color:var(--tx2);margin-bottom:6px}
-.lg-insight{font-size:14px;color:var(--tx);line-height:1.6;font-weight:600;max-width:400px;margin:0 auto}
-
-/* Element tip */
-.lg-element-tip{font-size:11px;color:#7a6a9a;text-align:center;line-height:1.5;padding-top:10px;border-top:1px solid rgba(201,162,39,.08)}
-
+.lg-ages{display:flex;justify-content:space-between;font-size:9px;color:#5a4a7a;letter-spacing:.04em;margin-bottom:2px}
 
 /* Phase labels above bars */
-.lg-phase-labels{display:flex;gap:1px;margin-bottom:4px}
-.lg-phase-label{flex:1;text-align:center;font-size:9px;color:#7a6a9a;letter-spacing:.03em;line-height:1.3;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.lg-phase-labels{display:flex;gap:1px;margin-bottom:6px}
+.lg-phase-label{flex:1;text-align:center;font-size:9px;color:#7a6a9a;letter-spacing:.03em;line-height:1.4;min-width:0;overflow:hidden;text-overflow:ellipsis;padding:0 1px}
 .lg-phase-label small{display:block;font-size:8px;color:#5a4a7a}
 .lg-phase-current{color:var(--g);font-weight:700}
 .lg-phase-current small{color:var(--g)}
+
+/* Insight card */
+.lg-insight-card{text-align:center;padding:12px 8px 4px;margin-top:12px;border-top:1px solid rgba(201,162,39,.12)}
+.lg-insight-label{font-size:12px;font-weight:700;color:var(--tx);letter-spacing:.03em;margin-bottom:6px}
+.lg-insight-text{font-size:13px;color:#b8a8d8;line-height:1.7;font-style:italic;margin:0 0 8px}
+.lg-next-pivot{font-size:11px;color:#7a6a9a;letter-spacing:.03em}
+.lg-next-pivot strong{color:var(--g)}

@@ -149,6 +149,10 @@ function go0(){
   var nm=document.getElementById('n0').value||(u.pdef||'บุคคลนี้');
   var gd=document.getElementById('g0').value;
   var ts=document.getElementById('t0').value||'06:00';
+  var bday = new Date(ds);
+  var birthDay = bday.getDate();
+  var birthMonth = bday.getMonth() + 1;
+  var birthYearBE = bday.getFullYear() + 543;
   var p=PL2[new Date(ds).getDay()];
   var ri=getRasi(ds), li=getLagna(ds,ts);
   var r=RA2[ri], l=RA2[li];
@@ -166,7 +170,7 @@ function go0(){
   setTimeout(function(){
     hideLoad();
     loadTxt.innerHTML = u.ld; // คืนค่าเดิม
-    renderInd(nm,gd,ds,ts,p,r,l,ri,li,u);
+    renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE);
   }, 3200);
 }
 
@@ -423,7 +427,14 @@ function wrapCollapsible(label, hint, content, startCollapsed) {
     + '</div>';
 }
 
-function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
+function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE){
+  // Fallback for tests that don't pass birth data
+  if (birthDay === undefined) {
+    var _bday = new Date(ds);
+    birthDay = _bday.getDate();
+    birthMonth = _bday.getMonth() + 1;
+    birthYearBE = _bday.getFullYear() + 543;
+  }
   var wrap=document.getElementById('r0');
   nm = escapeHTML(nm);
   gd = escapeHTML(gd);
@@ -639,8 +650,8 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     + '<div class="tabs-w"><div class="tabs" id="tt0"></div></div><div id="ts0"></div>'
     + '</div>';
 
-  var lifeGraph = buildPersonalLifeGraph(p, ageY);
-  var lifeGraphHtml = buildLifeGraphHtml(lifeGraph);
+  var lifeGraph = buildPersonalLifeGraphV2(birthDay, birthMonth, birthYearBE, ageY, p);
+  var lifeGraphHtml = buildLifeGraphHtmlV2(lifeGraph);
 
   wrap.innerHTML = blueprintCardHtml
     + '<div class="brow"><span style="font-size:15px;color:'+p.c+'">'+p.s+'</span>'
