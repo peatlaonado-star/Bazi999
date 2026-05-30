@@ -1977,4 +1977,38 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 @media(max-width:720px){.w{max-width:100%;padding:0 18px 72px}.premium-hero{padding:34px 0 24px}.hd h1{font-size:42px}.hero-title{font-size:31px;line-height:1.12}.hero-desc{font-size:15.5px}.daily-mantra{margin-bottom:18px}.modenav{margin-bottom:24px}.value-section,.premium-preview{margin:24px auto 20px}.value-grid,.preview-grid{grid-template-columns:1fr}.form-card{padding:22px}.newsletter-title{font-size:23px}}
 .nowrap{white-space:nowrap}
 @media(max-width:420px){.nowrap{white-space:normal}.hero-title{font-size:29px}}
+
+/* ===== P0: DAILY FORTUNE WIDGET ===== */
+.daily-fortune-section{max-width:640px;margin:0 auto 12px}
+.daily-fortune-card{background:linear-gradient(145deg,rgba(20,10,55,.82),rgba(10,5,30,.72));border:1px solid rgba(201,162,39,.2);border-radius:18px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.02);animation:fu .5s ease both}
+.df-header{display:flex;align-items:center;gap:8px;padding:14px 18px 0}
+.df-emoji{font-size:16px}
+.df-label{font-size:12px;font-weight:700;color:var(--g);letter-spacing:.06em;text-transform:uppercase}
+.df-date{font-size:10px;color:#7a6a9a;margin-left:auto;letter-spacing:.04em}
+.df-body{padding:8px 18px 14px}
+.df-quote{font-size:15px;line-height:1.7;color:#efe8d6;margin:0 0 12px;font-style:italic;text-align:center}
+.df-details{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding-top:10px;border-top:1px solid rgba(201,162,39,.08)}
+@media(max-width:480px){.df-details{grid-template-columns:1fr 1fr}}
+.df-item{text-align:center;padding:4px}
+.df-item-icon{font-size:14px;display:block;margin-bottom:3px}
+.df-item-label{font-size:9px;color:#7a6a9a;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+.df-item-value{font-size:12px;color:var(--g2);font-weight:600;line-height:1.4}
+.df-footer{padding:8px 18px;border-top:1px solid rgba(201,162,39,.06);background:rgba(0,0,0,.15)}
+.df-footer-text{font-size:10px;color:#5a4a7a;letter-spacing:.04em}
+
+/* Streak badge */
+.df-streak{display:inline-flex;align-items:center;gap:3px;background:rgba(201,162,39,.12);border:1px solid rgba(201,162,39,.25);border-radius:50px;padding:2px 10px 2px 6px;font-size:11px;color:var(--g);margin-left:6px;transition:all .3s}
+.df-streak-emoji{font-size:13px}
+.df-streak-count{font-weight:700;letter-spacing:.02em}
+
+/* ===== P0: SOCIAL PROOF SECTION ===== */
+.social-proof-section{max-width:640px;margin:18px auto 10px}
+.social-proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+@media(max-width:480px){.social-proof-grid{grid-template-columns:1fr 1fr}}
+.sp-stat-card{text-align:center;background:rgba(255,255,255,.03);border:1px solid rgba(214,173,69,.12);border-radius:14px;padding:14px 8px;transition:all .3s}
+.sp-stat-number{font-size:22px;font-weight:700;color:var(--g);margin-bottom:3px;letter-spacing:-.02em}
+.sp-stat-label{font-size:10px;color:#7a6a9a;letter-spacing:.06em}
+.testimonials-strip{text-align:center;padding:0 4px}
+.testimonial-text{font-size:13px;line-height:1.65;color:#b8a8d8;font-style:italic;margin:0}
+.testimonial-author{display:inline-block;margin-left:4px;font-size:11px;color:#5a4a7a;font-style:normal;white-space:nowrap}
 @media(max-width:640px){.bp-hero{grid-template-columns:1fr}.bp-age-meta{align-items:flex-start;white-space:normal}.bp-age-meta strong{max-width:100%}.bp-axis-grid{grid-template-columns:1fr}.brow{width:100%;border-radius:18px}}

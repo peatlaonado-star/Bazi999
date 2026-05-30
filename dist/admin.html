@@ -131,7 +131,7 @@
 <!-- STARVIA ADMIN CONFIG -->
 <script>
   window.STARVIA_ADMIN_CONFIG = {
-    apiBaseUrl: 'https://starvia-production.up.railway.app/v1/admin'
+    apiBaseUrl: '/v1/admin'
   };
 </script>
 
@@ -214,9 +214,8 @@ function loadPins() {
                         '<span class="badge badge-expired">หมดอายุ</span>';
       var actions = p.status === 'active' ?
         '<button class="btn btn-sm btn-danger" onclick="expirePin(\'' + esc(p.note) + '\')" title="หมดอายุ">✕</button>' : '';
-      // PIN is hashed in store — only available from issue result; for listing we show note as identifier
       return '<tr>' +
-        '<td><span class="pin-value"><em>ซ่อน</em></span></td>' +
+        "<td><span class=\"pin-value\" onclick=\"copyPin('" + esc(p.pin) + "')\" title=\"คลิกคัดลอก\">" + esc(p.pin) + "</span></td>" +
         '<td>' + esc(p.plan) + '</td>' +
         '<td>' + fmtDate(p.created) + '</td>' +
         '<td>' + fmtDate(p.expires) + '</td>' +

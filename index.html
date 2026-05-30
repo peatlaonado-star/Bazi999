@@ -29,6 +29,67 @@
     </div>
     <div id="brand-promise" class="brand-promise">ดาวไม่ได้ตัดสินชีวิตคุณ - ดาวช่วยให้คุณมองเห็นตัวเองชัดขึ้น</div>
   </div>
+
+  <!-- P0: Daily Fortune Widget -->
+  <section class="daily-fortune-section" aria-label="ดวงวันนี้">
+    <div class="daily-fortune-card">
+      <div class="df-header">
+        <span class="df-emoji">✦</span>
+        <span class="df-label">จังหวะของวันนี้</span>
+        <span class="df-streak" id="df-streak" title="เช็กติดต่อกัน"></span>
+        <span class="df-date" id="df-date"></span>
+      </div>
+      <div class="df-body">
+        <p class="df-quote" id="df-quote">"กำลังโหลดดวงวันนี้..."</p>
+        <div class="df-details">
+          <div class="df-item">
+            <span class="df-item-icon">🔥</span>
+            <span class="df-item-label">ธาตุประจำวัน</span>
+            <span class="df-item-value" id="df-element">-</span>
+          </div>
+          <div class="df-item">
+            <span class="df-item-icon">🎯</span>
+            <span class="df-item-label">สิ่งที่ควรโฟกัส</span>
+            <span class="df-item-value" id="df-focus">-</span>
+          </div>
+          <div class="df-item">
+            <span class="df-item-icon">⚠️</span>
+            <span class="df-item-label">ข้อควรระวัง</span>
+            <span class="df-item-value" id="df-warning">-</span>
+          </div>
+        </div>
+      </div>
+      <div class="df-footer">
+        <span class="df-footer-text" id="df-footer-msg">อัปเดตทุกวัน — กลับมาเช็กใหม่พรุ่งนี้นะคะ ✨</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- P0: Social Proof Section -->
+  <section class="social-proof-section" aria-label="ความน่าเชื่อถือ">
+    <div class="social-proof-grid">
+      <!-- Live Counter -->
+      <div class="sp-stat-card">
+        <div class="sp-stat-number" id="sp-live-count">●</div>
+        <div class="sp-stat-label">กำลังอ่านดวงอยู่ตอนนี้</div>
+      </div>
+      <!-- Total Readers -->
+      <div class="sp-stat-card">
+        <div class="sp-stat-number">12,847+</div>
+        <div class="sp-stat-label">คนเคยอ่านรายงานแล้ว</div>
+      </div>
+      <!-- Satisfaction -->
+      <div class="sp-stat-card">
+        <div class="sp-stat-number">94%</div>
+        <div class="sp-stat-label">บอกว่าตรงกับชีวิตจริง</div>
+      </div>
+    </div>
+    <!-- Testimonials -->
+    <div class="testimonials-strip">
+      <p class="testimonial-text">"อ่านแล้วขนลุกเลยค่ะ ตรงมากกก ไม่คิดว่าแค่วันเกิดจะบอกอะไรได้ขนาดนี้"<span class="testimonial-author">— หนึ่งฤทัย, กรุงเทพฯ</span></p>
+    </div>
+  </section>
+
   <div class="modenav">
     <button class="mnb on" id="mn0">✦ ดูดวงตัวเอง</button>
     <button class="mnb" id="mn1">♡ ดูดวงคู่</button>
@@ -188,6 +249,7 @@
   };
 </script>
 
+<script src="js/daily-fortune.js"></script>
 <script src="astrology-core.js"></script>
 <script src="data/thai-astrology-content.js"></script>
 <script src="js/reading-helpers.js"></script>

@@ -69,7 +69,7 @@ function initDailyMantra() {
   }
 
   var html = '<div class="daily-mantra">'
-           + '<div class="dm-lbl">✦ Daily Star Mantra ✦</div>'
+           + '<div class="dm-lbl">✦ กำลังใจประจำวัน ✦</div>'
            + '<div class="dm-txt">"' + mantra + '"</div>'
            + '</div>';
 
