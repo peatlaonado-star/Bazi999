@@ -553,35 +553,51 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     ) + '</div>';
   }
 
-  var currentLifeBand = LIFE_BANDS[getLifeBandIndex(ageY)];
-  var nextLifeBands = LIFE_BANDS.slice(getLifeBandIndex(ageY) + 1, getLifeBandIndex(ageY) + 3);
-  var domainMatrix = buildLifeDomainMatrix(p, r, l, currentLifeBand, nextLifeBands);
+  // ═══ Life Domain Forecast V2 — เฉพาะบุคคล เชื่อม Life Graph ═══
+  var domainMatrix = buildLifeDomainForecastV2(birthDay, birthMonth, birthYearBE, ageY, p, lifeGraph);
   var domainIntro = premiumUnlocked
     ? domainMatrix.intro
     : 'พรีวิวหัวข้อชีวิต 6 ด้านที่ STARVIA จะวิเคราะห์ให้ละเอียดในรีพอร์ตพรีเมียม';
   var domainHtml = '<div class="domain-matrix' + (premiumUnlocked ? '' : ' is-locked') + '">'
-    + '<div class="domain-kicker">พิมพ์เขียวชีวิตไทย</div>'
+    + '<div class="domain-kicker">วิเคราะห์เฉพาะบุคคล</div>'
     + '<div class="domain-title">✦ ' + escapeHTML(domainMatrix.title) + ' ✦</div>'
     + '<div class="domain-desc">' + escapeHTML(domainIntro) + '</div>'
-    + '<div class="domain-current-chip">ช่วงวัยปัจจุบัน: ' + escapeHTML(domainMatrix.currentAgeRange) + '</div>'
+    + '<div class="domain-element-tone">' + escapeHTML(domainMatrix.elementSummary) + '</div>'
+    + '<div class="domain-current-chip">🎯 วัยปัจจุบัน: ' + escapeHTML(domainMatrix.currentAgeRange) + '</div>'
     + '<div class="domain-grid">';
   domainMatrix.domains.forEach(function(domain){
     domainHtml += '<div class="domain-card domain-' + escapeHTML(domain.key) + '">'
-      + '<div class="domain-head"><span class="domain-icon">' + escapeHTML(domain.icon) + '</span><div><div class="domain-label">' + escapeHTML(domain.label) + '</div><div class="domain-subtitle">' + escapeHTML(domain.subtitle) + '</div></div></div>';
-    domainHtml += '<div class="domain-part"><strong>สถานการณ์ปัจจุบัน</strong><p>' + escapeHTML(domain.current) + '</p></div>'
-      + '<div class="domain-part"><strong>สัญญาณเตือน</strong><p>' + escapeHTML(domain.warning) + '</p></div>'
-      + '<div class="domain-part"><strong>วิธีเสริมให้ดีขึ้น</strong><p>' + escapeHTML(domain.remedy) + '</p></div>'
-      + '<div class="domain-part"><strong>โอกาสตามช่วงอายุ</strong><div class="domain-ages">';
+      // Header with score badge
+      + '<div class="domain-head-v2">'
+      + '<span class="domain-icon-v2">' + escapeHTML(domain.icon) + '</span>'
+      + '<div class="domain-head-info">'
+      + '<div class="domain-label-v2">' + escapeHTML(domain.label) + '</div>'
+      + '</div>'
+      + '<div class="domain-score-badge" style="background:' + escapeHTML(domain.levelColor) + '20;color:' + escapeHTML(domain.levelColor) + ';border:1px solid ' + escapeHTML(domain.levelColor) + '40">'
+      + '<span>' + escapeHTML(domain.levelIcon) + '</span>'
+      + '<span>' + escapeHTML(domain.level) + '</span>'
+      + '<span>' + domain.score + '/100</span>'
+      + '</div>'
+      + '</div>'
+      // Content sections
+      + '<div class="domain-part"><strong>สถานการณ์ปัจจุบัน</strong><p>' + escapeHTML(domain.current) + '</p></div>'
+      + '<div class="domain-part domain-warning"><strong>⚠️ สัญญาณเตือน</strong><p>' + escapeHTML(domain.warning) + '</p></div>'
+      + '<div class="domain-part domain-remedy"><strong>✨ วิธีเสริมให้ดีขึ้น</strong><p>' + escapeHTML(domain.remedy) + '</p></div>'
+      // Opportunities from Life Graph
+      + '<div class="domain-part"><strong>📅 โอกาสตามช่วงอายุ</strong><div class="domain-ages">';
     domain.opportunities.forEach(function(opp){
-      domainHtml += '<div class="domain-age"><span class="domain-age-chip">' + escapeHTML(opp.ageRange) + '</span><span>' + escapeHTML(opp.text) + '</span></div>';
+      domainHtml += '<div class="domain-age-v2">'
+        + '<span class="domain-age-chip" style="background:' + escapeHTML(opp.level === 'ปีทอง' ? '#FFD700' : opp.level === 'ปีดี' ? '#4CAF50' : opp.level === 'ปานกลาง' ? '#FFC107' : '#9E9E9E') + '20">' + escapeHTML(opp.ageRange) + '</span>'
+        + '<p>' + escapeHTML(opp.text) + '</p>'
+        + '</div>';
     });
-    domainHtml += '</div></div>';
-    domainHtml += '</div>';
+    domainHtml += '</div></div>'
+      + '</div>';
   });
   if (!premiumUnlocked) {
     domainHtml += '</div>' + buildPremiumLockOverlay(
       'ปลดล็อก แผนที่สถานการณ์ชีวิต',
-      'วิเคราะห์ 6 ด้าน: โชค การเงิน สุขภาพ ความรัก การงาน และบริวาร พร้อมคำแนะนำแบบลงมือทำได้'
+      'วิเคราะห์ 6 ด้าน: โชค การเงิน สุขภาพ ความรัก การงาน และบริวาร พร้อมคำแนะนำแบบลงมือทำได้ — คำนวณเฉพาะบุคคลจากเลขชีวิตและวันเกิดของคุณ'
     );
   }
   domainHtml += '</div>';
