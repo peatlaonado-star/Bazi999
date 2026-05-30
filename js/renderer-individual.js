@@ -438,14 +438,19 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
   // Blueprint Header Card
   var blueprintCardHtml = '<div class="blueprint-card">'
     + '<div class="bp-kicker">พิมพ์เขียวชีวิตไทย</div>'
-    + '<div class="bp-title">✦ ' + nm + ' ✦</div>'
-    + '<div class="bp-grid">'
-    + '<div class="bp-item"><div class="bp-icon" style="color:' + p.c + '">' + p.s + '</div><div class="bp-label">ดาวเจ้าชะตา</div><div class="bp-value" style="color:' + p.c + '">' + p.n + '</div></div>'
-    + '<div class="bp-item"><div class="bp-icon">🌍</div><div class="bp-label">ธาตุ</div><div class="bp-value">ธาตุ' + p.el + '</div></div>'
-    + '<div class="bp-item"><div class="bp-icon" style="color:' + r.c + '">' + r.s + '</div><div class="bp-label">ราศีเกิด</div><div class="bp-value" style="color:' + r.c + '">' + r.n + '</div></div>'
-    + '<div class="bp-item"><div class="bp-icon" style="color:' + l.c + '">' + l.s + '</div><div class="bp-label">ลัคนา</div><div class="bp-value" style="color:' + l.c + '">' + l.n + '</div></div>'
-    + '<div class="bp-item"><div class="bp-icon">🎂</div><div class="bp-label">อายุ</div><div class="bp-value">' + ageTxt + '</div></div>'
-    + '</div></div>';
+    + '<div class="bp-hero">'
+    + '<div class="bp-planet-main">'
+    + '<span class="bp-planet-symbol" style="color:' + p.c + '">' + p.s + '</span>'
+    + '<div><div class="bp-label">ดาวเจ้าชะตา</div><div class="bp-title">' + p.n + ' · ธาตุ' + p.el + '</div></div>'
+    + '</div>'
+    + '<div class="bp-age-meta"><span>เจ้าของดวง</span><strong>✦ ' + nm + ' ✦</strong><small>' + ageTxt + '</small></div>'
+    + '</div>'
+    + '<div class="bp-axis-grid">'
+    + '<div class="bp-axis-card"><span class="bp-axis-label">ตัวตนภายนอก</span><strong style="color:' + r.c + '">' + r.s + ' ' + r.n + '</strong><small>ราศีเกิดช่วยบอกโทนบุคลิกและแรงขับหลัก</small></div>'
+    + '<div class="bp-axis-card"><span class="bp-axis-label">วิธีที่โลกมองเห็น</span><strong style="color:' + l.c + '">' + l.s + ' ' + l.n + '</strong><small>ลัคนาช่วยบอกภาพแรกที่คนอื่นสัมผัสได้</small></div>'
+    + '</div>'
+    + '<div class="bp-summary">พิมพ์เขียวนี้สรุปแรงขับเดิมของคุณก่อนอ่านดวงรายเดือน — อายุเป็นเพียงบริบทเสริม ไม่ใช่ตัวตัดสินดวงทั้งหมด</div>'
+    + '</div>';
 
   var conversionRoadmapHtml = '<div class="conversion-roadmap">'
     + '<div class="cr-kicker">เริ่มอ่านตรงนี้</div>'

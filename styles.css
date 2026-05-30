@@ -938,48 +938,116 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   margin-left: auto;
   margin-right: auto;
 }
-.bp-title {
-  font-family: 'Georgia', 'Times New Roman', serif;
-  font-size: 20px;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 16px;
-  background: linear-gradient(135deg, #C9A227, #E8D48B, #C9A227);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.bp-grid {
+.bp-hero {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
-  gap: 12px;
-  align-items: stretch;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 14px;
 }
-.bp-item {
-  text-align: center;
+.bp-planet-main {
   min-width: 0;
-  padding: 10px 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 16px;
+  background: radial-gradient(circle at 0% 0%, rgba(201,162,39,.16), transparent 48%), rgba(255,255,255,.045);
+  border: 1px solid rgba(201,162,39,.18);
+}
+.bp-planet-symbol {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(0,0,0,.22);
+  border: 1px solid rgba(255,255,255,.12);
+  font-size: 26px;
+  line-height: 1;
+}
+.bp-age-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  padding: 10px 12px;
   border-radius: 14px;
-  background: rgba(255,255,255,.035);
+  background: rgba(0,0,0,.18);
+  border: 1px solid rgba(255,255,255,.08);
+  color: #d8cfa7;
+  white-space: nowrap;
+}
+.bp-age-meta span,
+.bp-age-meta small {
+  font-size: 10px;
+  color: #b8a8d8;
+}
+.bp-age-meta strong {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  color: #E8D48B;
+}
+.bp-axis-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.bp-axis-card {
+  min-width: 0;
+  padding: 12px;
+  border-radius: 15px;
+  background: rgba(255,255,255,.032);
   border: 1px solid rgba(201,162,39,.10);
 }
-.bp-icon {
-  font-size: 20px;
+.bp-axis-label {
+  display: block;
   margin-bottom: 6px;
-  line-height: 1;
+  font-size: 10px;
+  color: #b8a8d8;
+  letter-spacing: .03em;
+}
+.bp-axis-card strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 15px;
+  line-height: 1.25;
+}
+.bp-axis-card small {
+  display: block;
+  color: #d8cfa7;
+  font-size: 11px;
+  line-height: 1.45;
 }
 .bp-label {
   font-size: 10px;
   color: #b8a8d8;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.08em;
   margin-bottom: 4px;
   line-height: 1.35;
+  text-transform: uppercase;
 }
-.bp-value {
+.bp-summary {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(201,162,39,.07);
+  border: 1px solid rgba(201,162,39,.12);
+  color: #e6dcc0;
   font-size: 12px;
-  line-height: 1.35;
+  line-height: 1.55;
+}
+.bp-title {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: 20px;
   font-weight: 700;
-  color: #C9A227;
+  background: linear-gradient(135deg, #C9A227, #E8D48B, #C9A227);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   overflow-wrap: anywhere;
 }
 
@@ -1909,4 +1977,4 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 @media(max-width:720px){.w{max-width:100%;padding:0 18px 72px}.premium-hero{padding:34px 0 24px}.hd h1{font-size:42px}.hero-title{font-size:31px;line-height:1.12}.hero-desc{font-size:15.5px}.daily-mantra{margin-bottom:18px}.modenav{margin-bottom:24px}.value-section,.premium-preview{margin:24px auto 20px}.value-grid,.preview-grid{grid-template-columns:1fr}.form-card{padding:22px}.newsletter-title{font-size:23px}}
 .nowrap{white-space:nowrap}
 @media(max-width:420px){.nowrap{white-space:normal}.hero-title{font-size:29px}}
-@media(max-width:640px){.bp-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.bp-item{padding:10px 6px}.brow{width:100%;border-radius:18px}}
+@media(max-width:640px){.bp-hero{grid-template-columns:1fr}.bp-age-meta{align-items:flex-start;white-space:normal}.bp-age-meta strong{max-width:100%}.bp-axis-grid{grid-template-columns:1fr}.brow{width:100%;border-radius:18px}}

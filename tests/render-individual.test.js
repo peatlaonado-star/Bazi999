@@ -147,6 +147,23 @@ describe('Thai Life Blueprint header card', () => {
     expect(output).toContain('เมษ');
   });
 
+  it('presents the blueprint as a hierarchy instead of five equal badges', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+    const context = loadContext(dom);
+    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+
+    const card = dom.window.document.querySelector('.blueprint-card');
+    expect(card.querySelector('.bp-hero')).toBeTruthy();
+    expect(card.querySelector('.bp-planet-main')).toBeTruthy();
+    expect(card.querySelector('.bp-axis-grid')).toBeTruthy();
+    expect(card.querySelector('.bp-age-meta')).toBeTruthy();
+    expect(card.querySelector('.bp-summary')).toBeTruthy();
+    expect(card.querySelectorAll('.bp-item')).toHaveLength(0);
+    expect(card.textContent).toContain('ตัวตนภายนอก');
+    expect(card.textContent).toContain('วิธีที่โลกมองเห็น');
+    expect(card.textContent).toContain('อายุเป็นเพียงบริบทเสริม');
+  });
+
   it('blueprint card appears before the info card in DOM order', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
     const context = loadContext(dom);
