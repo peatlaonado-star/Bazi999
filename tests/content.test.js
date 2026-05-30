@@ -53,7 +53,8 @@ describe('Thai astrology content data', () => {
   it('presents a premium Thai-first landing value ladder before the report form', () => {
     const html = fs.readFileSync(path.resolve('index.html'), 'utf8');
 
-    expect(html).toContain('รู้จักตัวเองจากวันเกิด ไม่ใช่แค่ดูดวง');
+    expect(html).toContain('รู้จักตัวเองจากวันเกิด');
+    expect(html).toContain('ไม่ใช่แค่ดูดวง');
     expect(html).toContain('Premium 199 บาท/เดือน');
     expect(html).toContain('สิ่งที่คุณจะได้จาก STARVIA');
     expect(html).toContain('เริ่มจากข้อมูลพื้นฐาน');
