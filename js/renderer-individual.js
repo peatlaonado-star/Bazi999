@@ -170,6 +170,162 @@ function go0(){
   }, 3200);
 }
 
+// ===== PERSONALIZED LIFE GRAPH =====
+// คำนวณกราฟชีวิตเฉพาะบุคคลจาก ดาวเจ้าชะตา + ธาตุ + อายุ
+// แทนที่ LIFE_BANDS แบบเดิมที่เหมือนกันทุกคน
+var PLANET_PIVOT_AGES = {
+  'อาทิตย์': [21, 28, 35, 42, 56],
+  'จันทร์':  [18, 25, 33, 40, 52],
+  'อังคาร':  [20, 27, 32, 38, 45],
+  'พุธ':    [17, 23, 30, 37, 44],
+  'พฤหัสบดี':[24, 32, 40, 48, 60],
+  'ศุกร์':  [22, 29, 36, 43, 55],
+  'เสาร์':  [27, 35, 42, 49, 58],
+  'ราหู':   [19, 26, 34, 41, 50],
+  'เกตุ':   [19, 26, 34, 41, 50],
+  'พระจันทร์': [18, 25, 33, 40, 52]
+};
+
+var LIFE_PHASE_LABELS = ['รากฐาน', 'ค้นหาตัวเอง', 'ทดสอบโลก', 'ตั้งหลัก', 'สร้างตัว', 'ส่งต่อ'];
+
+function buildPersonalLifeGraph(p, ageY) {
+  var pivotAges = PLANET_PIVOT_AGES[p.n] || PLANET_PIVOT_AGES['อาทิตย์'];
+  var el = p.el || 'ดิน';
+
+  // Build phases from pivot ages
+  var phases = [];
+  var prevAge = 0;
+  for (var i = 0; i < pivotAges.length; i++) {
+    phases.push({ from: prevAge, to: pivotAges[i], label: LIFE_PHASE_LABELS[i] || ('ช่วงที่ ' + (i+1)) });
+    prevAge = pivotAges[i];
+  }
+  // Final phase
+  phases.push({ from: prevAge, to: 99, label: LIFE_PHASE_LABELS[LIFE_PHASE_LABELS.length - 1] || 'ส่งต่อ' });
+
+  // Element-based energy curve
+  var energyCurves = {
+    'ไฟ': [35, 70, 85, 65, 90, 75],
+    'ดิน': [30, 45, 55, 65, 75, 85],
+    'ลม': [40, 60, 50, 70, 55, 80],
+    'น้ำ': [30, 55, 60, 75, 70, 90]
+  };
+  var curve = energyCurves[el] || energyCurves['ดิน'];
+
+  // Assign energy to each phase
+  for (var j = 0; j < phases.length; j++) {
+    phases[j].energy = curve[j] || 50;
+    phases[j].color = getEnergyColor(phases[j].energy);
+  }
+
+  // Find current phase
+  var currentPhase = 0;
+  for (var k = 0; k < phases.length; k++) {
+    if (ageY >= phases[k].from && ageY < phases[k].to) {
+      currentPhase = k;
+      break;
+    }
+  }
+
+  // Calculate progress within current phase (0-100%)
+  var cp = phases[currentPhase];
+  var phaseSpan = cp.to - cp.from;
+  var progress = phaseSpan > 0 ? Math.min(100, Math.round(((ageY - cp.from) / phaseSpan) * 100)) : 50;
+
+  // Element-specific current insight
+  var elementInsights = {
+    'ไฟ': ['พลังนำ — ใช้ความกล้าเปิดทาง แต่อย่าลืมฟังคนรอบตัว', 'จังหวะลุย — ถึงเวลาลงมือ แต่วางแผนก่อนพุ่ง', 'ช่วงพัก — ใช้เวลาฟื้นพลังก่อนลุยต่อ', 'หัวเลี้ยว — ตัดสินใจใหญ่รออยู่ ใจเย็น ๆ'],
+    'ดิน': ['สร้างฐาน — มั่นคงทีละก้อน ไม่ต้องรีบ', 'ช่วงผลิดอก — สิ่งที่อดทนไว้กำลังผลิผล', 'ปรับดิน — ถึงเวลาเปลี่ยนวิธี ไม่ใช่เป้าหมาย', 'เก็บเกี่ยว — รับผลจากความเพียรที่ผ่านมา'],
+    'ลม': ['เปิดรับ — ไอเดียใหม่กำลังมา เลือกให้ดี', 'สื่อสาร — คำพูดมีพลังกว่าที่คิด', 'โฟกัส — รวมพลังไปที่เรื่องเดียวให้จบ', 'กระจาย — ถึงเวลาต่อยอดสิ่งที่ทำสำเร็จ'],
+    'น้ำ': ['ฟังใจ — สัญชาตญาณกำลังบอกอะไรบางอย่าง', 'ไหลตาม — อย่าฝืนธรรมชาติของจังหวะชีวิต', 'ลึกขึ้น — เข้าใจตัวเองในระดับที่ลึกกว่าเดิม', 'รวมพลัง — อารมณ์และเหตุผลประสานกัน']
+  };
+  var insights = elementInsights[el] || elementInsights['ดิน'];
+  var insightIdx = currentPhase >= insights.length ? insights.length - 1 : currentPhase;
+  var insight = insights[insightIdx];
+
+  return {
+    phases: phases,
+    currentPhase: currentPhase,
+    currentAge: ageY,
+    progress: progress,
+    element: el,
+    planetName: p.n,
+    planetSymbol: p.s,
+    planetColor: p.c,
+    insight: insight,
+    phaseLabel: cp.label
+  };
+}
+
+function getEnergyColor(energy) {
+  if (energy >= 80) return '#4CAF50';
+  if (energy >= 65) return '#8BC34A';
+  if (energy >= 50) return '#FFC107';
+  if (energy >= 35) return '#FF9800';
+  return '#F44336';
+}
+
+function buildLifeGraphHtml(graph) {
+  var html = '<div class="life-graph-card">'
+    + '<div class="lg-header">'
+    + '<span class="lg-planet" style="color:' + graph.planetColor + '">' + graph.planetSymbol + '</span>'
+    + '<div><div class="lg-title">✦ กราฟชีวิตเฉพาะบุคคล ✦</div>'
+    + '<div class="lg-subtitle">คำนวณจากดาวเจ้าชะตา' + graph.planetName + ' · ธาตุ' + graph.element + '</div></div>'
+    + '</div>';
+
+  // Timeline bar
+  html += '<div class="lg-timeline">';
+  for (var i = 0; i < graph.phases.length; i++) {
+    var ph = graph.phases[i];
+    var isCurrent = (i === graph.currentPhase);
+    var barClass = isCurrent ? ' lg-bar-current' : '';
+    var barStyle = 'background:' + ph.color + ';height:' + (20 + ph.energy * 0.3) + 'px';
+    html += '<div class="lg-bar' + barClass + '" style="' + barStyle + '" title="' + ph.label + ': ' + ph.from + '–' + ph.to + ' ปี (พลัง ' + ph.energy + '%)">';
+    if (isCurrent) {
+      html += '<span class="lg-marker">▼ คุณอยู่ตรงนี้</span>';
+    }
+    html += '</div>';
+  }
+  html += '</div>';
+
+  // Age labels
+  html += '<div class="lg-ages">';
+  for (var j = 0; j < Math.min(graph.phases.length, 5); j++) {
+    html += '<span>' + graph.phases[j].from + '</span>';
+  }
+  html += '<span style="margin-left:auto">' + (graph.phases[graph.phases.length-1].from || 60) + '</span>';
+  html += '</div>';
+
+  // Current phase card
+  var cp = graph.phases[graph.currentPhase];
+  html += '<div class="lg-current">'
+    + '<div class="lg-current-badge" style="background:' + cp.color + '">● ' + cp.label + '</div>'
+    + '<div class="lg-current-age">อายุ ' + graph.currentAge + ' ปี — ' + Math.round(graph.progress) + '% ของช่วงนี้</div>'
+    + '<div class="lg-insight">' + graph.insight + '</div>'
+    + '</div>';
+
+  // Element guide (1 line)
+  html += '<div class="lg-element-tip">'
+    + '<span style="color:' + graph.planetColor + '">✦</span> '
+    + 'พลังธาตุ' + graph.element + 'ช่วงนี้: ' + getElementPhaseTip(graph.element, graph.currentPhase)
+    + '</div>';
+
+  html += '</div>';
+  return html;
+}
+
+function getElementPhaseTip(element, phase) {
+  var tips = {
+    'ไฟ': ['เริ่มต้นด้วยความกล้า — แต่อย่าลืมตั้งหลักก่อนกระโดด', 'ไฟแรงไปถูกทาง — เลือกโฟกัสหนึ่งเรื่องแล้วลุย', 'เปลวไฟต้องพัก — ถอยก่อนเพื่อก้าวไกลกว่า'],
+    'ดิน': ['ค่อยเป็นค่อยไป — ทีละก้อนสร้างฐานให้แข็งแรง', 'รากฐานเริ่มมั่น — ถึงเวลาขยายผลอย่างมั่นคง', 'เก็บเกี่ยวผลจากความอดทน — สิ่งที่ผ่านมาทั้งหมดกำลังออกดอก'],
+    'ลม': ['เปิดรับทุกทิศทาง — แต่อย่ากระจัดกระจาย', 'จับทิศทางได้แล้ว — โฟกัสลมให้เป็นพลังเดียว', 'ใช้สายลมที่สะสม — พัดพาสิ่งที่สร้างไว้ให้กว้างไกล'],
+    'น้ำ': ['เรียนรู้ที่จะไหล — อย่าฝืนธรรมชาติของตัวเอง', 'น้ำขึ้น — พลังอารมณ์และเหตุผลกำลังสมดุล', 'น้ำลึก — ความเข้าใจที่สะสมมาจะนำทางคุณ']
+  };
+  var elTips = tips[element] || tips['ดิน'];
+  var idx = phase >= 3 ? 2 : (phase >= 2 ? 1 : 0);
+  return elTips[idx];
+}
+
+// ===== OLD LIFE BANDS (เก็บไว้ให้ buildLifeTimeline ยังทำงานได้) =====
 var LIFE_BANDS = [
   {from:0,to:7,key:'root',title:'รากฐานความปลอดภัย',life:'วัยนี้ชีวิตผูกกับบ้าน ความอบอุ่น และการอ่านอารมณ์ของคนรอบตัว',survive:'ผ่านมาได้ด้วยการสังเกต เรียนรู้จากผู้ใหญ่ และหาจุดที่ตัวเองรู้สึกปลอดภัย',unlock:'ถ้ายังไม่ค่อยมั่นคงทางใจ ให้ฝึกบอกความต้องการของตัวเองและสร้างพื้นที่สงบ',prep:'ฝึกพักใจ ไม่แบกอารมณ์คนอื่น และเชื่อว่าคุณสมควรได้รับความรักแบบปลอดภัย'},
   {from:8,to:14,key:'learn',title:'เริ่มรู้จักตัวเอง',life:'เริ่มเปรียบเทียบตัวเองกับคนอื่น และเริ่มถามว่า “ฉันเป็นใคร”',survive:'ผ่านมาได้ด้วยการเรียนรู้เร็ว มีครู เพื่อน หรือหนังสือเป็นตัวช่วย',unlock:'ถ้ายังไม่มั่นใจในคุณค่า ให้ลดการเปรียบเทียบและจดสิ่งที่ทำได้จริง',prep:'ฝึกพื้นฐานวินัยและทักษะที่ใช้ได้จริง เพื่อให้ความมั่นใจมาจากผลงาน'},
@@ -469,6 +625,9 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     + '<div class="tabs-w"><div class="tabs" id="tt0"></div></div><div id="ts0"></div>'
     + '</div>';
 
+  var lifeGraph = buildPersonalLifeGraph(p, ageY);
+  var lifeGraphHtml = buildLifeGraphHtml(lifeGraph);
+
   wrap.innerHTML = blueprintCardHtml
     + '<div class="brow"><span style="font-size:15px;color:'+p.c+'">'+p.s+'</span>'
     +'<span style="font-size:11px;color:#c8b87a"><strong style="color:#C9A227">'+nm+'</strong>'
@@ -483,6 +642,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u){
     +'<div class="ci"><div class="ci-l">'+u.el+'</div><div class="ci-v">ธาตุ'+p.el+'</div><div class="ci-s">'+u.es+'</div></div>'
     +'<div class="ci"><div class="ci-l">'+u.ge+'</div><div class="ci-v">'+gd+'</div><div class="ci-s">'+nm+'</div></div>'
     +'</div></div>'
+    + lifeGraphHtml
     + conversionRoadmapHtml
     + wrapCollapsible("✦ กำลังวันประจำตัว ✦", "วันเกิด · เทวดา · ธาตุ · สีมงคล", cosmicBriefHtml)
     + wrapCollapsible("✨ พลังงานเสริมดวง", "เลขและสีมงคลประจำวัน", powerCardHtml)

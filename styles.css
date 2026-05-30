@@ -2072,3 +2072,31 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .mockup-img:hover{transform:translateY(-3px)}
 .mockup-caption{font-size:11px;color:#5a4a7a;letter-spacing:.08em;margin-top:10px}
 @media(max-width:640px){.bp-hero{grid-template-columns:1fr}.bp-age-meta{align-items:flex-start;white-space:normal}.bp-age-meta strong{max-width:100%}.bp-axis-grid{grid-template-columns:1fr}.brow{width:100%;border-radius:18px}}
+
+/* ===== PERSONALIZED LIFE GRAPH ===== */
+.life-graph-card{margin-bottom:16px;padding:18px;background:linear-gradient(145deg,rgba(20,10,55,.72),rgba(10,5,30,.62));border:1px solid rgba(201,162,39,.18);border-radius:18px}
+.lg-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.lg-planet{font-size:28px;line-height:1}
+.lg-title{font-size:15px;font-weight:700;color:var(--g);letter-spacing:.04em}
+.lg-subtitle{font-size:10px;color:#7a6a9a;letter-spacing:.04em;margin-top:2px}
+
+/* Timeline bars */
+.lg-timeline{display:flex;align-items:flex-end;gap:2px;height:60px;padding:0 2px;margin-bottom:4px}
+.lg-bar{flex:1;min-width:12px;border-radius:3px 3px 0 0;position:relative;transition:all .3s;opacity:.7}
+.lg-bar:hover{opacity:1}
+.lg-bar-current{opacity:1;box-shadow:0 0 12px rgba(201,162,39,.4)}
+.lg-marker{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--g);white-space:nowrap;font-weight:700;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* Age labels */
+.lg-ages{display:flex;justify-content:space-between;font-size:9px;color:#5a4a7a;letter-spacing:.04em;margin-bottom:14px}
+
+/* Current phase */
+.lg-current{text-align:center;margin-bottom:10px}
+.lg-current-badge{display:inline-block;padding:3px 14px;border-radius:50px;font-size:11px;font-weight:700;color:#fff;letter-spacing:.06em;margin-bottom:6px}
+.lg-current-age{font-size:11px;color:var(--tx2);margin-bottom:6px}
+.lg-insight{font-size:14px;color:var(--tx);line-height:1.6;font-weight:600;max-width:400px;margin:0 auto}
+
+/* Element tip */
+.lg-element-tip{font-size:11px;color:#7a6a9a;text-align:center;line-height:1.5;padding-top:10px;border-top:1px solid rgba(201,162,39,.08)}
+
