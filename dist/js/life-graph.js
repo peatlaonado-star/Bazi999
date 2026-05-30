@@ -59,28 +59,29 @@ function calculateTwelveDigits(day, month, yearBE) {
 function buildPivotAges(lifePath, day, month, yearBE) {
   var digits12 = calculateTwelveDigits(day, month, yearBE);
   var pivots = [];
-  
-  // Algorithm: ใช้เลข 12 ตัวคำนวณจุดเปลี่ยน
+
+  // Base spread: กำหนดช่วงอายุหลัก 6 จุดให้กระจายทั่วชีวิต
+  // แต่ละคนจะมี offset ต่างกันตามวันเกิด
+  var baseAges = [7, 18, 30, 45, 60, 75];
+  var seed = lifePath * 100 + day * 10 + month;
+
   for (var i = 0; i < 6; i++) {
-    // เอา 2 digits มาสร้าง pivot
-    var a = digits12[i * 2] || digits12[i % digits12.length];
-    var b = digits12[i * 2 + 1] || digits12[(i + 1) % digits12.length];
-    var raw = a * 10 + b + lifePath * 2;
-    
-    // Clamp และทำให้ spread ดี
-    var pivot = Math.min(80, Math.max(7, raw + i * 4));
-    
+    // ใช้ digit sequence สร้าง variation ±5 ปี
+    var digitOffset = (digits12[i] || 0) - 4.5; // -4.5 to +4.5
+    var pivot = Math.round(baseAges[i] + digitOffset + (seededRandom(seed + i) * 4 - 2));
+
+    // Clamp 7-78
+    pivot = Math.min(78, Math.max(7, pivot));
+
     // Ensure strictly increasing
     if (i > 0 && pivot <= pivots[i - 1]) {
-      pivot = pivots[i - 1] + 5 + (day % 7) + i;
+      pivot = pivots[i - 1] + 4;
     }
-    
-    // Don't exceed 80
-    if (pivot > 80) pivot = 80;
-    
+    if (pivot > 78) pivot = 78;
+
     pivots.push(pivot);
   }
-  
+
   return pivots;
 }
 
@@ -141,12 +142,40 @@ var PHASE_LABEL_POOLS = [
 ];
 
 var PHASE_INSIGHT_POOLS = [
-  ['วางรากฐานให้มั่นคง — ทุกก้าวเล็ก ๆ ในวันนี้คือเสาเข็มของอนาคต', 'ช่วงเวลาสะสม — ไม่ต้องรีบร้อน สร้างฐานทีละก้อน'],
-  ['ฟังเสียงข้างใน — สิ่งที่คุณค้นหาไม่ได้อยู่ข้างนอก แต่อยู่ในตัวคุณเอง', 'ทดลองและเรียนรู้ — ทุกความผิดพลาดคือแผนที่นำทาง'],
-  ['โลกกำลังทดสอบคุณ — ทุกอุปสรรคคือแบบฝึกหัดให้คุณแข็งแกร่งขึ้น', 'อย่ากลัวการแข่งขัน — มันคือโอกาสให้คุณเติบโต'],
-  ['ถึงเวลาตั้งหลัก — สิ่งที่คุณสร้างไว้กำลังเริ่มออกดอก', 'รวบรวมสิ่งที่เรียนรู้ — แล้วต่อยอดให้มั่นคง'],
-  ['นี่คือช่วงเวลาของคุณ — เตรียมพร้อม ทุกสิ่งกำลังเข้าที่', 'เชื่อมั่นในเส้นทาง — คุณเดินมาไกล และกำลังถึงจุดเปลี่ยนสำคัญ'],
-  ['สิ่งที่คุณรู้คือของขวัญ — ถึงเวลาแบ่งปันให้คนรุ่นหลัง', 'มองกลับไปด้วยความภูมิใจ — แล้วส่งต่อคบไฟให้ผู้อื่น']
+  // Phase 0: ตั้งรากฐาน (เด็ก/วัยรุ่น)
+  ['วางรากฐานให้มั่นคง — ทุกก้าวเล็ก ๆ ในวันนี้คือเสาเข็มของอนาคต',
+   'ช่วงเวลาสะสม — ไม่ต้องรีบร้อน สร้างฐานทีละก้อน',
+   'ทุกสิ่งที่เรียนรู้ตอนนี้จะเป็นอาวุธในอนาคต — อย่าหยุดสำรวจ',
+   'เมล็ดที่เพาะวันนี้จะเติบโตเป็นต้นไม้ใหญ่ — อดทนรดน้ำต่อไป'],
+  // Phase 1: ค้นหาตน (วัยรุ่นตอนปลาย/20 ต้น)
+  ['ฟังเสียงข้างใน — สิ่งที่คุณค้นหาไม่ได้อยู่ข้างนอก แต่อยู่ในตัวคุณเอง',
+   'ทดลองและเรียนรู้ — ทุกความผิดพลาดคือแผนที่นำทาง',
+   'ช่วงนี้คือสนามทดลองชีวิต — ลองให้มาก ล้มให้เป็น เรียนรู้ให้เร็ว',
+   'ยิ่งรู้จักตัวเองเร็ว ยิ่งเลือกทางที่ใช่ได้เร็ว — อย่ากลัวการเปลี่ยนใจ'],
+  // Phase 2: ทดสอบโลก (20 ปลาย/30 ต้น)
+  ['โลกกำลังทดสอบคุณ — ทุกอุปสรรคคือแบบฝึกหัดให้คุณแข็งแกร่งขึ้น',
+   'อย่ากลัวการแข่งขัน — มันคือโอกาสให้คุณเติบโต',
+   'ช่วงนี้อาจเหนื่อย แต่ทุกก้าวที่เดินกำลังสร้างเส้นทางที่ชัดเจนขึ้น',
+   'ถ้ารู้สึกท้อ แปลว่าคุณกำลังออกจาก Comfort Zone — นั่นคือสัญญาณที่ดี',
+   'ทุกคนที่ประสบความสำเร็จต้องผ่านช่วง "ลองเชิง" มาก่อน — คุณกำลังมาถูกทาง'],
+  // Phase 3: ตั้งหลักปักฐาน (30 กลาง/40)
+  ['ถึงเวลาตั้งหลัก — สิ่งที่คุณสร้างไว้กำลังเริ่มออกดอก',
+   'รวบรวมสิ่งที่เรียนรู้ — แล้วต่อยอดให้มั่นคง',
+   'ช่วงนี้คือจุดเปลี่ยนสำคัญ — สิ่งที่คุณตัดสินใจตอนนี้จะกำหนดทศวรรษหน้า',
+   'ถ้ารู้สึกว่าชีวิต "ทรงตัว" ไม่ได้แปลว่าไม่ก้าวหน้า — แต่แปลว่าคุณกำลังสะสมพลัง',
+   'ลงทุนกับตัวเองตอนนี้ — ทั้งทักษะ สุขภาพ และความสัมพันธ์ จะงอกเงยใน 5-10 ปีข้างหน้า'],
+  // Phase 4: ทะยาน/เบ่งบาน (40 ปลาย/50-60)
+  ['นี่คือช่วงเวลาของคุณ — เตรียมพร้อม ทุกสิ่งกำลังเข้าที่',
+   'เชื่อมั่นในเส้นทาง — คุณเดินมาไกล และกำลังถึงจุดเปลี่ยนสำคัญ',
+   'ผลลัพธ์จากความพยายามที่ผ่านมาจะปรากฏชัดเจน — เก็บเกี่ยวให้เต็มที่',
+   'ช่วงนี้คือ "ปีทอง" ของชีวิต — ทั้งปัญญา ประสบการณ์ และโอกาสมาบรรจบกัน',
+   'สิ่งที่เคยยากจะง่ายขึ้น — เพราะคุณมีทั้งฝีมือและภูมิปัญญาที่สะสมมา'],
+  // Phase 5: ส่งต่อ/ภูมิปัญญา (60+)
+  ['สิ่งที่คุณรู้คือของขวัญ — ถึงเวลาแบ่งปันให้คนรุ่นหลัง',
+   'มองกลับไปด้วยความภูมิใจ — แล้วส่งต่อคบไฟให้ผู้อื่น',
+   'ชีวิตไม่ได้วัดแค่ความสำเร็จ แต่วัดด้วยสิ่งที่คุณทิ้งไว้ให้โลก',
+   'ทุกวันคือกำไร — ใช้เวลาที่เหลืออยู่กับสิ่งที่มีความหมายจริง ๆ',
+   'คุณคือคลังปัญญาที่มีชีวิต — คนรอบข้างโชคดีที่มีคุณ']
 ];
 
 /**
@@ -512,25 +541,75 @@ function buildLifeDomainForecastV2(birthDay, birthMonth, birthYearBE, ageY, p, l
     
     // Build age band opportunities from Life Graph pivot ages
     var opportunities = [];
+
+    // FIRST: Add current-phase opportunity (what to do NOW)
+    var currentPhaseInfo = null;
+    if (lifeGraph && lifeGraph.phases && lifeGraph.currentPhase < lifeGraph.phases.length) {
+      var cPhase = lifeGraph.phases[lifeGraph.currentPhase];
+      var cPhaseNext = lifeGraph.currentPhase < lifeGraph.phases.length - 1
+        ? lifeGraph.phases[lifeGraph.currentPhase + 1] : null;
+      var yearsLeft = cPhaseNext ? (cPhaseNext.from - ageY) : null;
+
+      // Current phase action pool — เฉพาะ domain
+      var currentActions = {
+        luck: ['สังเกตสัญญาณรอบตัว — ตัวเลข ความบังเอิญ หรือโอกาสเล็ก ๆ ที่คนอื่นมองข้าม',
+               'ใช้สัญชาตญาณนำทาง — ช่วงนี้สิ่งที่ "รู้สึกว่าใช่" มักจะใช่จริง'],
+        money: ['เริ่มจดบันทึกรายรับรายจ่าย — ข้อมูลคืออาวุธสำคัญในการจัดการเงิน',
+                'ลดค่าใช้จ่ายเล็กน้อย 5-10% แล้วออมส่วนต่างไว้ — ทุกบาทมีค่า'],
+        health: ['เริ่มออกกำลังกายเบา ๆ 30 นาที/วัน — ไม่ต้องหนัก แค่สม่ำเสมอ',
+                 'นอนให้ครบ 7 ชั่วโมง — พลังชีวิตเริ่มจากการพักผ่อน'],
+        relationship: ['แสดงความรู้สึกให้คนรอบข้างรู้ — อย่ารอ "จังหวะที่ใช่"',
+                       'รับฟังมากขึ้น พูดน้อยลง — ความเข้าใจเริ่มจากการฟัง'],
+        career: ['พัฒนาทักษะใหม่ 1 อย่างที่ตลาดต้องการ — เริ่มจากเรียนฟรีออนไลน์',
+                 'สร้างเครือข่ายกับคนในสายงาน 2-3 คนต่อเดือน'],
+        supporters: ['ขอบคุณคนที่ช่วยเหลือคุณ — น้ำใจเล็ก ๆ สร้างพันธมิตรที่ยิ่งใหญ่',
+                     'เป็นผู้ให้ก่อนเป็นผู้รับ — คนรอบข้างจะจำสิ่งที่คุณทำให้']
+      };
+      var actionPool = currentActions[key] || currentActions.luck;
+      var actionIdx = (birthDay + d + ageY) % actionPool.length;
+
+      var phaseYears = cPhase.from + '–' + (cPhase.to >= 99 ? '∞' : cPhase.to) + ' ปี';
+      var phaseYearsText = yearsLeft ? 'อีก ' + yearsLeft + ' ปีในช่วงนี้' : 'ช่วงปัจจุบัน';
+
+      currentPhaseInfo = {
+        ageRange: phaseYears,
+        title: '✦ ช่วง ' + phaseYears,
+        subtitle: phaseYearsText,
+        text: actionPool[actionIdx],
+        isCurrent: true,
+        icon: '▸'
+      };
+    }
+
+    // SECOND: Upcoming pivot ages (future opportunities)
     if (lifeGraph && lifeGraph.pivotAges) {
-      // Find upcoming pivot ages after current age
       for (var pa = 0; pa < lifeGraph.pivotAges.length; pa++) {
         var pivotAge = lifeGraph.pivotAges[pa];
         if (pivotAge > ageY && opportunities.length < 2) {
           var oppScore = calculateDomainScore(pivotAge, lifePath, birthDay, birthMonth, d * 7 + pa, null);
           var oppLevel = getEnergyLabel(oppScore);
           var ageRange = pivotAge + '–' + Math.min(pivotAge + 8, 99) + ' ปี';
-          
+
           var oppPool = oppScore >= 60 ? content.high : (oppScore >= 35 ? content.mid : content.low);
           var oppIdx = (pa * birthMonth + birthDay) % oppPool.current.length;
-          
+
+          // Add preparation advice — what to do BEFORE the pivot
+          var prepPool = oppScore >= 60
+            ? ['สะสมทักษะและคอนเนกชั่นไว้ — พอโอกาสมาจะคว้าได้ทัน',
+               'เตรียมตัวให้พร้อม — จังหวะดี ๆ มักมาตอนที่คุณพร้อมแล้ว']
+            : ['สร้างฐานให้แข็งแรง — ยิ่งพร้อมยิ่งผ่านอุปสรรคได้ง่าย',
+               'เรียนรู้จากประสบการณ์ตอนนี้ — มันจะเป็นเกราะป้องกันในอนาคต'];
+          var prepIdx = (pa + birthDay) % prepPool.length;
+
           opportunities.push({
             ageRange: ageRange,
             title: 'ช่วง ' + pivotAge + '–' + Math.min(pivotAge + 8, 99) + ' ปี',
             text: oppLevel.icon + ' ' + oppLevel.level + ' — ' + oppPool.current[oppIdx],
+            preparation: '💡 เตรียมตัวตอนนี้: ' + prepPool[prepIdx],
             score: oppScore,
             level: oppLevel.level,
-            icon: oppLevel.icon
+            icon: oppLevel.icon,
+            isCurrent: false
           });
         }
       }
@@ -548,6 +627,7 @@ function buildLifeDomainForecastV2(birthDay, birthMonth, birthYearBE, ageY, p, l
       current: pool.current[currentIdx],
       warning: pool.warning[warnIdx],
       remedy: pool.remedy[remedyIdx],
+      currentPhase: currentPhaseInfo,
       opportunities: opportunities
     });
   }

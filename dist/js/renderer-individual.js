@@ -584,18 +584,26 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
       + '<span>' + escapeHTML(domain.level) + '</span>'
       + '<span>' + domain.score + '/100</span>'
       + '</div>'
-      + '</div>'
       // Content sections
       + '<div class="domain-part"><strong>สถานการณ์ปัจจุบัน</strong><p>' + escapeHTML(domain.current) + '</p></div>'
       + '<div class="domain-part domain-warning"><strong>⚠️ สัญญาณเตือน</strong><p>' + escapeHTML(domain.warning) + '</p></div>'
       + '<div class="domain-part domain-remedy"><strong>✨ วิธีเสริมให้ดีขึ้น</strong><p>' + escapeHTML(domain.remedy) + '</p></div>'
-      // Opportunities from Life Graph
-      + '<div class="domain-part"><strong>📅 โอกาสตามช่วงอายุ</strong><div class="domain-ages">';
+      + '</div>';
+    // Current phase action
+    if (domain.currentPhase) {
+      domainHtml += '<div class="domain-part domain-current-phase"><strong>▸ สิ่งที่ทำได้ตอนนี้ (ช่วง ' + escapeHTML(domain.currentPhase.ageRange) + ')</strong>'
+        + '<p>' + escapeHTML(domain.currentPhase.text) + '</p></div>';
+    }
+    // Opportunities from Life Graph
+    domainHtml += '<div class="domain-part"><strong>📅 โอกาสตามช่วงอายุ</strong><div class="domain-ages">';
     domain.opportunities.forEach(function(opp){
       domainHtml += '<div class="domain-age-v2">'
         + '<span class="domain-age-chip" style="background:' + escapeHTML(opp.level === 'ปีทอง' ? '#FFD700' : opp.level === 'ปีดี' ? '#4CAF50' : opp.level === 'ปานกลาง' ? '#FFC107' : '#9E9E9E') + '20">' + escapeHTML(opp.ageRange) + '</span>'
-        + '<p>' + escapeHTML(opp.text) + '</p>'
-        + '</div>';
+        + '<p>' + escapeHTML(opp.text) + '</p>';
+      if (opp.preparation) {
+        domainHtml += '<p class="domain-age-prep">' + escapeHTML(opp.preparation) + '</p>';
+      }
+      domainHtml += '</div>';
     });
     domainHtml += '</div></div>'
       + '</div>';
