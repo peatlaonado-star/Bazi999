@@ -9,7 +9,7 @@ body{font-family:"Sarabun","Leelawadee UI","Segoe UI",Tahoma,sans-serif;backgrou
 #lbtn:hover{background:rgba(201,162,39,.28)}
 .hd{text-align:center;padding:44px 0 22px}
 .hd-tag{font-size:10px;letter-spacing:.5em;color:#5a4a7a;text-transform:uppercase;margin-bottom:10px}
-.hd h1{font-size:clamp(34px,7vw,58px);font-weight:700;font-family:"Chonburi",Georgia,"Times New Roman",serif;background:linear-gradient(135deg,var(--g3),var(--g) 35%,var(--g2) 55%,var(--g));background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:sh 5s linear infinite;line-height:1.2;letter-spacing:.04em}
+.hd h1{font-size:clamp(34px,7vw,58px);font-weight:700;font-family:"Charm",Georgia,"Times New Roman",serif;background:linear-gradient(135deg,var(--g3),var(--g) 35%,var(--g2) 55%,var(--g));background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:sh 5s linear infinite;line-height:1.2;letter-spacing:.04em}
 .hd-sub{font-size:11px;letter-spacing:.28em;color:var(--pu);margin-top:5px;text-transform:uppercase}
 .dl{width:120px;height:1px;background:linear-gradient(90deg,transparent,var(--g),transparent);margin:14px auto}
 .modenav{display:flex;gap:7px;justify-content:center;margin-bottom:20px;flex-wrap:wrap}

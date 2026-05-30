@@ -178,7 +178,7 @@
     if (!counterEl) return;
 
     function updateCounter() {
-      var count = Math.floor(Math.random() * 13) + 3;
+      var count = Math.floor(Math.random() * 31) + 23;
       counterEl.textContent = count + ' คน';
     }
 

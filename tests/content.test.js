@@ -63,6 +63,21 @@ describe('Thai astrology content data', () => {
     expect(html).toContain('รับจังหวะวันนี้ฟรีทุกเช้า');
   });
 
+  it('does not contain broken #premium-preview links', () => {
+    const html = fs.readFileSync(path.resolve('index.html'), 'utf8');
+    expect(html).not.toContain('#premium-preview');
+    expect(html).not.toContain('ดูตัวอย่างพรีเมียม');
+  });
+
+  it('loads only 3 essential Google Fonts families (Charm, Kanit, Sarabun)', () => {
+    const html = fs.readFileSync(path.resolve('index.html'), 'utf8');
+    expect(html).toContain('family=Charm');
+    expect(html).toContain('family=Kanit');
+    expect(html).toContain('family=Sarabun');
+    expect(html).not.toContain('family=Chonburi');
+    expect(html).not.toContain('family=Maitree');
+  });
+
   it('defines Monthly Life Map content for subscription retention', () => {
     const content = loadThaiAstroContent();
     expect(content.monthlyLifeMap).toBeTruthy();

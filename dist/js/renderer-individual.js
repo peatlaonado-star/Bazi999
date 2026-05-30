@@ -717,7 +717,6 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + '<div class="cr-step cr-hot"><span>2</span><strong>สูตรลาภลอย</strong><small>หัวข้อสายมูที่ล็อกไว้ให้กดซื้อ</small></div>'
     + '<div class="cr-step"><span>3</span><strong>แผนชีวิตรายเดือน</strong><small>เห็นภาพว่าพรีเมียมมีรายละเอียดแค่ไหน</small></div>'
     + '</div>'
-    + '<button class="cr-cta" data-action="open-payment">ปลดล็อกรีพอร์ตฉบับเต็ม 199 THB</button>'
     + '</div>';
 
   var detailTabsShellHtml = '<div class="detail-tabs-card">'

@@ -465,6 +465,18 @@ describe('Free reader conversion reading order', () => {
     expect(roadmap.textContent).toContain('ปลดล็อก');
   });
 
+  it('does not render a CTA button inside the conversion roadmap', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>', { url: 'http://localhost' });
+    const context = loadContext(dom);
+
+    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const roadmap = dom.window.document.querySelector('.conversion-roadmap');
+
+    expect(roadmap).toBeTruthy();
+    expect(roadmap.querySelector('.cr-cta')).toBeNull();
+    expect(roadmap.querySelector('button')).toBeNull();
+  });
+
   it('wraps detailed tabs in a guided card with shorter readable tab labels', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
     const context = loadContext(dom);
