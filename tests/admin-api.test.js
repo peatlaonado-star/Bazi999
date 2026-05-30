@@ -124,13 +124,12 @@ describe('Issue PINs', () => {
     expect(result.body.issued).toHaveLength(50);
   });
 
-  it('stores only hashed PINs, not raw PINs', () => {
+  it('stores raw PIN alongside pinHash so admin can copy issued codes', () => {
     const storeFile = tempStorePath();
     const config = makeConfig({ pinStoreFile: storeFile });
     const result = issuePins({ count: 1 }, config);
     const raw = fs.readFileSync(storeFile, 'utf8');
-    expect(raw).not.toContain(result.body.issued[0].pin);
-    // Should contain 'pinHash' in the file
+    expect(raw).toContain(result.body.issued[0].pin);
     expect(raw).toContain('pinHash');
   });
 });

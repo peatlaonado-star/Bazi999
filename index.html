@@ -16,12 +16,18 @@
 <body>
 <canvas id="cv"></canvas>
 <div class="w">
-  <div class="hd">
+  <div class="hd premium-hero">
     <div class="hd-tag" id="hd-tag">✦ ค้นพบตัวเองผ่านดวงดาว ✦</div>
     <h1 id="hd-ttl">STARVIA</h1>
-    <div class="hd-sub" id="hd-sub">นพเคราะห์ · ราศีจักร · ลัคนา · ดวงชะตา</div>
-    <div class="dl"></div>
-    <div id="brand-promise" style="font-size:12px;color:var(--tx2);letter-spacing:.04em;margin-bottom:4px;font-style:italic;opacity:.8">ดาวไม่ได้ตัดสินชีวิตคุณ — ดาวช่วยให้คุณมองเห็นตัวเองชัดขึ้น</div>
+    <div class="hero-kicker" id="hd-sub">นพเคราะห์ · ราศีจักร · ลัคนา · ดวงชะตา</div>
+    <div class="hero-price">Premium 199 บาท/เดือน</div>
+    <h2 class="hero-title">รู้จักตัวเองจากวันเกิด ไม่ใช่แค่ดูดวง</h2>
+    <p class="hero-desc">STARVIA ช่วยถอดรหัสจุดแข็ง ความรัก งาน เงิน และจังหวะชีวิต ผ่านโหราศาสตร์ไทยโบราณแบบอ่านง่าย</p>
+    <div class="hero-actions" aria-label="ทางลัดเริ่มใช้งาน">
+      <a class="hero-primary" href="#fc0">เริ่มดูดวงฟรี</a>
+      <a class="hero-secondary" href="#premium-preview">ดูตัวอย่างพรีเมียม</a>
+    </div>
+    <div id="brand-promise" class="brand-promise">ดาวไม่ได้ตัดสินชีวิตคุณ - ดาวช่วยให้คุณมองเห็นตัวเองชัดขึ้น</div>
   </div>
   <div class="modenav">
     <button class="mnb on" id="mn0">✦ ดูดวงตัวเอง</button>
@@ -31,20 +37,53 @@
 
   <!-- MODE 0 -->
   <div class="mode on" id="m0">
-  <div style="text-align:center; margin-bottom: 20px; padding: 0 10px; animation: fu 1s ease both;">
-      <div style="display: inline-block; background: rgba(201,162,39,0.15); border: 1px solid rgba(201,162,39,0.4); color: var(--g); font-size: 10px; padding: 4px 10px; border-radius: 50px; letter-spacing: 0.1em; margin-bottom: 10px;">
-        🚀 เปิดทดลองใช้งานพิเศษ
+    <section class="value-section" aria-label="สิ่งที่คุณจะได้จาก STARVIA">
+      <div class="section-pill">เปิดทดลองใช้งานพิเศษ</div>
+      <h2 class="section-title">สิ่งที่คุณจะได้จาก STARVIA</h2>
+      <p class="section-desc">เริ่มอ่านฟรีเพื่อดูว่ารายงานตรงกับตัวคุณไหม แล้วค่อยปลดล็อกพรีเมียมเมื่ออยากอ่านแผนเต็ม</p>
+      <div class="value-grid">
+        <article class="value-card featured">
+          <span class="value-icon">✦</span>
+          <h3>ตัวตน</h3>
+          <p>เห็นจุดแข็ง หลุมพราง และพลังประจำวันเกิดที่ใช้วางแผนชีวิตได้จริง</p>
+        </article>
+        <article class="value-card">
+          <span class="value-icon">♡</span>
+          <h3>ความรัก</h3>
+          <p>เข้าใจรูปแบบความสัมพันธ์ที่มักเกิดซ้ำ และวิธีรักแบบรู้ตัวมากขึ้น</p>
+        </article>
+        <article class="value-card">
+          <span class="value-icon">◈</span>
+          <h3>งาน/เงิน</h3>
+          <p>รู้จังหวะควรลุย ชะลอ หรือเคลียร์เรื่องค้าง เพื่อใช้พลังให้ถูกทาง</p>
+        </article>
+        <article class="value-card">
+          <span class="value-icon">☉</span>
+          <h3>ฤกษ์ดี</h3>
+          <p>เลือกวันที่เหมาะกับเรื่องสำคัญ เช่น เริ่มงาน นัดหมาย หรือเปิดโปรเจกต์</p>
+        </article>
       </div>
-      <div style="font-size: 15px; color: #fff; font-weight: 700; margin-bottom: 8px; letter-spacing: 0.05em; font-family: Georgia, 'Times New Roman', serif;">ค้นพบพิมพ์เขียวชีวิต ที่ซ่อนอยู่ในวันเกิดคุณ</div>
-      <div style="font-size: 12.5px; color: var(--tx2); line-height: 1.6; margin-bottom: 15px;">
-        ถอดรหัสจุดแข็ง ความรัก และหลุมพรางที่คุณต้องระวัง อิงจากรากฐานโหราศาสตร์ไทยโบราณแบบ <strong>เฉพาะบุคคล</strong>
+    </section>
+
+    <section class="premium-preview" id="premium-preview" aria-label="ตัวอย่างสิ่งที่จะได้อ่าน">
+      <div class="section-pill alt">Free + Premium</div>
+      <h2 class="section-title">ตัวอย่างสิ่งที่จะได้อ่าน</h2>
+      <div class="preview-grid">
+        <div class="preview-card free"><span>ฟรี</span><strong>กำลังวันประจำตัว</strong><small>ไพ่พลังวันเกิด ธาตุ เทพประจำวัน และสิ่งที่ควรโฟกัส</small></div>
+        <div class="preview-card free"><span>ฟรี</span><strong>สรุปตัวตนเบื้องต้น</strong><small>อ่านง่ายพอให้รู้ว่า STARVIA เข้าใจคุณแค่ไหน</small></div>
+        <div class="preview-card premium"><span>Premium</span><strong>แผนที่ชีวิตรายเดือน</strong><small>งาน เงิน ความรัก สุขภาพ และลาภลอยแบบเป็นขั้นตอน</small></div>
+        <div class="preview-card premium"><span>Premium</span><strong>สูตรเปิดดวงลาภลอย</strong><small>เลขเด่น ทิศทาง เวลา และข้อควรระวังแบบสายมูที่ไม่หลุดโลก</small></div>
       </div>
-      <div style="display: flex; justify-content: center; align-items: center; gap: 15px; font-size: 11px; color: #e8dfc8; background: rgba(0,0,0,0.3); padding: 10px 15px; border-radius: 12px; width: fit-content; margin: 0 auto; border: 1px dashed rgba(201,162,39,0.3);">
-        <span style="font-style: italic;">"แม่นมากก! เหมือนแอปนี้มองเห็นตัวตนข้างในจริงๆ"</span> 
-        <span style="color: rgba(201,162,39,0.8);">- ผู้ทดลองใช้งาน</span>
+    </section>
+
+    <div class="card form-card" id="fc0">
+      <div class="form-head">
+        <div>
+          <div class="section-pill compact">เริ่มดูฟรี</div>
+          <h2>เริ่มจากข้อมูลพื้นฐาน</h2>
+          <p>ใช้เวลาไม่ถึง 30 วินาที ระบบจะเปิดรายงานตัวตนเบื้องต้นให้ทันที</p>
+        </div>
       </div>
-    </div>
-    <div class="card" id="fc0">
       <div class="row">
         <div class="f"><label id="lb-n0">ชื่อ</label><input id="n0" type="text" placeholder="ชื่อของคุณ"></div>
         <div class="f"><label id="lb-g0">เพศ</label>
@@ -52,14 +91,12 @@
         </div>
       </div>
       <div class="row">
-        <div class="f"><label id="lb-d0">วันเดือนปีเกิด (ค.ศ.)</label><input id="d0" type="date"></div>
+        <div class="f"><label id="lb-d0">วันเกิด (ค.ศ.)</label><input id="d0" type="date"></div>
         <div class="f"><label id="lb-t0">เวลาเกิด <span class="opt-label">(ไม่บังคับ)</span></label><input id="t0" type="time" placeholder="06:00"></div>
       </div>
       <button class="btn" id="btn0" disabled>✦ เปิดดวงชะตา ✦</button>
-    <div style="font-size:9.5px; color:rgba(255,255,255,0.4); text-align:center; margin-top:12px; letter-spacing:0.05em; line-height: 1.5;">
-        🔒 ข้อมูลวันเกิดของคุณจะถูกนำมาประมวลผลบนหน้าจอเท่านั้น<br>ระบบไม่มีการบันทึกหรือเก็บข้อมูลส่วนตัวใดๆ ลงในเซิร์ฟเวอร์ (เน้นความเป็นส่วนตัว)
-      </div>
-</div>
+      <div class="trust-strip">🔒 ข้อมูลวันเกิดของคุณใช้ประมวลผลบนหน้าจอเท่านั้น ระบบไม่บันทึกข้อมูลส่วนตัวลงเซิร์ฟเวอร์</div>
+    </div>
     <div id="r0"></div>
   </div>
 
@@ -115,16 +152,16 @@
   <div class="newsletter-section" id="newsletter-section">
     <div class="newsletter-card">
       <div class="newsletter-icon">✦</div>
-      <h3 class="newsletter-title">รับดวงรายวันฟรี!</h3>
-      <p class="newsletter-desc">กรอกอีเมลของคุณ รับดวงชะตารายวันส่งถึงกล่องจดหมายทุกเช้า</p>
+      <h3 class="newsletter-title">รับจังหวะวันนี้ฟรีทุกเช้า</h3>
+      <p class="newsletter-desc">อีเมลสั้น ๆ ที่ช่วยให้คุณรู้ว่าวันนี้ควรลุย ชะลอ หรือจัดการเรื่องไหนก่อน</p>
       <form id="newsletter-form" class="newsletter-form">
         <input type="email" id="newsletter-email" placeholder="อีเมลของคุณ" required>
         <input type="date" id="newsletter-birthdate" placeholder="วันเกิด">
-        <button type="submit" class="newsletter-btn">✦ สมัครเลย ✦</button>
+        <button type="submit" class="newsletter-btn">✦ สมัครรับฟรี ✦</button>
       </form>
       <p class="newsletter-note">🔒 เราเคารพความเป็นส่วนตัวของคุณ ไม่ spam ไม่แชร์ข้อมูล</p>
       <div id="newsletter-success" class="newsletter-success" style="display:none">
-        ✓ สมัครสำเร็จ! รอรับดวงรายวันได้เลยค่ะ
+        ✓ สมัครสำเร็จ! รอรับจังหวะวันนี้ได้เลยค่ะ
       </div>
     </div>
   </div>
