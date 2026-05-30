@@ -615,7 +615,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
   });
   if (!premiumUnlocked) {
     domainHtml += '</div>' + buildPremiumLockOverlay(
-      'ปลดล็อก แผนที่สถานการณ์ชีวิต',
+      'ปลดล็อกคัมภีร์แก้ดวง 6 ด้าน',
       'วิเคราะห์ 6 ด้าน: โชค การเงิน สุขภาพ ความรัก การงาน และบริวาร พร้อมคำแนะนำแบบลงมือทำได้ — คำนวณเฉพาะบุคคลจากเลขชีวิตและวันเกิดของคุณ'
     );
   }
@@ -691,7 +691,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + wrapCollapsible("✨ พลังงานเสริมดวง", "เลขและสีมงคลประจำวัน", powerCardHtml)
     + wrapCollapsible("✦ สูตรเปิดดวงลาภลอย ✦", "เลขเด็ด หวย ทิศ คาถา สายมู 🔒 Premium", windfallLuckHtml, true)
     + wrapCollapsible("📅 แผนที่ชีวิตรายเดือน", "5 ด้าน พร้อมพรีวิวรายเดือน 🔒 Premium", monthlyLifeMapHtml, true)
-    + wrapCollapsible("📊 แผนที่สถานการณ์ชีวิต", "กราฟชีวิต + 6 ด้าน วิเคราะห์สถานการณ์ 🔒 Premium", domainHtml, false)
+    + wrapCollapsible("✦ คัมภีร์แก้ดวง 6 ด้าน ✦", "กราฟชีวิต + 6 ด้าน วิเคราะห์สถานการณ์ 🔒 Premium", domainHtml, false)
     + wrapCollapsible("🪞 กระจกกรรม", "บทเรียนและรูปแบบที่ชีวิตพาซ้ำ 🔒 Premium", karmaHtml, true)
     + buildElementRadar(p, r, l)
     + detailTabsShellHtml;

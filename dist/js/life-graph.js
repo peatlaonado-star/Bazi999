@@ -718,7 +718,7 @@ function buildLifeDomainForecastV2(birthDay, birthMonth, birthYearBE, ageY, p, l
   }
   
   return {
-    title: 'แผนที่สถานการณ์ชีวิต',
+    title: 'คัมภีร์แก้ดวง 6 ด้าน',
     intro: 'อ่านสถานะตอนนี้ แก้เหตุ เสริมดวง และจังหวะ 15 ปีข้างหน้า — คำนวณเฉพาะบุคคลจากเลขชีวิต ' + lifePath + ' · ธาตุ' + el,
     elementSummary: elementTones[el] || elementTones['ดิน'],
     currentAgeRange: currentAgeRange,

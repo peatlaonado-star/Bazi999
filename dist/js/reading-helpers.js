@@ -114,7 +114,7 @@ function buildLifeDomainMatrix(p, r, l, currentBand, nextBands){
   if (!upcomingBands.length) upcomingBands = [activeBand];
 
   return {
-    title: 'แผนที่สถานการณ์ชีวิต',
+    title: 'คัมภีร์แก้ดวง 6 ด้าน',
     intro: 'อ่านสถานการณ์ปัจจุบัน วิธีเสริมให้ดีขึ้น และโอกาสที่จะเปิดตามช่วงอายุ โดยผสานธาตุชีวิต ดาวเจ้าชะตา ราศี ลัคนา และจังหวะวัยปัจจุบัน',
     elementSummary: element.tone,
     currentAgeRange: formatDomainAgeRange(activeBand),
