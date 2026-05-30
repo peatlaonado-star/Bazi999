@@ -553,6 +553,10 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     ) + '</div>';
   }
 
+  // ═══ Life Graph V2 — คำนวณก่อน ใช้ร่วมกับ Domain ═══
+  var lifeGraph = buildPersonalLifeGraphV2(birthDay, birthMonth, birthYearBE, ageY, p);
+  var lifeGraphHtml = buildLifeGraphHtmlV2(lifeGraph);
+
   // ═══ Life Domain Forecast V2 — เฉพาะบุคคล เชื่อม Life Graph ═══
   var domainMatrix = buildLifeDomainForecastV2(birthDay, birthMonth, birthYearBE, ageY, p, lifeGraph);
   var domainIntro = premiumUnlocked
@@ -564,6 +568,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + '<div class="domain-desc">' + escapeHTML(domainIntro) + '</div>'
     + '<div class="domain-element-tone">' + escapeHTML(domainMatrix.elementSummary) + '</div>'
     + '<div class="domain-current-chip">🎯 วัยปัจจุบัน: ' + escapeHTML(domainMatrix.currentAgeRange) + '</div>'
+    + lifeGraphHtml
     + '<div class="domain-grid">';
   domainMatrix.domains.forEach(function(domain){
     domainHtml += '<div class="domain-card domain-' + escapeHTML(domain.key) + '">'
@@ -666,9 +671,6 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + '<div class="tabs-w"><div class="tabs" id="tt0"></div></div><div id="ts0"></div>'
     + '</div>';
 
-  var lifeGraph = buildPersonalLifeGraphV2(birthDay, birthMonth, birthYearBE, ageY, p);
-  var lifeGraphHtml = buildLifeGraphHtmlV2(lifeGraph);
-
   wrap.innerHTML = blueprintCardHtml
     + '<div class="brow"><span style="font-size:15px;color:'+p.c+'">'+p.s+'</span>'
     +'<span style="font-size:11px;color:#c8b87a"><strong style="color:#C9A227">'+nm+'</strong>'
@@ -683,13 +685,12 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     +'<div class="ci"><div class="ci-l">'+u.el+'</div><div class="ci-v">ธาตุ'+p.el+'</div><div class="ci-s">'+u.es+'</div></div>'
     +'<div class="ci"><div class="ci-l">'+u.ge+'</div><div class="ci-v">'+gd+'</div><div class="ci-s">'+nm+'</div></div>'
     +'</div></div>'
-    + lifeGraphHtml
     + conversionRoadmapHtml
     + wrapCollapsible("✦ กำลังวันประจำตัว ✦", "วันเกิด · เทวดา · ธาตุ · สีมงคล", cosmicBriefHtml)
     + wrapCollapsible("✨ พลังงานเสริมดวง", "เลขและสีมงคลประจำวัน", powerCardHtml)
     + wrapCollapsible("✦ สูตรเปิดดวงลาภลอย ✦", "เลขเด็ด หวย ทิศ คาถา สายมู 🔒 Premium", windfallLuckHtml, true)
     + wrapCollapsible("📅 แผนที่ชีวิตรายเดือน", "5 ด้าน พร้อมพรีวิวรายเดือน 🔒 Premium", monthlyLifeMapHtml, true)
-    + wrapCollapsible("📊 แผนที่สถานการณ์ชีวิต", "6 ด้าน วิเคราะห์สถานการณ์ปัจจุบันและอนาคต 🔒 Premium", domainHtml, true)
+    + wrapCollapsible("📊 แผนที่สถานการณ์ชีวิต", "กราฟชีวิต + 6 ด้าน วิเคราะห์สถานการณ์ 🔒 Premium", domainHtml, false)
     + wrapCollapsible("🪞 กระจกกรรม", "บทเรียนและรูปแบบที่ชีวิตพาซ้ำ 🔒 Premium", karmaHtml, true)
     + buildElementRadar(p, r, l)
     + detailTabsShellHtml;

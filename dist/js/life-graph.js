@@ -172,12 +172,13 @@ function buildPersonalLifeGraphV2(birthDay, birthMonth, birthYearBE, ageY, p) {
     var labelPool = PHASE_LABEL_POOLS[i] || PHASE_LABEL_POOLS[0];
     var insightPool = PHASE_INSIGHT_POOLS[i] || PHASE_INSIGHT_POOLS[0];
     var idx = (birthDay + i) % labelPool.length;
+    var insightIdx = (birthDay + i) % insightPool.length;
     
     phases.push({
       from: prevAge,
       to: pivotAges[i],
       label: labelPool[idx],
-      insight: insightPool[idx],
+      insight: insightPool[insightIdx],
       energy: calculateEnergyAtAge(Math.floor((prevAge + pivotAges[i]) / 2), lifePath, birthDay, birthMonth, birthYearBE)
     });
     prevAge = pivotAges[i];
