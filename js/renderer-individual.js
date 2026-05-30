@@ -103,13 +103,53 @@ function buildMonthlyLifeMapHtml(model, premiumUnlocked){
 
   html += '<div class="mlm-section-title">5 ด้านเด่นเดือนนี้</div><div class="mlm-domains">';
   model.domains.forEach(function(domain){
-    html += '<div class="mlm-domain"><div class="mlm-domain-head"><span>' + escapeHTML(domain.icon) + '</span>' + escapeHTML(domain.label) + '</div>'
-      + '<div class="mlm-score-row"><span>คะแนนความเด่น</span><strong>' + escapeHTML(String(domain.score || 0)) + '/100</strong></div>'
-      + '<div class="mlm-score-bar"><i style="width:' + escapeHTML(String(domain.score || 0)) + '%"></i></div>'
-      + '<p>' + escapeHTML(premiumUnlocked ? domain.forecast : domain.teaser) + '</p>'
-      + '<div class="mlm-action"><strong>ควรทำ:</strong> ' + escapeHTML(domain.action || '') + '</div>'
-      + (premiumUnlocked ? '<div class="mlm-goal">เป้าหมาย: ' + escapeHTML(domain.goal) + '</div>' : '')
-      + '</div>';
+    var phaseClass = domain.phase === 'ขาขึ้น' ? 'mlm-phase-up' : domain.phase === 'ทรงตัว' ? 'mlm-phase-stable' : 'mlm-phase-warn';
+    html += '<div class="mlm-domain">'
+      + '<div class="mlm-domain-head">'
+      + '<span>' + escapeHTML(domain.icon) + '</span>' + escapeHTML(domain.label)
+      + (domain.luckyDay ? ' <span class="mlm-lucky-day">วันที่ ' + escapeHTML(String(domain.luckyDay)) + '</span>' : '')
+      + '</div>'
+      + '<div class="mlm-score-row"><span>คะแนนความเด่น</span>'
+      + '<strong>' + escapeHTML(String(domain.score || 0)) + '/100</strong>'
+      + (domain.phase ? ' <span class="mlm-phase ' + phaseClass + '">' + escapeHTML(domain.phase) + '</span>' : '')
+      + '</div>'
+      + '<div class="mlm-score-bar"><i style="width:' + escapeHTML(String(domain.score || 0)) + '%"></i></div>';
+
+    if (domain.key === 'career') {
+      html += '<p>' + escapeHTML(premiumUnlocked ? domain.forecast : domain.teaser) + '</p>'
+        + '<div class="mlm-action"><strong>สิ่งที่ควรทำ:</strong> ' + escapeHTML(domain.action || '') + '</div>';
+    } else if (domain.key === 'money') {
+      var moneyItems = (premiumUnlocked ? domain.forecast : domain.teaser).split(' — ');
+      html += '<ul class="mlm-money-list">';
+      moneyItems.forEach(function(item, i){
+        if (item && i < 3) html += '<li>' + escapeHTML(item) + '</li>';
+      });
+      html += '</ul>'
+        + '<div class="mlm-action"><strong>เคล็ดลับ:</strong> ' + escapeHTML(domain.action || '') + '</div>';
+    } else if (domain.key === 'windfall') {
+      html += '<p>' + escapeHTML(premiumUnlocked ? domain.forecast : domain.teaser) + '</p>';
+      if (domain.luckyDay) {
+        html += '<div class="mlm-lucky-hint"><strong>เลขนำโชค:</strong> ลองดูวันที่ ' + escapeHTML(String(domain.luckyDay)) + '</div>';
+      }
+      html += '<div class="mlm-action"><strong>สิ่งที่ควรทำ:</strong> ' + escapeHTML(domain.action || '') + '</div>';
+    } else if (domain.key === 'relationship') {
+      html += '<p>' + escapeHTML(premiumUnlocked ? domain.forecast : domain.teaser) + '</p>';
+    } else if (domain.key === 'health') {
+      html += '<p>' + escapeHTML(premiumUnlocked ? domain.forecast : domain.teaser) + '</p>'
+        + '<div class="mlm-action"><strong>สัญญาณร่างกาย:</strong> ' + escapeHTML(domain.action || '') + '</div>';
+    } else {
+      html += '<p>' + escapeHTML(premiumUnlocked ? domain.forecast : domain.teaser) + '</p>'
+        + '<div class="mlm-action"><strong>ควรทำ:</strong> ' + escapeHTML(domain.action || '') + '</div>';
+    }
+
+    if (domain.omen) {
+      html += '<div class="mlm-omen"><em>🔮 ' + escapeHTML(domain.omen) + '</em></div>';
+    }
+
+    if (premiumUnlocked && domain.goal) {
+      html += '<div class="mlm-goal">เป้าหมาย: ' + escapeHTML(domain.goal) + '</div>';
+    }
+    html += '</div>';
   });
   html += '</div>';
 

@@ -518,16 +518,31 @@ describe('Monthly Life Map subscription feature', () => {
     expect(model.domains.map((domain) => domain.key)).toEqual(['career', 'money', 'windfall', 'relationship', 'health']);
     const windfall = model.domains.find((domain) => domain.key === 'windfall');
     expect(windfall.forecast).toMatch(/โชคลอย|ลาภลอย/);
-    expect(windfall.action).toContain('ควร');
+    expect(windfall.action).not.toMatch(/^ควร/);
     model.domains.forEach((domain) => {
       expect(domain.icon).toMatch(/[◈💰🎲♡🫀]/u);
       expect(domain.score).toBeGreaterThanOrEqual(55);
       expect(domain.score).toBeLessThanOrEqual(99);
       expect(domain.forecast.length).toBeLessThanOrEqual(95);
       expect(domain.action.length).toBeLessThanOrEqual(70);
-      expect(domain.action).toContain('ควร');
       expect(domain.forecast).not.toContain('ธาตุไฟบอกให้เดือนนี้');
+
+      // New fields: omen, luckyDay, phase
+      expect(domain.omen).toEqual(expect.any(String));
+      expect(domain.omen.length).toBeGreaterThan(10);
+      expect(domain.omen.length).toBeLessThanOrEqual(80);
+      expect(domain.luckyDay).toBeGreaterThanOrEqual(1);
+      expect(domain.luckyDay).toBeLessThanOrEqual(28);
+      expect(domain.phase).toMatch(/ขาขึ้น|ทรงตัว|ต้องระวัง/);
+
+      // Tone check: no corporate "ควร" standalone prefix in forecast
+      expect(domain.forecast).not.toMatch(/^ควร/);
+      // Action should be in หมอทัก tone (no "ควร" prefix)
+      expect(domain.action).not.toMatch(/^ควร/);
     });
+
+    // 4 entries variety: all 5 domains should produce unique forecasts
+    expect(new Set(model.domains.map((d) => d.forecast)).size).toBe(model.domains.length);
   });
 
   it('personalizes monthly domain copy from birth date, planet, element, and current month', () => {
@@ -554,7 +569,6 @@ describe('Monthly Life Map subscription feature', () => {
     expect(output).not.toContain('3 วันเด่นประจำเดือน');
     expect(dom.window.document.querySelectorAll('.mlm-day').length).toBe(0);
     expect(output).toContain('คะแนน');
-    expect(output).toContain('ควร');
     expect(output).toContain('ปลดล็อกรีพอร์ตฉบับเต็ม');
     expect(output).not.toContain('สรุปรายสัปดาห์ 4 สัปดาห์');
     expect(output).not.toContain('ภารกิจเสริมดวง 7 วัน');
@@ -573,5 +587,28 @@ describe('Monthly Life Map subscription feature', () => {
     expect(output).toContain('ปฏิทินวันดีรายเดือน');
     expect(output).toContain('วันที่ควรระวัง');
     expect(dom.window.document.querySelector('.monthly-life-map.is-locked')).toBeNull();
+  });
+
+  it('renders omen, luckyDay badge, and phase chip for each domain in HTML', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div>');
+    const context = loadContext(dom, { isPremiumUnlocked: () => true });
+
+    context.renderInd('Test', 'หญิง', '2000-01-01', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const output = dom.window.document.getElementById('r0').innerHTML;
+
+    // Each domain should have an omen element (italic)
+    const omenElements = dom.window.document.querySelectorAll('.mlm-omen');
+    expect(omenElements.length).toBe(5);
+    omenElements.forEach((el) => {
+      expect(el.textContent.length).toBeGreaterThan(5);
+    });
+
+    // Each domain should have a lucky day badge
+    const luckyElements = dom.window.document.querySelectorAll('.mlm-lucky-day');
+    expect(luckyElements.length).toBe(5);
+
+    // Each domain should have a phase chip
+    const phaseElements = dom.window.document.querySelectorAll('.mlm-phase');
+    expect(phaseElements.length).toBe(5);
   });
 });

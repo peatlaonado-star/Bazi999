@@ -1680,6 +1680,17 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .mlm-week strong{display:block;color:var(--g);font-size:12px;margin-bottom:4px}.mlm-week span{font-size:10px;color:#05030f;background:linear-gradient(135deg,var(--g),var(--g3));border-radius:50px;padding:2px 8px;display:inline-block;margin-top:6px;font-weight:700}
 .mlm-rituals{display:grid;gap:7px}.mlm-ritual span{color:var(--g);font-size:10px;letter-spacing:.08em;margin-right:8px;font-weight:700}
 
+/* Monthly Life Map: new elements */
+.mlm-lucky-day{display:inline-block;font-size:9px;letter-spacing:.08em;color:#ffd86b;background:rgba(255,216,107,.12);border:1px solid rgba(255,216,107,.28);border-radius:50px;padding:1px 7px;margin-left:6px;font-weight:700}
+.mlm-phase{display:inline-block;font-size:9px;letter-spacing:.06em;padding:2px 8px;border-radius:50px;margin-left:6px;font-weight:700}
+.mlm-phase-up{color:#4caf50;background:rgba(76,175,80,.12);border:1px solid rgba(76,175,80,.28)}
+.mlm-phase-stable{color:#ffd86b;background:rgba(255,216,107,.12);border:1px solid rgba(255,216,107,.28)}
+.mlm-phase-warn{color:#ef5350;background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.28)}
+.mlm-omen{margin-top:7px;font-size:11px;line-height:1.65;color:var(--tx2);opacity:.88}
+.mlm-omen em{font-style:italic}
+.mlm-money-list{margin:6px 0 0;padding-left:16px;list-style:disc}.mlm-money-list li{font-size:12px;line-height:1.75;color:var(--tx2);margin-bottom:3px}
+.mlm-lucky-hint{margin-top:6px;font-size:11px;color:var(--tx);line-height:1.65}.mlm-lucky-hint strong{color:#ffd86b}
+
 /* Windfall number reveal */
 .windfall-luck.is-locked .wfl-full-number,
 .windfall-luck.is-locked .wfl-full-detail {
