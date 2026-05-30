@@ -2100,3 +2100,10 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 /* Element tip */
 .lg-element-tip{font-size:11px;color:#7a6a9a;text-align:center;line-height:1.5;padding-top:10px;border-top:1px solid rgba(201,162,39,.08)}
 
+
+/* Phase labels above bars */
+.lg-phase-labels{display:flex;gap:1px;margin-bottom:4px}
+.lg-phase-label{flex:1;text-align:center;font-size:9px;color:#7a6a9a;letter-spacing:.03em;line-height:1.3;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.lg-phase-label small{display:block;font-size:8px;color:#5a4a7a}
+.lg-phase-current{color:var(--g);font-weight:700}
+.lg-phase-current small{color:var(--g)}

@@ -269,33 +269,42 @@ function buildLifeGraphHtml(graph) {
     + '<div class="lg-header">'
     + '<span class="lg-planet" style="color:' + graph.planetColor + '">' + graph.planetSymbol + '</span>'
     + '<div><div class="lg-title">✦ กราฟชีวิตเฉพาะบุคคล ✦</div>'
-    + '<div class="lg-subtitle">คำนวณจากดาวเจ้าชะตา' + graph.planetName + ' · ธาตุ' + graph.element + '</div></div>'
+    + '<div class="lg-subtitle">จุดเปลี่ยนชีวิตคำนวณจากดาว' + graph.planetName + ' · ธาตุ' + graph.element + '</div></div>'
     + '</div>';
 
-  // Timeline bar
-  html += '<div class="lg-timeline">';
+  // Phase labels above bars
+  html += '<div class="lg-phase-labels">';
   for (var i = 0; i < graph.phases.length; i++) {
     var ph = graph.phases[i];
     var isCurrent = (i === graph.currentPhase);
-    var barClass = isCurrent ? ' lg-bar-current' : '';
-    var barStyle = 'background:' + ph.color + ';height:' + (20 + ph.energy * 0.3) + 'px';
-    html += '<div class="lg-bar' + barClass + '" style="' + barStyle + '" title="' + ph.label + ': ' + ph.from + '–' + ph.to + ' ปี (พลัง ' + ph.energy + '%)">';
-    if (isCurrent) {
-      var nextPivot = (i + 1 < graph.phases.length) ? graph.phases[i + 1].from : 99;
-      var yearsLeft = nextPivot - graph.currentAge;
-      html += '<span class="lg-marker">▼ อายุ ' + graph.currentAge + ' อีก ' + yearsLeft + ' ปี ถึง ' + nextPivot + '</span>';
+    var labelClass = isCurrent ? ' lg-phase-current' : '';
+    html += '<span class="lg-phase-label' + labelClass + '">' + ph.label + '<small>' + ph.from + '</small></span>';
+  }
+  html += '</div>';
+
+  // Timeline bar
+  html += '<div class="lg-timeline">';
+  for (var i2 = 0; i2 < graph.phases.length; i2++) {
+    var ph2 = graph.phases[i2];
+    var isCurrent2 = (i2 === graph.currentPhase);
+    var barClass2 = isCurrent2 ? ' lg-bar-current' : '';
+    var barStyle2 = 'background:' + ph2.color + ';height:' + (20 + ph2.energy * 0.3) + 'px';
+    html += '<div class="lg-bar' + barClass2 + '" style="' + barStyle2 + '">';
+    if (isCurrent2) {
+      var nextPivot2 = (i2 + 1 < graph.phases.length) ? graph.phases[i2 + 1].from : 99;
+      var yearsLeft2 = nextPivot2 - graph.currentAge;
+      html += '<span class="lg-marker">▼ ' + graph.currentAge + ' ปี</span>';
     }
     html += '</div>';
   }
   html += '</div>';
 
-  // Age labels — แสดง pivot ages + อายุปัจจุบัน
+  // Age labels below
   html += '<div class="lg-ages">';
-  html += '<span>' + graph.phases[0].from + '</span>';
-  for (var j = 1; j < Math.min(graph.phases.length, 6); j++) {
+  for (var j = 0; j < graph.phases.length; j++) {
     html += '<span>' + graph.phases[j].from + '</span>';
   }
-  html += '<span>' + (graph.phases[graph.phases.length-1].from || 60) + '+</span>';
+  html += '<span>' + (graph.phases[graph.phases.length-1].to || 99) + '</span>';
   html += '</div>';
 
   // Current phase card
