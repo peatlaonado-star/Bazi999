@@ -39,9 +39,9 @@ function loadContext(dom, overrides = {}) {
   return context;
 }
 
-function samplePlanet(element = 'ไฟ') {
+function samplePlanet(element = 'ไฟ', planetIndex = 0, planetName = 'อาทิตย์') {
   return {
-    c: '#fff', s: '☉', n: 'อาทิตย์', d: 'desc', el: element, ei: 0,
+    c: '#fff', s: '☉', n: planetName, d: 'desc', el: element, ei: planetIndex,
     p: 'personality', str: 'strength', wkfix: 'fix', lv: 'love', ca: 'career', mn: 'money', man: 'mantra'
   };
 }
@@ -523,8 +523,24 @@ describe('Monthly Life Map subscription feature', () => {
       expect(domain.icon).toMatch(/[◈💰🎲♡🫀]/u);
       expect(domain.score).toBeGreaterThanOrEqual(55);
       expect(domain.score).toBeLessThanOrEqual(99);
+      expect(domain.forecast.length).toBeLessThanOrEqual(95);
+      expect(domain.action.length).toBeLessThanOrEqual(70);
       expect(domain.action).toContain('ควร');
+      expect(domain.forecast).not.toContain('ธาตุไฟบอกให้เดือนนี้');
     });
+  });
+
+  it('personalizes monthly domain copy from birth date, planet, element, and current month', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div>');
+    const context = loadContext(dom);
+    const mayFire = context.buildMonthlyLifeMap(samplePlanet('ไฟ', 0, 'อาทิตย์'), sampleSign(), sampleSign(), '1991-05-17', new Date('2026-05-15T00:00:00Z'));
+    const mayWater = context.buildMonthlyLifeMap(samplePlanet('น้ำ', 2, 'จันทร์'), sampleSign(), sampleSign(), '1994-11-03', new Date('2026-05-15T00:00:00Z'));
+    const juneFire = context.buildMonthlyLifeMap(samplePlanet('ไฟ', 0, 'อาทิตย์'), sampleSign(), sampleSign(), '1991-05-17', new Date('2026-06-15T00:00:00Z'));
+
+    expect(mayFire.domains.map((domain) => domain.forecast)).not.toEqual(mayWater.domains.map((domain) => domain.forecast));
+    expect(mayFire.domains.map((domain) => domain.action)).not.toEqual(mayWater.domains.map((domain) => domain.action));
+    expect(mayFire.domains.map((domain) => domain.forecast)).not.toEqual(juneFire.domains.map((domain) => domain.forecast));
+    expect(new Set(mayFire.domains.map((domain) => domain.forecast)).size).toBe(mayFire.domains.length);
   });
 
   it('shows free monthly preview but locks detailed monthly planning', () => {

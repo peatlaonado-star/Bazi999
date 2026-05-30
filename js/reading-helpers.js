@@ -273,23 +273,37 @@ function buildMonthlyLifeMap(p, r, l, birthDate, today){
     elementWarning: guide.warning,
     elementAction: guide.action,
     domains: (cfg.domains || FALLBACK_MONTHLY_LIFE_MAP.domains).map(function(domain, index){
-      var score = clampMonthlyScore(62 + ((planetIndex + 1) * 7 + (monthIndex + 1) * 3 + (index + 1) * 8) % 34);
-      var actionMap = {
-        career: 'ควรเลือกงานหลัก 1 เรื่อง ปิดให้จบก่อนเริ่มเรื่องใหม่ และจดสิ่งที่ต้องส่งมอบให้ชัด',
-        money: 'ควรแยกเงินจำเป็น เงินสำรอง และเงินโอกาส แล้วหลีกเลี่ยงการใช้เงินตามอารมณ์',
-        windfall: 'ควรกำหนดงบเสี่ยงโชคเล็ก ๆ ที่เสียได้จริง จดเลขหรือสัญญาณที่เจอซ้ำ แล้วหยุดทันทีเมื่อเกินวงเงิน',
-        relationship: 'ควรพูดความต้องการให้ตรงแต่สุภาพ นัดคุยตอนใจนิ่ง และไม่เดาใจแทนกัน',
-        health: 'ควรวางเวลานอน พักสายตา และทำ routine เล็ก ๆ ให้ต่อเนื่องอย่างน้อย 7 วัน'
+      var personalSeed = bornDay * 13 + (monthIndex + 1) * 17 + (planetIndex + 1) * 19 + index * 23 + elementKey.charCodeAt(0);
+      var score = clampMonthlyScore(58 + (personalSeed % 38));
+      var domainForecasts = {
+        career: ['ปิดงานค้างให้เห็นผล', 'เลือกงานที่สร้างชื่อก่อน', 'คุยบทบาทให้ชัด'],
+        money: ['กันเงินสำรองก่อนใช้', 'แยกเงินจำเป็นกับเงินเสี่ยง', 'ทบทวนรายจ่ายรั่ว'],
+        windfall: ['ลาภลอยมาแบบสั้น ๆ', 'ลาภลอยมาจากเลขที่เจอซ้ำ', 'โชคลอยให้เสี่ยงเล็กพอสนุก'],
+        relationship: ['พูดตรงแต่ใจเย็น', 'นัดคุยก่อนคิดแทนกัน', 'ลดคาดหวังที่ไม่เคยบอก'],
+        health: ['พักให้เป็นเวลาขึ้น', 'ลดการฝืนร่างกาย', 'ทำ routine เล็กทุกวัน']
       };
+      var domainActions = {
+        career: ['ควรปิดงานหลัก 1 ชิ้น', 'ควรส่งมอบให้ชัด', 'ควรเลื่อนเรื่องรองไว้ก่อน'],
+        money: ['ควรตั้งงบ 3 ช่อง', 'ควรพักก่อนซื้อของใหญ่', 'ควรแยกเงินเสี่ยงให้ชัด'],
+        windfall: ['ควรตั้งงบแล้วหยุด', 'ควรจดเลขที่เจอซ้ำ', 'ควรเสี่ยงเล็ก ไม่ไล่ทุน'],
+        relationship: ['ควรพูดความต้องการ 1 เรื่อง', 'ควรฟังก่อนตอบ', 'ควรนัดคุยตอนใจนิ่ง'],
+        health: ['ควรนอนให้ตรงเวลา', 'ควรพักสายตาเป็นรอบ', 'ควรทำ routine 7 วัน']
+      };
+      var planetNudges = ['ใช้จังหวะผู้นำ', 'ฟังความรู้สึกก่อน', 'ตัดสินใจให้คม', 'สื่อสารให้ครบ', 'ยึดหลักให้มั่น', 'เลือกความพอดี', 'ทำแบบมีวินัย'];
+      var forecastPool = domainForecasts[domain.key] || [domain.teaser];
+      var actionPool = domainActions[domain.key] || ['ควรตั้งเป้าหมายให้ชัด'];
+      var forecast = forecastPool[personalSeed % forecastPool.length];
+      var action = actionPool[(personalSeed + planetIndex) % actionPool.length];
+      var nudge = planetNudges[planetIndex % planetNudges.length] || guide.focus;
       return {
         key: domain.key,
         label: domain.label,
         icon: domain.icon || '✦',
         score: score,
-        teaser: domain.teaser,
-        forecast: domain.teaser + ' · ธาตุ' + elementKey + 'บอกให้เดือนนี้ ' + guide.action,
-        action: actionMap[domain.key] || ('ควรตั้งเป้าเรื่อง' + domain.label + 'ให้ชัดและลงมือทีละขั้น'),
-        goal: 'ตั้งเป้าเรื่อง' + domain.label + 'ให้ชัด 1 ข้อ แล้วเช็กความคืบหน้าทุกสัปดาห์'
+        teaser: forecast,
+        forecast: forecast + ' — ' + nudge,
+        action: action,
+        goal: 'เลือก 1 ข้อของ' + domain.label + ' แล้วเช็กผลปลายสัปดาห์'
       };
     }),
     calendarDays: calendarDays,
