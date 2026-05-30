@@ -2081,12 +2081,12 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .lg-subtitle{font-size:10px;color:#7a6a9a;letter-spacing:.04em;margin-top:2px}
 
 /* Timeline bars */
-.lg-timeline{display:flex;align-items:flex-end;gap:2px;height:60px;padding:0 2px;margin-bottom:4px}
+.lg-timeline{display:flex;align-items:flex-end;gap:2px;height:70px;padding:24px 2px 0;margin-bottom:4px}
 .lg-bar{flex:1;min-width:12px;border-radius:3px 3px 0 0;position:relative;transition:all .3s;opacity:.7}
 .lg-bar:hover{opacity:1}
-.lg-bar-current{opacity:1;box-shadow:0 0 12px rgba(201,162,39,.4)}
-.lg-marker{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--g);white-space:nowrap;font-weight:700;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.lg-bar-current{opacity:1;box-shadow:0 0 12px rgba(201,162,39,.4);position:relative}
+.lg-marker{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--g);white-space:nowrap;font-weight:700;background:rgba(9,6,28,.85);padding:2px 10px;border-radius:10px;border:1px solid rgba(201,162,39,.3);animation:pulse 2s infinite;z-index:5}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
 
 /* Age labels */
 .lg-ages{display:flex;justify-content:space-between;font-size:9px;color:#5a4a7a;letter-spacing:.04em;margin-bottom:14px}

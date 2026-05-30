@@ -281,25 +281,30 @@ function buildLifeGraphHtml(graph) {
     var barStyle = 'background:' + ph.color + ';height:' + (20 + ph.energy * 0.3) + 'px';
     html += '<div class="lg-bar' + barClass + '" style="' + barStyle + '" title="' + ph.label + ': ' + ph.from + '–' + ph.to + ' ปี (พลัง ' + ph.energy + '%)">';
     if (isCurrent) {
-      html += '<span class="lg-marker">▼ คุณอยู่ตรงนี้</span>';
+      var nextPivot = (i + 1 < graph.phases.length) ? graph.phases[i + 1].from : 99;
+      var yearsLeft = nextPivot - graph.currentAge;
+      html += '<span class="lg-marker">▼ อายุ ' + graph.currentAge + ' อีก ' + yearsLeft + ' ปี ถึง ' + nextPivot + '</span>';
     }
     html += '</div>';
   }
   html += '</div>';
 
-  // Age labels
+  // Age labels — แสดง pivot ages + อายุปัจจุบัน
   html += '<div class="lg-ages">';
-  for (var j = 0; j < Math.min(graph.phases.length, 5); j++) {
+  html += '<span>' + graph.phases[0].from + '</span>';
+  for (var j = 1; j < Math.min(graph.phases.length, 6); j++) {
     html += '<span>' + graph.phases[j].from + '</span>';
   }
-  html += '<span style="margin-left:auto">' + (graph.phases[graph.phases.length-1].from || 60) + '</span>';
+  html += '<span>' + (graph.phases[graph.phases.length-1].from || 60) + '+</span>';
   html += '</div>';
 
   // Current phase card
   var cp = graph.phases[graph.currentPhase];
+  var nextPivotForDisplay = (graph.currentPhase + 1 < graph.phases.length) ? graph.phases[graph.currentPhase + 1].from : 99;
+  var yearsToNext = nextPivotForDisplay - graph.currentAge;
   html += '<div class="lg-current">'
-    + '<div class="lg-current-badge" style="background:' + cp.color + '">● ' + cp.label + '</div>'
-    + '<div class="lg-current-age">อายุ ' + graph.currentAge + ' ปี — ' + Math.round(graph.progress) + '% ของช่วงนี้</div>'
+    + '<div class="lg-current-badge" style="background:' + cp.color + '">● ' + cp.label + ' · ' + cp.from + '–' + cp.to + ' ปี</div>'
+    + '<div class="lg-current-age">ตอนนี้ ' + graph.currentAge + ' ปี → จุดเปลี่ยนถัดไปที่ ' + nextPivotForDisplay + ' ปี (อีก ' + yearsToNext + ' ปี)</div>'
     + '<div class="lg-insight">' + graph.insight + '</div>'
     + '</div>';
 
