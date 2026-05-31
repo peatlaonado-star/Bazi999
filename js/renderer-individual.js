@@ -727,13 +727,6 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + '<div class="bp-summary">พิมพ์เขียวนี้สรุปแรงขับเดิมของคุณก่อนอ่านดวงรายเดือน — อายุเป็นเพียงบริบทเสริม ไม่ใช่ตัวตัดสินดวงทั้งหมด</div>'
     + '</div>';
 
-  var readingSnapshotHtml = '<div class="reading-snapshot">'
-    + '<div class="rs-grid">'
-    + '<div class="rs-line"><b>โฟกัสวันนี้</b><span>' + escapeHTML(briefData.focus) + '</span></div>'
-    + '<div class="rs-line"><b>ระวัง</b><span>' + escapeHTML(briefData.warning) + '</span></div>'
-    + '<div class="rs-line rs-remedy"><b>แก้เหตุวันนี้</b><span>' + escapeHTML(briefData.action) + '</span></div>'
-    + '</div>'
-    + '</div>';
 
   var detailTabsShellHtml = '<div class="detail-tabs-card">'
     + '<div class="tabs-w"><div class="tabs" id="tt0"></div></div><div id="ts0"></div>'
@@ -754,8 +747,6 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
   }
 
   wrap.innerHTML = blueprintCardHtml
-    + readingSnapshotHtml
-    + badgesHtml
     + wrapCollapsible("✦ กำลังวันประจำตัว ✦", "วันเกิด · เทวดา · ธาตุ · สีมงคล", cosmicBriefHtml)
     + wrapCollapsible("✨ พลังงานเสริมดวง", "เลขและสีมงคลประจำวัน", powerCardHtml)
     + wrapCollapsible("✦ สูตรเปิดดวงลาภลอย ✦", "เลขเด็ด หวย ทิศ คาถา สายมู 🔒 Premium", windfallLuckHtml, true)
@@ -763,7 +754,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + lifeGraphSectionHtml
     + wrapCollapsible("✦ คัมภีร์แก้ดวง 6 ด้าน ✦", "คะแนน 6 ด้าน + 6 ด้านชีวิต 🔒 Premium", domainHtml, true)
     + wrapCollapsible("✦ สัดส่วนและสมดุลธาตุ ✦", "กราฟธาตุ + คำแนะนำเสริมใจ (แตะเพื่อดู)", buildElementRadar(p, r, l), true)
-    + detailTabsShellHtml;
+    + wrapCollapsible("📋 ตัวตน · ความสัมพันธ์ · การงาน · เงิน", "ปลดล็อกเพื่ออ่านรายละเอียด 🔒 Premium", detailTabsShellHtml, true);
 
   // 6. อ้างอิงและเนื้อหาใน Tabs
   var refDesc = {

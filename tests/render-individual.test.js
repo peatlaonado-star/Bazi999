@@ -300,7 +300,6 @@ describe('Free reader conversion reading order', () => {
     const output = dom.window.document.getElementById('r0').innerHTML;
     const order = [
       'blueprint-card',
-      'reading-snapshot',
       'weekday-power-card',
       'power-card',
       'windfall-luck',
@@ -315,25 +314,6 @@ describe('Free reader conversion reading order', () => {
       expect(order[i - 1]).toBeLessThan(order[i]);
     }
     expect(output).not.toContain('conversion-roadmap');
-  });
-
-  it('removes the guided roadmap and snapshot heading while keeping compact action cues', () => {
-    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>', { url: 'http://localhost' });
-    const context = loadContext(dom);
-
-    context.renderInd('พ่อ', 'ชาย', '1990-01-15', '08:30', samplePlanet('น้ำ', 2, 'จันทร์'), sampleSign(), sampleSign(), 0, 0, sampleUi());
-    const snapshot = dom.window.document.querySelector('.reading-snapshot');
-    const output = dom.window.document.getElementById('r0').innerHTML;
-
-    expect(dom.window.document.querySelector('.conversion-roadmap')).toBeNull();
-    expect(output).not.toContain('เริ่มอ่านตรงนี้');
-    expect(snapshot).toBeTruthy();
-    expect(snapshot.textContent).not.toContain('อ่านสรุปก่อน');
-    expect(snapshot.textContent).not.toContain('สรุปดวงของพ่อ');
-    expect(snapshot.textContent).toContain('โฟกัสวันนี้');
-    expect(snapshot.textContent).toContain('แก้เหตุวันนี้');
-    expect(snapshot.querySelector('.rs-actions')).toBeNull();
-    expect(dom.window.document.body.classList.contains('has-report')).toBe(true);
   });
 
   it('shows the life graph as its own visible section before the collapsed six-domain scripture', () => {

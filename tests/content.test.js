@@ -83,7 +83,7 @@ describe('Thai astrology content data', () => {
     const html = fs.readFileSync(path.resolve('index.html'), 'utf8');
 
     expect(html).toContain('daily-fortune-section compact-daily');
-    expect(html).toContain('ดูรายละเอียดวันนี้');
+    expect(html).toContain('df-lucky-section');
   });
 
   it('does not contain broken #premium-preview links', () => {
