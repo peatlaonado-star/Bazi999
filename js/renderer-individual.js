@@ -747,6 +747,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
   }
 
   wrap.innerHTML = blueprintCardHtml
+    + badgesHtml
     + wrapCollapsible("✦ กำลังวันประจำตัว ✦", "วันเกิด · เทวดา · ธาตุ · สีมงคล", cosmicBriefHtml)
     + wrapCollapsible("✨ พลังงานเสริมดวง", "เลขและสีมงคลประจำวัน", powerCardHtml)
     + wrapCollapsible("✦ สูตรเปิดดวงลาภลอย ✦", "เลขเด็ด หวย ทิศ คาถา สายมู 🔒 Premium", windfallLuckHtml, true)
