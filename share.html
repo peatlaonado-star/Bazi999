@@ -360,14 +360,16 @@ body{
   // Share to LINE
   document.getElementById('btn-share-line').addEventListener('click', function() {
     var text = '🔮 ดวงวันนี้ของฉันจาก STARVIA\n' + fortune.fortuneCard.icon + ' ไพ่: ' + fortune.fortuneCard.name + '\n🎨 สีมงคล: ' + fortune.luckyColor.name + '\n🔢 เลขนำโชค: ' + fortune.luckyNumbers.join(', ');
-    var url = 'https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(SHARE_PAGE + '?dob=' + encodeURIComponent(dob)) + '&text=' + encodeURIComponent(text);
-    window.open(url, '_blank', 'width=600,height=500');
+    var shareLink = SHARE_PAGE + '?dob=' + encodeURIComponent(dob);
+    var url = 'https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(shareLink) + '&text=' + encodeURIComponent(text);
+    window.location.href = url;
   });
 
   // Share to Facebook
   document.getElementById('btn-share-fb').addEventListener('click', function() {
-    var url = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(SHARE_PAGE + '?dob=' + encodeURIComponent(dob));
-    window.open(url, '_blank', 'width=600,height=400');
+    var shareLink = SHARE_PAGE + '?dob=' + encodeURIComponent(dob);
+    var url = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(shareLink);
+    window.location.href = url;
   });
 
   // Copy link

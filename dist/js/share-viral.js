@@ -95,7 +95,8 @@
     var url = 'https://social-plugins.line.me/lineit/share?url='
       + encodeURIComponent(shareUrl)
       + '&text=' + encodeURIComponent(text);
-    window.open(url, '_blank', 'width=600,height=500');
+    // Direct navigation instead of popup (avoids mobile blockers)
+    window.location.href = url;
     recordShare('line');
   }
 
@@ -104,7 +105,7 @@
     var url = 'https://www.facebook.com/sharer/sharer.php?u='
       + encodeURIComponent(shareUrl)
       + '&quote=' + encodeURIComponent(generateShareMessage());
-    window.open(url, '_blank', 'width=600,height=400');
+    window.location.href = url;
     recordShare('facebook');
   }
 
@@ -114,7 +115,7 @@
     var url = 'https://twitter.com/intent/tweet?text='
       + encodeURIComponent(text)
       + '&url=' + encodeURIComponent(shareUrl);
-    window.open(url, '_blank', 'width=600,height=400');
+    window.location.href = url;
     recordShare('x');
   }
 
