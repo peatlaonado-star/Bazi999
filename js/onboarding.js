@@ -267,12 +267,28 @@ var Onboarding = (function() {
     var existing = document.getElementById('onboarding-overlay');
     if (existing) return;
 
+    // If user already has birth data, auto-fill form and trigger reading
+    if (state.birthData && state.birthData.name && state.step >= 1) {
+      var n0 = document.getElementById('n0');
+      var d0 = document.getElementById('d0');
+      var t0 = document.getElementById('t0');
+      var g0 = document.getElementById('g0');
+      if (n0 && !n0.value) n0.value = state.birthData.name;
+      if (d0 && !d0.value) d0.value = state.birthData.dob;
+      if (t0 && state.birthData.time && !t0.value) t0.value = state.birthData.time;
+      if (g0 && state.birthData.gender && !g0.value) g0.value = state.birthData.gender;
+      // Auto-trigger reading if form has data but reading hasn't started
+      if (n0 && n0.value && d0 && d0.value) {
+        setTimeout(function() { go0(); }, 300);
+      }
+    }
+
     switch (phase) {
       case 'welcome':
         document.body.insertAdjacentHTML('beforeend', renderWelcomeScreen());
         break;
       case 'first-reading':
-        document.body.insertAdjacentHTML('beforeend', renderFirstReading(state.birthData));
+        // Skip overlay — reading will be triggered via auto-fill above
         break;
       // Other phases are handled via banners/inline elements, not full overlays
     }
@@ -323,13 +339,28 @@ var Onboarding = (function() {
       var fd = new FormData(form);
       var name = (fd.get('name') || '').trim();
       var dob = fd.get('dob') || '';
-      var time = fd.get('time') || '';
-      var gender = fd.get('gender') || '';
+      var time = (fd.get('time') || '').trim();
+      var gender = (fd.get('gender') || '').trim();
       if (!name || !dob) return;
       saveBirthData({ name: name, dob: dob, time: time, gender: gender });
+
+      // Close overlay
       var overlay = document.getElementById('onboarding-overlay');
-      if (overlay) {
-        overlay.outerHTML = renderFirstReading(getState().birthData);
+      if (overlay) overlay.remove();
+
+      // Fill the main STARVIA form and trigger reading
+      var n0 = document.getElementById('n0');
+      var d0 = document.getElementById('d0');
+      var t0 = document.getElementById('t0');
+      var g0 = document.getElementById('g0');
+      if (n0) n0.value = name;
+      if (d0) d0.value = dob;
+      if (t0 && time) t0.value = time;
+      if (g0 && gender) g0.value = gender;
+
+      // Trigger the reading engine
+      if (typeof go0 === 'function') {
+        setTimeout(function() { go0(); }, 100);
       }
     });
   }
