@@ -172,19 +172,19 @@ function buildMonthlyLifeMapHtml(model, premiumUnlocked){
   html += '</div>';
 
   if (premiumUnlocked) {
-    html += '<div class="mlm-section-title">📅 ฤกษ์ยามวันดีประจำเดือน</div><div class="mlm-calendar">';
+    html += '<div class="mlm-section-title">📅 ปฏิทินวันดีรายเดือน</div><div class="mlm-calendar">';
     model.calendarDays.forEach(function(day){
       html += '<div class="mlm-cal-day mlm-' + escapeHTML(day.tone) + '"><strong>' + day.day + '</strong><span>' + escapeHTML(day.label) + '</span></div>';
     });
     html += '</div>';
 
-    html += '<div class="mlm-section-title">✦ จังหวะดาวรายสัปดาห์ ✦</div><div class="mlm-weeks">';
+    html += '<div class="mlm-section-title">✦ สรุปรายสัปดาห์ 4 สัปดาห์ ✦</div><div class="mlm-weeks">';
     model.weeklyBriefs.forEach(function(week){
       html += '<div class="mlm-week"><strong>' + escapeHTML(week.title) + '</strong><p>' + escapeHTML(week.brief) + '</p><span>' + escapeHTML(week.action) + '</span></div>';
     });
     html += '</div>';
 
-    html += '<div class="mlm-section-title">✦ คาถาเสริมดวง 7 วัน ✦</div><div class="mlm-rituals">';
+    html += '<div class="mlm-section-title">✦ ภารกิจเสริมดวง 7 วัน ✦</div><div class="mlm-rituals">';
     model.rituals.forEach(function(ritual, index){
       html += '<div class="mlm-ritual"><span class="mlm-ritual-day">Day ' + (index + 1) + '</span>' + escapeHTML(ritual) + '</div>';
     });
@@ -494,6 +494,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     birthYearBE = _bday.getFullYear() + 543;
   }
   var wrap=document.getElementById('r0');
+  if (document.body && document.body.classList) document.body.classList.add('has-report');
   nm = escapeHTML(nm);
   gd = escapeHTML(gd);
   ts = escapeHTML(ts);
@@ -726,6 +727,17 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + '<div class="bp-summary">พิมพ์เขียวนี้สรุปแรงขับเดิมของคุณก่อนอ่านดวงรายเดือน — อายุเป็นเพียงบริบทเสริม ไม่ใช่ตัวตัดสินดวงทั้งหมด</div>'
     + '</div>';
 
+  var readingSnapshotHtml = '<div class="reading-snapshot">'
+    + '<div class="rs-kicker">อ่านสรุปก่อน</div>'
+    + '<div class="rs-title">สรุปดวงของ' + nm + '</div>'
+    + '<div class="rs-grid">'
+    + '<div class="rs-line"><b>โฟกัสวันนี้</b><span>' + escapeHTML(briefData.focus) + '</span></div>'
+    + '<div class="rs-line"><b>ระวัง</b><span>' + escapeHTML(briefData.warning) + '</span></div>'
+    + '<div class="rs-line rs-remedy"><b>แก้เหตุวันนี้</b><span>' + escapeHTML(briefData.action) + '</span></div>'
+    + '</div>'
+    + '<div class="rs-actions"><a href="#" data-action="scroll-domain" data-domain="money">อ่านการเงิน</a><a href="#" data-action="scroll-domain" data-domain="relationship">อ่านความรัก</a><a href="#" data-action="scroll-domain" data-domain="career">อ่านงาน</a></div>'
+    + '</div>';
+
   var conversionRoadmapHtml = '<div class="conversion-roadmap">'
     + '<div class="cr-kicker">เริ่มอ่านตรงนี้</div>'
     + '<div class="cr-title">อ่านฟรีให้รู้สึกว่า “ตรง” แล้วค่อยไหลไปปลดล็อกส่วนที่อยากรู้ที่สุด</div>'
@@ -756,16 +768,17 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
   }
 
   wrap.innerHTML = blueprintCardHtml
+    + readingSnapshotHtml
     + badgesHtml
     + conversionRoadmapHtml
     + wrapCollapsible("✦ กำลังวันประจำตัว ✦", "วันเกิด · เทวดา · ธาตุ · สีมงคล", cosmicBriefHtml)
     + wrapCollapsible("✨ พลังงานเสริมดวง", "เลขและสีมงคลประจำวัน", powerCardHtml)
     + wrapCollapsible("✦ สูตรเปิดดวงลาภลอย ✦", "เลขเด็ด หวย ทิศ คาถา สายมู 🔒 Premium", windfallLuckHtml, true)
     + wrapCollapsible("🔮 หมอทักประจำเดือน", "5 ด้าน พร้อมสัญญาณ 🔒 Premium", monthlyLifeMapHtml, true)
-    + wrapCollapsible("✦ คัมภีร์แก้ดวง 6 ด้าน ✦", "กราฟชีวิต + 6 ด้าน วิเคราะห์สถานการณ์", domainHtml, false)
+    + wrapCollapsible("✦ คัมภีร์แก้ดวง 6 ด้าน ✦", "คะแนน 6 ด้าน + กราฟชีวิต (แตะเพื่อดูรายละเอียด)", domainHtml, true)
     + wrapCollapsible("🪞 กระจกกรรม", "บทเรียนและรูปแบบที่ชีวิตพาซ้ำ 🔒 Premium", karmaHtml, true)
-    + buildElementRadar(p, r, l)
-    + detailTabsShellHtml;
+    + wrapCollapsible("✦ สัดส่วนและสมดุลธาตุ ✦", "กราฟธาตุ + คำแนะนำเสริมใจ (แตะเพื่อดู)", buildElementRadar(p, r, l), true)
+    + wrapCollapsible("อ่านรายละเอียดพื้นฐาน", "ตัวตนฟรี · ความรัก · งานเงิน (แตะเพื่ออ่านต่อ)", detailTabsShellHtml, true);
 
   // 6. อ้างอิงและเนื้อหาใน Tabs
   var refDesc = {

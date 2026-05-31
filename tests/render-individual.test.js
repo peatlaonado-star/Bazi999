@@ -465,6 +465,60 @@ describe('Free reader conversion reading order', () => {
     expect(roadmap.textContent).toContain('ปลดล็อก');
   });
 
+  it('renders a compact snapshot immediately after the blueprint so readers know what to do next', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+    const context = loadContext(dom);
+
+    context.renderInd('พ่อ', 'ชาย', '1990-01-15', '08:30', samplePlanet('น้ำ', 2, 'จันทร์'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const snapshot = dom.window.document.querySelector('.reading-snapshot');
+    const output = dom.window.document.getElementById('r0').innerHTML;
+
+    expect(snapshot).toBeTruthy();
+    expect(snapshot.textContent).toContain('สรุปดวงของพ่อ');
+    expect(snapshot.textContent).toContain('โฟกัสวันนี้');
+    expect(snapshot.textContent).toContain('แก้เหตุวันนี้');
+    expect(snapshot.textContent).toContain('อ่านการเงิน');
+    expect(snapshot.textContent).toContain('อ่านความรัก');
+    expect(output.indexOf('blueprint-card')).toBeLessThan(output.indexOf('reading-snapshot'));
+    expect(output.indexOf('reading-snapshot')).toBeLessThan(output.indexOf('conversion-roadmap'));
+    expect(dom.window.document.body.classList.contains('has-report')).toBe(true);
+  });
+
+  it('collapses the long six-domain scripture section by default for free readers', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+    const context = loadContext(dom);
+
+    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const domainSection = Array.from(dom.window.document.querySelectorAll('.collapsible-section'))
+      .find((node) => node.textContent.includes('คัมภีร์แก้ดวง 6 ด้าน'));
+
+    expect(domainSection).toBeTruthy();
+    expect(domainSection.classList.contains('collapsed')).toBe(true);
+    expect(domainSection.querySelector('.section-toggle-hint').textContent).toContain('คะแนน 6 ด้าน');
+  });
+
+  it('collapses lower supporting sections so the initial report ends after the conversion path', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+    const context = loadContext(dom, {
+      buildElementRadar: () => '<div class="element-radar-test">กราฟสมดุลธาตุ</div>',
+    });
+
+    context.renderInd('พ่อ', 'ชาย', '1990-01-15', '08:30', samplePlanet('น้ำ', 2, 'จันทร์'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const sections = Array.from(dom.window.document.querySelectorAll('.collapsible-section'));
+    const findByLabel = (label) => sections.find((node) => node.querySelector('.section-toggle-label')?.textContent.includes(label));
+    const elementSection = findByLabel('สัดส่วนและสมดุลธาตุ');
+    const detailSection = findByLabel('อ่านรายละเอียดพื้นฐาน');
+    const output = dom.window.document.getElementById('r0').innerHTML;
+
+    expect(elementSection).toBeTruthy();
+    expect(elementSection.classList.contains('collapsed')).toBe(true);
+    expect(elementSection.querySelector('.section-body').innerHTML).toContain('element-radar-test');
+    expect(detailSection).toBeTruthy();
+    expect(detailSection.classList.contains('collapsed')).toBe(true);
+    expect(output.indexOf('คัมภีร์แก้ดวง 6 ด้าน')).toBeLessThan(output.indexOf('สัดส่วนและสมดุลธาตุ'));
+    expect(output.indexOf('สัดส่วนและสมดุลธาตุ')).toBeLessThan(output.indexOf('อ่านรายละเอียดพื้นฐาน'));
+  });
+
   it('does not render a CTA button inside the conversion roadmap', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>', { url: 'http://localhost' });
     const context = loadContext(dom);

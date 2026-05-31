@@ -63,6 +63,29 @@ describe('Thai astrology content data', () => {
     expect(html).toContain('รับจังหวะวันนี้ฟรีทุกเช้า');
   });
 
+  it('puts the free birth form before long landing sections so users can start in the first viewport', () => {
+    const html = fs.readFileSync(path.resolve('index.html'), 'utf8');
+    const formIndex = html.indexOf('id="fc0"');
+    const dailyIndex = html.indexOf('daily-fortune-section');
+    const socialIndex = html.indexOf('social-proof-section');
+    const valueIndex = html.indexOf('value-section');
+
+    expect(formIndex).toBeGreaterThan(-1);
+    expect(dailyIndex).toBeGreaterThan(-1);
+    expect(socialIndex).toBeGreaterThan(-1);
+    expect(valueIndex).toBeGreaterThan(-1);
+    expect(formIndex).toBeLessThan(dailyIndex);
+    expect(formIndex).toBeLessThan(socialIndex);
+    expect(formIndex).toBeLessThan(valueIndex);
+  });
+
+  it('keeps the landing daily fortune as a compact teaser instead of a full report wall', () => {
+    const html = fs.readFileSync(path.resolve('index.html'), 'utf8');
+
+    expect(html).toContain('daily-fortune-section compact-daily');
+    expect(html).toContain('ดูรายละเอียดวันนี้');
+  });
+
   it('does not contain broken #premium-preview links', () => {
     const html = fs.readFileSync(path.resolve('index.html'), 'utf8');
     expect(html).not.toContain('#premium-preview');

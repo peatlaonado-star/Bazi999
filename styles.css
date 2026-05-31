@@ -2456,7 +2456,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .lg-next-pivot{font-size:11px;color:#7a6a9a;letter-spacing:.03em}
 .lg-next-pivot strong{color:var(--g)}
 
-* ===== DAILY FORTUNE CARD ===== */
+/* ===== DAILY FORTUNE CARD ===== */
 .daily-fortune-card {
   background: linear-gradient(135deg, rgba(201,162,39,0.08), rgba(91,63,166,0.08));
   border: 1px solid rgba(201,162,39,0.2);
@@ -3288,8 +3288,6 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .gk-notif-title { font-family: 'Kanit', sans-serif; font-size: 13px; color: #c9a227; }
 .gk-notif-name { font-family: 'Kanit', sans-serif; font-size: 16px; color: #f0e6d3; font-weight: 600; }
 .gk-notif-desc { font-family: 'Sarabun', sans-serif; font-size: 12px; color: #a09880; }
-tion into index.html and build pipeline)
-
 /* ===== REPORT BADGES SECTION ===== */
 .report-badges {
   margin: 0 0 20px;
@@ -3486,3 +3484,32 @@ tion into index.html and build pipeline)
 .mlm-action strong {
   color: #c9a227;
 }
+
+/* ===== Quick length reduction: form-first landing + compact daily + reading snapshot ===== */
+.compact-daily{margin-top:18px}
+.compact-daily .daily-fortune-card{border-radius:16px}
+.compact-daily .df-body{padding:8px 16px 12px}
+.compact-daily .df-quote{font-size:13.5px;line-height:1.55;margin-bottom:8px;text-align:left}
+.compact-daily .df-details{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding-top:8px}
+.compact-daily .df-item{padding:6px 4px;background:rgba(142,114,216,.06);border:1px solid rgba(142,114,216,.1);border-radius:12px}
+.compact-daily .df-lucky-section,
+.compact-daily .df-card-section,
+.compact-daily .df-share-section,
+.compact-daily .df-footer{display:none}
+.df-expand-btn{display:block;margin:10px auto 0;padding:7px 14px;border:1px solid rgba(201,162,39,.25);border-radius:999px;background:rgba(201,162,39,.08);color:var(--g2);font:600 11px/1.2 Kanit,Sarabun,sans-serif;letter-spacing:.04em;cursor:pointer}
+@media(max-width:520px){.compact-daily .df-details{grid-template-columns:1fr}.compact-daily .df-quote{text-align:center}}
+
+.reading-snapshot{margin:14px 0;padding:16px;border:1px solid rgba(201,162,39,.22);border-radius:18px;background:linear-gradient(145deg,rgba(201,162,39,.09),rgba(142,114,216,.08));box-shadow:0 10px 28px rgba(0,0,0,.24)}
+.rs-kicker{font-size:10px;color:var(--g2);letter-spacing:.12em;text-transform:uppercase;margin-bottom:5px}
+.rs-title{font-size:18px;font-weight:800;color:var(--tx);margin-bottom:12px;letter-spacing:-.01em}
+.rs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.rs-line{padding:10px;border-radius:13px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.05)}
+.rs-line b{display:block;font-size:11px;color:var(--g);margin-bottom:5px;letter-spacing:.04em}
+.rs-line span{display:block;font-size:12px;line-height:1.55;color:var(--tx2)}
+.rs-remedy{background:rgba(201,162,39,.1);border-color:rgba(201,162,39,.18)}
+.rs-actions{display:flex;gap:8px;flex-wrap:wrap}
+.rs-actions a{flex:1;min-width:120px;text-align:center;padding:8px 10px;border-radius:999px;background:rgba(142,114,216,.12);border:1px solid rgba(142,114,216,.22);color:#DDCEFF;text-decoration:none;font-size:12px;font-weight:700}
+@media(max-width:620px){.rs-grid{grid-template-columns:1fr}.rs-actions a{flex-basis:100%}}
+body.has-report .value-section,
+body.has-report .daily-fortune-section,
+body.has-report .social-proof-section{display:none}

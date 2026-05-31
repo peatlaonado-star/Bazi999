@@ -23,7 +23,7 @@ function premiumLockedCard(className, teaserHtml, title, description){
 function buildTabs(tid,sid,pre,TB,p,u){
   var tt=document.getElementById(tid), ts2=document.getElementById(sid);
   // Icon map for each tab position
-  var tabIcons = ['✦', '🔮', '💰'];
+  var tabIcons = ['👤', '🌑', '💕'];
   
   TB.forEach(function(tb,i){
     var btn=document.createElement('button');
@@ -74,6 +74,7 @@ function buildTabs(tid,sid,pre,TB,p,u){
 
 function resetM(mode){
   var fc=['fc0','fc1','fc2'][mode], r=['r0','r1','r2'][mode];
+  if (document.body && document.body.classList) document.body.classList.remove('has-report');
   document.getElementById(r).innerHTML='';
   document.getElementById(fc).style.display='block';
   scrollTo({top:0,behavior:'smooth'});
