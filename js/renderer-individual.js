@@ -544,16 +544,15 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     elementAction = 'แผ่เมตตาให้ตัวเอง <strong class="hl-gold">3 นาทีก่อนนอน</strong> <span style="font-size:14px">💛</span> — "สุขิโต โหมิ — ขอให้ข้าพเจ้ามีความสุข" เติมน้ำในถังก่อนให้คนอื่น';
   }
   var wkFull = '<div style="font-size:14px; line-height:1.9; color:var(--tx); margin-bottom:15px;">'
-    + '<span class="hl-gold">✦ ดวงดาวไม่ได้มีไว้เพื่อสาปแช่ง แต่มีไว้เพื่อชี้เป้าหมายที่รอการปลดล็อก ✦</span><br>'
-    + 'สิ่งที่คุณมองว่าเป็นจุดอ่อน หรือ <span class="hl-purple">[' + tk.kala + ']</span> แท้จริงแล้วคือพลังงานแห่งดาว' + p.n + ' ที่ถูกใช้ผิดทิศทาง <span style="font-size:14px">🥀</span><br><br>'
-    + elementInsight + ' หากปล่อยทิ้งไว้ มันจะค่อยๆ กัดเซาะความมั่นใจและโอกาสดีๆ ในชีวิตคุณโดยไม่รู้ตัว <span style="font-size:14px">🌪️</span>'
+    + 'สิ่งที่คุณมองว่าเป็นจุดอ่อน แท้จริงแล้วคือพลังงานแห่งดาว' + p.n + ' ที่ถูกใช้ผิดทิศทาง — <span class="hl-purple">' + tk.kala + '</span><br><br>'
+    + elementInsight
     + '</div>'
     + '<div class="action-plan-card">'
     + '<div class="ap-title">✦ พิมพ์เขียวเพื่อปรับฐานชีวิต ✦</div>'
     + '<div style="text-align:center; font-size:11px; color:#7a6a9a; margin-bottom:20px; letter-spacing:0.05em;"></div>'
-    + '<div class="ap-step"><div class="ap-num">1</div><div class="ap-content"><h4><span style="font-size:15px; margin-right:4px;">👁️</span> สติรับรู้</h4><p>เมื่อไหร่ก็ตามที่คุณเริ่มรู้สึกว่า <strong class="hl-purple">"' + tk.kala + '"</strong> กำลังก่อตัวขึ้น ให้ถือว่านั่นคือสัญญาณเตือนจากดวงดาว <span style="font-size:13px">🔔</span> อย่ากล่าวโทษตัวเอง แต่ให้รับรู้ว่าเงามืดกำลังพยายามเข้ามาควบคุมพวงมาลัยชีวิตคุณ</p></div></div>'
-    + '<div class="ap-step"><div class="ap-num">2</div><div class="ap-content"><h4><span style="font-size:15px; margin-right:4px;">🧭</span> ลงมือปรับจูน </h4><p><span class="hl-gold">✧</span> ' + p.wkfix + '<br><br><span class="hl-gold">✧</span> นอกจากนี้ กุญแจสำคัญของคนธาตุ' + p.el + 'คือ <strong>' + elementAction + '</strong> <span style="font-size:13px">⏳</span> เริ่มต้นทำสิ่งนี้ให้เป็นนิสัยใน 21 วันข้างหน้า</p></div></div>'
-    + '<div class="ap-step"><div class="ap-num">3</div><div class="ap-content"><h4><span style="font-size:15px; margin-right:4px;">🦋</span> ยกระดับจิตวิญญาณ </h4><p>เมื่อคุณปรับสมดุลข้อ 1 และ 2 ได้ พลังงานแห่งความขัดแย้งจะถูกเปลี่ยนเป็น <strong class="hl-gold">✨ ' + tk.sri + '</strong> โดยอัตโนมัติ คุณจะพบว่าผู้คน โอกาส และโชคลาภ <span style="font-size:13px">🕊️</span> จะถูกดึงดูดเข้ามาหาคุณอย่างเป็นธรรมชาติ เพราะฐานชีวิตคุณมั่นคงแล้ว</p></div></div>'
+    + '<div class="ap-step"><div class="ap-num">1</div><div class="ap-content"><h4><span style="font-size:15px; margin-right:4px;">👁️</span> สติรับรู้</h4><p>เมื่อไหร่ก็ตามที่คุณเริ่มรู้สึกว่า <strong class="hl-purple">"' + tk.kala + '"</strong> กำลังก่อตัวขึ้น ให้ถือว่านั่นคือสัญญาณเตือน — หยุด 3 ลมหายใจ รับรู้ว่าความรู้สึกนี้ไม่เที่ยง (อนิจจัง) อย่ากล่าวโทษตัวเอง</p></div></div>'
+    + '<div class="ap-step"><div class="ap-num">2</div><div class="ap-content"><h4><span style="font-size:15px; margin-right:4px;">🧭</span> ลงมือปรับจูน </h4><p><span class="hl-gold">✧</span> ' + p.wkfix + '<br><br><span class="hl-gold">✧</span> กุญแจสำคัญของคนธาตุ' + p.el + 'คือ <strong>' + elementAction + '</strong> <span style="font-size:13px">⏳</span> เริ่มต้นทำสิ่งนี้ให้เป็นนิสัยใน 21 วันข้างหน้า</p></div></div>'
+    + '<div class="ap-step"><div class="ap-num">3</div><div class="ap-content"><h4><span style="font-size:15px; margin-right:4px;">🧘</span> เหตุเสริมจากพระไตรปิฎก </h4><p>นั่งสมาธิ <span class="hl-gold">"พุท-โธ" 3 นาที</span> ทุกวัน — อานาปานสติช่วยสงบจิต เมื่อจิตสงบแล้ว พลังงานแห่ง <strong class="hl-gold">✨ ' + tk.sri + '</strong> จะถูกปลดล็อกเอง ผู้คน โอกาส และโชคลาภจะเข้ามาหาคุณอย่างเป็นธรรมชาติ</p></div></div>'
     + '<div class="ap-quote">"จุดอ่อนที่ถูกเยียวยา จะกลายเป็นจุดแข็งที่แข็งแกร่งที่สุดของคุณ <span style="font-style:normal">🤍</span>"</div>'
     + '</div>';
 
@@ -786,7 +785,8 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
       {t:u.s0[0], c:p.p, rf:refDesc.p_r_l},
       {t:'สไตล์การแสดงออก (ราศีเกิด)', c:rasiHtml, rf:'วิเคราะห์จากราศีเกิด ('+r.n+') ซึ่งเป็นรูปแบบพลังงานที่คุณใช้ขับเคลื่อนตัวเองบนโลกใบนี้'},
       {t:'รหัสผ่านชีวิต (ทักษาปกรณ์)', c:thaksaHtml, rf:refDesc.thaksa},
-      {t:u.s0[1], c:p.str, rf:'วิเคราะห์จากพลังงานธาตุ'+p.el+' และลักษณะเด่นของดาว'+p.n}
+      {t:u.s0[1], c:p.str, rf:'วิเคราะห์จากพลังงานธาตุ'+p.el+' และลักษณะเด่นของดาว'+p.n},
+      {t:u.s0[2], c:wkFull, rf:'วิเคราะห์จากมุมตั้งฉากและเรือนอริ/มรณะ ของ <span class="hl-purple">ดาว'+p.n+'</span> ซึ่งสะท้อนจุดเปราะบางที่ซ่อนอยู่ในจิตใต้สำนึก'}
     ]},
     {lb:'ความรัก', secs:[{t:u.s0[3], c:p.lv, rf:refDesc.lv}]},
     {lb:'งานเงิน', secs:[
