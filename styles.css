@@ -3146,3 +3146,54 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .gk-notif-name { font-family: 'Kanit', sans-serif; font-size: 16px; color: #f0e6d3; font-weight: 600; }
 .gk-notif-desc { font-family: 'Sarabun', sans-serif; font-size: 12px; color: #a09880; }
 tion into index.html and build pipeline)
+
+/* ===== REPORT BADGES SECTION ===== */
+.report-badges {
+  margin: 0 0 20px;
+  padding: 16px;
+  background: linear-gradient(145deg, rgba(201,162,39,0.06), rgba(91,63,166,0.06));
+  border: 1px solid rgba(201,162,39,0.15);
+  border-radius: 16px;
+}
+.rb-title {
+  font-family: 'Kanit', sans-serif;
+  font-size: 15px;
+  color: #c9a227;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+/* ===== ENHANCED BLUEPRINT AXIS SYMBOLS ===== */
+.bp-axis-symbol {
+  font-size: 28px;
+  display: block;
+  margin: 4px 0 6px;
+  text-shadow: 0 0 15px currentColor;
+  animation: bpSymbolPulse 3s ease-in-out infinite;
+}
+@keyframes bpSymbolPulse {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+/* ===== MYSTICAL DOMAIN LINES ===== */
+.domain-compact-line b {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.domain-cause {
+  border-left: 2px solid #9B8AB8;
+}
+.domain-boost {
+  border-left: 2px solid #c9a227;
+}
+.domain-caution {
+  border-left: 2px solid #E8534A;
+}
+.domain-now {
+  border-left: 2px solid #6EC89A;
+}
+.domain-practice {
+  border-left: 2px solid #F5A623;
+}

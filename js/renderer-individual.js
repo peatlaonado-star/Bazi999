@@ -632,10 +632,10 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
       + '</div>'
       + '</div>'
       + '<div class="domain-compact-body">'
-      + '<div class="domain-compact-line domain-now"><b>สถานะตอนนี้</b><span>' + escapeHTML(domain.current) + '</span></div>'
-      + '<div class="domain-compact-line domain-caution"><b>ระวัง</b><span>' + escapeHTML(domain.warning) + '</span></div>'
-      + '<div class="domain-compact-line domain-cause"><b>แก้เหตุ</b><span>' + escapeHTML(remedy.fix) + '</span></div>'
-      + '<div class="domain-compact-line domain-boost"><b>เสริมให้ปัง</b><span>' + escapeHTML(remedy.boost) + '</span></div>'
+      + '<div class="domain-compact-line domain-now"><b>🌙 สถานะตอนนี้</b><span>' + escapeHTML(domain.current) + '</span></div>'
+      + '<div class="domain-compact-line domain-caution"><b>⚡ ระวัง</b><span>' + escapeHTML(domain.warning) + '</span></div>'
+      + '<div class="domain-compact-line domain-cause"><b>🔮 แก้เหตุ</b><span>' + escapeHTML(remedy.fix) + '</span></div>'
+      + '<div class="domain-compact-line domain-boost"><b>✨ เสริมให้ปัง</b><span>' + escapeHTML(remedy.boost) + '</span></div>'
       + '<div class="domain-compact-line domain-practice"><b>ภารกิจ 7 วัน</b><span>' + escapeHTML(practiceText) + '</span></div>'
       + '</div>'
       + '<details class="domain-age-details">'
@@ -694,17 +694,17 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
   // 5. ประกอบร่างการแสดงผล (Info + Power Elements + Radar)
   // Blueprint Header Card
   var blueprintCardHtml = '<div class="blueprint-card">'
-    + '<div class="bp-kicker">พิมพ์เขียวชีวิตไทย</div>'
+    + '<div class="bp-kicker">✦ พิมพ์เขียวชีวิตไทย ✦</div>'
     + '<div class="bp-hero">'
     + '<div class="bp-planet-main">'
-    + '<span class="bp-planet-symbol" style="color:' + p.c + '">' + p.s + '</span>'
+    + '<span class="bp-planet-symbol" style="color:' + p.c + ';text-shadow:0 0 20px ' + p.c + '80">' + p.s + '</span>'
     + '<div><div class="bp-label">ดาวเจ้าชะตา</div><div class="bp-title">' + p.n + ' · ธาตุ' + p.el + '</div></div>'
     + '</div>'
     + '<div class="bp-age-meta"><span>เจ้าของดวง</span><strong>✦ ' + nm + ' ✦</strong><small>' + ageTxt + '</small></div>'
     + '</div>'
     + '<div class="bp-axis-grid">'
-    + '<div class="bp-axis-card"><span class="bp-axis-label">ตัวตนภายนอก</span><strong style="color:' + r.c + '">' + r.s + ' ' + r.n + '</strong><small>' + (r.trait || 'โทนบุคลิกและแรงขับหลัก') + '</small><p class="bp-axis-desc">' + (r.apply || '') + '</p></div>'
-    + '<div class="bp-axis-card"><span class="bp-axis-label">วิธีที่โลกมองเห็น</span><strong style="color:' + l.c + '">' + l.s + ' ' + l.n + '</strong><small>' + (l.trait || 'ภาพแรกที่คนอื่นสัมผัสได้') + '</small>' + (ts ? '<p class="bp-axis-desc">' + (l.apply || '') + '</p>' : '<p class="bp-axis-hint">⚠️ ใส่เวลาเกิดเพื่อดูลัคนาที่แม่นยำ</p>') + '</div>'
+    + '<div class="bp-axis-card"><span class="bp-axis-label">ตัวตนภายนอก</span><div class="bp-axis-symbol" style="color:' + r.c + '">' + r.s + '</div><strong style="color:' + r.c + '">' + r.n + '</strong><small>' + (r.trait || 'โทนบุคลิกและแรงขับหลัก') + '</small><p class="bp-axis-desc">' + (r.apply || '') + '</p></div>'
+    + '<div class="bp-axis-card"><span class="bp-axis-label">วิธีที่โลกมองเห็น</span><div class="bp-axis-symbol" style="color:' + l.c + '">' + l.s + '</div><strong style="color:' + l.c + '">' + l.n + '</strong><small>' + (l.trait || 'ภาพแรกที่คนอื่นสัมผัสได้') + '</small>' + (ts ? '<p class="bp-axis-desc">' + (l.apply || '') + '</p>' : '<p class="bp-axis-hint">⚠️ ใส่เวลาเกิดเพื่อดูลัคนาที่แม่นยำ</p>') + '</div>'
     + '</div>'
     + '<div class="bp-summary">พิมพ์เขียวนี้สรุปแรงขับเดิมของคุณก่อนอ่านดวงรายเดือน — อายุเป็นเพียงบริบทเสริม ไม่ใช่ตัวตัดสินดวงทั้งหมด</div>'
     + '</div>';
@@ -724,7 +724,22 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + '<div class="tabs-w"><div class="tabs" id="tt0"></div></div><div id="ts0"></div>'
     + '</div>';
 
+  var badgesHtml = '';
+  if (typeof Gamification !== 'undefined') {
+    var gState = Gamification.getState();
+    var streak = Gamification.getStreak();
+    if (gState.badges.length > 0 || streak > 0) {
+      badgesHtml = '<div class="report-badges">'
+        + '<div class="rb-title">🏆 ผลงานของคุณ</div>'
+        + (streak > 0 ? Gamification.renderStreakBadge(streak) : '')
+        + Gamification.renderBadges(gState.badges)
+        + (gState.points > 0 ? Gamification.renderProgressBar(gState.points) : '')
+        + '</div>';
+    }
+  }
+
   wrap.innerHTML = blueprintCardHtml
+    + badgesHtml
     + conversionRoadmapHtml
     + wrapCollapsible("✦ กำลังวันประจำตัว ✦", "วันเกิด · เทวดา · ธาตุ · สีมงคล", cosmicBriefHtml)
     + wrapCollapsible("✨ พลังงานเสริมดวง", "เลขและสีมงคลประจำวัน", powerCardHtml)
