@@ -22,6 +22,7 @@ const files = [
   'js/social-proof.js',
   'assets/html2canvas.min.js',
   'assets/og-image.png',
+  'assets/og-share-story.png',
   'assets/qr-payment.jpg',
   'privacy.html',
   'terms.html',
