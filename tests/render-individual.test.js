@@ -332,6 +332,7 @@ describe('Free reader conversion reading order', () => {
     expect(snapshot.textContent).not.toContain('สรุปดวงของพ่อ');
     expect(snapshot.textContent).toContain('โฟกัสวันนี้');
     expect(snapshot.textContent).toContain('แก้เหตุวันนี้');
+    expect(snapshot.querySelector('.rs-actions')).toBeNull();
     expect(dom.window.document.body.classList.contains('has-report')).toBe(true);
   });
 
@@ -374,21 +375,17 @@ describe('Free reader conversion reading order', () => {
     expect(tabsCard.textContent).not.toContain('อ่านรายละเอียดพื้นฐาน');
   });
 
-  it('locks the self tab for premium readers and keeps other tabs free', () => {
+  it('locks all tabs for premium readers', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>', { url: 'http://localhost' });
     const context = loadContext(dom);
 
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const tabs = Array.from(dom.window.document.querySelectorAll('#tt0 .tab'));
-    const selfTab = tabs[0];
-    const lockIcon = selfTab.querySelector('.tab-lock');
-    const freeTabs = tabs.slice(1);
 
-    expect(selfTab).toBeTruthy();
-    expect(selfTab.textContent).toContain('🔒');
-    expect(lockIcon).toBeTruthy();
-    freeTabs.forEach((tab) => {
-      expect(tab.querySelector('.tab-lock')).toBeNull();
+    expect(tabs.length).toBe(4);
+    tabs.forEach((tab) => {
+      expect(tab.querySelector('.tab-lock')).toBeTruthy();
+      expect(tab.textContent).toContain('🔒');
     });
   });
 
@@ -426,7 +423,7 @@ describe('Free reader conversion reading order', () => {
     const labels = tabs.map((node) => node.textContent);
 
     expect(tabsCard).toBeTruthy();
-    expect(labels).toEqual(['👤ตัวตน🔒', '💞คู่สัมพันธ์', '💼การงาน', '💰การเงิน']);
+    expect(labels).toEqual(['👤ตัวตน🔒', '💞คู่สัมพันธ์🔒', '💼การงาน🔒', '💰การเงิน🔒']);
 
     tabs.forEach((tab, index) => {
       tab.click();

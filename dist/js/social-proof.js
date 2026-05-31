@@ -92,7 +92,7 @@
     }
 
     renderTestimonial(0);
-    setInterval(rotateTestimonial, 6000);
+    setInterval(rotateTestimonial, 10000);
   }
 
   // ===== Authority Badge =====

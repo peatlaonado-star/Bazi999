@@ -28,7 +28,7 @@ function buildTabs(tid,sid,pre,TB,p,u){
   TB.forEach(function(tb,i){
     var btn=document.createElement('button');
     btn.className='tab'+(i===0?' on':'');
-    var lockSpan = i===0 ? '<span class="tab-lock">🔒</span>' : '';
+    var lockSpan = '<span class="tab-lock">🔒</span>';
     btn.innerHTML = '<span class="tab-icon">' + (tabIcons[i] || '✦') + '</span><span class="tab-text">' + tb.lb + '</span>' + lockSpan;
     btn.addEventListener('click', function(){
       document.querySelectorAll('#'+tid+' .tab').forEach(function(t){t.classList.remove('on');});
@@ -42,7 +42,7 @@ function buildTabs(tid,sid,pre,TB,p,u){
     sec.className='sec'+(i===0?' on':'');
     sec.id=pre+i;
 
-    var isPremiumTab = (i === 0);
+    var isPremiumTab = true;
     if (isPremiumTab && !premiumIsUnlocked()) {
        sec.classList.add('is-locked');
     }

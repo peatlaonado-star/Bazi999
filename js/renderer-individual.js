@@ -733,7 +733,6 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + '<div class="rs-line"><b>ระวัง</b><span>' + escapeHTML(briefData.warning) + '</span></div>'
     + '<div class="rs-line rs-remedy"><b>แก้เหตุวันนี้</b><span>' + escapeHTML(briefData.action) + '</span></div>'
     + '</div>'
-    + '<div class="rs-actions"><a href="#" data-action="scroll-domain" data-domain="money">อ่านการเงิน</a><a href="#" data-action="scroll-domain" data-domain="relationship">อ่านความสัมพันธ์</a><a href="#" data-action="scroll-domain" data-domain="career">อ่านการงาน</a></div>'
     + '</div>';
 
   var detailTabsShellHtml = '<div class="detail-tabs-card">'
