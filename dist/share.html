@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>✦ ดวงวันนี้ — STARVIA ✦</title>
+<meta name="description" content="ดูดวงวันนี้ของคุณจากโหราศาสตร์ไทยโบราณ">
+<meta property="og:title" content="✦ ดวงวันนี้จาก STARVIA ✦">
+<meta property="og:description" content="ดูดวงส่วนตัวของฉัน — ธาตุ สีมงคล เลขนำโชค ไพ่ประจำวัน">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://starvia.website/share.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Charm:wght@400;700&family=Kanit:wght@400;600;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:Sarabun,Kanit,sans-serif;
+  background:#09061c;
+  color:#F8F1DF;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:radial-gradient(circle at 14% -10%,rgba(91,63,166,.55),transparent 36%),radial-gradient(circle at 82% 4%,rgba(42,20,90,.45),transparent 32%),#09061c;
+}
+
+/* Fortune Card */
+.fortune-card{
+  max-width:420px;
+  width:100%;
+  background:linear-gradient(145deg,rgba(37,24,68,.92),rgba(11,7,28,.88));
+  border:1px solid rgba(201,162,39,.3);
+  border-radius:24px;
+  overflow:hidden;
+  box-shadow:0 24px 70px rgba(0,0,0,.5),0 0 60px rgba(201,162,39,.08);
+  position:relative;
+}
+.fortune-card::before{
+  content:'';position:absolute;top:-2px;left:-2px;right:-2px;bottom:-2px;
+  background:linear-gradient(135deg,rgba(201,162,39,.3),transparent 40%,transparent 60%,rgba(142,114,216,.2));
+  border-radius:25px;z-index:-1;
+}
+
+/* Header */
+.fc-header{
+  text-align:center;padding:28px 24px 18px;
+  background:linear-gradient(180deg,rgba(201,162,39,.08),transparent);
+}
+.fc-brand{
+  font-family:Georgia,'Times New Roman',serif;
+  font-size:16px;font-weight:700;
+  background:linear-gradient(135deg,#8B6914,#C9A227 50%,#f0d96a);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:.12em;margin-bottom:4px;
+}
+.fc-tagline{font-size:9px;color:#7a6a9a;letter-spacing:.15em;text-transform:uppercase}
+.fc-date{
+  font-size:12px;color:#8a7aaa;margin-top:10px;letter-spacing:.04em;
+}
+
+/* Personalized Quote */
+.fc-quote{
+  padding:18px 24px;text-align:center;
+  border-bottom:1px solid rgba(201,162,39,.08);
+}
+.fc-personal-tag{
+  display:inline-block;
+  background:linear-gradient(135deg,rgba(142,114,216,.25),rgba(201,162,39,.2));
+  border:1px solid rgba(142,114,216,.35);
+  border-radius:50px;padding:2px 10px;
+  font-size:9px;color:#8E72D8;font-weight:600;
+  letter-spacing:.08em;margin-bottom:10px;
+}
+.fc-quote-text{
+  font-size:14px;line-height:1.7;color:#C9BDDF;
+  font-style:italic;
+}
+
+/* Lucky Grid */
+.fc-lucky{
+  padding:16px 20px;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+}
+.fc-lucky-item{
+  text-align:center;padding:12px 6px;
+  background:rgba(142,114,216,.06);
+  border:1px solid rgba(142,114,216,.1);
+  border-radius:14px;
+}
+.fc-lucky-icon{font-size:20px;margin-bottom:4px}
+.fc-lucky-swatch{
+  width:24px;height:24px;border-radius:50%;margin:0 auto 4px;
+  box-shadow:0 0 10px rgba(201,162,39,.3);
+}
+.fc-lucky-label{font-size:8px;color:#7a6a9a;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}
+.fc-lucky-value{font-size:13px;color:#F4D987;font-weight:700;line-height:1.3}
+.fc-lucky-num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:linear-gradient(135deg,rgba(201,162,39,.2),rgba(201,162,39,.08));border:1px solid rgba(201,162,39,.35);border-radius:8px;font-size:14px;color:#C9A227;font-weight:800;font-family:Chonburi,Kanit,serif}
+.fc-lucky-nums{display:flex;gap:5px;justify-content:center;flex-wrap:wrap}
+.fc-lucky-sub{font-size:8px;color:#6a5a8a;margin-top:3px;line-height:1.3}
+
+/* Fortune Card */
+.fc-card{
+  margin:0 20px 16px;
+  background:linear-gradient(135deg,rgba(142,114,216,.1),rgba(201,162,39,.06));
+  border:1px solid rgba(142,114,216,.18);
+  border-radius:16px;padding:16px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.fc-card::before{
+  content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+  background:radial-gradient(circle at 30% 30%,rgba(201,162,39,.05),transparent 50%);
+  pointer-events:none;
+}
+.fc-card-icon{font-size:32px;margin-bottom:4px;filter:drop-shadow(0 0 8px rgba(201,162,39,.3))}
+.fc-card-name{font-size:15px;color:#C9A227;font-weight:700;font-family:Chonburi,Kanit,serif;margin-bottom:4px;letter-spacing:.04em}
+.fc-card-meaning{font-size:11px;color:#C9BDDF;line-height:1.5;font-style:italic}
+
+/* Warning */
+.fc-warning{
+  margin:0 20px 16px;padding:10px 14px;
+  background:rgba(232,83,58,.06);
+  border:1px solid rgba(232,83,58,.12);
+  border-radius:12px;
+  font-size:11px;color:#d4a0a0;line-height:1.5;
+}
+.fc-warning-label{font-size:9px;color:#e8534a;font-weight:600;letter-spacing:.06em;margin-bottom:3px}
+
+/* Focus */
+.fc-focus{
+  margin:0 20px 16px;padding:10px 14px;
+  background:rgba(46,204,113,.06);
+  border:1px solid rgba(46,204,113,.12);
+  border-radius:12px;
+  font-size:11px;color:#a0d4b0;line-height:1.5;
+}
+.fc-focus-label{font-size:9px;color:#2ecc71;font-weight:600;letter-spacing:.06em;margin-bottom:3px}
+
+/* CTA */
+.fc-cta{
+  text-align:center;padding:0 20px 20px;
+}
+.fc-cta a{
+  display:inline-block;
+  padding:12px 28px;
+  background:linear-gradient(135deg,#C9A227,#8B6914);
+  color:#fff;text-decoration:none;
+  border-radius:50px;font-size:13px;font-weight:700;
+  letter-spacing:.04em;
+  box-shadow:0 4px 20px rgba(201,162,39,.3);
+  transition:all .25s;
+}
+.fc-cta a:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(201,162,39,.4)}
+
+/* Actions */
+.actions{
+  max-width:420px;width:100%;margin-top:16px;
+  display:flex;gap:10px;justify-content:center;flex-wrap:wrap;
+}
+.action-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:10px 18px;border:1px solid rgba(201,162,39,.25);
+  border-radius:50px;background:rgba(201,162,39,.06);
+  color:#F4D987;font-size:12px;font-weight:600;
+  cursor:pointer;transition:all .25s;font-family:inherit;
+}
+.action-btn:hover{background:rgba(201,162,39,.15);transform:translateY(-2px)}
+.action-btn-primary{
+  background:linear-gradient(135deg,rgba(201,162,39,.2),rgba(201,162,39,.08));
+  border-color:rgba(201,162,39,.4);
+}
+
+/* Footer */
+.share-footer{
+  margin-top:20px;text-align:center;
+  font-size:10px;color:#5a4a7a;letter-spacing:.06em;
+}
+.share-footer a{color:#8c7bb3;text-decoration:none}
+
+/* Canvas for screenshot */
+#screenshot-output{
+  max-width:420px;width:100%;margin-top:16px;display:none;
+}
+#screenshot-output img{width:100%;border-radius:18px;border:1px solid rgba(201,162,39,.2)}
+
+@media(max-width:480px){
+  body{padding:12px}
+  .fc-lucky{grid-template-columns:1fr;gap:8px}
+  .fc-header{padding:20px 16px 14px}
+  .fc-quote{padding:14px 16px}
+}
+</style>
+</head>
+<body>
+
+<div class="fortune-card" id="fortune-card">
+  <div class="fc-header">
+    <div class="fc-brand">✦ STARVIA ✦</div>
+    <div class="fc-tagline">โหราศาสตร์ไทยโบราณ · นพเคราะห์ · ดวงชะตา</div>
+    <div class="fc-date" id="fc-date"></div>
+  </div>
+
+  <div class="fc-quote">
+    <div class="fc-personal-tag">🔮 ดวงส่วนตัว</div>
+    <div class="fc-quote-text" id="fc-quote-text"></div>
+  </div>
+
+  <div class="fc-lucky">
+    <div class="fc-lucky-item">
+      <div class="fc-lucky-swatch" id="fc-color-swatch"></div>
+      <div class="fc-lucky-label">สีมงคล</div>
+      <div class="fc-lucky-value" id="fc-color-name"></div>
+      <div class="fc-lucky-sub" id="fc-color-meaning"></div>
+    </div>
+    <div class="fc-lucky-item">
+      <div class="fc-lucky-icon">🔢</div>
+      <div class="fc-lucky-label">เลขนำโชค</div>
+      <div class="fc-lucky-nums" id="fc-numbers"></div>
+      <div class="fc-lucky-sub">เลขที่ดาวส่งมาให้วันนี้</div>
+    </div>
+    <div class="fc-lucky-item">
+      <div class="fc-lucky-icon">⏰</div>
+      <div class="fc-lucky-label">เวลาเฮง</div>
+      <div class="fc-lucky-value" id="fc-time"></div>
+      <div class="fc-lucky-sub" id="fc-time-reason"></div>
+    </div>
+  </div>
+
+  <div class="fc-card">
+    <div class="fc-card-icon" id="fc-card-icon"></div>
+    <div class="fc-card-name" id="fc-card-name"></div>
+    <div class="fc-card-meaning" id="fc-card-meaning"></div>
+  </div>
+
+  <div class="fc-warning" id="fc-warning-box">
+    <div class="fc-warning-label">⚠️ ข้อควรระวัง</div>
+    <div id="fc-warning-text"></div>
+  </div>
+
+  <div class="fc-focus" id="fc-focus-box">
+    <div class="fc-focus-label">🎯 สิ่งที่ควรโฟกัส</div>
+    <div id="fc-focus-text"></div>
+  </div>
+
+  <div class="fc-cta">
+    <a href="https://starvia.website">✦ ดูดวงของคุณเอง ✦</a>
+  </div>
+</div>
+
+<div class="actions">
+  <button class="action-btn action-btn-primary" id="btn-save-image">📸 บันทึกเป็นรูป</button>
+  <button class="action-btn" id="btn-share-line">💬 แชร์ LINE</button>
+  <button class="action-btn" id="btn-share-fb">📘 แชร์ Facebook</button>
+  <button class="action-btn" id="btn-copy-link">🔗 คัดลอกลิงก์</button>
+</div>
+
+<div id="screenshot-output"></div>
+
+<div class="share-footer">
+  <a href="https://starvia.website">✦ STARVIA ✦</a> — ค้นพบตัวเองผ่านดวงดาว
+</div>
+
+<script src="assets/html2canvas.min.js"></script>
+<script src="js/daily-fortune.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  var SITE_URL = 'https://starvia.website';
+  var SHARE_PAGE = SITE_URL + '/share.html';
+
+  // Parse URL params
+  var params = new URLSearchParams(window.location.search);
+  var dob = params.get('dob') || '';
+  var name = params.get('name') || '';
+
+  // Build fortune
+  var PF = window.PersonalizedFortune;
+  var birthData = null;
+  if (dob) {
+    birthData = { dob: dob, name: name };
+    // Save to onboarding for PF to read
+    localStorage.setItem('starvia_onboarding', JSON.stringify({
+      step: 2,
+      startedAt: new Date().toISOString(),
+      birthData: birthData
+    }));
+  }
+
+  var fortune = PF.buildPersonalizedFortune(birthData);
+
+  // Render date
+  var monthNames = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  var d = new Date();
+  document.getElementById('fc-date').textContent = d.getDate() + ' ' + monthNames[d.getMonth()] + ' ' + (d.getFullYear() + 543);
+
+  // Render quote
+  var quoteText = fortune.quote;
+  if (fortune.hasBirthData) {
+    quoteText = quoteText.replace(/^คนเกิดวัน[^\s]+ \(ธาตุ[^\s]+\) — /, '');
+  }
+  document.getElementById('fc-quote-text').textContent = '"' + quoteText + '"';
+
+  // Render lucky color
+  document.getElementById('fc-color-swatch').style.background = fortune.luckyColor.hex;
+  document.getElementById('fc-color-name').textContent = fortune.luckyColor.name;
+  document.getElementById('fc-color-meaning').textContent = fortune.luckyColor.meaning;
+
+  // Render lucky numbers
+  var numsHtml = fortune.luckyNumbers.map(function(n) {
+    return '<span class="fc-lucky-num">' + n + '</span>';
+  }).join('');
+  document.getElementById('fc-numbers').innerHTML = numsHtml;
+
+  // Render lucky time
+  document.getElementById('fc-time').textContent = fortune.luckyTime.time;
+  document.getElementById('fc-time-reason').textContent = fortune.luckyTime.reason;
+
+  // Render fortune card
+  document.getElementById('fc-card-icon').textContent = fortune.fortuneCard.icon;
+  document.getElementById('fc-card-name').textContent = fortune.fortuneCard.name;
+  document.getElementById('fc-card-meaning').textContent = '"' + fortune.fortuneCard.meaning + '"';
+
+  // Render warning & focus
+  document.getElementById('fc-warning-text').textContent = fortune.warning;
+  document.getElementById('fc-focus-text').textContent = fortune.focus;
+
+  // === Actions ===
+
+  // Save as image
+  document.getElementById('btn-save-image').addEventListener('click', function() {
+    var card = document.getElementById('fortune-card');
+    var btn = this;
+    btn.textContent = '⏳ กำลังสร้างรูป...';
+    btn.disabled = true;
+
+    html2canvas(card, {
+      backgroundColor: '#09061c',
+      scale: 2,
+      useCORS: true,
+      borderRadius: '24px',
+    }).then(function(canvas) {
+      var link = document.createElement('a');
+      link.download = 'starvia-fortune-' + d.toISOString().slice(0, 10) + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      btn.textContent = '✅ บันทึกแล้ว!';
+      setTimeout(function() {
+        btn.textContent = '📸 บันทึกเป็นรูป';
+        btn.disabled = false;
+      }, 2000);
+    }).catch(function() {
+      btn.textContent = '❌ ลองอีกครั้ง';
+      btn.disabled = false;
+    });
+  });
+
+  // Share to LINE
+  document.getElementById('btn-share-line').addEventListener('click', function() {
+    var text = '🔮 ดวงวันนี้ของฉันจาก STARVIA\n' + fortune.fortuneCard.icon + ' ไพ่: ' + fortune.fortuneCard.name + '\n🎨 สีมงคล: ' + fortune.luckyColor.name + '\n🔢 เลขนำโชค: ' + fortune.luckyNumbers.join(', ');
+    var url = 'https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(SHARE_PAGE + '?dob=' + encodeURIComponent(dob)) + '&text=' + encodeURIComponent(text);
+    window.open(url, '_blank', 'width=600,height=500');
+  });
+
+  // Share to Facebook
+  document.getElementById('btn-share-fb').addEventListener('click', function() {
+    var url = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(SHARE_PAGE + '?dob=' + encodeURIComponent(dob));
+    window.open(url, '_blank', 'width=600,height=400');
+  });
+
+  // Copy link
+  document.getElementById('btn-copy-link').addEventListener('click', function() {
+    var link = SHARE_PAGE + '?dob=' + encodeURIComponent(dob);
+    var btn = this;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(link).then(function() {
+        btn.innerHTML = '✅ คัดลอกแล้ว!';
+        setTimeout(function() { btn.innerHTML = '🔗 คัดลอกลิงก์'; }, 2000);
+      });
+    }
+  });
+})();
+</script>
+</body>
+</html>

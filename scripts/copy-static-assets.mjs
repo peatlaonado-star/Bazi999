@@ -26,6 +26,7 @@ const files = [
   'privacy.html',
   'terms.html',
   'admin.html',
+  'share.html',
 ];
 
 for (const file of files) {

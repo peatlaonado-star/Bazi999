@@ -2317,6 +2317,9 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 
 /* Share hint */
 .share-hint{text-align:center;font-size:9px;color:#5a4a7a;margin-top:8px;letter-spacing:.1em}
+.share-preview{text-align:center;margin-top:8px}
+.share-preview-link{font-size:11px;color:#8E72D8;text-decoration:none;letter-spacing:.03em;transition:color .2s}
+.share-preview-link:hover{color:#C9A227;text-decoration:underline}
 
 /* Mobile share */
 @media(max-width:480px){

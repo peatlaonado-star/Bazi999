@@ -70,18 +70,39 @@
 
   // ===== Share Functions =====
 
+  function getShareUrl() {
+    var birthData = getBirthDataFromStorage();
+    var url = SITE_URL + '/share.html';
+    if (birthData && birthData.dob) {
+      url += '?dob=' + encodeURIComponent(birthData.dob);
+      if (birthData.name) url += '&name=' + encodeURIComponent(birthData.name);
+    }
+    return url;
+  }
+
+  function getBirthDataFromStorage() {
+    try {
+      var raw = getLS().getItem(ONBOARDING_KEY);
+      var data = safeJSON(raw);
+      if (data && data.birthData) return data.birthData;
+    } catch(e) {}
+    return null;
+  }
+
   function shareToLine() {
+    var shareUrl = getShareUrl();
     var text = generateShareMessage();
     var url = 'https://social-plugins.line.me/lineit/share?url='
-      + encodeURIComponent(SITE_URL)
+      + encodeURIComponent(shareUrl)
       + '&text=' + encodeURIComponent(text);
     window.open(url, '_blank', 'width=600,height=500');
     recordShare('line');
   }
 
   function shareToFacebook() {
+    var shareUrl = getShareUrl();
     var url = 'https://www.facebook.com/sharer/sharer.php?u='
-      + encodeURIComponent(SITE_URL)
+      + encodeURIComponent(shareUrl)
       + '&quote=' + encodeURIComponent(generateShareMessage());
     window.open(url, '_blank', 'width=600,height=400');
     recordShare('facebook');
@@ -89,25 +110,26 @@
 
   function shareToX() {
     var text = generateShareMessage();
+    var shareUrl = getShareUrl();
     var url = 'https://twitter.com/intent/tweet?text='
       + encodeURIComponent(text)
-      + '&url=' + encodeURIComponent(SITE_URL);
+      + '&url=' + encodeURIComponent(shareUrl);
     window.open(url, '_blank', 'width=600,height=400');
     recordShare('x');
   }
 
   function copyShareLink() {
-    var text = generateShareMessage() + '\n' + SITE_URL;
+    var shareUrl = getShareUrl();
 
     // Try clipboard API first
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(function() {
+      navigator.clipboard.writeText(shareUrl).then(function() {
         showCopySuccess();
       }).catch(function() {
-        fallbackCopy(text);
+        fallbackCopy(shareUrl);
       });
     } else {
-      fallbackCopy(text);
+      fallbackCopy(shareUrl);
     }
     recordShare('copy');
   }
@@ -223,6 +245,11 @@
     // Subtle hint
     html += '<div class="share-hint">✦ ยิ่งแชร์ ยิ่งเสริมพลังดวง ✦</div>';
 
+    // Preview link
+    html += '<div class="share-preview">'
+      + '<a class="share-preview-link" href="' + (ShareViral.getShareUrl ? ShareViral.getShareUrl() : '/share.html') + '" target="_blank">👁️ ดูตัวอย่างบัตรดวงชะตา</a>'
+      + '</div>';
+
     container.innerHTML = html;
   }
 
@@ -245,6 +272,7 @@
     copyShareLink: copyShareLink,
     nativeShare: nativeShare,
     generateShareMessage: generateShareMessage,
-    recordShare: recordShare
+    recordShare: recordShare,
+    getShareUrl: getShareUrl
   };
 })();
