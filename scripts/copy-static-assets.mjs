@@ -18,6 +18,8 @@ const files = [
   'js/daily-fortune.js',
   'js/onboarding.js',
   'js/gamification.js',
+  'js/share-viral.js',
+  'js/social-proof.js',
   'assets/html2canvas.min.js',
   'assets/og-image.png',
   'assets/qr-payment.jpg',

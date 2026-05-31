@@ -2095,6 +2095,18 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   margin-bottom: 20px;
 }
 
+/* Newsletter Teaser — Information Gap */
+.newsletter-teaser{margin:0 auto 18px;max-width:440px;padding:14px 18px;background:rgba(201,162,39,.06);border:1px dashed rgba(201,162,39,.25);border-radius:14px;position:relative}
+.newsletter-teaser-label{font-size:9px;color:#8a7aaa;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.newsletter-teaser-text{font-size:13px;color:var(--tx2);line-height:1.6;font-style:italic;margin-bottom:8px}
+.newsletter-teaser-cta{font-size:11px;color:var(--g);font-weight:700;letter-spacing:.04em;cursor:pointer}
+.newsletter-teaser-cta:hover{text-decoration:underline}
+
+/* Newsletter Benefits */
+.newsletter-benefits{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 auto 18px;max-width:440px}
+.newsletter-benefit{font-size:11px;color:#b8a8d8;text-align:left;padding:6px 10px;background:rgba(142,114,216,.04);border-radius:8px;line-height:1.4}
+@media(max-width:480px){.newsletter-benefits{grid-template-columns:1fr}}
+
 .newsletter-form {
   display: flex;
   flex-direction: column;
@@ -2250,6 +2262,68 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .df-footer{padding:8px 18px;border-top:1px solid rgba(201,162,39,.06);background:rgba(0,0,0,.15)}
 .df-footer-text{font-size:10px;color:#5a4a7a;letter-spacing:.04em}
 
+/* ===== Personalized Daily Fortune v2 ===== */
+.df-personal-tag{display:inline-block;background:linear-gradient(135deg,rgba(142,114,216,.25),rgba(201,162,39,.2));border:1px solid rgba(142,114,216,.35);border-radius:50px;padding:2px 10px;font-size:10px;color:var(--pu);font-weight:600;letter-spacing:.06em;margin-right:6px}
+
+/* Lucky Section */
+.df-lucky-section{padding:10px 18px 14px}
+.df-lucky-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.df-lucky-item{text-align:center;padding:10px 6px;background:rgba(142,114,216,.08);border:1px solid rgba(142,114,216,.12);border-radius:14px;transition:all .25s}
+.df-lucky-item:hover{background:rgba(142,114,216,.14);border-color:rgba(142,114,216,.25);transform:translateY(-2px)}
+.df-lucky-icon{font-size:22px;margin-bottom:4px}
+.df-lucky-label{font-size:9px;color:#7a6a9a;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.df-lucky-value{font-size:14px;color:var(--g2);font-weight:700;line-height:1.3}
+.df-lucky-meaning{font-size:9px;color:#8a7aaa;margin-top:3px;line-height:1.3}
+.df-lucky-numbers{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.df-lucky-num{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:linear-gradient(135deg,rgba(201,162,39,.2),rgba(201,162,39,.08));border:1px solid rgba(201,162,39,.35);border-radius:8px;font-size:15px;color:var(--g);font-weight:800;font-family:Chonburi,Kanit,serif}
+
+/* Fortune Card */
+.df-card-section{padding:0 18px 14px}
+.df-card-label{font-size:10px;color:#7a6a9a;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;text-align:center}
+.df-card-container{background:linear-gradient(135deg,rgba(142,114,216,.12),rgba(201,162,39,.08));border:1px solid rgba(142,114,216,.2);border-radius:16px;padding:16px;text-align:center;position:relative;overflow:hidden}
+.df-card-container::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 30%,rgba(201,162,39,.06),transparent 50%);pointer-events:none}
+.df-card-inner{position:relative;z-index:1}
+.df-card-icon{font-size:36px;margin-bottom:6px;filter:drop-shadow(0 0 8px rgba(201,162,39,.3))}
+.df-card-name{font-size:16px;color:var(--g);font-weight:700;font-family:Chonburi,Kanit,serif;margin-bottom:6px;letter-spacing:.04em}
+.df-card-meaning{font-size:12px;color:var(--tx2);line-height:1.5;font-style:italic}
+
+/* Mobile responsive */
+@media(max-width:480px){
+  .df-lucky-grid{grid-template-columns:1fr;gap:8px}
+  .df-lucky-item{padding:8px 10px}
+  .df-lucky-num{width:28px;height:28px;font-size:13px}
+}
+
+/* ===== Share & Viral ===== */
+.df-share-section{padding:0 18px 14px;margin-top:4px}
+.share-header{display:flex;align-items:center;gap:6px;margin-bottom:10px;justify-content:center}
+.share-icon{font-size:14px}
+.share-title{font-size:11px;color:#8a7aaa;text-transform:uppercase;letter-spacing:.1em;font-weight:600}
+.share-buttons{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.share-btn{display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border:1px solid rgba(142,114,216,.2);border-radius:50px;background:rgba(142,114,216,.06);color:var(--tx2);font-size:11px;font-weight:600;cursor:pointer;transition:all .25s;font-family:inherit;letter-spacing:.02em}
+.share-btn:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.share-btn-icon{font-size:14px}
+.share-btn-label{font-size:11px}
+
+/* Platform-specific hover colors */
+.share-btn-line:hover{background:rgba(6,199,80,.15);border-color:rgba(6,199,80,.4);color:#06C750}
+.share-btn-fb:hover{background:rgba(66,103,178,.15);border-color:rgba(66,103,178,.4);color:#4267B2}
+.share-btn-x:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.3);color:#fff}
+.share-btn-copy:hover{background:rgba(201,162,39,.15);border-color:rgba(201,162,39,.4);color:var(--g)}
+.share-btn-native:hover{background:rgba(142,114,216,.15);border-color:rgba(142,114,216,.4);color:var(--pu)}
+
+/* Copy success state */
+.share-copied{background:rgba(46,204,113,.15)!important;border-color:rgba(46,204,113,.4)!important;color:#2ecc71!important}
+
+/* Share hint */
+.share-hint{text-align:center;font-size:9px;color:#5a4a7a;margin-top:8px;letter-spacing:.1em}
+
+/* Mobile share */
+@media(max-width:480px){
+  .share-btn{padding:6px 10px;font-size:10px}
+  .share-btn-icon{font-size:12px}
+}
+
 /* Streak badge */
 .df-streak{display:inline-flex;align-items:center;gap:3px;background:rgba(201,162,39,.12);border:1px solid rgba(201,162,39,.25);border-radius:50px;padding:2px 10px 2px 6px;font-size:11px;color:var(--g);margin-left:6px;transition:all .3s}
 .df-streak-emoji{font-size:13px}
@@ -2262,9 +2336,26 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .sp-stat-card{text-align:center;background:rgba(255,255,255,.03);border:1px solid rgba(214,173,69,.12);border-radius:14px;padding:14px 8px;transition:all .3s}
 .sp-stat-number{font-size:22px;font-weight:700;color:var(--g);margin-bottom:3px;letter-spacing:-.02em}
 .sp-stat-label{font-size:10px;color:#7a6a9a;letter-spacing:.06em}
-.testimonials-strip{text-align:center;padding:0 4px}
+.testimonials-strip{text-align:center;padding:0 4px;min-height:60px;position:relative}
 .testimonial-text{font-size:13px;line-height:1.65;color:#b8a8d8;font-style:italic;margin:0}
 .testimonial-author{display:inline-block;margin-left:4px;font-size:11px;color:#5a4a7a;font-style:normal;white-space:nowrap}
+.testimonial-card{animation:testimonialIn .5s ease-out}
+.testimonial-enter{opacity:0;transform:translateY(8px)}
+.testimonial-exit{opacity:0;transform:translateY(-8px);transition:all .4s ease-in}
+.testimonial-stars{color:#C9A227;font-size:11px;letter-spacing:2px;margin-bottom:4px}
+@keyframes testimonialIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* Live dot pulse */
+.sp-live-dot{position:relative}
+.sp-live-dot::before{content:'';display:inline-block;width:8px;height:8px;background:#2ecc71;border-radius:50%;margin-right:6px;animation:livePulse 2s infinite}
+@keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+
+/* Authority Badge */
+.sp-authority{margin-bottom:10px}
+.sp-authority-inner{display:flex;align-items:center;gap:10px;padding:10px 16px;background:rgba(142,114,216,.06);border:1px solid rgba(142,114,216,.15);border-radius:14px}
+.sp-authority-icon{font-size:20px}
+.sp-authority-title{font-size:11px;color:var(--g);font-weight:700;letter-spacing:.04em}
+.sp-authority-detail{font-size:9px;color:#7a6a9a;letter-spacing:.06em;margin-top:2px}
 
 /* Premium Mockup Showcase */
 .mockup-showcase{text-align:center;margin-bottom:20px}
