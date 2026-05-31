@@ -3492,9 +3492,6 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .compact-daily .df-quote{font-size:13.5px;line-height:1.55;margin-bottom:8px;text-align:left}
 .compact-daily .df-details{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding-top:8px}
 .compact-daily .df-item{padding:6px 4px;background:rgba(142,114,216,.06);border:1px solid rgba(142,114,216,.1);border-radius:12px}
-.compact-daily .df-lucky-section,
-.compact-daily .df-card-section,
-.compact-daily .df-share-section,
 .compact-daily .df-footer{display:none}
 .df-expand-btn{display:block;margin:10px auto 0;padding:7px 14px;border:1px solid rgba(201,162,39,.25);border-radius:999px;background:rgba(201,162,39,.08);color:var(--g2);font:600 11px/1.2 Kanit,Sarabun,sans-serif;letter-spacing:.04em;cursor:pointer}
 @media(max-width:520px){.compact-daily .df-details{grid-template-columns:1fr}.compact-daily .df-quote{text-align:center}}
