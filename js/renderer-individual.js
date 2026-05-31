@@ -531,17 +531,17 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
   // 2. พิมพ์เขียวปรับฐานชีวิต (Action Plan)
   var elementInsight = ''; var elementAction = '';
   if (p.ei === 0) {
-    elementInsight = 'พลังแห่งไฟ <span style="font-size:14px">🔥</span> ทำให้คุณมีแรงขับเคลื่อนมหาศาล แต่มักเผาผลาญพลังงานไปกับความใจร้อนหรือการพยายามควบคุมทุกอย่าง';
-    elementAction = 'สร้าง <strong class="hl-gold">"พื้นที่ว่าง"</strong> <span style="font-size:14px">🧘</span> ระหว่างสิ่งเร้าและการตอบสนอง ฝึกหยุดคิดสัก 3 วินาทีก่อนพูดหรือตัดสินใจเสมอ';
+    elementInsight = 'พลังแห่งไฟ <span style="font-size:14px">🔥</span> ทำให้คุณมีแรงขับเคลื่อนมหาศาล แต่มักเผาผลาญพลังงานไปกับความใจร้อน — โทสะคือไฟที่เผาทั้งตัวเองและคนรอบข้าง';
+    elementAction = 'นั่งสมาธิ "พุท-โธ" <strong class="hl-gold">5 นาทีทุกเช้า</strong> <span style="font-size:14px">🧘</span> — อานาปานสติช่วยดับไฟในใจ พระพุทธเจ้าสอนว่า "ผู้ชนะในสงครามพันครั้ง สู้ชนะใจตัวเองไม่ได้"';
   } else if (p.ei === 1) {
-    elementInsight = 'พลังแห่งดิน <span style="font-size:14px">🌱</span> ทำให้คุณมั่นคงและรอบคอบ แต่ความกลัวความผิดพลาดมักทำให้คุณยึดติดและปฏิเสธความเปลี่ยนแปลง';
-    elementAction = 'อนุญาตให้ตัวเองทำอะไรที่ <strong class="hl-gold">"ไม่สมบูรณ์แบบ"</strong> <span style="font-size:14px">🎨</span> บ้างสัปดาห์ละครั้ง เพื่อสอนจิตใต้สำนึกว่าความผิดพลาดไม่ใช่จุดจบ';
+    elementInsight = 'พลังแห่งดิน <span style="font-size:14px">🌱</span> ทำให้คุณมั่นคงและรอบคอบ แต่ความกลัวความผิดพลาดมักทำให้ยึดติด — อนิจจัง: ทุกสิ่งเปลี่ยนแปลง แม้แต่ความกลัว';
+    elementAction = 'เดินจงกรม <strong class="hl-gold">10 นาที/วัน</strong> <span style="font-size:14px">🚶</span> — กรรมฐาน 4 อิริยาบถ หลวงปู่ชาสอน "เดินก็รู้ว่าเดิน" ช่วยให้ดินยืดหยุ่นขึ้น';
   } else if (p.ei === 2) {
-    elementInsight = 'พลังแห่งลม <span style="font-size:14px">💨</span> ทำให้ความคิดคุณแล่นไวและยืดหยุ่น แต่มักทำให้คุณกระจัดกระจายและขาดจุดยืนเมื่อต้องเผชิญแรงกดดัน';
-    elementAction = 'ฝึก <strong class="hl-gold">"การจดจ่อ (Deep Focus)"</strong> <span style="font-size:14px">🎯</span> ทำสิ่งใดสิ่งหนึ่งให้เสร็จโดยไม่ละสายตาไปเรื่องอื่น เพื่อสร้างสมอเรือให้ความคิด';
+    elementInsight = 'พลังแห่งลม <span style="font-size:14px">💨</span> ทำให้ความคิดแล่นไว แต่มักกระจัดกระจาย — จิตที่ไม่ตั้งมั่นเหมือนลมที่พัดไปเรื่อยไม่มีทิศทาง';
+    elementAction = 'นั่งสมาธิ <strong class="hl-gold">3 นาที ดูลมหายใจ</strong> <span style="font-size:14px">🎯</span> — ไม่ต้องคิดอะไร แค่รู้ "พุท" เข้า "โธ" ออก จิตฟุ้งก็กลับมา ลมนิ่ง = จิตนิ่ง';
   } else {
-    elementInsight = 'พลังแห่งน้ำ <span style="font-size:14px">🌊</span> ทำให้คุณลึกซึ้งและเข้าถึงจิตใจคน แต่ขอบเขตอารมณ์ที่พร่ามัวมักทำให้คุณรับเอาความรู้สึกคนอื่นมาเป็นของตัวเอง';
-    elementAction = 'สร้าง <strong class="hl-gold">"ขอบเขตทางอารมณ์ (Boundaries)"</strong> <span style="font-size:14px">🛡️</span> ฝึกพูดคำว่า "ไม่" อย่างสุภาพ เพื่อปกป้องพลังงานบริสุทธิ์ของคุณเอง';
+    elementInsight = 'พลังแห่งน้ำ <span style="font-size:14px">🌊</span> ทำให้ลึกซึ้งและเข้าถึงจิตใจคน แต่ขอบเขตอารมณ์ที่พร่ามัวมักทำให้รับเอาความรู้สึกคนอื่นมาแบก — เมตตาเริ่มจากตัวเอง';
+    elementAction = 'แผ่เมตตาให้ตัวเอง <strong class="hl-gold">3 นาทีก่อนนอน</strong> <span style="font-size:14px">💛</span> — "สุขิโต โหมิ — ขอให้ข้าพเจ้ามีความสุข" เติมน้ำในถังก่อนให้คนอื่น';
   }
   var wkFull = '<div style="font-size:14px; line-height:1.9; color:var(--tx); margin-bottom:15px;">'
     + '<span class="hl-gold">✦ ดวงดาวไม่ได้มีไว้เพื่อสาปแช่ง แต่มีไว้เพื่อชี้เป้าหมายที่รอการปลดล็อก ✦</span><br>'
