@@ -3510,5 +3510,4 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .rs-actions{display:flex;gap:8px;flex-wrap:wrap}
 .rs-actions a{flex:1;min-width:120px;text-align:center;padding:8px 10px;border-radius:999px;background:rgba(142,114,216,.12);border:1px solid rgba(142,114,216,.22);color:#DDCEFF;text-decoration:none;font-size:12px;font-weight:700}
 @media(max-width:620px){.rs-grid{grid-template-columns:1fr}.rs-actions a{flex-basis:100%}}
-body.has-report .value-section,
-body.has-report .social-proof-section{display:none}
+body.has-report .value-section{display:none}

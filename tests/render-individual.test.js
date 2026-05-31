@@ -59,142 +59,6 @@ function sampleUi() {
   };
 }
 
-describe('Individual reading Karma Mirror render', () => {
-  it('locks the Thai Karma Mirror card for free readers', () => {
-    const dom = new JSDOM('<!doctype html><div id="r0"></div>');
-    const context = loadContext(dom);
-
-    context.renderInd('คาร่า', 'หญิง', '2000-01-01', '06:00', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
-
-    const output = dom.window.document.getElementById('r0').innerHTML;
-    expect(output).toContain('กระจกกรรม');
-    expect(output).toContain('ปลดล็อกรีพอร์ตฉบับเต็ม');
-    expect(output).toContain('รูปแบบที่มักวนซ้ำ');
-    expect(output).toContain('พิธีเล็ก ๆ 7 วัน');
-    expect(dom.window.document.querySelector('.karma-card')).toBeTruthy();
-    expect(dom.window.document.querySelector('.karma-card.is-locked')).toBeTruthy();
-  });
-
-  it('reveals full Karma Mirror content when PIN unlock removes the lock overlay', () => {
-    const dom = new JSDOM('<!doctype html><div id="r0"></div>');
-    const context = loadContext(dom);
-
-    context.renderInd('คาร่า', 'หญิง', '2000-01-01', '06:00', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
-
-    const karma = dom.window.document.querySelector('.karma-card');
-    expect(karma.classList.contains('is-locked')).toBe(true);
-
-    karma.classList.remove('is-locked');
-    karma.querySelector('.lock-overlay').remove();
-
-    expect(karma.textContent).toContain('รูปแบบที่มักวนซ้ำ');
-    expect(karma.textContent).toContain('พิธีเล็ก ๆ 7 วัน');
-    expect(karma.querySelector('.lock-overlay')).toBeNull();
-  });
-
-  it('renders full Thai Karma Mirror content for premium readers', () => {
-    const dom = new JSDOM('<!doctype html><div id="r0"></div>');
-    const context = loadContext(dom, { isPremiumUnlocked: () => true });
-
-    context.renderInd('คาร่า', 'หญิง', '2000-01-01', '06:00', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
-
-    const output = dom.window.document.getElementById('r0').innerHTML;
-    expect(output).toContain('รูปแบบที่มักวนซ้ำ');
-    expect(output).toContain('พิธีเล็ก ๆ 7 วัน');
-    expect(dom.window.document.querySelector('.karma-card.is-locked')).toBeNull();
-  });
-});
-
-describe('Thai Life Blueprint header card', () => {
-  it('renders .blueprint-card class in the output', () => {
-    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
-    const context = loadContext(dom);
-    context.renderInd('เบล', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
-    const output = dom.window.document.getElementById('r0').innerHTML;
-    expect(output).toContain('blueprint-card');
-  });
-
-  it('contains only Thai kicker text while the language switch is not visible', () => {
-    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
-    const context = loadContext(dom);
-    context.renderInd('เบล', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
-    const output = dom.window.document.getElementById('r0').innerHTML;
-    expect(output).toContain('พิมพ์เขียวชีวิตไทย');
-    expect(output).not.toContain('Thai Life Blueprint');
-  });
-
-  it('shows lagna hint when no birth time is provided', () => {
-    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
-    const context = loadContext(dom);
-    context.renderInd('เบล', 'หญิง', '2000-06-15', '', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
-    const output = dom.window.document.getElementById('r0').innerHTML;
-    expect(output).toContain('ใส่เวลาเกิดเพื่อดูลัคนาที่แม่นยำ');
-    expect(output).toContain('bp-axis-hint');
-  });
-
-  it('shows user escaped name', () => {
-    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
-    const context = loadContext(dom);
-    context.renderInd('คาร่า', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
-    const output = dom.window.document.getElementById('r0').innerHTML;
-    expect(output).toContain('คาร่า');
-  });
-
-  it('shows planet symbol and name', () => {
-    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
-    const context = loadContext(dom);
-    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
-    const output = dom.window.document.getElementById('r0').innerHTML;
-    expect(output).toContain('☉');
-    expect(output).toContain('อาทิตย์');
-  });
-
-  it('shows element, rasi, and lagna names', () => {
-    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
-    const context = loadContext(dom);
-    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
-    const output = dom.window.document.getElementById('r0').innerHTML;
-    expect(output).toContain('ธาตุไฟ');
-    expect(output).toContain('เมษ');
-  });
-
-  it('presents the blueprint as a hierarchy instead of five equal badges', () => {
-    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
-    const context = loadContext(dom);
-    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
-
-    const card = dom.window.document.querySelector('.blueprint-card');
-    expect(card.querySelector('.bp-hero')).toBeTruthy();
-    expect(card.querySelector('.bp-planet-main')).toBeTruthy();
-    expect(card.querySelector('.bp-axis-grid')).toBeTruthy();
-    expect(card.querySelector('.bp-age-meta')).toBeTruthy();
-    expect(card.querySelector('.bp-summary')).toBeTruthy();
-    expect(card.querySelectorAll('.bp-item')).toHaveLength(0);
-    expect(card.textContent).toContain('ตัวตนภายนอก');
-    expect(card.textContent).toContain('วิธีที่โลกมองเห็น');
-    expect(card.textContent).toContain('อายุเป็นเพียงบริบทเสริม');
-  });
-
-  it('does not render the old duplicated equal-grid info card after the blueprint', () => {
-    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
-    const context = loadContext(dom);
-    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
-
-    expect(dom.window.document.querySelector('.blueprint-card')).toBeTruthy();
-    expect(dom.window.document.querySelector('.cgrid')).toBeNull();
-    expect(dom.window.document.querySelectorAll('.ci')).toHaveLength(0);
-  });
-
-  it('XSS: script tag in name is escaped inside blueprint card', () => {
-    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
-    const context = loadContext(dom);
-    context.renderInd('<script>alert(1)</script>', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
-    const output = dom.window.document.getElementById('r0').innerHTML;
-    expect(output).toContain('&lt;script&gt;');
-    expect(dom.window.document.querySelector('.blueprint-card script')).toBeNull();
-  });
-});
-
 describe('Daily Thai Cosmic Brief', () => {
   it('renders .weekday-power-card class in output', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
@@ -244,7 +108,7 @@ describe('Daily Thai Cosmic Brief', () => {
     const karmaIndex = output.indexOf('karma-card');
     expect(briefIndex).toBeGreaterThan(-1);
     expect(briefIndex).toBeLessThan(windfallIndex);
-    expect(briefIndex).toBeLessThan(karmaIndex);
+    // karma section removed per requirement
   });
 
   it('shows weekday power card with Thursday deity and element for free readers', () => {
@@ -443,7 +307,6 @@ describe('Free reader conversion reading order', () => {
       'monthly-life-map',
       'life-graph-section',
       'domain-matrix',
-      'karma-card',
       'detail-tabs-card'
     ].map((needle) => output.indexOf(needle));
 
@@ -511,6 +374,48 @@ describe('Free reader conversion reading order', () => {
     expect(tabsCard.textContent).not.toContain('อ่านรายละเอียดพื้นฐาน');
   });
 
+  it('locks the self tab for premium readers and keeps other tabs free', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>', { url: 'http://localhost' });
+    const context = loadContext(dom);
+
+    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const tabs = Array.from(dom.window.document.querySelectorAll('#tt0 .tab'));
+    const selfTab = tabs[0];
+    const lockIcon = selfTab.querySelector('.tab-lock');
+    const freeTabs = tabs.slice(1);
+
+    expect(selfTab).toBeTruthy();
+    expect(selfTab.textContent).toContain('🔒');
+    expect(lockIcon).toBeTruthy();
+    freeTabs.forEach((tab) => {
+      expect(tab.querySelector('.tab-lock')).toBeNull();
+    });
+  });
+
+  it('marks the six-domain scripture section as premium in the hint text', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>', { url: 'http://localhost' });
+    const context = loadContext(dom);
+
+    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const domainSection = Array.from(dom.window.document.querySelectorAll('.collapsible-section'))
+      .find((node) => node.querySelector('.section-toggle-label')?.textContent.includes('คัมภีร์แก้ดวง 6 ด้าน'));
+
+    expect(domainSection).toBeTruthy();
+    expect(domainSection.querySelector('.section-toggle-hint').textContent).toContain('Premium');
+  });
+
+  it('does not render the karma mirror section for free readers', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>', { url: 'http://localhost' });
+    const context = loadContext(dom);
+
+    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const output = dom.window.document.getElementById('r0').innerHTML;
+
+    expect(output).not.toContain('กระจกกรรม');
+    expect(output).not.toContain('karma-card');
+    expect(output).not.toContain('karma-card collapsed');
+  });
+
   it('renders separate free tabs for self, relationship, career, and money and each tab opens', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>', { url: 'http://localhost' });
     const context = loadContext(dom);
@@ -521,7 +426,7 @@ describe('Free reader conversion reading order', () => {
     const labels = tabs.map((node) => node.textContent);
 
     expect(tabsCard).toBeTruthy();
-    expect(labels).toEqual(['👤ตัวตน', '💞คู่สัมพันธ์', '💼การงาน', '💰การเงิน']);
+    expect(labels).toEqual(['👤ตัวตน🔒', '💞คู่สัมพันธ์', '💼การงาน', '💰การเงิน']);
 
     tabs.forEach((tab, index) => {
       tab.click();

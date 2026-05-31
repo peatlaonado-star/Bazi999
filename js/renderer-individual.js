@@ -762,8 +762,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + wrapCollapsible("✦ สูตรเปิดดวงลาภลอย ✦", "เลขเด็ด หวย ทิศ คาถา สายมู 🔒 Premium", windfallLuckHtml, true)
     + wrapCollapsible("🔮 หมอทักประจำเดือน", "5 ด้าน พร้อมสัญญาณ 🔒 Premium", monthlyLifeMapHtml, true)
     + lifeGraphSectionHtml
-    + wrapCollapsible("✦ คัมภีร์แก้ดวง 6 ด้าน ✦", "คะแนน 6 ด้าน + 6 ด้านชีวิต (แตะเพื่อดูรายละเอียด)", domainHtml, true)
-    + wrapCollapsible("🪞 กระจกกรรม", "บทเรียนและรูปแบบที่ชีวิตพาซ้ำ 🔒 Premium", karmaHtml, true)
+    + wrapCollapsible("✦ คัมภีร์แก้ดวง 6 ด้าน ✦", "คะแนน 6 ด้าน + 6 ด้านชีวิต 🔒 Premium", domainHtml, true)
     + wrapCollapsible("✦ สัดส่วนและสมดุลธาตุ ✦", "กราฟธาตุ + คำแนะนำเสริมใจ (แตะเพื่อดู)", buildElementRadar(p, r, l), true)
     + detailTabsShellHtml;
 
