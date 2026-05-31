@@ -359,9 +359,8 @@ body{
 
   // Share to LINE
   document.getElementById('btn-share-line').addEventListener('click', function() {
-    var text = '🔮 ดวงวันนี้ของฉันจาก STARVIA\n' + fortune.fortuneCard.icon + ' ไพ่: ' + fortune.fortuneCard.name + '\n🎨 สีมงคล: ' + fortune.luckyColor.name + '\n🔢 เลขนำโชค: ' + fortune.luckyNumbers.join(', ');
-    var shareLink = SHARE_PAGE + '?dob=' + encodeURIComponent(dob);
-    var url = 'https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(shareLink) + '&text=' + encodeURIComponent(text);
+    var text = '🔮 ดวงวันนี้ของฉันจาก STARVIA\n' + fortune.fortuneCard.icon + ' ไพ่: ' + fortune.fortuneCard.name + '\n🎨 สีมงคล: ' + fortune.luckyColor.name + '\n🔢 เลขนำโชค: ' + fortune.luckyNumbers.join(', ') + '\n' + SHARE_PAGE + '?dob=' + encodeURIComponent(dob);
+    var url = 'https://line.me/R/msg/text/?' + encodeURIComponent(text);
     window.location.href = url;
   });
 

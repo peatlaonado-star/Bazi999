@@ -91,11 +91,9 @@
 
   function shareToLine() {
     var shareUrl = getShareUrl();
-    var text = generateShareMessage();
-    var url = 'https://social-plugins.line.me/lineit/share?url='
-      + encodeURIComponent(shareUrl)
-      + '&text=' + encodeURIComponent(text);
-    // Direct navigation instead of popup (avoids mobile blockers)
+    var text = generateShareMessage() + '\n' + shareUrl;
+    // LINE direct share (text+link) — works without OG tags
+    var url = 'https://line.me/R/msg/text/?' + encodeURIComponent(text);
     window.location.href = url;
     recordShare('line');
   }
