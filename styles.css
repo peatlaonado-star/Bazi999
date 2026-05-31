@@ -2990,4 +2990,159 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   .ob-title { font-size: 20px; }
   .ob-logo { font-size: 22px; }
 }
-0-5 (welcome → birth data → first reading → anticipation → wow day → streak → premium CTA))
+/* ===== GAMIFICATION ===== */
+.gk-streak {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: rgba(201,162,39,0.06);
+  border: 1px solid rgba(201,162,39,0.2);
+  border-radius: 14px;
+  margin: 0 auto 16px;
+  max-width: 220px;
+}
+.gk-streak-fire { font-size: 20px; }
+.gk-streak-info { text-align: left; }
+.gk-streak-num { font-family: 'Kanit', sans-serif; font-size: 18px; font-weight: 600; }
+.gk-streak-label { font-family: 'Sarabun', sans-serif; font-size: 11px; color: #a09880; text-transform: uppercase; letter-spacing: 1px; }
+
+/* Badges */
+.gk-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin: 16px 0;
+}
+.gk-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  min-width: 70px;
+  transition: transform 0.2s;
+}
+.gk-badge-earned {
+  background: rgba(201,162,39,0.1);
+  border: 1px solid rgba(201,162,39,0.3);
+}
+.gk-badge-earned:hover { transform: scale(1.05); }
+.gk-badge-locked {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  opacity: 0.5;
+}
+.gk-badge-icon { font-size: 22px; }
+.gk-badge-name { font-family: 'Sarabun', sans-serif; font-size: 10px; color: #a09880; text-align: center; }
+
+/* Level Progress */
+.gk-level {
+  margin: 12px 0;
+  padding: 12px 16px;
+  background: rgba(201,162,39,0.04);
+  border-radius: 12px;
+}
+.gk-level-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.gk-level-name {
+  font-family: 'Kanit', sans-serif;
+  font-size: 14px;
+  color: #c9a227;
+}
+.gk-level-points {
+  font-family: 'Sarabun', sans-serif;
+  font-size: 12px;
+  color: #7a7060;
+}
+.gk-level-bar {
+  height: 6px;
+  background: rgba(201,162,39,0.12);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.gk-level-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #c9a227, #e8c547);
+  border-radius: 3px;
+  transition: width 0.8s ease;
+}
+.gk-level-next {
+  font-family: 'Sarabun', sans-serif;
+  font-size: 11px;
+  color: #7a7060;
+  margin-top: 4px;
+  text-align: right;
+}
+
+/* Challenges */
+.gk-challenges {
+  margin: 16px 0;
+  padding: 16px;
+  background: rgba(201,162,39,0.04);
+  border-radius: 14px;
+  border: 1px solid rgba(201,162,39,0.1);
+}
+.gk-challenges-title {
+  font-family: 'Kanit', sans-serif;
+  font-size: 15px;
+  color: #c9a227;
+  margin-bottom: 12px;
+}
+.gk-challenge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(201,162,39,0.06);
+}
+.gk-challenge:last-child { border-bottom: none; }
+.gk-challenge-done { opacity: 0.6; }
+.gk-challenge-icon { font-size: 18px; }
+.gk-challenge-info { flex: 1; }
+.gk-challenge-name { font-family: 'Kanit', sans-serif; font-size: 13px; color: #d4c5a9; display: block; }
+.gk-challenge-desc { font-family: 'Sarabun', sans-serif; font-size: 11px; color: #7a7060; }
+.gk-challenge-pts { font-family: 'Kanit', sans-serif; font-size: 12px; color: #c9a227; white-space: nowrap; }
+.gk-challenge-check { color: #6EC89A; font-weight: 600; }
+
+/* Badge Notification */
+.gk-notification {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(145deg, #1a1a2e, #16213e);
+  border: 1px solid rgba(201,162,39,0.4);
+  border-radius: 16px;
+  padding: 16px 24px;
+  z-index: 10001;
+  animation: gkSlideUp 0.4s ease, gkFadeOut 0.4s ease 3.6s forwards;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  max-width: 360px;
+  width: calc(100% - 40px);
+}
+@keyframes gkSlideUp {
+  from { transform: translateX(-50%) translateY(20px); opacity: 0; }
+  to { transform: translateX(-50%) translateY(0); opacity: 1; }
+}
+@keyframes gkFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; pointer-events: none; }
+}
+.gk-notif-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.gk-notif-icon { font-size: 28px; }
+.gk-notif-text { text-align: left; }
+.gk-notif-title { font-family: 'Kanit', sans-serif; font-size: 13px; color: #c9a227; }
+.gk-notif-name { font-family: 'Kanit', sans-serif; font-size: 16px; color: #f0e6d3; font-weight: 600; }
+.gk-notif-desc { font-family: 'Sarabun', sans-serif; font-size: 12px; color: #a09880; }
+tion into index.html and build pipeline)
