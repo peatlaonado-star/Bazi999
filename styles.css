@@ -2334,6 +2334,54 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 
 /* ===== P0: SOCIAL PROOF SECTION ===== */
 .social-proof-section{max-width:640px;margin:18px auto 10px}
+
+/* ===== Auspicious Days v2 ===== */
+.ausp-today-card{margin-bottom:14px;padding:18px;background:linear-gradient(145deg,rgba(37,24,68,.72),rgba(10,5,30,.62));border:1px solid rgba(201,162,39,.18);border-radius:18px}
+.atc-header{text-align:center;margin-bottom:14px}
+.atc-title{font-size:15px;font-weight:700;color:#C9A227;letter-spacing:.06em}
+.atc-subtitle{font-size:10px;color:#7a6a9a;letter-spacing:.04em;margin-top:4px}
+.atc-score{margin-bottom:14px}
+.atc-score-bar{width:100%;height:8px;background:rgba(142,114,216,.12);border-radius:50px;overflow:hidden}
+.atc-score-fill{height:100%;border-radius:50px;background:linear-gradient(90deg,#8E72D8,#C9A227);transition:width .8s ease}
+.atc-score-text{text-align:center;font-size:11px;color:#C9A227;font-weight:600;margin-top:6px;letter-spacing:.04em}
+.atc-good-at{font-size:12px;color:var(--tx2);line-height:1.6;margin-bottom:8px;padding:10px 14px;background:rgba(46,204,113,.06);border:1px solid rgba(46,204,113,.1);border-radius:12px}
+.atc-advice{font-size:11px;color:#b8a8d8;line-height:1.6;font-style:italic;margin-bottom:8px;padding:10px 14px;background:rgba(142,114,216,.06);border:1px solid rgba(142,114,216,.1);border-radius:12px}
+.atc-element-tag{text-align:center;font-size:9px;color:#7a6a9a;letter-spacing:.1em}
+
+/* Week Grid */
+.ausp-week-card{margin-bottom:14px;padding:18px;background:linear-gradient(145deg,rgba(37,24,68,.72),rgba(10,5,30,.62));border:1px solid rgba(142,114,216,.15);border-radius:18px;position:relative}
+.awc-title{font-size:14px;font-weight:700;color:#C9A227;text-align:center;letter-spacing:.06em}
+.awc-subtitle{font-size:10px;color:#7a6a9a;text-align:center;margin:4px 0 14px;letter-spacing:.04em}
+.awc-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.awc-day{text-align:center;padding:8px 2px;background:rgba(142,114,216,.04);border:1px solid rgba(142,114,216,.08);border-radius:10px;position:relative}
+.awc-today{border-color:rgba(201,162,39,.35);background:rgba(201,162,39,.06)}
+.awc-day-name{font-size:9px;color:#7a6a9a;letter-spacing:.04em}
+.awc-day-symbol{font-size:16px;margin:3px 0}
+.awc-day-element{font-size:8px;color:#6a5a8a}
+.awc-day-score{font-size:8px;font-weight:600;margin-top:3px}
+.awc-good{color:#2ecc71}
+.awc-mid{color:#C9A227}
+.awc-bad{color:#e8534a}
+.awc-day-focus{font-size:7px;color:#5a4a7a;margin-top:2px;line-height:1.3}
+.awc-today-badge{position:absolute;top:-4px;right:-4px;background:#C9A227;color:#09061c;font-size:7px;font-weight:700;padding:1px 5px;border-radius:50px;letter-spacing:.04em}
+.awc-preview{display:flex;justify-content:center}
+.awc-locked-hint{font-size:10px;color:#7a6a9a;text-align:center;margin-top:8px}
+@media(max-width:480px){.awc-grid{grid-template-columns:repeat(4,1fr)}}
+
+/* Vinai / เหตุเสริม */
+.ausp-vinai-card{margin-bottom:14px;padding:18px;background:linear-gradient(145deg,rgba(37,24,68,.72),rgba(10,5,30,.62));border:1px solid rgba(201,162,39,.18);border-radius:18px}
+.avc-header{text-align:center;margin-bottom:14px}
+.avc-title{font-size:14px;font-weight:700;color:#C9A227;letter-spacing:.06em}
+.avc-subtitle{font-size:10px;color:#7a6a9a;letter-spacing:.04em;margin-top:3px}
+.avc-step{display:flex;gap:10px;margin-bottom:12px;padding:10px 12px;background:rgba(142,114,216,.04);border:1px solid rgba(142,114,216,.08);border-radius:12px}
+.avc-step-icon{font-size:20px;min-width:24px;text-align:center}
+.avc-step-name{font-size:12px;color:#C9A227;font-weight:700;letter-spacing:.04em}
+.avc-step-action{font-size:11px;color:var(--tx2);line-height:1.5;margin-top:2px}
+.avc-step-why{font-size:9px;color:#7a6a9a;font-style:italic;margin-top:3px}
+.avc-challenge{margin-top:14px;padding:12px 14px;background:rgba(201,162,39,.06);border:1px dashed rgba(201,162,39,.25);border-radius:14px;text-align:center}
+.avc-challenge-title{font-size:12px;color:#C9A227;font-weight:700;margin-bottom:6px}
+.avc-challenge-text{font-size:11px;color:var(--tx2);line-height:1.6}
+.avc-ref{font-size:9px;color:#5a4a7a;text-align:center;margin-top:10px;letter-spacing:.04em}
 .social-proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
 @media(max-width:480px){.social-proof-grid{grid-template-columns:1fr 1fr}}
 .sp-stat-card{text-align:center;background:rgba(255,255,255,.03);border:1px solid rgba(214,173,69,.12);border-radius:14px;padding:14px 8px;transition:all .3s}
