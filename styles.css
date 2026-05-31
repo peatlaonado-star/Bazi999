@@ -2378,6 +2378,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .avc-step-name{font-size:12px;color:#C9A227;font-weight:700;letter-spacing:.04em}
 .avc-step-action{font-size:11px;color:var(--tx2);line-height:1.5;margin-top:2px}
 .avc-step-why{font-size:9px;color:#7a6a9a;font-style:italic;margin-top:3px}
+.avc-step-level{font-size:9px;color:#b08040;margin-top:2px;letter-spacing:.02em}
 .avc-challenge{margin-top:14px;padding:12px 14px;background:rgba(201,162,39,.06);border:1px dashed rgba(201,162,39,.25);border-radius:14px;text-align:center}
 .avc-challenge-title{font-size:12px;color:#C9A227;font-weight:700;margin-bottom:6px}
 .avc-challenge-text{font-size:11px;color:var(--tx2);line-height:1.6}
