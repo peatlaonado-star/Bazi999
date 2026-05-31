@@ -23,7 +23,7 @@ function premiumLockedCard(className, teaserHtml, title, description){
 function buildTabs(tid,sid,pre,TB,p,u){
   var tt=document.getElementById(tid), ts2=document.getElementById(sid);
   // Icon map for each tab position
-  var tabIcons = ['👤', '🌑', '💕'];
+  var tabIcons = ['👤', '💞', '💼', '💰'];
   
   TB.forEach(function(tb,i){
     var btn=document.createElement('button');

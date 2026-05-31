@@ -626,7 +626,6 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + '<div class="domain-desc">' + escapeHTML(domainIntro) + '</div>'
     + '<div class="domain-element-tone">' + escapeHTML(domainMatrix.elementSummary) + '</div>'
     + '<div class="domain-current-chip">🎯 วัยปัจจุบัน: ' + escapeHTML(domainMatrix.currentAgeRange) + '</div>'
-    + lifeGraphHtml
     + '<div class="domain-premium' + (premiumUnlocked ? '' : ' is-locked') + '">'
     + '<div class="domain-grid">';
   domainMatrix.domains.forEach(function(domain){
@@ -678,6 +677,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     );
   }
   domainHtml += '</div></div>';
+  var lifeGraphSectionHtml = '<div class="life-graph-section">' + lifeGraphHtml + '</div>';
 
   var monthlyLifeMap = buildMonthlyLifeMap(p, r, l, ds);
   var monthlyLifeMapHtml = buildMonthlyLifeMapHtml(monthlyLifeMap, premiumUnlocked);
@@ -728,28 +728,15 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + '</div>';
 
   var readingSnapshotHtml = '<div class="reading-snapshot">'
-    + '<div class="rs-kicker">อ่านสรุปก่อน</div>'
-    + '<div class="rs-title">สรุปดวงของ' + nm + '</div>'
     + '<div class="rs-grid">'
     + '<div class="rs-line"><b>โฟกัสวันนี้</b><span>' + escapeHTML(briefData.focus) + '</span></div>'
     + '<div class="rs-line"><b>ระวัง</b><span>' + escapeHTML(briefData.warning) + '</span></div>'
     + '<div class="rs-line rs-remedy"><b>แก้เหตุวันนี้</b><span>' + escapeHTML(briefData.action) + '</span></div>'
     + '</div>'
-    + '<div class="rs-actions"><a href="#" data-action="scroll-domain" data-domain="money">อ่านการเงิน</a><a href="#" data-action="scroll-domain" data-domain="relationship">อ่านความรัก</a><a href="#" data-action="scroll-domain" data-domain="career">อ่านงาน</a></div>'
-    + '</div>';
-
-  var conversionRoadmapHtml = '<div class="conversion-roadmap">'
-    + '<div class="cr-kicker">เริ่มอ่านตรงนี้</div>'
-    + '<div class="cr-title">อ่านฟรีให้รู้สึกว่า “ตรง” แล้วค่อยไหลไปปลดล็อกส่วนที่อยากรู้ที่สุด</div>'
-    + '<div class="cr-steps">'
-    + '<div class="cr-step"><span>1</span><strong>พลังวันนี้</strong><small>ดูอารมณ์ สี และเลขที่ใช้ได้ทันที</small></div>'
-    + '<div class="cr-step cr-hot"><span>2</span><strong>สูตรลาภลอย</strong><small>หัวข้อสายมูที่ล็อกไว้ให้กดซื้อ</small></div>'
-    + '<div class="cr-step"><span>3</span><strong>แผนชีวิตรายเดือน</strong><small>เห็นภาพว่าพรีเมียมมีรายละเอียดแค่ไหน</small></div>'
-    + '</div>'
+    + '<div class="rs-actions"><a href="#" data-action="scroll-domain" data-domain="money">อ่านการเงิน</a><a href="#" data-action="scroll-domain" data-domain="relationship">อ่านความสัมพันธ์</a><a href="#" data-action="scroll-domain" data-domain="career">อ่านการงาน</a></div>'
     + '</div>';
 
   var detailTabsShellHtml = '<div class="detail-tabs-card">'
-    + '<div class="detail-tabs-head"><div><span>อ่านรายละเอียดพื้นฐาน</span><small>แท็บแรกอ่านฟรี ส่วนแท็บต่อไปคือเนื้อหาลึกสำหรับพรีเมียม จัดเป็นหมวดสั้น ๆ ให้กดง่าย</small></div></div>'
     + '<div class="tabs-w"><div class="tabs" id="tt0"></div></div><div id="ts0"></div>'
     + '</div>';
 
@@ -770,15 +757,15 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
   wrap.innerHTML = blueprintCardHtml
     + readingSnapshotHtml
     + badgesHtml
-    + conversionRoadmapHtml
     + wrapCollapsible("✦ กำลังวันประจำตัว ✦", "วันเกิด · เทวดา · ธาตุ · สีมงคล", cosmicBriefHtml)
     + wrapCollapsible("✨ พลังงานเสริมดวง", "เลขและสีมงคลประจำวัน", powerCardHtml)
     + wrapCollapsible("✦ สูตรเปิดดวงลาภลอย ✦", "เลขเด็ด หวย ทิศ คาถา สายมู 🔒 Premium", windfallLuckHtml, true)
     + wrapCollapsible("🔮 หมอทักประจำเดือน", "5 ด้าน พร้อมสัญญาณ 🔒 Premium", monthlyLifeMapHtml, true)
-    + wrapCollapsible("✦ คัมภีร์แก้ดวง 6 ด้าน ✦", "คะแนน 6 ด้าน + กราฟชีวิต (แตะเพื่อดูรายละเอียด)", domainHtml, true)
+    + lifeGraphSectionHtml
+    + wrapCollapsible("✦ คัมภีร์แก้ดวง 6 ด้าน ✦", "คะแนน 6 ด้าน + 6 ด้านชีวิต (แตะเพื่อดูรายละเอียด)", domainHtml, true)
     + wrapCollapsible("🪞 กระจกกรรม", "บทเรียนและรูปแบบที่ชีวิตพาซ้ำ 🔒 Premium", karmaHtml, true)
     + wrapCollapsible("✦ สัดส่วนและสมดุลธาตุ ✦", "กราฟธาตุ + คำแนะนำเสริมใจ (แตะเพื่อดู)", buildElementRadar(p, r, l), true)
-    + wrapCollapsible("อ่านรายละเอียดพื้นฐาน", "ตัวตนฟรี · ความรัก · งานเงิน (แตะเพื่ออ่านต่อ)", detailTabsShellHtml, true);
+    + detailTabsShellHtml;
 
   // 6. อ้างอิงและเนื้อหาใน Tabs
   var refDesc = {
@@ -794,18 +781,16 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
   };
 
   var TB=[
-    {lb:'ตัวตนฟรี', secs:[
+    {lb:'ตัวตน', secs:[
       {t:u.s0[0], c:p.p, rf:refDesc.p_r_l},
       {t:'สไตล์การแสดงออก (ราศีเกิด)', c:rasiHtml, rf:'วิเคราะห์จากราศีเกิด ('+r.n+') ซึ่งเป็นรูปแบบพลังงานที่คุณใช้ขับเคลื่อนตัวเองบนโลกใบนี้'},
       {t:'รหัสผ่านชีวิต (ทักษาปกรณ์)', c:thaksaHtml, rf:refDesc.thaksa},
       {t:u.s0[1], c:p.str, rf:'วิเคราะห์จากพลังงานธาตุ'+p.el+' และลักษณะเด่นของดาว'+p.n},
       {t:u.s0[2], c:wkFull, rf:'วิเคราะห์จากมุมตั้งฉากและเรือนอริ/มรณะ ของ <span class="hl-purple">ดาว'+p.n+'</span> ซึ่งสะท้อนจุดเปราะบางที่ซ่อนอยู่ในจิตใต้สำนึก'}
     ]},
-    {lb:'ความรัก', secs:[{t:u.s0[3], c:p.lv, rf:refDesc.lv}]},
-    {lb:'งานเงิน', secs:[
-      {t:u.s0[4], c:p.ca, rf:refDesc.ca},
-      {t:u.s0[5], c:p.mn, rf:refDesc.mn}
-    ]}
+    {lb:'คู่สัมพันธ์', secs:[{t:'ความสัมพันธ์', c:p.lv, rf:refDesc.lv}]},
+    {lb:'การงาน', secs:[{t:u.s0[4], c:p.ca, rf:refDesc.ca}]},
+    {lb:'การเงิน', secs:[{t:u.s0[5], c:p.mn, rf:refDesc.mn}]}
   ];
 
   buildTabs('tt0','ts0','s0_',TB,p,u);

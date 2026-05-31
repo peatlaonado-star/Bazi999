@@ -428,19 +428,20 @@ describe('Windfall Luck gimmick section', () => {
 
 
 describe('Free reader conversion reading order', () => {
-  it('orders the free result page from quick value to lottery hook, monthly plan, then deeper premium proof', () => {
-    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+  it('orders the free result page from quick value to visible graph, premium hooks, then free detail tabs', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>', { url: 'http://localhost' });
     const context = loadContext(dom);
 
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const output = dom.window.document.getElementById('r0').innerHTML;
     const order = [
       'blueprint-card',
-      'conversion-roadmap',
+      'reading-snapshot',
       'weekday-power-card',
       'power-card',
       'windfall-luck',
       'monthly-life-map',
+      'life-graph-section',
       'domain-matrix',
       'karma-card',
       'detail-tabs-card'
@@ -450,55 +451,47 @@ describe('Free reader conversion reading order', () => {
     for (let i = 1; i < order.length; i += 1) {
       expect(order[i - 1]).toBeLessThan(order[i]);
     }
+    expect(output).not.toContain('conversion-roadmap');
   });
 
-  it('adds a clear premium path card before the locked sections', () => {
-    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
-    const context = loadContext(dom);
-
-    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
-    const roadmap = dom.window.document.querySelector('.conversion-roadmap');
-
-    expect(roadmap).toBeTruthy();
-    expect(roadmap.textContent).toContain('เริ่มอ่านตรงนี้');
-    expect(roadmap.textContent).toContain('สูตรลาภลอย');
-    expect(roadmap.textContent).toContain('ปลดล็อก');
-  });
-
-  it('renders a compact snapshot immediately after the blueprint so readers know what to do next', () => {
-    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+  it('removes the guided roadmap and snapshot heading while keeping compact action cues', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>', { url: 'http://localhost' });
     const context = loadContext(dom);
 
     context.renderInd('พ่อ', 'ชาย', '1990-01-15', '08:30', samplePlanet('น้ำ', 2, 'จันทร์'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const snapshot = dom.window.document.querySelector('.reading-snapshot');
     const output = dom.window.document.getElementById('r0').innerHTML;
 
+    expect(dom.window.document.querySelector('.conversion-roadmap')).toBeNull();
+    expect(output).not.toContain('เริ่มอ่านตรงนี้');
     expect(snapshot).toBeTruthy();
-    expect(snapshot.textContent).toContain('สรุปดวงของพ่อ');
+    expect(snapshot.textContent).not.toContain('อ่านสรุปก่อน');
+    expect(snapshot.textContent).not.toContain('สรุปดวงของพ่อ');
     expect(snapshot.textContent).toContain('โฟกัสวันนี้');
     expect(snapshot.textContent).toContain('แก้เหตุวันนี้');
-    expect(snapshot.textContent).toContain('อ่านการเงิน');
-    expect(snapshot.textContent).toContain('อ่านความรัก');
-    expect(output.indexOf('blueprint-card')).toBeLessThan(output.indexOf('reading-snapshot'));
-    expect(output.indexOf('reading-snapshot')).toBeLessThan(output.indexOf('conversion-roadmap'));
     expect(dom.window.document.body.classList.contains('has-report')).toBe(true);
   });
 
-  it('collapses the long six-domain scripture section by default for free readers', () => {
-    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+  it('shows the life graph as its own visible section before the collapsed six-domain scripture', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>', { url: 'http://localhost' });
     const context = loadContext(dom);
 
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const output = dom.window.document.getElementById('r0').innerHTML;
     const domainSection = Array.from(dom.window.document.querySelectorAll('.collapsible-section'))
-      .find((node) => node.textContent.includes('คัมภีร์แก้ดวง 6 ด้าน'));
+      .find((node) => node.querySelector('.section-toggle-label')?.textContent.includes('คัมภีร์แก้ดวง 6 ด้าน'));
+    const graphSection = dom.window.document.querySelector('.life-graph-section');
 
+    expect(graphSection).toBeTruthy();
+    expect(graphSection.querySelector('.life-graph-card')).toBeTruthy();
     expect(domainSection).toBeTruthy();
     expect(domainSection.classList.contains('collapsed')).toBe(true);
-    expect(domainSection.querySelector('.section-toggle-hint').textContent).toContain('คะแนน 6 ด้าน');
+    expect(domainSection.querySelector('.section-body .life-graph-card')).toBeNull();
+    expect(output.indexOf('life-graph-section')).toBeLessThan(output.indexOf('คัมภีร์แก้ดวง 6 ด้าน'));
   });
 
-  it('collapses lower supporting sections so the initial report ends after the conversion path', () => {
-    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
+  it('keeps lower supporting sections collapsed but leaves the free detail tabs visible', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>', { url: 'http://localhost' });
     const context = loadContext(dom, {
       buildElementRadar: () => '<div class="element-radar-test">กราฟสมดุลธาตุ</div>',
     });
@@ -508,40 +501,34 @@ describe('Free reader conversion reading order', () => {
     const findByLabel = (label) => sections.find((node) => node.querySelector('.section-toggle-label')?.textContent.includes(label));
     const elementSection = findByLabel('สัดส่วนและสมดุลธาตุ');
     const detailSection = findByLabel('อ่านรายละเอียดพื้นฐาน');
-    const output = dom.window.document.getElementById('r0').innerHTML;
+    const tabsCard = dom.window.document.querySelector('.detail-tabs-card');
 
     expect(elementSection).toBeTruthy();
     expect(elementSection.classList.contains('collapsed')).toBe(true);
     expect(elementSection.querySelector('.section-body').innerHTML).toContain('element-radar-test');
-    expect(detailSection).toBeTruthy();
-    expect(detailSection.classList.contains('collapsed')).toBe(true);
-    expect(output.indexOf('คัมภีร์แก้ดวง 6 ด้าน')).toBeLessThan(output.indexOf('สัดส่วนและสมดุลธาตุ'));
-    expect(output.indexOf('สัดส่วนและสมดุลธาตุ')).toBeLessThan(output.indexOf('อ่านรายละเอียดพื้นฐาน'));
+    expect(detailSection).toBeUndefined();
+    expect(tabsCard).toBeTruthy();
+    expect(tabsCard.textContent).not.toContain('อ่านรายละเอียดพื้นฐาน');
   });
 
-  it('does not render a CTA button inside the conversion roadmap', () => {
+  it('renders separate free tabs for self, relationship, career, and money and each tab opens', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>', { url: 'http://localhost' });
     const context = loadContext(dom);
 
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
-    const roadmap = dom.window.document.querySelector('.conversion-roadmap');
-
-    expect(roadmap).toBeTruthy();
-    expect(roadmap.querySelector('.cr-cta')).toBeNull();
-    expect(roadmap.querySelector('button')).toBeNull();
-  });
-
-  it('wraps detailed tabs in a guided card with shorter readable tab labels', () => {
-    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>');
-    const context = loadContext(dom);
-
-    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const tabsCard = dom.window.document.querySelector('.detail-tabs-card');
-    const labels = Array.from(dom.window.document.querySelectorAll('#tt0 .tab')).map((node) => node.textContent);
+    const tabs = Array.from(dom.window.document.querySelectorAll('#tt0 .tab'));
+    const labels = tabs.map((node) => node.textContent);
 
     expect(tabsCard).toBeTruthy();
-    expect(tabsCard.textContent).toContain('อ่านรายละเอียดพื้นฐาน');
-    expect(labels).toEqual(['👤ตัวตนฟรี', '🌑ความรัก', '💕งานเงิน']);
+    expect(labels).toEqual(['👤ตัวตน', '💞คู่สัมพันธ์', '💼การงาน', '💰การเงิน']);
+
+    tabs.forEach((tab, index) => {
+      tab.click();
+      expect(tab.classList.contains('on')).toBe(true);
+      const sections = Array.from(dom.window.document.querySelectorAll('#ts0 .sec'));
+      expect(sections[index].classList.contains('on')).toBe(true);
+    });
   });
 });
 
