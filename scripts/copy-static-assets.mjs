@@ -16,6 +16,8 @@ const files = [
   'js/renderer-couple.js',
   'js/renderer-auspicious.js',
   'js/daily-fortune.js',
+  'js/onboarding.js',
+  'js/gamification.js',
   'assets/html2canvas.min.js',
   'assets/og-image.png',
   'assets/qr-payment.jpg',
