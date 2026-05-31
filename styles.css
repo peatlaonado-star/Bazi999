@@ -3522,10 +3522,26 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .compact-daily .df-body{padding:8px 16px 12px}
 .compact-daily .df-quote{font-size:13.5px;line-height:1.55;margin-bottom:8px;text-align:left}
 .compact-daily .df-details{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding-top:8px}
-.compact-daily .df-item{padding:6px 4px;background:rgba(142,114,216,.06);border:1px solid rgba(142,114,216,.1);border-radius:12px}
+.compact-daily .df-details{display:flex;flex-direction:column;gap:8px;padding-top:10px}
+.compact-daily .df-item{display:grid;grid-template-columns:28px 1fr;grid-template-rows:auto auto;gap:1px 8px;padding:10px 12px;border-radius:14px;align-items:center}
+.compact-daily .df-item-icon{font-size:18px;grid-row:1/3;align-self:center;text-align:center;margin:0}
+.compact-daily .df-item-label{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;grid-column:2;grid-row:1;margin:0}
+.compact-daily .df-item-value{font-size:14px;font-weight:600;line-height:1.5;grid-column:2;grid-row:2;word-break:break-word}
+/* Element card — gold/amber */
+.compact-daily .df-item:nth-child(1){background:linear-gradient(135deg,rgba(255,183,77,.12),rgba(255,152,0,.06));border:1px solid rgba(255,183,77,.25)}
+.compact-daily .df-item:nth-child(1) .df-item-label{color:#ffb84d}
+.compact-daily .df-item:nth-child(1) .df-item-value{color:#ffd699}
+/* Focus card — teal/green */
+.compact-daily .df-item:nth-child(2){background:linear-gradient(135deg,rgba(46,204,113,.12),rgba(26,188,156,.06));border:1px solid rgba(46,204,113,.25)}
+.compact-daily .df-item:nth-child(2) .df-item-label{color:#2ecc71}
+.compact-daily .df-item:nth-child(2) .df-item-value{color:#6ddb9f}
+/* Warning card — rose/red */
+.compact-daily .df-item:nth-child(3){background:linear-gradient(135deg,rgba(232,83,58,.12),rgba(192,57,43,.06));border:1px solid rgba(232,83,58,.25)}
+.compact-daily .df-item:nth-child(3) .df-item-label{color:#e8534a}
+.compact-daily .df-item:nth-child(3) .df-item-value{color:#e88a80}
 .compact-daily .df-footer{display:none}
 .df-expand-btn{display:block;margin:10px auto 0;padding:7px 14px;border:1px solid rgba(201,162,39,.25);border-radius:999px;background:rgba(201,162,39,.08);color:var(--g2);font:600 11px/1.2 Kanit,Sarabun,sans-serif;letter-spacing:.04em;cursor:pointer}
-@media(max-width:520px){.compact-daily .df-details{grid-template-columns:1fr}.compact-daily .df-quote{text-align:center}}
+@media(max-width:520px){.compact-daily .df-quote{text-align:center}}
 
 .reading-snapshot{margin:14px 0;padding:16px;border:1px solid rgba(201,162,39,.22);border-radius:18px;background:linear-gradient(145deg,rgba(201,162,39,.09),rgba(142,114,216,.08));box-shadow:0 10px 28px rgba(0,0,0,.24)}
 .rs-kicker{font-size:10px;color:var(--g2);letter-spacing:.12em;text-transform:uppercase;margin-bottom:5px}
