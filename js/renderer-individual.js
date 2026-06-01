@@ -87,19 +87,35 @@ function buildWindfallDetailHtml(guide, premiumUnlocked){
 }
 
 // Helper: คำนวณหวยงวดถัดไป (ออกทุกวันที่ 1 และ 16)
+// ถ้าวันนี้เป็นวันหวยออก ยังถือว่างวดนี้ขายได้จนถึง 16:00 น.
 function getNextLotteryDraw(){
   var now = new Date();
   var day = now.getDate();
+  var hour = now.getHours();
   var nextDraw;
-  if (day < 16) {
+  
+  // หวยออกวันที่ 1 หรือ 16 — ถ้ายังไม่เลย 16:00 น. ยังขายได้
+  if (day === 1 && hour < 16) {
+    // งวดวันที่ 1 ยังไม่ออก → แสดงงวดนี้
+    nextDraw = new Date(now.getFullYear(), now.getMonth(), 1);
+  } else if (day === 16 && hour < 16) {
+    // งวดวันที่ 16 ยังไม่ออก → แสดงงวดนี้
+    nextDraw = new Date(now.getFullYear(), now.getMonth(), 16);
+  } else if (day < 16) {
     nextDraw = new Date(now.getFullYear(), now.getMonth(), 16);
   } else {
     nextDraw = new Date(now.getFullYear(), now.getMonth() + 1, 1);
   }
+  
   var diff = Math.ceil((nextDraw - now) / (1000 * 60 * 60 * 24));
   var monthNames = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
   var label = nextDraw.getDate() + ' ' + monthNames[nextDraw.getMonth()] + ' ' + (nextDraw.getFullYear() + 543);
-  return { daysLeft: diff, label: label };
+  
+  // ถ้าวันนี้หวยออก ให้แสดง "วันนี้!" แทนจำนวนวัน
+  if (diff <= 0 || (day === nextDraw.getDate() && now.getMonth() === nextDraw.getMonth())) {
+    return { daysLeft: 0, label: label, isToday: true };
+  }
+  return { daysLeft: diff, label: label, isToday: false };
 }
 
 function buildWindfallLuckHtml(guide, premiumUnlocked){
@@ -122,9 +138,10 @@ function buildWindfallLuckHtml(guide, premiumUnlocked){
   if (!premiumUnlocked) {
     // นับถอยหลังหวยงวดถัดไป
     var nextLottery = getNextLotteryDraw();
-    html += '<div class="wfl-countdown">'
-      + '📅 หวยงวดถัดไป: <strong>' + nextLottery.label + '</strong> (อีก <span class="wfl-countdown-num">' + nextLottery.daysLeft + '</span> วัน)'
-      + '</div>';
+    var countdownText = nextLottery.isToday
+      ? '🔥 หวยงวดนี้ออก <strong>วันนี้!</strong> รีบดูก่อนหวยออก'
+      : '📅 หวยงวดถัดไป: <strong>' + nextLottery.label + '</strong> (อีก <span class="wfl-countdown-num">' + nextLottery.daysLeft + '</span> วัน)';
+    html += '<div class="wfl-countdown">' + countdownText + '</div>';
     
     // Social proof
     html += '<div class="wfl-social-proof">'
