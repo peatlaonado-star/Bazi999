@@ -340,6 +340,34 @@ describe('Free reader conversion reading order', () => {
     expect(output).toContain('ตกวันละประมาณ 7 บาท');
   });
 
+
+  it('adds a soft daily CTA and premium preview summary before locked content', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>', { url: 'http://localhost' });
+    const context = loadContext(dom);
+
+    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const wrap = dom.window.document.getElementById('r0');
+    const output = wrap.innerHTML;
+    const dailyCta = wrap.querySelector('.daily-fortune-cta');
+    const powerSection = Array.from(wrap.querySelectorAll('.collapsible-section'))
+      .find((node) => node.querySelector('.section-toggle-label')?.textContent.includes('พลังงานเสริมดวง'));
+    const previewSummary = wrap.querySelector('.premium-preview-summary');
+    const windfallSection = Array.from(wrap.querySelectorAll('.collapsible-section'))
+      .find((node) => node.querySelector('.section-toggle-label')?.textContent.includes('สูตรเปิดดวงลาภลอย'));
+    const children = Array.from(wrap.children);
+
+    expect(dailyCta).toBeTruthy();
+    expect(powerSection).toBeTruthy();
+    expect(previewSummary).toBeTruthy();
+    expect(windfallSection).toBeTruthy();
+    expect(children.indexOf(dailyCta)).toBeLessThan(children.indexOf(powerSection));
+    expect(children.indexOf(previewSummary)).toBeGreaterThan(children.indexOf(powerSection));
+    expect(children.indexOf(previewSummary)).toBeLessThan(children.indexOf(windfallSection));
+    expect(output).toContain('วันนี้คือ “สัญญาณแรก”');
+    expect(output).toContain('สิ่งที่ถูกล็อกไว้ไม่ใช่แค่ “คำทำนาย”');
+    expect(output).toContain('ใช้เป็นแผนที่สะท้อนจังหวะชีวิต');
+  });
+
   it('shows the life graph as its own visible section before the collapsed six-domain scripture', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>', { url: 'http://localhost' });
     const context = loadContext(dom);

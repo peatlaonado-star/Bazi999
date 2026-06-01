@@ -3754,6 +3754,100 @@ body.has-report .value-section{display:none}
   font-size: 11px;
 }
 
+.daily-fortune-cta,
+.premium-preview-summary {
+  position: relative;
+  max-width: 720px;
+  margin: 14px auto 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(214,173,69,.24);
+  background: linear-gradient(135deg, rgba(18,10,45,.88), rgba(42,27,16,.78));
+  box-shadow: 0 18px 52px rgba(0,0,0,.22);
+}
+.daily-fortune-cta {
+  padding: 18px 18px 16px;
+  text-align: center;
+}
+.dfc-kicker,
+.pps-kicker {
+  font-family: "Kanit","Sarabun",sans-serif;
+  font-size: 10px;
+  letter-spacing: .18em;
+  color: #b8a8d8;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+.dfc-title,
+.pps-title {
+  color: #fff4cf;
+  font-family: "Kanit","Sarabun",sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.55;
+}
+.dfc-desc {
+  max-width: 560px;
+  margin: 8px auto 14px;
+  color: #e8dfc8;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.dfc-btn {
+  border: 0;
+  border-radius: 999px;
+  padding: 11px 20px;
+  background: linear-gradient(90deg, #C9A227, #f0d96a, #C9A227);
+  color: #1A1035;
+  font-family: "Kanit","Sarabun",sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 26px rgba(201,162,39,.22);
+}
+.premium-preview-summary {
+  padding: 18px;
+}
+.pps-title {
+  text-align: center;
+  margin-bottom: 13px;
+}
+.pps-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+.pps-item {
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255,255,255,.07);
+}
+.pps-item strong {
+  display: block;
+  color: var(--g2);
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+.pps-item span {
+  display: block;
+  color: #d9cfeb;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.pps-trust {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(255,255,255,.11);
+  color: #a89070;
+  font-size: 11.5px;
+  text-align: center;
+  line-height: 1.6;
+}
+@media(max-width:720px){
+  .pps-grid{grid-template-columns:1fr}
+  .daily-fortune-cta,.premium-preview-summary{margin-left:0;margin-right:0}
+}
+
 /* สัญญาณเตือน teaser */
 .warning-teaser {
   background: rgba(255,152,0,.08);

@@ -51,6 +51,29 @@ function buildConversionCta(hook, desc, proof) {
     + '</div>';
 }
 
+function buildDailyFortuneCta(){
+  return '<div class="daily-fortune-cta">'
+    + '<div class="dfc-kicker">อ่านต่อจากดวงวันนี้</div>'
+    + '<div class="dfc-title">วันนี้คือ “สัญญาณแรก” — รายงานเต็มจะบอกว่าควรระวังและแก้ตรงไหน</div>'
+    + '<div class="dfc-desc">ถ้าดวงวันนี้สะกิดใจ ให้เปิดหมอทักรายเดือน + เลขลาภลอย + วิธีแก้ดวงเฉพาะตัว เพื่อใช้วางแผนวันนี้ให้แม่นขึ้น</div>'
+    + '<button class="dfc-btn" data-action="unlock-premium">ดูคำเตือนและวิธีแก้เฉพาะตัว</button>'
+    + '</div>';
+}
+
+function buildPremiumPreviewSummary(){
+  return '<div class="premium-preview-summary">'
+    + '<div class="pps-kicker">ใน Premium จะได้อ่านต่อ</div>'
+    + '<div class="pps-title">สิ่งที่ถูกล็อกไว้ไม่ใช่แค่ “คำทำนาย” แต่คือแผนใช้งานจริง</div>'
+    + '<div class="pps-grid">'
+    + '<div class="pps-item"><strong>เลขลาภลอยครบ</strong><span>เลข 3 ชุด + วิธีใช้แบบไม่เสี่ยงเกินตัว</span></div>'
+    + '<div class="pps-item"><strong>หมอทักรายเดือน</strong><span>5 ด้านชีวิต · สัญญาณเตือน · วิธีแก้</span></div>'
+    + '<div class="pps-item"><strong>คัมภีร์ 6 ด้าน</strong><span>โชค เงิน สุขภาพ ความรัก งาน บริวาร</span></div>'
+    + '<div class="pps-item"><strong>วันดี/วันต้องระวัง</strong><span>ใช้วางแผนก่อนตัดสินใจเรื่องสำคัญ</span></div>'
+    + '</div>'
+    + '<div class="pps-trust">ใช้เป็นแผนที่สะท้อนจังหวะชีวิต ไม่ใช่การฟันธงแทนการตัดสินใจของคุณ</div>'
+    + '</div>';
+}
+
 function buildWarningTeaser(text) {
   return '<div class="warning-teaser">'
     + '<span class="wt-icon">⚠️</span>'
@@ -939,7 +962,9 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
   wrap.innerHTML = blueprintCardHtml
     + badgesHtml
     + wrapCollapsible("✦ กำลังวันประจำตัว ✦", "วันเกิด · เทวดา · ธาตุ · สีมงคล", cosmicBriefHtml)
+    + buildDailyFortuneCta()
     + wrapCollapsible("✨ พลังงานเสริมดวง", "เลขและสีมงคลประจำวัน", powerCardHtml)
+    + buildPremiumPreviewSummary()
     + buildPremiumPriceAnchor(false)
     + wrapCollapsible("✦ สูตรเปิดดวงลาภลอย ✦", "เลขเด็ด · หวย · ทิศ · คาถา สายมู", windfallLuckHtml, true)
     + wrapCollapsible("🔮 หมอทักประจำเดือน", "5 ด้านชีวิต · สัญญาณเตือน · วิธีแก้", monthlyLifeMapHtml, true)
