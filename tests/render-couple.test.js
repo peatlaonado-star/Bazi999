@@ -244,4 +244,27 @@ describe('Couple mode rendering', () => {
     expect(output).not.toContain('ปลดล็อกแผนความรักเฉพาะคู่');
   });
 
+  it('renders single love opportunity when partner data is not provided', () => {
+    const dom = new JSDOM('<!doctype html><div id="r1"></div>');
+    const pa = planet('อาทิตย์', 'ไฟ', 0);
+    const context = loadContext(dom, {
+      getPL: () => [pa],
+    });
+    const signs = [
+      sign('เมษ', '♈', 0), sign('พฤษภ', '♉', 1), sign('เมถุน', '♊', 2), sign('กรกฎ', '♋', 3),
+      sign('สิงห์', '♌', 0), sign('กันย์', '♍', 1), sign('ตุลย์', '♎', 2), sign('พิจิก', '♏', 3),
+      sign('ธนู', '♐', 0), sign('มังกร', '♑', 1), sign('กุมภ์', '♒', 2), sign('มีน', '♓', 3),
+    ];
+
+    context.renderSingleLoveOpportunity('ดาว', pa, signs[0], signs[0], 0, 0, coupleUi(), signs, '1998-04-12');
+
+    const output = dom.window.document.getElementById('r1').innerHTML;
+    expect(output).toContain('โอกาสเจอคู่ของคุณ');
+    expect(output).toContain('มีแนวโน้มเจอที่ไหน');
+    expect(output).toContain('ราศี/พลังที่มีแนวโน้มเข้ามา');
+    expect(output).toContain('นิสัยคนที่มีแนวโน้มเข้ากัน');
+    expect(output).toContain('อ้างอิงเชิงระบบ');
+    expect(output).toContain('ปลดล็อกแผนเปิดทางความรัก');
+  });
+
 });

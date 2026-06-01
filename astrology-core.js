@@ -48,7 +48,13 @@ function setMode(m){
 // Button enable check
 function chkBtn(mode){
   if(mode===0) document.getElementById('btn0').disabled=!document.getElementById('d0').value;
-  if(mode===1) document.getElementById('btn1').disabled=!(document.getElementById('d1a').value&&document.getElementById('d1b').value);
+  if(mode===1){
+    var hasSelf = !!document.getElementById('d1a').value;
+    var hasPartner = !!document.getElementById('d1b').value;
+    var btn1 = document.getElementById('btn1');
+    btn1.disabled = !hasSelf;
+    btn1.textContent = hasPartner ? '♡ วิเคราะห์ความเข้ากัน ♡' : '💖 ดูโอกาสเจอคู่ของฉัน';
+  }
   if(mode===2) document.getElementById('btn2').disabled=!document.getElementById('d2').value;
 }
 

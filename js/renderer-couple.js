@@ -3,20 +3,26 @@
 // ===== MODE 1: Couple =====
 function go1(){
   var da=document.getElementById('d1a').value, db=document.getElementById('d1b').value;
-  if(!da||!db)return;
+  if(!da)return;
   var u=U(), PL2=getPL(), RA2=getRA();
   var def=u.def||['คนที่หนึ่ง','คนที่สอง'];
   var na=document.getElementById('n1a').value||def[0];
-  var nb=document.getElementById('n1b').value||def[1];
   var ta=document.getElementById('t1a').value||'06:00';
-  var tb=document.getElementById('t1b').value||'06:00';
-  var pa=PL2[new Date(da).getDay()], pb=PL2[new Date(db).getDay()];
-  var ria=getRasi(da), rib=getRasi(db);
-  var lia=getLagna(da,ta), lib=getLagna(db,tb);
+  var pa=PL2[new Date(da).getDay()];
+  var ria=getRasi(da);
+  var lia=getLagna(da,ta);
   document.getElementById('fc1').style.display='none';
   showLoad();
   setTimeout(function(){
     hideLoad();
+    if(!db){
+      renderSingleLoveOpportunity(na,pa,RA2[ria],RA2[lia],ria,lia,u,RA2,da);
+      return;
+    }
+    var nb=document.getElementById('n1b').value||def[1];
+    var tb=document.getElementById('t1b').value||'06:00';
+    var pb=PL2[new Date(db).getDay()];
+    var rib=getRasi(db), lib=getLagna(db,tb);
     renderCouple(na,pa,RA2[ria],RA2[lia],ria,lia,nb,pb,RA2[rib],RA2[lib],rib,lib,u,RA2,da,db);
   },900);
 }
@@ -97,6 +103,76 @@ function buildLoveDestinyModel(dateA,dateB,total,elS,plS,angS,lgS,pa,pb,ria,rib)
     premiumPlan: premiumPlan,
     reference: 'อ้างอิงเชิงระบบ: วันเกิด → ดาวประจำวัน/ธาตุ, ราศีสัมพันธ์, ลัคนา และวงรอบ 7 ปีของจังหวะชีวิต ใช้เป็นแนวโน้มเพื่อวางแผนความสัมพันธ์ ไม่ใช่คำทำนายตายตัว'
   };
+}
+
+function buildSingleLoveOpportunityModel(dateA, pa, ra, la, ria, lia, RA2){
+  var piA = Math.max(0, getPL().indexOf(pa));
+  var windowA = loveWindowForPerson(dateA, piA, ria || 0, 2);
+  var digit = loveDigitFromDate(dateA);
+  var signIdx = (digit + piA + (ria || 0) + (lia || 0)) % 12;
+  var fallbackSigns = ['เมษ','พฤษภ','เมถุน','กรกฎ','สิงห์','กันย์','ตุลย์','พิจิก','ธนู','มังกร','กุมภ์','มีน'];
+  var partnerSign = RA2 && RA2[signIdx] ? RA2[signIdx] : { n: fallbackSigns[signIdx], s: '', el: signIdx % 4 };
+  var elNames = ['ไฟ','ดิน','ลม','น้ำ'];
+  var partnerEl = typeof partnerSign.el === 'number' ? elNames[partnerSign.el % 4] : (partnerSign.el || pa.el || 'ลม');
+  var channelMap = {
+    'ไฟ': 'งานอีเวนต์ กิจกรรมที่ได้แสดงตัวตน กีฬา โปรเจกต์ใหม่ หรือพื้นที่ที่ต้องใช้ความกล้า',
+    'น้ำ': 'วงเพื่อนสนิท ครอบครัว งานดูแลผู้คน คาเฟ่เงียบ ๆ หรือบทสนทนาที่ได้เปิดใจลึก',
+    'ลม': 'ออนไลน์ คอร์สเรียน เวิร์กช็อป งานสื่อสาร คอมมูนิตี้ความรู้ หรือการเดินทางสั้น ๆ',
+    'ดิน': 'ที่ทำงาน ธุรกิจ การเงิน อสังหา สถานที่ที่ไปเป็นประจำ หรือคนที่เจอจากกิจวัตรเดิม'
+  };
+  var traitMap = {
+    'ไฟ': 'ตรงไปตรงมา มีแพสชัน ชอบคนจริงใจ ตัดสินใจเร็ว แต่บางครั้งใจร้อน',
+    'น้ำ': 'อ่อนโยน ลึกซึ้ง อ่านบรรยากาศเก่ง ต้องการความปลอดภัยทางใจ',
+    'ลม': 'คุยสนุก ฉลาด ชอบแลกเปลี่ยนความคิด รักอิสระและไม่ชอบความสัมพันธ์ที่อึดอัด',
+    'ดิน': 'มั่นคง รับผิดชอบ รักจริงแบบค่อยเป็นค่อยไป ชอบความชัดเจนและไว้ใจได้'
+  };
+  var chance = Math.max(52, Math.min(94, 58 + (digit * 3) + (piA * 2) + ((ria || 0) % 9)));
+  var monthHints = ['ม.ค.–มี.ค.', 'เม.ย.–มิ.ย.', 'ก.ค.–ก.ย.', 'ต.ค.–ธ.ค.'];
+  var monthHint = monthHints[(digit + piA) % monthHints.length];
+  return {
+    window: windowA,
+    chance: chance,
+    monthHint: monthHint,
+    partnerSignName: partnerSign.n || fallbackSigns[signIdx],
+    partnerSignSymbol: partnerSign.s || '',
+    partnerElement: partnerEl,
+    channel: channelMap[partnerEl] || channelMap['ลม'],
+    traits: traitMap[partnerEl] || traitMap['ลม'],
+    signal: 'สัญญาณที่ควรสังเกตคือคนที่คุยแล้วใจนิ่งขึ้น ไม่เร่งให้ตัดสินใจ และมีความสม่ำเสมอมากกว่าคำหวานช่วงแรก',
+    reference: 'อ้างอิงเชิงระบบ: วันเกิด → ดาวประจำวัน/ธาตุ, ราศีเกิด, ลัคนา และวงรอบ 7 ปีของจังหวะความรัก ใช้เป็นแนวโน้มเพื่อเปิดโอกาส ไม่ใช่คำฟันธงตายตัว'
+  };
+}
+
+function renderSingleLoveOpportunity(na,pa,ra,la,ria,lia,u,RA2,dateA){
+  var wrap=document.getElementById('r1');
+  na = escapeHTML(na);
+  var premiumUnlocked = premiumIsUnlocked();
+  var model = buildSingleLoveOpportunityModel(dateA, pa, ra, la, ria, lia, RA2);
+  var premiumHtml = '<div class="love-destiny-premium">'
+    + '<div class="ld-section-title">แผนเปิดทางความรัก 3 ขั้น</div>'
+    + '<ol>'
+    + '<li>เลือกออกไปอยู่ในพื้นที่ที่ตรงกับธาตุของคนที่มีแนวโน้มเข้ามา: ' + escapeHTML(model.channel) + '</li>'
+    + '<li>ตั้งกติกาคัดคน: คุยแล้วสบายใจไหม, สม่ำเสมอไหม, เป้าหมายชีวิตไปทางเดียวกันไหม</li>'
+    + '<li>ช่วง ' + escapeHTML(model.monthHint) + ' ให้เพิ่มโอกาสเจอคนใหม่อย่างน้อยสัปดาห์ละ 1 ครั้ง</li>'
+    + '</ol>'
+    + '<div class="ld-note"><strong>สัญญาณคนที่ควรให้โอกาส:</strong> ' + escapeHTML(model.signal) + '</div>'
+    + '</div>';
+  wrap.innerHTML = '<div class="love-destiny-card single-love-card">'
+    + '<div class="ld-kicker">Single Love Timing</div>'
+    + '<div class="ld-title">💖 โอกาสเจอคู่ของคุณ</div>'
+    + '<div class="ld-summary"><strong>' + na + '</strong> ยังไม่ต้องมีข้อมูลอีกฝ่าย ก็อ่านจังหวะรักจากดวงตัวเองได้ — ช่วงเด่นคือ <span>' + escapeHTML(model.window.label) + '</span></div>'
+    + '<div class="ld-grid">'
+    + '<div class="ld-box"><small>โอกาสเปิดใจ/เจอคนใหม่</small><strong>' + model.chance + '%</strong><p>เด่นเป็นพิเศษช่วง ' + escapeHTML(model.monthHint) + ' ของรอบปีที่จังหวะรักเปิด</p></div>'
+    + '<div class="ld-box"><small>มีแนวโน้มเจอที่ไหน</small><p>' + escapeHTML(model.channel) + '</p></div>'
+    + '</div>'
+    + '<div class="ld-two">'
+    + '<div><b>ราศี/พลังที่มีแนวโน้มเข้ามา</b><br>' + escapeHTML(model.partnerSignSymbol + ' ' + model.partnerSignName) + ' · ธาตุ' + escapeHTML(model.partnerElement) + '</div>'
+    + '<div><b>นิสัยคนที่มีแนวโน้มเข้ากัน</b><br>' + escapeHTML(model.traits) + '</div>'
+    + '</div>'
+    + (premiumUnlocked ? premiumHtml : '<div class="love-destiny-locked">' + premiumLockedCard('love-destiny-lock-card', '<div class="ld-section-title">ปลดล็อกเพื่อดูแผน 3 ขั้น วิธีเปิดโอกาส และสัญญาณคนที่ควรให้โอกาส</div>', 'ปลดล็อกแผนเปิดทางความรัก', 'ดูสถานที่ควรไป วิธีคัดคน และสัญญาณคู่ที่เหมาะกับดวงคุณแบบละเอียด') + '</div>')
+    + '<div class="ld-ref">' + escapeHTML(model.reference) + '</div>'
+    + '</div>'
+    + '<div class="rbt"><button class="rbtn" data-action="reset-mode" data-mode="1">' + (u.r1 || 'เริ่มใหม่') + '</button></div>';
 }
 
 function buildLoveDestinyCard(model, premiumUnlocked, na, nb){
