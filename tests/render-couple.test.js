@@ -97,8 +97,8 @@ describe('Couple mode rendering', () => {
     expect(dom.window.document.querySelector('script')).toBeNull();
   });
 
-  it('renders couple tabs for detailed sections', () => {
-    const dom = new JSDOM('<!doctype html><div id="r1"></div><div id="tt1"></div><div id="ts1"></div>');
+  it('does not render detailed sub-tabs for couple results', () => {
+    const dom = new JSDOM('<!doctype html><div id="r1"></div>');
     const pa = planet('อาทิตย์', 'ไฟ', 0);
     const pb = planet('เสาร์', 'ไฟ', 0);
     const context = loadContext(dom, {
@@ -114,14 +114,14 @@ describe('Couple mode rendering', () => {
 
     context.renderCouple('A', pa, ra, ra, 0, 0, 'B', pb, rb, rb, 1, 1, coupleUi(), RA2);
 
-    const tabs = dom.window.document.getElementById('tt1');
-    expect(tabs).toBeTruthy();
-    expect(tabs.children.length).toBe(4);
-    expect(tabs.children[0].textContent).toBe('ภาพรวม');
+    const output = dom.window.document.getElementById('r1').innerHTML;
+    expect(output).not.toContain('tabs-w');
+    expect(output).not.toContain('id="tt1"');
+    expect(output).not.toContain('id="ts1"');
   });
 
   it('renders reset button at the end', () => {
-    const dom = new JSDOM('<!doctype html><div id="r1"></div><div id="tt1"></div><div id="ts1"></div>');
+    const dom = new JSDOM('<!doctype html><div id="r1"></div>');
     const pa = planet('อาทิตย์', 'ไฟ', 0);
     const pb = planet('เสาร์', 'ไฟ', 0);
     const context = loadContext(dom, {
@@ -137,10 +137,9 @@ describe('Couple mode rendering', () => {
 
     context.renderCouple('A', pa, ra, ra, 0, 0, 'B', pb, rb, rb, 1, 1, coupleUi(), RA2);
 
-    // Reset button is appended to ts1 via insertAdjacentHTML
-    const ts1 = dom.window.document.getElementById('ts1');
-    expect(ts1.innerHTML).toContain('data-action="reset-mode"');
-    expect(ts1.innerHTML).toContain('data-mode="1"');
+    const output = dom.window.document.getElementById('r1').innerHTML;
+    expect(output).toContain('data-action="reset-mode"');
+    expect(output).toContain('data-mode="1"');
   });
 
   it('locks couple dharma details, score breakdown, and action plan for free readers', () => {

@@ -280,8 +280,7 @@ function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2,dateA,dateB
   wrap.innerHTML = matrixHtml
     + loveDestinyHtml
     + dharmaHtml
-    + scoreBreakdownHtml
-    +'<div class="tabs-w"><div class="tabs" id="tt1"></div></div><div id="ts1"></div>';
+    + scoreBreakdownHtml;
 
   // สร้าง Action Plan สำหรับคู่รัก
   var strG = elS>=80 ? 'ธาตุ'+pa.el+'และ'+pb.el+'ที่ส่งเสริมกันอย่างเป็นธรรมชาติ' : 'ความแตกต่างของธาตุที่ทำให้อีกฝ่ายได้เห็นมุมมองใหม่';
@@ -301,37 +300,7 @@ function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2,dateA,dateB
   );
   wrap.insertAdjacentHTML('beforeend', visibleActionPlanHtml);
 
-  var CT=[
-    {lb:u.ct[0], secs:[{t:'ผลวิเคราะห์เคมีคู่รัก', c:(premiumUnlocked ? actionPlanHtml : '<p>ปลดล็อก Premium เพื่ออ่านแผนความสัมพันธ์ฉบับเต็ม</p>'), rf:'หลักดวงสมพงศ์ (Synastry) ผสมผสานหลักจิตวิทยาความสัมพันธ์'}]},
-    {lb:u.ct[1], secs:[{t:u.cs[1], c:elDesc, rf:'Four Elements | '+pa.el+' + '+pb.el+' | Score: '+elS+'%'}]},
-    {lb:u.ct[2], secs:[{t:u.cs[2], c:ra.n+' meets '+rb.n+' — '+angD, rf:'Sign synastry | '+ra.n+' + '+rb.n+' | Score: '+angS+'%'}]},
-    {lb:u.ct[3], secs:[{t:u.cs[3], c:'ลัคนาของ'+na+'ตกในราศี'+RA2[lia].n+' — '+RA2[lia].add+'<br><br>ลัคนาของ'+nb+'ตกในราศี'+RA2[lib].n+' — '+RA2[lib].add, rf:'Lagna '+RA2[lia].n+' + '+RA2[lib].n+' | Score: '+lgS+'%'}]}
-  ];
-
-  var tt=document.getElementById('tt1'), ts2=document.getElementById('ts1');
-  CT.forEach(function(tb,i){
-    var btn=document.createElement('button');
-    btn.className='tab'+(i===0?' on':'');
-    btn.textContent=tb.lb;
-    btn.addEventListener('click', function(){
-      document.querySelectorAll('#tt1 .tab').forEach(function(t){t.classList.remove('on');});
-      document.querySelectorAll('#ts1 .sec').forEach(function(s){s.classList.remove('on');});
-      btn.classList.add('on');
-      document.getElementById('c1_'+i).classList.add('on');
-    });
-    tt.appendChild(btn);
-    var sec=document.createElement('div');
-    sec.className='sec'+(i===0?' on':'');
-    sec.id='c1_'+i;
-    var html='<div class="orn">✦ · ✦ · ✦</div>';
-    tb.secs.forEach(function(s){
-      html+='<div class="st">'+s.t+'</div><div class="rb" style="background:transparent; border:none; padding:0;">'+s.c+'<div class="ref" style="margin-top:15px;">'+u.rf+' '+s.rf+'</div></div>';
-    });
-    sec.innerHTML=html;
-    ts2.appendChild(sec);
-  });
-  
-  ts2.insertAdjacentHTML('beforeend',
+  wrap.insertAdjacentHTML('beforeend',
     '<div class="mc" style="margin-top:20px;"><div class="mc-l">✦ '+u.cm+' ✦</div>'
     +'<div class="mc-t">"'+u.cv2+'"</div></div>'
     +'<div class="rbt"><button class="rbtn" data-action="reset-mode" data-mode="1">'+u.r1+'</button></div>'
