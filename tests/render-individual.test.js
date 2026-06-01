@@ -252,7 +252,9 @@ describe('Windfall Luck gimmick section', () => {
     const maskedDetail = windfall.querySelector('.wfl-mask-detail').textContent;
     fullNumbers.forEach((number) => expect(maskedDetail).not.toContain(number));
     maskedNumbers.forEach((number) => expect(maskedDetail).toContain(number));
-    expect(dom.window.document.querySelector('.windfall-luck.is-locked')).toBeTruthy();
+    expect(dom.window.document.querySelector('.windfall-luck-freemium')).toBeTruthy();
+    expect(dom.window.document.querySelector('.wfl-locked-zone')).toBeTruthy();
+    expect(dom.window.document.querySelector('.wfl-countdown')).toBeTruthy();
   });
 
   it('keeps masked lucky numbers ready to reveal when the premium lock is removed', () => {
@@ -292,7 +294,7 @@ describe('Windfall Luck gimmick section', () => {
     expect(output).toContain('ตั้งงบก่อนเสี่ยง');
     expect(dom.window.document.querySelectorAll('.wfl-mask-number').length).toBe(0);
     expect(dom.window.document.querySelectorAll('.wfl-full-number').length).toBe(3);
-    expect(dom.window.document.querySelector('.windfall-luck.is-locked')).toBeNull();
+    expect(dom.window.document.querySelector('.windfall-luck-freemium')).toBeNull();
   });
 });
 

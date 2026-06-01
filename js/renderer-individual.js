@@ -86,8 +86,25 @@ function buildWindfallDetailHtml(guide, premiumUnlocked){
     + '<ol class="wfl-full-detail" aria-hidden="true">' + fullStepsHtml + '</ol>';
 }
 
+// Helper: คำนวณหวยงวดถัดไป (ออกทุกวันที่ 1 และ 16)
+function getNextLotteryDraw(){
+  var now = new Date();
+  var day = now.getDate();
+  var nextDraw;
+  if (day < 16) {
+    nextDraw = new Date(now.getFullYear(), now.getMonth(), 16);
+  } else {
+    nextDraw = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  }
+  var diff = Math.ceil((nextDraw - now) / (1000 * 60 * 60 * 24));
+  var monthNames = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  var label = nextDraw.getDate() + ' ' + monthNames[nextDraw.getMonth()] + ' ' + (nextDraw.getFullYear() + 543);
+  return { daysLeft: diff, label: label };
+}
+
 function buildWindfallLuckHtml(guide, premiumUnlocked){
-  var html = '<div class="windfall-luck' + (premiumUnlocked ? '' : ' is-locked') + '">'
+  // === FREE ZONE: แสดงชัดเจนเสมอ ===
+  var html = '<div class="windfall-luck' + (premiumUnlocked ? '' : ' windfall-luck-freemium') + '">'
     + '<div class="wfl-kicker">หวย · ลอตเตอรี่ · ลาภลอย</div>'
     + '<div class="wfl-title">✦ ' + escapeHTML(guide.title) + ' ✦</div>'
     + '<div class="wfl-desc">' + escapeHTML(guide.subtitle) + '</div>'
@@ -99,22 +116,46 @@ function buildWindfallLuckHtml(guide, premiumUnlocked){
     + '<div class="wfl-box"><small>ทิศเปิดโชค</small><b>' + escapeHTML(guide.direction) + '</b></div>'
     + '</div>'
     + '<div class="wfl-line"><strong>หวย / ลอตเตอรี่:</strong> ' + escapeHTML(guide.lotteryFocus) + '</div>'
-    + '<div class="wfl-line"><strong>สัญญาณเลข:</strong> ' + escapeHTML(guide.omen) + '</div>'
-    + '<div class="wfl-section"><strong>พิธีเปิดทางโชค</strong>'
-    + buildWindfallDetailHtml(guide, premiumUnlocked)
-    + '</div>'
-    + '<div class="wfl-mantra"><span>คาถาเรียกโชค</span>“' + escapeHTML(guide.mantra) + '”</div>'
-    + '<div class="wfl-avoid"><strong>กันโชครั่ว:</strong> ' + escapeHTML(guide.avoid) + '</div>';
+    + '<div class="wfl-line"><strong>สัญญาณเลข:</strong> ' + escapeHTML(guide.omen) + '</div>';
+
+  // === LOCKED ZONE: เบลอเฉพาะส่วนนี้ ===
   if (!premiumUnlocked) {
-    // แสดง teaser: ทิศ + เวลาฟรี แต่ล็อกเลขและรายละเอียด
+    // นับถอยหลังหวยงวดถัดไป
+    var nextLottery = getNextLotteryDraw();
+    html += '<div class="wfl-countdown">'
+      + '📅 หวยงวดถัดไป: <strong>' + nextLottery.label + '</strong> (อีก <span class="wfl-countdown-num">' + nextLottery.daysLeft + '</span> วัน)'
+      + '</div>';
+    
+    // Social proof
+    html += '<div class="wfl-social-proof">'
+      + '💬 <em>"เลขวันเกิดตัวเอง ตรงกับที่ฝันเลย งวดที่แล้วถูก 2 ตัวบน"</em> — ผู้ใช้ STARVIA'
+      + '</div>';
+    
+    // Locked content (blurred)
+    html += '<div class="wfl-locked-zone">'
+      + '<div class="wfl-section"><strong>พิธีเปิดทางโชค</strong>'
+      + buildWindfallDetailHtml(guide, false)
+      + '</div>'
+      + '<div class="wfl-mantra"><span>คาถาเรียกโชค</span>"' + escapeHTML(guide.mantra) + '"</div>'
+      + '<div class="wfl-avoid"><strong>กันโชครั่ว:</strong> ' + escapeHTML(guide.avoid) + '</div>'
+      + '</div>';
+    
+    // Teaser + CTA
     html += buildTeaserReveal('✦ ทิศเปิดโชคของคุณวันนี้ ✦',
       'ทิศ <span class="teaser-highlight">' + escapeHTML(guide.direction) + '</span> · จังหวะเฮง <span class="teaser-highlight">' + escapeHTML(guide.sacredTime) + '</span>')
-    + buildWarningTeaser('คุณมีเลขนำโชคเฉพาะตัวที่คำนวณจากวันเกิด — ตัวเลขเหล่านี้มีผลกับหวย ลอตเตอรี่ และการเสี่ยงโชคทุกรูปแบบ')
+    + buildWarningTeaser('เลขตัวที่ 2 ถูกซ่อนไว้ — เปิดดูครบทุกตัวก่อนหวยออก')
     + buildConversionCta(
-      '🔮 ดูเลขนำโชคของคุณ · ปลดล็อก 199 บาท',
-      'เลขที่คำนวณจากวันเกิด + คาถาเรียกโชค + พิธีเปิดทาง + สิ่งที่ต้องหลีกเลี่ยง',
+      '🔮 เปิดเลขตัวที่ 2 ก่อนหวยออก · ปลดล็อก 199 บาท',
+      'เลขนำโชคครบทุกตัว + พิธีเปิดทาง + คาถาเรียกโชค + กันโชครั่ว',
       '94% ของคนที่ดูเลขตัวเอง บอกว่า "ตรงจนตกใจ"'
     );
+  } else {
+    // Premium unlocked — แสดงทั้งหมด
+    html += '<div class="wfl-section"><strong>พิธีเปิดทางโชค</strong>'
+      + buildWindfallDetailHtml(guide, true)
+      + '</div>'
+      + '<div class="wfl-mantra"><span>คาถาเรียกโชค</span>"' + escapeHTML(guide.mantra) + '"</div>'
+      + '<div class="wfl-avoid"><strong>กันโชครั่ว:</strong> ' + escapeHTML(guide.avoid) + '</div>';
   }
   html += '</div>';
   return html;
