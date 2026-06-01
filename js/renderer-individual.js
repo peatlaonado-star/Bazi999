@@ -120,8 +120,131 @@ function buildWindfallLuckHtml(guide, premiumUnlocked){
   return html;
 }
 
+// Helper: สร้าง domain card สำหรับคัมภีร์ 6 ด้าน
+function buildDomainCardV2(domain, isLocked){
+  var remedy = domain.dhammaRemedy || {
+    cause: domain.warning,
+    fix: domain.remedy,
+    boost: domain.currentPhase ? domain.currentPhase.text : domain.remedy,
+    practice: 'ภารกิจ 7 วัน: เลือก 1 เรื่องที่ควบคุมได้ แล้วทำให้ต่อเนื่อง'
+  };
+  var practiceText = String(remedy.practice || '').replace(/^ภารกิจ 7 วัน:\s*/, '');
+  
+  var html = '<div class="domain-card domain-' + escapeHTML(domain.key) + (isLocked ? ' domain-card-locked' : '') + '">'
+    + '<div class="domain-head-v2">'
+    + '<span class="domain-icon-v2">' + escapeHTML(domain.icon) + '</span>'
+    + '<div class="domain-head-info">'
+    + '<div class="domain-label-v2">' + escapeHTML(domain.label) + '</div>'
+    + '</div>'
+    + '<div class="domain-score-badge" style="background:' + escapeHTML(domain.levelColor) + '20;color:' + escapeHTML(domain.levelColor) + ';border:1px solid ' + escapeHTML(domain.levelColor) + '40">'
+    + '<span>' + escapeHTML(domain.levelIcon) + '</span>'
+    + '<span>' + escapeHTML(domain.level) + '</span>'
+    + '<span>' + domain.score + '/100</span>'
+    + '</div>'
+    + '</div>';
+  
+  if (isLocked) {
+    html += '<div class="domain-compact-body">'
+      + '<div class="domain-compact-line domain-now" style="opacity:.4"><b>🌙</b><span>ปลดล็อกเพื่อดูรายละเอียด</span></div>'
+      + '</div>';
+  } else {
+    html += '<div class="domain-compact-body">'
+      + '<div class="domain-compact-line domain-now"><b>🌙 สถานะตอนนี้</b><span>' + escapeHTML(domain.current) + '</span></div>'
+      + '<div class="domain-compact-line domain-caution"><b>⚡ ระวัง</b><span>' + escapeHTML(domain.warning) + '</span></div>'
+      + '<div class="domain-compact-line domain-cause"><b>🔮 แก้เหตุ</b><span>' + escapeHTML(remedy.fix) + '</span></div>'
+      + '<div class="domain-compact-line domain-boost"><b>✨ เสริมให้ปัง</b><span>' + escapeHTML(remedy.boost) + '</span></div>'
+      + '<div class="domain-compact-line domain-practice"><b>ภารกิจ 7 วัน</b><span>' + escapeHTML(practiceText) + '</span></div>'
+      + '</div>'
+      + '<details class="domain-age-details">'
+      + '<summary>ดูจังหวะ 15 ปีข้างหน้า</summary>'
+      + '<div class="domain-ages">';
+    domain.opportunities.forEach(function(opp){
+      html += '<div class="domain-age-v2">'
+        + '<span class="domain-age-chip" style="background:' + escapeHTML(opp.level === 'ปีทอง' ? '#FFD700' : opp.level === 'ปีดี' ? '#4CAF50' : opp.level === 'ปานกลาง' ? '#FFC107' : '#9E9E9E') + '20">' + escapeHTML(opp.ageRange) + '</span>'
+        + '<p>' + escapeHTML(opp.text) + '</p>';
+      if (opp.preparation) {
+        html += '<p class="domain-age-prep">' + escapeHTML(opp.preparation) + '</p>';
+      }
+      html += '</div>';
+    });
+    html += '</div></details>';
+  }
+  html += '</div>';
+  return html;
+}
+
+// Helper: สร้าง domain card สำหรับหมอทัก (ใช้ร่วมกันระหว่าง free/locked)
+function buildSingleDomainCard(domain, isLocked){
+  var phaseClass = domain.phase === 'ขาขึ้น' ? 'mlm-phase-up' : domain.phase === 'ทรงตัว' ? 'mlm-phase-stable' : 'mlm-phase-warn';
+  var phaseEmoji = domain.phase === 'ขาขึ้น' ? '📈' : domain.phase === 'ทรงตัว' ? '⚖️' : '⚠️';
+  
+  var html = '<div class="mlm-domain mlm-domain-moo' + (isLocked ? ' mlm-domain-locked' : '') + '">'
+    + '<div class="mlm-domain-head">'
+    + '<span class="mlm-domain-icon">' + escapeHTML(domain.icon) + '</span>'
+    + '<span class="mlm-domain-label">' + escapeHTML(domain.label) + '</span>'
+    + (domain.phase ? '<span class="mlm-phase ' + phaseClass + '">' + phaseEmoji + ' ' + escapeHTML(domain.phase) + '</span>' : '')
+    + (domain.luckyDay ? '<span class="mlm-lucky-day">🌙 วันที่ ' + escapeHTML(String(domain.luckyDay)) + '</span>' : '')
+    + '</div>'
+    + '<div class="mlm-score-row"><span>คะแนนความเด่น</span>'
+    + '<strong>' + escapeHTML(String(domain.score || 0)) + '/100</strong>'
+    + '</div>'
+    + '<div class="mlm-score-bar"><i style="width:' + escapeHTML(String(domain.score || 0)) + '%"></i></div>';
+
+  if (isLocked) {
+    // แสดงแค่ teaser สั้นๆ
+    html += '<div class="mlm-moo-forecast">'
+      + '<p class="mlm-moo-text" style="opacity:.5">' + escapeHTML(domain.teaser || 'ปลดล็อกเพื่อดูรายละเอียด') + '</p>'
+      + '</div>';
+  } else {
+    // แสดงเต็ม
+    if (domain.key === 'career') {
+      html += '<div class="mlm-moo-forecast">'
+        + '<p class="mlm-moo-text">' + escapeHTML(domain.forecast) + '</p>'
+        + '</div>'
+        + '<div class="mlm-action"><span class="mlm-action-icon">🎯</span><strong>สิ่งที่ควรทำ:</strong> ' + escapeHTML(domain.action || '') + '</div>';
+    } else if (domain.key === 'money') {
+      var moneyItems = domain.forecast.split(' — ');
+      html += '<div class="mlm-moo-forecast">'
+        + '<ul class="mlm-money-list">';
+      moneyItems.forEach(function(item, i){
+        if (item && i < 3) html += '<li>💰 ' + escapeHTML(item) + '</li>';
+      });
+      html += '</ul>'
+        + '</div>'
+        + '<div class="mlm-action"><span class="mlm-action-icon">💎</span><strong>เคล็ดลับ:</strong> ' + escapeHTML(domain.action || '') + '</div>';
+    } else if (domain.key === 'windfall') {
+      html += '<div class="mlm-moo-forecast mll-windfall">'
+        + '<p class="mlm-moo-text">' + escapeHTML(domain.forecast) + '</p>'
+        + '</div>';
+      if (domain.luckyDay) {
+        html += '<div class="mlm-lucky-hint"><span class="mlm-lucky-icon">🎰</span><strong>เลขนำโชค:</strong> ลองดูวันที่ ' + escapeHTML(String(domain.luckyDay)) + '</div>';
+      }
+      html += '<div class="mlm-action"><span class="mlm-action-icon">🌟</span><strong>สิ่งที่ควรทำ:</strong> ' + escapeHTML(domain.action || '') + '</div>';
+    } else if (domain.key === 'relationship') {
+      html += '<div class="mlm-moo-forecast">'
+        + '<p class="mlm-moo-text">' + escapeHTML(domain.forecast) + '</p>'
+        + '</div>';
+    } else if (domain.key === 'health') {
+      html += '<div class="mlm-moo-forecast">'
+        + '<p class="mlm-moo-text">' + escapeHTML(domain.forecast) + '</p>'
+        + '</div>'
+        + '<div class="mlm-action"><span class="mlm-action-icon">🏥</span><strong>สัญญาณร่างกาย:</strong> ' + escapeHTML(domain.action || '') + '</div>';
+    } else {
+      html += '<div class="mlm-moo-forecast">'
+        + '<p class="mlm-moo-text">' + escapeHTML(domain.forecast) + '</p>'
+        + '</div>'
+        + '<div class="mlm-action"><span class="mlm-action-icon">✨</span><strong>ควรทำ:</strong> ' + escapeHTML(domain.action || '') + '</div>';
+    }
+    if (domain.omen) {
+      html += '<div class="mlm-omen"><span class="mlm-omen-icon">👁️</span><em>' + escapeHTML(domain.omen) + '</em></div>';
+    }
+  }
+  html += '</div>';
+  return html;
+}
+
 function buildMonthlyLifeMapHtml(model, premiumUnlocked){
-  var html = '<div class="monthly-life-map' + (premiumUnlocked ? '' : ' is-locked') + '">'
+  var html = '<div class="monthly-life-map' + (premiumUnlocked ? '' : ' monthly-life-map-freemium') + '">'
     + '<div class="mlm-kicker">✦ หมอทักประจำเดือน ✦</div>'
     + '<div class="mlm-title">🔮 ' + escapeHTML(model.title) + '</div>'
     + '<div class="mlm-mystic-intro">'
@@ -135,7 +258,7 @@ function buildMonthlyLifeMapHtml(model, premiumUnlocked){
     + '<div class="mlm-pill mlm-pill-action"><span>✨ สิ่งที่ควรทำ</span>' + escapeHTML(model.elementAction) + '</div>'
     + '</div>';
 
-  html += '<div class="mlm-section-title">✦ 5 ด้านชีวิตที่ดาวจับตา ✦</div><div class="mlm-domains">';
+  html += '<div class="mlm-section-title">✦ 5 ด้านชีวิตที่ดาวจับตา ✦</div>';
   
   // หาด้านที่คะแนนสูงสุดสำหรับ free preview
   var topDomain = null;
@@ -143,126 +266,31 @@ function buildMonthlyLifeMapHtml(model, premiumUnlocked){
     topDomain = model.domains.reduce(function(max, d){ return (d.score || 0) > (max.score || 0) ? d : max; }, model.domains[0]);
   }
   
-  model.domains.forEach(function(domain, idx){
-    var phaseClass = domain.phase === 'ขาขึ้น' ? 'mlm-phase-up' : domain.phase === 'ทรงตัว' ? 'mlm-phase-stable' : 'mlm-phase-warn';
-    var phaseEmoji = domain.phase === 'ขาขึ้น' ? '📈' : domain.phase === 'ทรงตัว' ? '⚖️' : '⚠️';
-    var isTopPreview = !premiumUnlocked && topDomain && domain.key === topDomain.key;
-    var isLockedDomain = !premiumUnlocked && !isTopPreview;
-    
-    html += '<div class="mlm-domain mlm-domain-moo' + (isLockedDomain ? ' mlm-domain-locked' : '') + '">'
-      + '<div class="mlm-domain-head">'
-      + '<span class="mlm-domain-icon">' + escapeHTML(domain.icon) + '</span>'
-      + '<span class="mlm-domain-label">' + escapeHTML(domain.label) + '</span>'
-      + (domain.phase ? '<span class="mlm-phase ' + phaseClass + '">' + phaseEmoji + ' ' + escapeHTML(domain.phase) + '</span>' : '')
-      + (domain.luckyDay ? '<span class="mlm-lucky-day">🌙 วันที่ ' + escapeHTML(String(domain.luckyDay)) + '</span>' : '')
-      + '</div>'
-      + '<div class="mlm-score-row"><span>คะแนนความเด่น</span>'
-      + '<strong>' + escapeHTML(String(domain.score || 0)) + '/100</strong>'
-      + '</div>'
-      + '<div class="mlm-score-bar"><i style="width:' + escapeHTML(String(domain.score || 0)) + '%"></i></div>';
-
-    // ถ้าเป็นด้านที่คะแนนสูงสุด → แสดงเต็ม (forecast + action + omen)
-    // ถ้าไม่ → แสดงแค่ score + phase แล้วล็อก
-    if (isTopPreview) {
-      // แสดงเนื้อหาเต็มสำหรับด้านที่เด่นที่สุด
-      if (domain.key === 'career') {
-        html += '<div class="mlm-moo-forecast">'
-          + '<p class="mlm-moo-text">' + escapeHTML(domain.forecast) + '</p>'
-          + '</div>'
-          + '<div class="mlm-action"><span class="mlm-action-icon">🎯</span><strong>สิ่งที่ควรทำ:</strong> ' + escapeHTML(domain.action || '') + '</div>';
-      } else if (domain.key === 'money') {
-        var moneyItems = domain.forecast.split(' — ');
-        html += '<div class="mlm-moo-forecast">'
-          + '<ul class="mlm-money-list">';
-        moneyItems.forEach(function(item, i){
-          if (item && i < 3) html += '<li>💰 ' + escapeHTML(item) + '</li>';
-        });
-        html += '</ul>'
-          + '</div>'
-          + '<div class="mlm-action"><span class="mlm-action-icon">💎</span><strong>เคล็ดลับ:</strong> ' + escapeHTML(domain.action || '') + '</div>';
-      } else if (domain.key === 'windfall') {
-        html += '<div class="mlm-moo-forecast mll-windfall">'
-          + '<p class="mlm-moo-text">' + escapeHTML(domain.forecast) + '</p>'
-          + '</div>';
-        if (domain.luckyDay) {
-          html += '<div class="mlm-lucky-hint"><span class="mlm-lucky-icon">🎰</span><strong>เลขนำโชค:</strong> ลองดูวันที่ ' + escapeHTML(String(domain.luckyDay)) + '</div>';
-        }
-        html += '<div class="mlm-action"><span class="mlm-action-icon">🌟</span><strong>สิ่งที่ควรทำ:</strong> ' + escapeHTML(domain.action || '') + '</div>';
-      } else if (domain.key === 'relationship') {
-        html += '<div class="mlm-moo-forecast">'
-          + '<p class="mlm-moo-text">' + escapeHTML(domain.forecast) + '</p>'
-          + '</div>';
-      } else if (domain.key === 'health') {
-        html += '<div class="mlm-moo-forecast">'
-          + '<p class="mlm-moo-text">' + escapeHTML(domain.forecast) + '</p>'
-          + '</div>'
-          + '<div class="mlm-action"><span class="mlm-action-icon">🏥</span><strong>สัญญาณร่างกาย:</strong> ' + escapeHTML(domain.action || '') + '</div>';
-      } else {
-        html += '<div class="mlm-moo-forecast">'
-          + '<p class="mlm-moo-text">' + escapeHTML(domain.forecast) + '</p>'
-          + '</div>'
-          + '<div class="mlm-action"><span class="mlm-action-icon">✨</span><strong>ควรทำ:</strong> ' + escapeHTML(domain.action || '') + '</div>';
-      }
-      if (domain.omen) {
-        html += '<div class="mlm-omen"><span class="mlm-omen-icon">👁️</span><em>' + escapeHTML(domain.omen) + '</em></div>';
-      }
-    } else if (isLockedDomain) {
-      // แสดงแค่ teaser สั้นๆ สำหรับด้านอื่นๆ
-      html += '<div class="mlm-moo-forecast">'
-        + '<p class="mlm-moo-text" style="opacity:.5">' + escapeHTML(domain.teaser || 'ปลดล็อกเพื่อดูรายละเอียด') + '</p>'
-        + '</div>';
-    } else {
-      // Premium unlocked - แสดงเต็ม
-      if (domain.key === 'career') {
-        html += '<div class="mlm-moo-forecast">'
-          + '<p class="mlm-moo-text">' + escapeHTML(domain.forecast) + '</p>'
-          + '</div>'
-          + '<div class="mlm-action"><span class="mlm-action-icon">🎯</span><strong>สิ่งที่ควรทำ:</strong> ' + escapeHTML(domain.action || '') + '</div>';
-      } else if (domain.key === 'money') {
-        var moneyItems = domain.forecast.split(' — ');
-        html += '<div class="mlm-moo-forecast">'
-          + '<ul class="mlm-money-list">';
-        moneyItems.forEach(function(item, i){
-          if (item && i < 3) html += '<li>💰 ' + escapeHTML(item) + '</li>';
-        });
-        html += '</ul>'
-          + '</div>'
-          + '<div class="mlm-action"><span class="mlm-action-icon">💎</span><strong>เคล็ดลับ:</strong> ' + escapeHTML(domain.action || '') + '</div>';
-      } else if (domain.key === 'windfall') {
-        html += '<div class="mlm-moo-forecast mll-windfall">'
-          + '<p class="mlm-moo-text">' + escapeHTML(domain.forecast) + '</p>'
-          + '</div>';
-        if (domain.luckyDay) {
-          html += '<div class="mlm-lucky-hint"><span class="mlm-lucky-icon">🎰</span><strong>เลขนำโชค:</strong> ลองดูวันที่ ' + escapeHTML(String(domain.luckyDay)) + '</div>';
-        }
-        html += '<div class="mlm-action"><span class="mlm-action-icon">🌟</span><strong>สิ่งที่ควรทำ:</strong> ' + escapeHTML(domain.action || '') + '</div>';
-      } else if (domain.key === 'relationship') {
-        html += '<div class="mlm-moo-forecast">'
-          + '<p class="mlm-moo-text">' + escapeHTML(domain.forecast) + '</p>'
-          + '</div>';
-      } else if (domain.key === 'health') {
-        html += '<div class="mlm-moo-forecast">'
-          + '<p class="mlm-moo-text">' + escapeHTML(domain.forecast) + '</p>'
-          + '</div>'
-          + '<div class="mlm-action"><span class="mlm-action-icon">🏥</span><strong>สัญญาณร่างกาย:</strong> ' + escapeHTML(domain.action || '') + '</div>';
-      } else {
-        html += '<div class="mlm-moo-forecast">'
-          + '<p class="mlm-moo-text">' + escapeHTML(domain.forecast) + '</p>'
-          + '</div>'
-          + '<div class="mlm-action"><span class="mlm-action-icon">✨</span><strong>ควรทำ:</strong> ' + escapeHTML(domain.action || '') + '</div>';
-      }
-
-      if (domain.omen) {
-        html += '<div class="mlm-omen"><span class="mlm-omen-icon">👁️</span><em>' + escapeHTML(domain.omen) + '</em></div>';
-      }
-
-      if (premiumUnlocked && domain.goal) {
-        html += '<div class="mlm-goal">🎯 ' + escapeHTML(domain.goal) + '</div>';
-      }
-    }
+  // === Free preview: top domain แสดงชัดเจน, ด้านอื่นๆ อยู่ใน locked zone ===
+  if (!premiumUnlocked && topDomain) {
+    // แสดง top domain เต็มก่อน (นอก locked zone)
+    html += '<div class="mlm-domains mlm-domains-free">';
+    html += buildSingleDomainCard(topDomain, false);
     html += '</div>';
-  });
-  html += '</div>';
+    // แสดงด้านอื่นๆ ใน locked zone
+    html += '<div class="mlm-domains-locked">';
+    html += '<div class="mlm-domains">';
+    model.domains.forEach(function(domain){
+      if (domain.key !== topDomain.key) {
+        html += buildSingleDomainCard(domain, true);
+      }
+    });
+    html += '</div>';
+    html += '</div>';
+  } else {
+    // Premium unlocked — แสดงทั้งหมด
+    html += '<div class="mlm-domains">';
+    model.domains.forEach(function(domain){
+      html += buildSingleDomainCard(domain, false);
+    });
+    html += '</div>';
+  }
+
 
   if (premiumUnlocked) {
     html += '<div class="mlm-section-title">📅 ปฏิทินวันดีรายเดือน</div><div class="mlm-calendar">';
@@ -732,80 +760,43 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + '<div class="domain-title">✦ ' + escapeHTML(domainMatrix.title) + ' ✦</div>'
     + '<div class="domain-desc">' + escapeHTML(domainIntro) + '</div>'
     + '<div class="domain-element-tone">' + escapeHTML(domainMatrix.elementSummary) + '</div>'
-    + '<div class="domain-current-chip">🎯 วัยปัจจุบัน: ' + escapeHTML(domainMatrix.currentAgeRange) + '</div>'
-    + '<div class="domain-premium' + (premiumUnlocked ? '' : ' is-locked') + '">'
-    + '<div class="domain-grid">';
+    + '<div class="domain-current-chip">🎯 วัยปัจุบัน: ' + escapeHTML(domainMatrix.currentAgeRange) + '</div>';
   
   // เรียง domain ตาม score แล้วแสดงเฉพาะ top 2 สำหรับ free reader
   var sortedDomains = domainMatrix.domains.slice().sort(function(a, b){ return b.score - a.score; });
   var top2Keys = sortedDomains.slice(0, 2).map(function(d){ return d.key; });
   
+  // === Top 2 domains: แสดงชัดเจน (นอก locked zone) ===
+  domainHtml += '<div class="domain-grid">';
   domainMatrix.domains.forEach(function(domain){
-    var remedy = domain.dhammaRemedy || {
-      cause: domain.warning,
-      fix: domain.remedy,
-      boost: domain.currentPhase ? domain.currentPhase.text : domain.remedy,
-      practice: 'ภารกิจ 7 วัน: เลือก 1 เรื่องที่ควบคุมได้ แล้วทำให้ต่อเนื่อง'
-    };
-    var practiceText = String(remedy.practice || '').replace(/^ภารกิจ 7 วัน:\s*/, '');
-    var isTop2 = premiumUnlocked || top2Keys.indexOf(domain.key) >= 0;
-    var isLockedCard = !premiumUnlocked && !isTop2;
-    
-    domainHtml += '<div class="domain-card domain-' + escapeHTML(domain.key) + (isLockedCard ? ' domain-card-locked' : '') + '">'
-      + '<div class="domain-head-v2">'
-      + '<span class="domain-icon-v2">' + escapeHTML(domain.icon) + '</span>'
-      + '<div class="domain-head-info">'
-      + '<div class="domain-label-v2">' + escapeHTML(domain.label) + '</div>'
-      + '</div>'
-      + '<div class="domain-score-badge" style="background:' + escapeHTML(domain.levelColor) + '20;color:' + escapeHTML(domain.levelColor) + ';border:1px solid ' + escapeHTML(domain.levelColor) + '40">'
-      + '<span>' + escapeHTML(domain.levelIcon) + '</span>'
-      + '<span>' + escapeHTML(domain.level) + '</span>'
-      + '<span>' + domain.score + '/100</span>'
-      + '</div>'
-      + '</div>';
-    
-    if (isTop2) {
-      // แสดงเนื้อหาเต็มสำหรับ top 2
-      domainHtml += '<div class="domain-compact-body">'
-        + '<div class="domain-compact-line domain-now"><b>🌙 สถานะตอนนี้</b><span>' + escapeHTML(domain.current) + '</span></div>'
-        + '<div class="domain-compact-line domain-caution"><b>⚡ ระวัง</b><span>' + escapeHTML(domain.warning) + '</span></div>'
-        + '<div class="domain-compact-line domain-cause"><b>🔮 แก้เหตุ</b><span>' + escapeHTML(remedy.fix) + '</span></div>'
-        + '<div class="domain-compact-line domain-boost"><b>✨ เสริมให้ปัง</b><span>' + escapeHTML(remedy.boost) + '</span></div>'
-        + '<div class="domain-compact-line domain-practice"><b>ภารกิจ 7 วัน</b><span>' + escapeHTML(practiceText) + '</span></div>'
-        + '</div>'
-        + '<details class="domain-age-details">'
-        + '<summary>ดูจังหวะ 15 ปีข้างหน้า</summary>'
-        + '<div class="domain-ages">';
-      domain.opportunities.forEach(function(opp){
-        domainHtml += '<div class="domain-age-v2">'
-          + '<span class="domain-age-chip" style="background:' + escapeHTML(opp.level === 'ปีทอง' ? '#FFD700' : opp.level === 'ปีดี' ? '#4CAF50' : opp.level === 'ปานกลาง' ? '#FFC107' : '#9E9E9E') + '20">' + escapeHTML(opp.ageRange) + '</span>'
-          + '<p>' + escapeHTML(opp.text) + '</p>';
-        if (opp.preparation) {
-          domainHtml += '<p class="domain-age-prep">' + escapeHTML(opp.preparation) + '</p>';
-        }
-        domainHtml += '</div>';
-      });
-      domainHtml += '</div></details>';
-    } else {
-      // แสดงแค่ score สำหรับด้านอื่นๆ
-      domainHtml += '<div class="domain-compact-body">'
-        + '<div class="domain-compact-line domain-now" style="opacity:.4"><b>🌙</b><span>ปลดล็อกเพื่อดูรายละเอียด</span></div>'
-        + '</div>';
+    if (premiumUnlocked || top2Keys.indexOf(domain.key) >= 0) {
+      domainHtml += buildDomainCardV2(domain, false);
     }
-    domainHtml += '</div>';
   });
+  domainHtml += '</div>';
+  
+  // === ด้านอื่นๆ: อยู่ใน locked zone ===
   if (!premiumUnlocked) {
-    // แสดง teaser: คะแนนรวม + ด้านที่ต่ำสุด แต่ล็อกรายละเอียด
+    domainHtml += '<div class="domain-locked-zone">';
+    domainHtml += '<div class="domain-grid">';
+    domainMatrix.domains.forEach(function(domain){
+      if (top2Keys.indexOf(domain.key) < 0) {
+        domainHtml += buildDomainCardV2(domain, true);
+      }
+    });
+    domainHtml += '</div>';
+    domainHtml += '</div>';
+    
+    // teaser + CTA
     var lowestDomain = domainMatrix.domains.reduce(function(min, d){ return d.score < min.score ? d : min; }, domainMatrix.domains[0]);
-    domainHtml += '</div>'
-      + buildTeaserReveal('✦ ด้านที่ต้องระวังที่สุด ✦',
-        escapeHTML(lowestDomain.icon) + ' <span class="teaser-highlight">' + escapeHTML(lowestDomain.label) + '</span> คะแนน ' + lowestDomain.score + '/100 — "' + escapeHTML(lowestDomain.current) + '"')
-      + buildWarningTeaser('คุณมีจุดอ่อนซ่อนอยู่ใน ' + escapeHTML(lowestDomain.label) + ' — รู้ก่อน แก้ก่อน')
-      + buildConversionCta(
-        '📖 ดูคัมภีร์แก้ดวง 6 ด้าน · ปลดล็อก 199 บาท',
-        'โชค · การเงิน · สุขภาพ · ความรัก · การงาน · บริวาร — วิเคราะห์เฉพาะบุคคล',
-        '94% บอกว่า "ตรงจนตกใจ"'
-      );
+    domainHtml += buildTeaserReveal('✦ ด้านที่ต้องระวังที่สุด ✦',
+      escapeHTML(lowestDomain.icon) + ' <span class="teaser-highlight">' + escapeHTML(lowestDomain.label) + '</span> คะแนน ' + lowestDomain.score + '/100 — "' + escapeHTML(lowestDomain.current) + '"')
+    + buildWarningTeaser('คุณมีจุดอ่อนซ่อนอยู่ใน ' + escapeHTML(lowestDomain.label) + ' — รู้ก่อน แก้ก่อน')
+    + buildConversionCta(
+      '📖 ดูคัมภีร์แก้ดวง 6 ด้าน · ปลดล็อก 199 บาท',
+      'โชค · การเงิน · สุขภาพ · ความรัก · การงาน · บริวาร — วิเคราะห์เฉพาะบุคคล',
+      '94% บอกว่า "ตรงจนตกใจ"'
+    );
   }
   domainHtml += '</div></div>';
   var lifeGraphSectionHtml = '<div class="life-graph-section">' + lifeGraphHtml + '</div>';

@@ -748,30 +748,28 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   user-select: none;
   transition: all 0.5s ease;
 }
-/* Domain Matrix — แผนที่สถานการณ์ชีวิต (Premium) */
-.domain-premium.is-locked > .domain-grid,
-.domain-premium.is-locked > .domain-kicker,
-.domain-premium.is-locked > .domain-title,
-.domain-premium.is-locked > .domain-desc,
-.domain-premium.is-locked > .domain-current-chip {
-  filter: blur(8px);
-  opacity: 0.3;
-  pointer-events: none;
-  user-select: none;
-  transition: all 0.5s ease;
+
+/* Monthly Life Map — เฉพาะ locked zone ที่เบลอ */
+.mlm-domains-locked {
+  position: relative;
+  overflow: hidden;
 }
-/* Monthly Life Map — แผนที่ชีวิตรายเดือน (Premium) */
-.is-locked > .mlm-kicker,
-.is-locked > .mlm-title,
-.is-locked > .mlm-summary,
-.is-locked > .mlm-grid,
-.is-locked > .mlm-section-title,
-.is-locked > .mlm-domains {
-  filter: blur(8px);
-  opacity: 0.3;
+.mlm-domains-locked > .mlm-domains {
+  filter: blur(6px);
+  opacity: 0.35;
   pointer-events: none;
   user-select: none;
-  transition: all 0.5s ease;
+}
+/* Domain Matrix — เฉพาะ locked zone ที่เบลอ */
+.domain-locked-zone {
+  position: relative;
+  overflow: hidden;
+}
+.domain-locked-zone > .domain-grid {
+  filter: blur(6px);
+  opacity: 0.35;
+  pointer-events: none;
+  user-select: none;
 }
 /* Karma Mirror — กระจกกรรม (Premium) */
 .is-locked > .karma-kicker,

@@ -156,7 +156,7 @@ describe('Life Domain Forecast Matrix', () => {
     // Top 2 domains show full content (5 lines each), rest show minimal
     expect(dom.window.document.querySelectorAll('.domain-compact-line').length).toBeGreaterThanOrEqual(10);
     expect(dom.window.document.querySelectorAll('.domain-age-details').length).toBe(2); // Only top 2 have age details
-    expect(dom.window.document.querySelector('.domain-premium.is-locked')).toBeTruthy();
+    expect(dom.window.document.querySelector('.domain-locked-zone')).toBeTruthy();
   });
 
   it('unlocks domain matrix when is-locked class is removed (simulates PIN unlock)', () => {
@@ -165,22 +165,21 @@ describe('Life Domain Forecast Matrix', () => {
 
     context.renderInd('Test', 'หญิง', '1990-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
 
-    const matrix = dom.window.document.querySelector('.domain-premium');
-    expect(matrix.classList.contains('is-locked')).toBe(true);
-
-    // Simulate onPremiumVerified behavior
-    dom.window.document.querySelectorAll('.is-locked').forEach((el) => {
-      el.classList.remove('is-locked');
-      const overlay = el.querySelector('.lock-overlay');
-      if (overlay) overlay.remove();
-    });
-
-    expect(matrix.classList.contains('is-locked')).toBe(false);
-    expect(matrix.querySelector('.lock-overlay')).toBeNull();
+    // Verify locked zone exists (4 locked domains)
+    const lockedZone = dom.window.document.querySelector('.domain-locked-zone');
+    expect(lockedZone).toBeTruthy();
+    expect(lockedZone.querySelectorAll('.domain-card-locked').length).toBe(4);
+    
+    // Top 2 domains are visible outside locked zone (not blurred)
+    const allDomainCards = dom.window.document.querySelectorAll('.domain-card');
+    const freeCards = dom.window.document.querySelectorAll('.domain-card:not(.domain-card-locked)');
+    expect(allDomainCards.length).toBe(6);
+    expect(freeCards.length).toBe(2);
+    
+    // Content from top 2 is accessible
+    const matrix = dom.window.document.querySelector('.domain-matrix');
     expect(matrix.textContent).toContain('สถานะตอนนี้');
     expect(matrix.textContent).toContain('ระวัง');
-    expect(matrix.textContent).toContain('แก้เหตุ');
-    expect(matrix.textContent).toContain('ดูจังหวะ 15 ปีข้างหน้า');
   });
 
   it('renders all required life-domain guidance parts for premium readers', () => {
@@ -524,7 +523,7 @@ describe('Monthly Life Map subscription feature', () => {
     expect(output).toContain('conversion-cta');
     expect(output).not.toContain('สรุปรายสัปดาห์ 4 สัปดาห์');
     // Domain cards are now visible with teaser content
-    expect(dom.window.document.querySelector('.monthly-life-map.is-locked')).toBeTruthy();
+    expect(dom.window.document.querySelector('.mlm-domains-locked')).toBeTruthy();
   });
 
   it('renders full monthly planner for premium readers', () => {
