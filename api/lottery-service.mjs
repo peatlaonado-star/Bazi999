@@ -131,10 +131,17 @@ export function setManualResults(data) {
     return { success: false, message: 'Missing required fields: firstPrize' };
   }
   
+  const dateStr = data.date || new Date().toISOString().split('T')[0];
+  let displayDate = data.displayDate;
+  if (!displayDate || (!displayDate.date && !displayDate.month && !displayDate.year)) {
+    const parts = dateStr.split('-');
+    displayDate = { date: parts[2] || '', month: parts[1] || '', year: parts[0] || '' };
+  }
+  
   const result = {
     available: true,
-    date: data.date || new Date().toISOString().split('T')[0],
-    displayDate: data.displayDate || { date: '', month: '', year: '' },
+    date: dateStr,
+    displayDate,
     period: data.period || [],
     firstPrize: data.firstPrize,
     last3f: data.last3f || [],
