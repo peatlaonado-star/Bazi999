@@ -12,6 +12,7 @@ const files = [
   'js/reading-helpers.js',
   'js/life-graph.js',
   'js/renderer-shared.js',
+  'js/streak-tracker.js',
   'js/renderer-individual.js',
   'js/renderer-couple.js',
   'js/renderer-auspicious.js',

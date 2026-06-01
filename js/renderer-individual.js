@@ -965,6 +965,8 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
   }
 
   wrap.innerHTML = blueprintCardHtml
+    + '<div class="streak-progress-anchor"></div>'
+    + '<div class="streak-discount-anchor"></div>'
     + badgesHtml
     + wrapCollapsible("✦ กำลังวันประจำตัว ✦", "วันเกิด · เทวดา · ธาตุ · สีมงคล", cosmicBriefHtml)
     + buildDailyFortuneCta()
