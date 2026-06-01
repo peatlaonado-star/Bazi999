@@ -216,7 +216,25 @@ describe('Couple mode rendering', () => {
     expect(output).toContain('โอกาสความสัมพันธ์');
     expect(output).toContain('อ้างอิงเชิงระบบ');
     expect(output).toContain('ดาวประจำวัน/ธาตุ');
+    expect(output).toContain('จังหวะรักของทั้งคู่');
     expect(output).not.toContain('ความสม่ำเสมอ 21 วัน');
+  });
+
+  it('marks love timing cycles that already passed and shifts to the next 7-year window', () => {
+    const dom = new JSDOM('<!doctype html><div id="r1"></div>');
+    const pa = planet('อาทิตย์', 'ไฟ', 0);
+    const pb = planet('พุธ', 'ลม', 1);
+    const context = loadContext(dom, {
+      getPL: () => [pa, pb],
+    });
+
+    const oldWindow = context.loveWindowForPerson('1970-01-01', 0, 0, 0);
+    const model = context.buildLoveDestinyModel('1970-01-01', '1972-07-15', 78, 75, 78, 80, 82, pa, pb, 0, 6);
+
+    expect(oldWindow.shiftedFromPast).toBe(true);
+    expect(oldWindow.cyclesShifted).toBeGreaterThan(0);
+    expect(model.timingStatus).toContain('ผ่านไปแล้ว');
+    expect(model.timingStatus).toContain('ระบบอ่านรอบถัดไป');
   });
 
   it('unlocks love timing action plan for premium readers', () => {

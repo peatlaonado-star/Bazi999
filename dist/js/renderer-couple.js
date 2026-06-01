@@ -63,9 +63,14 @@ function loveWindowForPerson(dateValue, planetIndex, rasiIndex, offset){
   }
   return {
     age: age,
+    baseStart: base,
+    baseEnd: base + 2,
+    cyclesShifted: safety,
+    shiftedFromPast: safety > 0,
     start: target,
     end: target + 2,
-    label: target + '–' + (target + 2) + ' ปี'
+    label: target + '–' + (target + 2) + ' ปี',
+    baseLabel: base + '–' + (base + 2) + ' ปี'
   };
 }
 
@@ -79,6 +84,13 @@ function buildLoveDestinyModel(dateA,dateB,total,elS,plS,angS,lgS,pa,pb,ria,rib)
   var hasOverlap = overlapStart <= overlapEnd;
   var coupleStart = hasOverlap ? overlapStart : Math.round((wa.start + wb.start) / 2);
   var coupleEnd = hasOverlap ? overlapEnd : coupleStart + 2;
+  var shiftedText = [];
+  if(wa.shiftedFromPast) shiftedText.push('รอบเดิมของคนที่หนึ่ง (' + wa.baseLabel + ') ผ่านไปแล้ว ระบบอ่านรอบถัดไป');
+  if(wb.shiftedFromPast) shiftedText.push('รอบเดิมของคนที่สอง (' + wb.baseLabel + ') ผ่านไปแล้ว ระบบอ่านรอบถัดไป');
+  var timingStatus = hasOverlap
+    ? 'จังหวะรักของทั้งคู่ซ้อนกันจริงในช่วงนี้ จึงเหมาะกับการขยับความสัมพันธ์หรือวางแผนอนาคตร่วมกัน'
+    : 'จังหวะรักของทั้งคู่ไม่ซ้อนกันโดยตรง ระบบจึงอ่านเป็น “ช่วงประสานกลาง” ที่ต้องใช้การนัดหมาย การสื่อสาร และการเปิดโอกาสมากกว่าปล่อยให้จังหวะพาไปเอง';
+  if(shiftedText.length) timingStatus += ' · ' + shiftedText.join(' · ');
   var openness = Math.max(48, Math.min(96, Math.round(total * .42 + elS * .18 + plS * .16 + angS * .16 + lgS * .08)));
   var channelMap = {
     'ไฟ': 'กิจกรรมที่มีพลังร่วมกัน งานอีเวนต์ กีฬา โปรเจกต์ที่ต้องตัดสินใจเร็ว หรือพื้นที่ที่ได้แสดงตัวตน',
@@ -96,6 +108,8 @@ function buildLoveDestinyModel(dateA,dateB,total,elS,plS,angS,lgS,pa,pb,ria,rib)
   return {
     wa: wa,
     wb: wb,
+    hasOverlap: hasOverlap,
+    timingStatus: timingStatus,
     coupleLabel: coupleStart + '–' + coupleEnd + ' ปี',
     openness: openness,
     channel: channelMap[mainEl] || channelMap['ลม'],
@@ -185,6 +199,7 @@ function buildLoveDestinyCard(model, premiumUnlocked, na, nb){
     + '<div class="ld-kicker">Love Timing Method</div>'
     + '<div class="ld-title">💖 ดวงคู่รักของคุณกับเขา</div>'
     + '<div class="ld-summary">ช่วงอายุที่ดวงความรักของ <strong>' + na + '</strong> และ <strong>' + nb + '</strong> มีจังหวะเปิดร่วมกัน: <span>' + escapeHTML(model.coupleLabel) + '</span></div>'
+    + '<div class="ld-status ' + (model.hasOverlap ? 'ld-overlap' : 'ld-no-overlap') + '">' + escapeHTML(model.timingStatus) + '</div>'
     + '<div class="ld-grid">'
     + '<div class="ld-box"><small>โอกาสความสัมพันธ์</small><strong>' + model.openness + '%</strong><p>คะแนนนี้รวมเคมีธาตุ ดาวประจำวัน ราศีสัมพันธ์ และลัคนา เพื่อดูแนวโน้ม ไม่ใช่ฟันธง</p></div>'
     + '<div class="ld-box"><small>ทางที่มีโอกาสเจอคนที่ใช่</small><p>' + escapeHTML(model.channel) + '</p></div>'
