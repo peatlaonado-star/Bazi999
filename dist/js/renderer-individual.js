@@ -972,6 +972,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + buildPremiumPreviewSummary()
     + buildPremiumPriceAnchor(false)
     + wrapCollapsible("✦ สูตรเปิดดวงลาภลอย ✦", "เลขเด็ด · หวย · ทิศ · คาถา สายมู", windfallLuckHtml, true)
+    + '<div id=\"lottery-results-section\" style=\"margin-bottom:14px;\"></div>'
     + wrapCollapsible("🔮 หมอทักประจำเดือน", "5 ด้านชีวิต · สัญญาณเตือน · วิธีแก้", monthlyLifeMapHtml, true)
     + lifeGraphSectionHtml
     + wrapCollapsible("✦ คัมภีร์แก้ดวง 6 ด้าน ✦", "โชค · การเงิน · สุขภาพ · ความรัก · การงาน · บริวาร", domainHtml, true)
@@ -1015,6 +1016,8 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + '</div>';
 
   if (typeof initCollapsibleSections === 'function') initCollapsibleSections();
+  // Load lottery results after report renders
+  if (typeof loadLotteryResults === 'function') setTimeout(loadLotteryResults, 400);
   document.getElementById('ts0').insertAdjacentHTML('beforeend',
     '<div class="mc"><div class="mc-l">✦ '+u.mn+' · '+nm+' ✦</div>'
     +'<div class="mc-t">"'+p.man+'"</div></div>'
