@@ -73,7 +73,7 @@
   <!-- DASHBOARD -->
   <div id="dashboard" class="hidden">
     <div class="topbar">
-      <div><h1 style="font-size:18px">✦ STARVIA Admin ✦</h1><span style="font-size:10px;color:var(--tx2)">จัดการ PIN</span></div>
+      <div><h1 style="font-size:18px">✦ STARVIA Admin ✦</h1><span style="font-size:10px;color:var(--tx2)">จัดการ PIN + Newsletter</span></div>
       <div style="display:flex;gap:6px">
         <span id="api-url" style="font-size:10px;color:var(--tx2);align-self:center"></span>
         <button class="btn btn-outline btn-sm" onclick="doLogout()">ออกจากระบบ</button>
@@ -119,6 +119,27 @@
           <table>
             <thead><tr><th>PIN</th><th>แผน</th><th>สร้าง</th><th>หมดอายุ</th><th>ใช้เมื่อ</th><th>หมายเหตุ</th><th>สถานะ</th><th></th></tr></thead>
             <tbody id="pin-table"><tr><td colspan="8" class="loading">กำลังโหลด...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Newsletter Subscribers -->
+    <div class="section">
+      <div class="section-title">📧 ผู้สมัคร Newsletter</div>
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <div class="stat-card" style="flex:0 0 auto;padding:10px 18px">
+            <div class="stat-num" id="sub-count" style="font-size:22px">-</div>
+            <div class="stat-label">ผู้สมัคร</div>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="loadSubscribers()">🔄 รีเฟรช</button>
+          <button class="btn btn-outline btn-sm" onclick="exportSubscribers()">📥 Export CSV</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th>#</th><th>อีเมล</th><th>วันเกิด</th><th>สมัครเมื่อ</th><th>สถานะ</th></tr></thead>
+            <tbody id="sub-table"><tr><td colspan="5" class="loading">กำลังโหลด...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -188,7 +209,7 @@ function api(path, options) {
 }
 
 // ── Data ──
-function refreshAll() { loadStats(); loadPins(); }
+function refreshAll() { loadStats(); loadPins(); loadSubscribers(); }
 
 function loadStats() {
   api('/stats').then(function(d){
@@ -256,6 +277,73 @@ function expirePin(note) {
     if (d.success) { toast('หมดอายุแล้ว: ' + d.expired); refreshAll(); }
     else { toast(d.message || 'ไม่สำเร็จ', true); }
   }).catch(function(){});
+}
+
+// ── Newsletter Subscribers ──
+var NEWSLETTER_API = '/v1/newsletter';
+
+function loadSubscribers() {
+  var tbody = document.getElementById('sub-table');
+  tbody.innerHTML = '<tr><td colspan="5" class="loading">กำลังโหลด...</td></tr>';
+  
+  fetch(NEWSLETTER_API + '/subscribers', {
+    headers: {'Authorization': 'Bearer ' + token}
+  }).then(function(r){ return r.json(); }).then(function(d){
+    if (!d.success) {
+      tbody.innerHTML = '<tr><td colspan="5" style="color:#F44336;text-align:center">ไม่สามารถโหลดข้อมูล</td></tr>';
+      return;
+    }
+    
+    var subs = d.subscribers || [];
+    document.getElementById('sub-count').textContent = subs.length;
+    
+    if (subs.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--tx2)">ยังไม่มีผู้สมัคร</td></tr>';
+      return;
+    }
+    
+    tbody.innerHTML = subs.map(function(s, i) {
+      var status = s.active !== false ? 
+        '<span class="badge badge-active">Active</span>' : 
+        '<span class="badge badge-expired">Unsubscribed</span>';
+      return '<tr>' +
+        '<td>' + (i + 1) + '</td>' +
+        '<td style="font-family:monospace;font-size:12px">' + esc(s.email) + '</td>' +
+        '<td>' + (s.birthdate || '-') + '</td>' +
+        '<td>' + fmtDate(s.subscribedAt) + '</td>' +
+        '<td>' + status + '</td>' +
+        '</tr>';
+    }).join('');
+  }).catch(function(){
+    tbody.innerHTML = '<tr><td colspan="5" style="color:#F44336;text-align:center">เกิดข้อผิดพลาด</td></tr>';
+  });
+}
+
+function exportSubscribers() {
+  fetch(NEWSLETTER_API + '/subscribers', {
+    headers: {'Authorization': 'Bearer ' + token}
+  }).then(function(r){ return r.json(); }).then(function(d){
+    if (!d.success || !d.subscribers.length) {
+      toast('ไม่มีข้อมูลให้ export', true);
+      return;
+    }
+    
+    var csv = 'Email,Birthdate,Subscribed At,Active\n';
+    d.subscribers.forEach(function(s) {
+      csv += '"' + (s.email||'') + '","' + (s.birthdate||'') + '","' + (s.subscribedAt||'') + '",' + (s.active !== false) + '\n';
+    });
+    
+    var blob = new Blob(['\ufeff' + csv], {type: 'text/csv;charset=utf-8'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'starvia-newsletter-subscribers.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('Export CSV สำเร็จ (' + d.subscribers.length + ' รายการ)');
+  }).catch(function(){ toast('Export ไม่สำเร็จ', true); });
 }
 
 // ── Helpers ──
