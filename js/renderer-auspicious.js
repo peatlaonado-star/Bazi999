@@ -18,6 +18,7 @@ function renderAusp(nm,p,pw,u){
   nm = escapeHTML(nm);
   var premiumUnlocked = premiumIsUnlocked();
   var elementEmoji = p.el === 'ไฟ' ? '🔥' : p.el === 'ดิน' ? '🪨' : p.el === 'ลม' ? '💨' : '💧';
+  var now = new Date();
   var DN=u.dn;
   var DS=['☉','☽','♂','☿','♃','♀','♄'];
   var DC=['#FFB84D','#C8DCF0','#E8534A','#6EC89A','#F5A623','#E8A0CF','#9B8AB8'];
@@ -90,7 +91,7 @@ function renderAusp(nm,p,pw,u){
 
   // ===== 3. จังหวะดาวรายสัปดาห์ (Personalized) =====
   var weekHtml = '<div class="ausp-week-card' + (premiumUnlocked ? '' : ' is-locked') + '">'
-    + '<div class="awc-title">📅 จังหวะดาวรายสัปดาห์</div>'
+    + '<div class="awc-title">📅 ปฏิทินวันมงคล · จังหวะดาวรายสัปดาห์</div>'
     + '<div class="awc-subtitle">วันไหนเหมาะทำอะไร — เฉพาะธาตุ' + p.el + 'ของคุณ</div>';
 
   if (premiumUnlocked) {
@@ -250,7 +251,7 @@ function renderAusp(nm,p,pw,u){
     + '<div style="font-size:11.5px; color:var(--tx2); margin-bottom:16px; text-align:center; line-height:1.6;">ตารางเวลาที่สอดคล้องกับพลังงานดวงดาวของคุณ</div>';
   if (premiumUnlocked) {
     myRoutine.forEach(function(rt){
-      routineHtml += '<div class="time-block"><div class="tb-time">' + rt.t + '</div><div class="tb-desc">' + rt.d + '</div></div>';
+      routineHtml += '<div class="time-block act-time-window"><div class="tb-time">⏰ ' + rt.t + '</div><div class="tb-desc">' + rt.d + '</div></div>';
     });
   } else {
     routineHtml += '<div class="time-block"><div class="tb-time">Premium</div><div class="tb-desc">ปลดล็อกเพื่อดูตารางนาฬิกาชีวิตรายช่วงเวลา</div></div>'

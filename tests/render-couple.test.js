@@ -194,4 +194,54 @@ describe('Couple mode rendering', () => {
     expect(dom.window.document.querySelector('.cg2.is-locked')).toBeNull();
   });
 
+  it('renders love timing as a visible flagship couple section with credible reference', () => {
+    const dom = new JSDOM('<!doctype html><div id="r1"></div><div id="tt1"></div><div id="ts1"></div>');
+    const pa = planet('อาทิตย์', 'ไฟ', 0);
+    const pb = planet('พุธ', 'ลม', 2);
+    const context = loadContext(dom, {
+      getPL: () => [pa, pb],
+      ELC: [[82, 74], [74, 80]],
+      PLC: [[82, 74], [74, 80]],
+      getELD: () => [['ไฟเจอลม'], ['ลมเจอไฟ']],
+      rasiAngle: () => [76, 'มุมส่งเสริม'],
+    });
+    const ra = sign('เมษ');
+    const rb = sign('เมถุน');
+    const RA2 = [ra, rb];
+
+    context.renderCouple('ดาว', pa, ra, ra, 0, 0, 'ฟ้า', pb, rb, rb, 1, 1, coupleUi(), RA2, '1998-04-12', '2000-09-20');
+
+    const output = dom.window.document.getElementById('r1').innerHTML;
+    expect(output).toContain('ดวงคู่รักของคุณกับเขา');
+    expect(output).toContain('จังหวะเปิดเด่น');
+    expect(output).toContain('โอกาสความสัมพันธ์');
+    expect(output).toContain('อ้างอิงเชิงระบบ');
+    expect(output).toContain('ดาวประจำวัน/ธาตุ');
+    expect(output).not.toContain('ความสม่ำเสมอ 21 วัน');
+  });
+
+  it('unlocks love timing action plan for premium readers', () => {
+    const dom = new JSDOM('<!doctype html><div id="r1"></div><div id="tt1"></div><div id="ts1"></div>');
+    const pa = planet('อาทิตย์', 'ไฟ', 0);
+    const pb = planet('พุธ', 'ลม', 1);
+    const context = loadContext(dom, {
+      getPL: () => [pa, pb],
+      ELC: [[82, 74], [74, 80]],
+      PLC: [[82, 74], [74, 80]],
+      getELD: () => [['ไฟเจอลม'], ['ลมเจอไฟ']],
+      rasiAngle: () => [76, 'มุมส่งเสริม'],
+      isPremiumUnlocked: () => true,
+    });
+    const ra = sign('เมษ');
+    const rb = sign('เมถุน');
+    const RA2 = [ra, rb];
+
+    context.renderCouple('ดาว', pa, ra, ra, 0, 0, 'ฟ้า', pb, rb, rb, 1, 1, coupleUi(), RA2, '1998-04-12', '2000-09-20');
+
+    const output = dom.window.document.getElementById('r1').innerHTML;
+    expect(output).toContain('แผนเพิ่มโอกาสให้ได้คู่ที่เข้ากัน');
+    expect(output).toContain('ความสม่ำเสมอ 21 วัน');
+    expect(output).not.toContain('ปลดล็อกแผนความรักเฉพาะคู่');
+  });
+
 });

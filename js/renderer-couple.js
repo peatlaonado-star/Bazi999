@@ -17,11 +17,112 @@ function go1(){
   showLoad();
   setTimeout(function(){
     hideLoad();
-    renderCouple(na,pa,RA2[ria],RA2[lia],ria,lia,nb,pb,RA2[rib],RA2[lib],rib,lib,u,RA2);
+    renderCouple(na,pa,RA2[ria],RA2[lia],ria,lia,nb,pb,RA2[rib],RA2[lib],rib,lib,u,RA2,da,db);
   },900);
 }
 
-function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2){
+function parseBirthDateSafe(value){
+  if(!value) return null;
+  var d = new Date(value + 'T12:00:00');
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function getAgeFromBirthDate(value){
+  var d = parseBirthDateSafe(value);
+  if(!d) return null;
+  var today = new Date();
+  var age = today.getFullYear() - d.getFullYear();
+  var hadBirthday = today.getMonth() > d.getMonth() || (today.getMonth() === d.getMonth() && today.getDate() >= d.getDate());
+  return hadBirthday ? age : age - 1;
+}
+
+function loveDigitFromDate(value){
+  var d = parseBirthDateSafe(value);
+  if(!d) return 6;
+  var raw = String(d.getFullYear()) + String(d.getMonth()+1) + String(d.getDate());
+  var sum = raw.split('').reduce(function(acc,ch){ return acc + (parseInt(ch,10)||0); },0);
+  while(sum > 9) sum = String(sum).split('').reduce(function(acc,ch){ return acc + (parseInt(ch,10)||0); },0);
+  return sum || 6;
+}
+
+function loveWindowForPerson(dateValue, planetIndex, rasiIndex, offset){
+  var age = getAgeFromBirthDate(dateValue);
+  var digit = loveDigitFromDate(dateValue);
+  var base = 18 + ((digit * 3 + planetIndex * 2 + rasiIndex + offset) % 16);
+  var target = base;
+  var safety = 0;
+  while(age !== null && target < age - 1 && safety < 8){
+    target += 7;
+    safety++;
+  }
+  return {
+    age: age,
+    start: target,
+    end: target + 2,
+    label: target + '–' + (target + 2) + ' ปี'
+  };
+}
+
+function buildLoveDestinyModel(dateA,dateB,total,elS,plS,angS,lgS,pa,pb,ria,rib){
+  var piA = Math.max(0, getPL().indexOf(pa));
+  var piB = Math.max(0, getPL().indexOf(pb));
+  var wa = loveWindowForPerson(dateA, piA, ria || 0, 0);
+  var wb = loveWindowForPerson(dateB, piB, rib || 0, 3);
+  var overlapStart = Math.max(wa.start, wb.start);
+  var overlapEnd = Math.min(wa.end, wb.end);
+  var hasOverlap = overlapStart <= overlapEnd;
+  var coupleStart = hasOverlap ? overlapStart : Math.round((wa.start + wb.start) / 2);
+  var coupleEnd = hasOverlap ? overlapEnd : coupleStart + 2;
+  var openness = Math.max(48, Math.min(96, Math.round(total * .42 + elS * .18 + plS * .16 + angS * .16 + lgS * .08)));
+  var channelMap = {
+    'ไฟ': 'กิจกรรมที่มีพลังร่วมกัน งานอีเวนต์ กีฬา โปรเจกต์ที่ต้องตัดสินใจเร็ว หรือพื้นที่ที่ได้แสดงตัวตน',
+    'น้ำ': 'วงเพื่อนสนิท ครอบครัว งานดูแลผู้คน คอมมูนิตี้เล็ก ๆ หรือบทสนทนาที่เปิดใจลึก',
+    'ลม': 'ออนไลน์ การเรียน คอร์ส เวิร์กช็อป งานสื่อสาร และพื้นที่ที่ได้คุยแลกเปลี่ยนความคิด',
+    'ดิน': 'ที่ทำงาน งานอาชีพ ธุรกิจ การเงิน อสังหา หรือกิจวัตรที่พบกันซ้ำจนไว้ใจกัน'
+  };
+  var mainEl = elS >= 78 ? pa.el : pb.el;
+  var risk = pa.ei === pb.ei ? 'อารมณ์หรือรูปแบบเดิมของทั้งคู่คล้ายกันมาก จึงควรระวังการย้ำแผลเดิมซ้ำ ๆ' : 'แรงดึงดูดมาจากความต่าง จึงต้องแปลความต่างให้เป็นการเติมเต็ม ไม่ใช่การเอาชนะ';
+  var premiumPlan = [
+    'เปิดพื้นที่เจอคนใหม่อย่างน้อยสัปดาห์ละ 1 ครั้งในช่องทางที่ธาตุเด่นสนับสนุน',
+    'ใช้กติกา 3 คำถามก่อนเริ่มสัมพันธ์จริงจัง: คุยกันรู้เรื่องไหม, รู้สึกปลอดภัยไหม, เป้าหมายชีวิตไม่ชนกันเกินไปไหม',
+    'ถ้าเริ่มคุยแล้ว ให้ดูความสม่ำเสมอ 21 วัน มากกว่าคำหวานช่วงแรก'
+  ];
+  return {
+    wa: wa,
+    wb: wb,
+    coupleLabel: coupleStart + '–' + coupleEnd + ' ปี',
+    openness: openness,
+    channel: channelMap[mainEl] || channelMap['ลม'],
+    risk: risk,
+    premiumPlan: premiumPlan,
+    reference: 'อ้างอิงเชิงระบบ: วันเกิด → ดาวประจำวัน/ธาตุ, ราศีสัมพันธ์, ลัคนา และวงรอบ 7 ปีของจังหวะชีวิต ใช้เป็นแนวโน้มเพื่อวางแผนความสัมพันธ์ ไม่ใช่คำทำนายตายตัว'
+  };
+}
+
+function buildLoveDestinyCard(model, premiumUnlocked, na, nb){
+  var premiumHtml = '<div class="love-destiny-premium">'
+    + '<div class="ld-section-title">แผนเพิ่มโอกาสให้ได้คู่ที่เข้ากัน</div>'
+    + '<ol>' + model.premiumPlan.map(function(item){ return '<li>' + escapeHTML(item) + '</li>'; }).join('') + '</ol>'
+    + '<div class="ld-note"><strong>จุดที่ต้องระวัง:</strong> ' + escapeHTML(model.risk) + '</div>'
+    + '</div>';
+  return '<div class="love-destiny-card">'
+    + '<div class="ld-kicker">Love Timing Method</div>'
+    + '<div class="ld-title">💖 ดวงคู่รักของคุณกับเขา</div>'
+    + '<div class="ld-summary">ช่วงอายุที่ดวงความรักของ <strong>' + na + '</strong> และ <strong>' + nb + '</strong> มีจังหวะเปิดร่วมกัน: <span>' + escapeHTML(model.coupleLabel) + '</span></div>'
+    + '<div class="ld-grid">'
+    + '<div class="ld-box"><small>โอกาสความสัมพันธ์</small><strong>' + model.openness + '%</strong><p>คะแนนนี้รวมเคมีธาตุ ดาวประจำวัน ราศีสัมพันธ์ และลัคนา เพื่อดูแนวโน้ม ไม่ใช่ฟันธง</p></div>'
+    + '<div class="ld-box"><small>ทางที่มีโอกาสเจอคนที่ใช่</small><p>' + escapeHTML(model.channel) + '</p></div>'
+    + '</div>'
+    + '<div class="ld-two">'
+    + '<div><b>' + na + '</b><br>จังหวะเปิดเด่น: ' + escapeHTML(model.wa.label) + '</div>'
+    + '<div><b>' + nb + '</b><br>จังหวะเปิดเด่น: ' + escapeHTML(model.wb.label) + '</div>'
+    + '</div>'
+    + (premiumUnlocked ? premiumHtml : '<div class="love-destiny-locked">' + premiumLockedCard('love-destiny-lock-card', '<div class="ld-section-title">ปลดล็อกเพื่อดูแผน 3 ขั้น วิธีเพิ่มโอกาส และสัญญาณว่าคนนี้ใช่จริงไหม</div>', 'ปลดล็อกแผนความรักเฉพาะคู่', 'ดูวิธีเข้าหา สภาพแวดล้อมที่ควรไป และจุดระวังของคู่นี้แบบละเอียด') + '</div>')
+    + '<div class="ld-ref">' + escapeHTML(model.reference) + '</div>'
+    + '</div>';
+}
+
+function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2,dateA,dateB){
   var wrap=document.getElementById('r1');
   na = escapeHTML(na);
   nb = escapeHTML(nb);
@@ -44,6 +145,9 @@ function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2){
                  total >= 70 ? 'Growing Together (คู่ที่ต้องเรียนรู้และเติบโต)' : 
                  total >= 60 ? 'Understanding Needed (คู่ที่ต้องใช้ความเข้าใจสูง)' : 
                                'Karmic Lesson (คู่เวรคู่กรรม/บทเรียนสำคัญ)';
+
+  var loveDestiny = buildLoveDestinyModel(dateA, dateB, total, elS, plS, angS, lgS, pa, pb, ria, rib);
+  var loveDestinyHtml = buildLoveDestinyCard(loveDestiny, premiumUnlocked, na, nb);
 
   var dharma = getCoupleDharmaType(total, elS, pa.ei === pb.ei);
   var dharmaTeaser = '<div class="dharma-kicker">Couple Dharma Map</div>'
@@ -98,6 +202,7 @@ function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2){
     +'</div>';
 
   wrap.innerHTML = matrixHtml
+    + loveDestinyHtml
     + dharmaHtml
     + scoreBreakdownHtml
     +'<div class="tabs-w"><div class="tabs" id="tt1"></div></div><div id="ts1"></div>';
