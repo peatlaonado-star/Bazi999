@@ -40,13 +40,14 @@ function buildPremiumPriceAnchor(compact){
     + '</div>';
 }
 
-function buildConversionCta(hook, desc, proof) {
+function buildConversionCta(hook, desc, proof, buttonLabel) {
+  var label = buttonLabel || '✦ ปลดล็อกรายงานเต็ม ✦';
   return '<div class="conversion-cta">'
     + '<div class="cta-hook">' + hook + '</div>'
     + '<div class="cta-desc">' + desc + '</div>'
     + (proof ? '<div class="cta-proof">' + proof + '</div>' : '')
     + buildPremiumPriceAnchor(true)
-    + '<button class="cta-btn" data-action="unlock-premium">✦ ปลดล็อกรายงานเต็ม ✦</button>'
+    + '<button class="cta-btn" data-action="unlock-premium">' + label + '</button>'
     + '<div class="cta-price">Early Access 199 บาท/เดือน · ถูกกว่าดูดวงส่วนตัว 1 ครั้ง</div>'
     + '</div>';
 }
@@ -197,7 +198,8 @@ function buildWindfallLuckHtml(guide, premiumUnlocked){
     + buildConversionCta(
       '🔮 เปิดเลขตัวที่ 2 ก่อนหวยออก · ปลดล็อก 199 บาท',
       'เลขนำโชคครบทุกตัว + พิธีเปิดทาง + คาถาเรียกโชค + กันโชครั่ว',
-      '94% ของคนที่ดูเลขตัวเอง บอกว่า "ตรงจนตกใจ"'
+      '94% ของคนที่ดูเลขตัวเอง บอกว่า "ตรงจนตกใจ"',
+      'เปิดเลขตัวที่ 2 ก่อนหวยออก'
     );
   } else {
     // Premium unlocked — แสดงทั้งหมด
@@ -409,7 +411,8 @@ function buildMonthlyLifeMapHtml(model, premiumUnlocked){
     + buildConversionCta(
       '🔮 ดูหมอทักครบทุกด้าน · ปลดล็อก 199 บาท',
       'ดู ' + lockedDomainNames + ' + ปฏิทินวันดี + สรุปรายสัปดาห์ + ภารกิจเสริมดวง 7 วัน',
-      'รู้ก่อน แก้ก่อน — ไม่ต้องรอให้ปัญหาเกิด'
+      'รู้ก่อน แก้ก่อน — ไม่ต้องรอให้ปัญหาเกิด',
+      'ดูคำเตือนรายเดือนของฉัน'
     );
   }
 
@@ -832,7 +835,8 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
       + buildConversionCta(
         '🪞 ดูกระจกกรรมของคุณ · ปลดล็อก 199 บาท',
         'รูปแบบที่วนซ้ำ + เงาจากวันเกิด + สิ่งที่ควรทำเดือนนี้ + พิธีเล็กๆ 7 วัน',
-        'เข้าใจอดีต เปลี่ยนอนาคต — เริ่มจากวันนี้'
+        'เข้าใจอดีต เปลี่ยนอนาคต — เริ่มจากวันนี้',
+        'เปิดรูปแบบชีวิตที่วนซ้ำของฉัน'
       )
       + '</div>';
   }
@@ -886,7 +890,8 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + buildConversionCta(
       '📖 ดูคัมภีร์แก้ดวง 6 ด้าน · ปลดล็อก 199 บาท',
       'โชค · การเงิน · สุขภาพ · ความรัก · การงาน · บริวาร — วิเคราะห์เฉพาะบุคคล',
-      '94% บอกว่า "ตรงจนตกใจ"'
+      '94% บอกว่า "ตรงจนตกใจ"',
+      'เปิดวิธีแก้ดวงเฉพาะตัวครบ 6 ด้าน'
     );
   }
   domainHtml += '</div></div>';

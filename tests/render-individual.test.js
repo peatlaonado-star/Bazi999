@@ -257,6 +257,19 @@ describe('Windfall Luck gimmick section', () => {
     expect(dom.window.document.querySelector('.wfl-countdown')).toBeTruthy();
   });
 
+  it('adds section-specific premium CTA button labels', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>', { url: 'http://localhost' });
+    const context = loadContext(dom);
+
+    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const output = dom.window.document.getElementById('r0').innerHTML;
+
+    expect(output).toContain('เปิดเลขตัวที่ 2 ก่อนหวยออก');
+    expect(output).toContain('ดูคำเตือนรายเดือนของฉัน');
+    expect(output).toContain('เปิดวิธีแก้ดวงเฉพาะตัวครบ 6 ด้าน');
+    expect(output).not.toContain('>✦ ปลดล็อกรายงานเต็ม ✦</button>');
+  });
+
   it('keeps masked lucky numbers ready to reveal when the premium lock is removed', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div>');
     const context = loadContext(dom);
