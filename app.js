@@ -5,6 +5,39 @@ function iS(){cv.width=innerWidth;cv.height=innerHeight;ST=Array.from({length:80
 function dS(){cx.clearRect(0,0,cv.width,cv.height);ST.forEach(function(s){s.a=Math.max(.05,Math.min(.88,s.a+s.da));if(s.a<=.05||s.a>=.88)s.da*=-1;cx.beginPath();cx.arc(s.x,s.y,s.r,0,Math.PI*2);cx.fillStyle='rgba(255,255,255,'+s.a+')';cx.fill();});requestAnimationFrame(dS);}
 iS();dS();addEventListener('resize',iS);
 
+// Floating hearts for couple mode
+var HEART_SYMBOLS = ['♡', '♥', '✧'];
+function spawnHearts(){
+  var hc = document.getElementById('heart-container');
+  if(!hc) return;
+  var count = 8;
+  for(var i=0;i<count;i++){
+    var el = document.createElement('div');
+    el.className = 'heart-float';
+    el.textContent = HEART_SYMBOLS[i % HEART_SYMBOLS.length];
+    el.style.left = (10 + Math.random() * 80) + '%';
+    el.style.top = (20 + Math.random() * 60) + '%';
+    el.style.fontSize = (8 + Math.random() * 10) + 'px';
+    el.style.setProperty('--dur', (6 + Math.random() * 6) + 's');
+    el.style.setProperty('--delay', (Math.random() * 4) + 's');
+    hc.appendChild(el);
+  }
+}
+// Observe mode switch to spawn hearts when couple mode is shown
+var _origSetMode = window.setMode;
+if(typeof setMode === 'function'){
+  var _orig = setMode;
+  setMode = function(m){
+    _orig(m);
+    if(m === 1){ spawnHearts(); }
+  };
+} else {
+  // Fallback: spawn on first interaction
+  document.addEventListener('click', function once(){
+    spawnHearts();
+  }, {once: true});
+}
+
 // Current language
 var CL = 'th';
 
