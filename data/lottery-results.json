@@ -1,0 +1,17 @@
+{
+  "available": true,
+  "date": "2026-06-01",
+  "displayDate": {
+    "date": "01",
+    "month": "06",
+    "year": "2026"
+  },
+  "period": [],
+  "firstPrize": "173770",
+  "last3f": ["410", "938"],
+  "last3b": ["770"],
+  "last2": ["95"],
+  "near1": ["173769", "173771"],
+  "updatedAt": "2026-06-01T16:00:00.000Z",
+  "source": "manual"
+}
