@@ -284,13 +284,29 @@ var NEWSLETTER_API = '/v1/newsletter';
 
 function loadSubscribers() {
   var tbody = document.getElementById('sub-table');
+  if (!tbody) return;
   tbody.innerHTML = '<tr><td colspan="5" class="loading">กำลังโหลด...</td></tr>';
   
-  fetch(NEWSLETTER_API + '/subscribers', {
-    headers: {'Authorization': 'Bearer ' + token}
-  }).then(function(r){ return r.json(); }).then(function(d){
+  // Ensure token exists
+  if (!token) {
+    token = localStorage.getItem(TOKEN_KEY);
+  }
+  
+  var headers = {};
+  if (token) {
+    headers['Authorization'] = 'Bearer ' + token;
+  }
+  
+  fetch(NEWSLETTER_API + '/subscribers', { headers: headers })
+  .then(function(r){ 
+    if (!r.ok) {
+      throw new Error('HTTP ' + r.status);
+    }
+    return r.json(); 
+  })
+  .then(function(d){
     if (!d.success) {
-      tbody.innerHTML = '<tr><td colspan="5" style="color:#F44336;text-align:center">ไม่สามารถโหลดข้อมูล</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" style="color:#F44336;text-align:center">ไม่สามารถโหลดข้อมูล: ' + (d.error || 'Unknown') + '</td></tr>';
       return;
     }
     
@@ -314,8 +330,9 @@ function loadSubscribers() {
         '<td>' + status + '</td>' +
         '</tr>';
     }).join('');
-  }).catch(function(){
-    tbody.innerHTML = '<tr><td colspan="5" style="color:#F44336;text-align:center">เกิดข้อผิดพลาด</td></tr>';
+  })
+  .catch(function(err){
+    tbody.innerHTML = '<tr><td colspan="5" style="color:#F44336;text-align:center">เกิดข้อผิดพลาด: ' + esc(err.message || 'Unknown') + '</td></tr>';
   });
 }
 
