@@ -92,6 +92,15 @@ describe('Thai astrology content data', () => {
     expect(html).not.toContain('ดูตัวอย่างพรีเมียม');
   });
 
+  it('routes premium CTA buttons to the payment modal action', () => {
+    const appSource = fs.readFileSync(path.resolve('app.js'), 'utf8');
+    const rendererSource = fs.readFileSync(path.resolve('js/renderer-individual.js'), 'utf8');
+
+    expect(rendererSource).toContain('data-action="unlock-premium"');
+    expect(appSource).toContain("action === 'open-payment' || action === 'unlock-premium'");
+    expect(appSource).toContain('openPayment();');
+  });
+
   it('loads only 3 essential Google Fonts families (Charm, Kanit, Sarabun)', () => {
     const html = fs.readFileSync(path.resolve('index.html'), 'utf8');
     expect(html).toContain('family=Charm');

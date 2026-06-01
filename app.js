@@ -659,7 +659,7 @@ function bindUIEvents(){
       saveImage(act.getAttribute('data-target'), act.getAttribute('data-filename'), ev);
     } else if (action === 'reset-mode') {
       resetM(parseInt(act.getAttribute('data-mode'), 10));
-    } else if (action === 'open-payment') {
+    } else if (action === 'open-payment' || action === 'unlock-premium') {
       openPayment();
     } else if (action === 'close-payment') {
       closePayment();
