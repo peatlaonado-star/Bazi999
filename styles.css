@@ -3698,6 +3698,61 @@ body.has-report .value-section{display:none}
   margin-top: 8px;
   position: relative;
 }
+.premium-price-anchor {
+  position: relative;
+  margin: 14px auto 16px;
+  padding: 14px 16px;
+  max-width: 560px;
+  border: 1px solid rgba(214,173,69,.34);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(201,162,39,.13), rgba(142,114,216,.10));
+  text-align: center;
+  box-shadow: 0 14px 38px rgba(0,0,0,.18);
+}
+.ppa-kicker {
+  font-family: "Kanit","Sarabun",sans-serif;
+  font-size: 9px;
+  letter-spacing: .22em;
+  color: #b8a8d8;
+  margin-bottom: 7px;
+}
+.ppa-price-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.ppa-price-row strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+  color: #fff4cf;
+}
+.ppa-old {
+  font-size: 13px;
+  color: #8B6914;
+  text-decoration: line-through;
+}
+.ppa-save {
+  margin-top: 6px;
+  font-size: 11.5px;
+  color: #70d47e;
+  font-weight: 700;
+}
+.ppa-value {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 10px;
+}
+.ppa-value span {
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.06);
+  color: #e8dfc8;
+  font-size: 11px;
+}
 
 /* สัญญาณเตือน teaser */
 .warning-teaser {

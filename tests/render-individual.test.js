@@ -324,6 +324,22 @@ describe('Free reader conversion reading order', () => {
     expect(output).not.toContain('conversion-roadmap');
   });
 
+  it('places a premium price anchor before the first locked teaser', () => {
+    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>', { url: 'http://localhost' });
+    const context = loadContext(dom);
+
+    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
+    const output = dom.window.document.getElementById('r0').innerHTML;
+    const anchorIndex = output.indexOf('premium-price-anchor');
+    const windfallIndex = output.indexOf('windfall-luck');
+
+    expect(anchorIndex).toBeGreaterThan(-1);
+    expect(anchorIndex).toBeLessThan(windfallIndex);
+    expect(output).toContain('590 บาท');
+    expect(output).toContain('199 บาท/เดือน');
+    expect(output).toContain('ตกวันละประมาณ 7 บาท');
+  });
+
   it('shows the life graph as its own visible section before the collapsed six-domain scripture', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>', { url: 'http://localhost' });
     const context = loadContext(dom);

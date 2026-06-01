@@ -31,13 +31,23 @@ function buildDailyBrief(p, dayOfWeek, personalColor) {
 
 
 // ═══ Conversion CTA Builder (ระบบชิมก่อนซื้อ) ═══
+function buildPremiumPriceAnchor(compact){
+  return '<div class="premium-price-anchor" aria-label="ราคา Premium">'
+    + '<div class="ppa-kicker">EARLY ACCESS PREMIUM</div>'
+    + '<div class="ppa-price-row"><span class="ppa-old">590 บาท</span><strong>199 บาท/เดือน</strong></div>'
+    + '<div class="ppa-save">ประหยัด 391 บาทในช่วงเปิดตัว · ตกวันละประมาณ 7 บาท</div>'
+    + (compact ? '' : '<div class="ppa-value"><span>รายงานเต็ม</span><span>เลขลาภลอย</span><span>หมอทักรายเดือน</span><span>คำแนะนำแก้ดวงครบ 6 ด้าน</span></div>')
+    + '</div>';
+}
+
 function buildConversionCta(hook, desc, proof) {
   return '<div class="conversion-cta">'
     + '<div class="cta-hook">' + hook + '</div>'
     + '<div class="cta-desc">' + desc + '</div>'
     + (proof ? '<div class="cta-proof">' + proof + '</div>' : '')
+    + buildPremiumPriceAnchor(true)
     + '<button class="cta-btn" data-action="unlock-premium">✦ ปลดล็อกรายงานเต็ม ✦</button>'
-    + '<div class="cta-price">199 บาท/เดือน · เท่ากับกาแฟ 2 แก้ว</div>'
+    + '<div class="cta-price">Early Access 199 บาท/เดือน · ถูกกว่าดูดวงส่วนตัว 1 ครั้ง</div>'
     + '</div>';
 }
 
@@ -930,6 +940,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + badgesHtml
     + wrapCollapsible("✦ กำลังวันประจำตัว ✦", "วันเกิด · เทวดา · ธาตุ · สีมงคล", cosmicBriefHtml)
     + wrapCollapsible("✨ พลังงานเสริมดวง", "เลขและสีมงคลประจำวัน", powerCardHtml)
+    + buildPremiumPriceAnchor(false)
     + wrapCollapsible("✦ สูตรเปิดดวงลาภลอย ✦", "เลขเด็ด · หวย · ทิศ · คาถา สายมู", windfallLuckHtml, true)
     + wrapCollapsible("🔮 หมอทักประจำเดือน", "5 ด้านชีวิต · สัญญาณเตือน · วิธีแก้", monthlyLifeMapHtml, true)
     + lifeGraphSectionHtml
