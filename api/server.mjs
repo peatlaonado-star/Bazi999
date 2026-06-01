@@ -6,6 +6,7 @@ import { createPremiumRequestHandler, loadPremiumConfig } from './premium-servic
 import { createAdminRequestHandler, loadAdminConfig } from './admin-service.mjs';
 import { subscribe, getSubscribers, getSubscriberCount, unsubscribe } from './newsletter-service.mjs';
 import { getLotteryResults, refreshLotteryResults, setManualResults } from './lottery-service.mjs';
+import { createStreakReward, verifyStreakReward, getRewardStats } from './streak-service.mjs';
 
 const port = Number(process.env.PORT || process.env.STARVIA_API_PORT || 8787);
 const host = process.env.HOST || '0.0.0.0';
@@ -197,6 +198,31 @@ const server = http.createServer(async (req, res) => {
         } catch (err) {
           return writeJson(res, 400, { success: false, error: 'Invalid data' });
         }
+      }
+      return writeJson(res, 404, { success: false, error: 'Not found' });
+    }
+    
+    // Route streak reward paths
+    if (url.startsWith('/v1/streak')) {
+      // POST /v1/streak/reward — claim 7-day streak reward
+      if (url === '/v1/streak/reward' && req.method === 'POST') {
+        const result = createStreakReward(req);
+        return writeJson(res, result.success ? 200 : 400, result);
+      }
+      // POST /v1/streak/verify — verify streak reward code
+      if (url === '/v1/streak/verify' && req.method === 'POST') {
+        try {
+          const body = await readJsonBody(req);
+          const result = verifyStreakReward(body.code);
+          return writeJson(res, result.success ? 200 : 400, result);
+        } catch (err) {
+          return writeJson(res, 400, { success: false, error: 'Invalid data' });
+        }
+      }
+      // GET /v1/streak/stats — admin only
+      if (url === '/v1/streak/stats' && req.method === 'GET') {
+        const stats = getRewardStats();
+        return writeJson(res, 200, { success: true, ...stats });
       }
       return writeJson(res, 404, { success: false, error: 'Not found' });
     }

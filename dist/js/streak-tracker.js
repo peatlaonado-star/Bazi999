@@ -200,16 +200,110 @@
       + '</div>';
   }
 
-  // Claim the Premium reward
-  function claimReward() {
-    unlockPremium();
-    // Close popup
+  // Claim the Premium reward via API
+  async function claimReward() {
+    var btn = document.querySelector('.streak-unlock-btn');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = '⏳ กำลังปลดล็อก...';
+    }
+    
+    try {
+      var API_BASE = window.location.origin;
+      var res = await fetch(API_BASE + '/v1/streak/reward', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      var data = await res.json();
+      
+      if (data.success && data.code) {
+        // Show code in popup
+        showRewardCode(data.code, data.expiresAt);
+      } else {
+        // Show error
+        alert(data.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่');
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = '🔓 รับรางวัลเลย';
+        }
+      }
+    } catch (err) {
+      // Fallback: local unlock
+      unlockPremium();
+      closePopup();
+      try { localStorage.setItem('starvia_premium', 'true'); } catch(e) {}
+      window.location.reload();
+    }
+  }
+
+  // Show reward code after claiming
+  function showRewardCode(code, expiresAt) {
+    var card = document.querySelector('.streak-unlock-card');
+    if (!card) return;
+    
+    var expiresStr = '';
+    if (expiresAt) {
+      var d = new Date(expiresAt);
+      expiresStr = '⏰ หมดอายุ: ' + d.toLocaleString('th-TH', { 
+        day: 'numeric', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit' 
+      });
+    }
+    
+    card.innerHTML = '<div class="streak-unlock-icon">🎉</div>'
+      + '<div class="streak-unlock-title">ปลดล็อกสำเร็จ!</div>'
+      + '<div class="streak-unlock-subtitle">รหัส Premium ฟรี 24 ชม.</div>'
+      + '<div class="streak-code-box">'
+      + '<div class="streak-code-label">รหัสของคุณ</div>'
+      + '<div class="streak-code-value" id="streak-code-display">' + code + '</div>'
+      + '<button class="streak-code-copy" onclick="StreakReward.copyCode(\'' + code + '\')">📋 คัดลอก</button>'
+      + '</div>'
+      + '<div class="streak-code-expires">' + expiresStr + '</div>'
+      + '<button class="streak-unlock-btn" onclick="StreakReward.activateCode(\'' + code + '\')">🔓 ใช้รหัสเลย</button>'
+      + '<div class="streak-unlock-note">💡 กรอกรหัสในหน้า Premium เพื่อปลดล็อก</div>';
+  }
+
+  // Copy code to clipboard
+  function copyCode(code) {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(code).then(function() {
+        var btn = document.querySelector('.streak-code-copy');
+        if (btn) {
+          btn.textContent = '✅ คัดลอกแล้ว!';
+          setTimeout(function() { btn.textContent = '📋 คัดลอก'; }, 2000);
+        }
+      });
+    }
+  }
+
+  // Activate code via verify endpoint
+  async function activateCode(code) {
+    try {
+      var API_BASE = window.location.origin;
+      var res = await fetch(API_BASE + '/v1/streak/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: code })
+      });
+      var data = await res.json();
+      
+      if (data.success) {
+        unlockPremium();
+        closePopup();
+        try { localStorage.setItem('starvia_premium', 'true'); } catch(e) {}
+        window.location.reload();
+      } else {
+        alert(data.message || 'รหัสไม่ถูกต้อง');
+      }
+    } catch (err) {
+      alert('เกิดข้อผิดพลาด กรุณาลองใหม่');
+    }
+  }
+
+  // Close popup helper
+  function closePopup() {
     var popup = document.getElementById('streak-unlock-popup');
     if (popup) popup.remove();
-    // Set premium flag for the app to read
-    try { localStorage.setItem('starvia_premium', 'true'); } catch(e) {}
-    // Reload to show premium content
-    window.location.reload();
   }
 
   // Claim the discount
@@ -276,7 +370,9 @@
     claimDiscount: claimDiscount,
     dismissDiscount: dismissDiscount,
     getPremiumTimeRemaining: getPremiumTimeRemaining,
-    buildStreakProgress: buildStreakProgress
+    buildStreakProgress: buildStreakProgress,
+    copyCode: copyCode,
+    activateCode: activateCode
   };
 
   // Auto-init when DOM ready

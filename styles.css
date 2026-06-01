@@ -4280,3 +4280,49 @@ body.has-report .value-section{display:none}
   font-family: inherit;
   white-space: nowrap;
 }
+
+/* Streak Code Box */
+.streak-code-box {
+  background: linear-gradient(135deg, rgba(201,162,39,.15), rgba(91,63,166,.15));
+  border: 2px dashed rgba(201,162,39,.5);
+  border-radius: 16px;
+  padding: 20px;
+  margin: 16px 0;
+  text-align: center;
+}
+.streak-code-label {
+  font-size: 11px;
+  letter-spacing: .15em;
+  color: var(--tx2);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.streak-code-value {
+  font-size: 28px;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  color: var(--g);
+  letter-spacing: .1em;
+  margin-bottom: 12px;
+  user-select: all;
+}
+.streak-code-copy {
+  background: rgba(201,162,39,.2);
+  border: 1px solid rgba(201,162,39,.4);
+  border-radius: 8px;
+  padding: 8px 16px;
+  color: var(--g);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all .2s;
+}
+.streak-code-copy:hover {
+  background: rgba(201,162,39,.35);
+}
+.streak-code-expires {
+  font-size: 11px;
+  color: var(--tx2);
+  opacity: .7;
+  margin-bottom: 12px;
+}
