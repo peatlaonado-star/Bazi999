@@ -5,7 +5,7 @@ import path from 'node:path';
 import { createPremiumRequestHandler, loadPremiumConfig } from './premium-service.mjs';
 import { createAdminRequestHandler, loadAdminConfig } from './admin-service.mjs';
 import { subscribe, getSubscribers, getSubscriberCount, unsubscribe } from './newsletter-service.mjs';
-import { getLotteryResults, refreshLotteryResults } from './lottery-service.mjs';
+import { getLotteryResults, refreshLotteryResults, setManualResults } from './lottery-service.mjs';
 
 const port = Number(process.env.PORT || process.env.STARVIA_API_PORT || 8787);
 const host = process.env.HOST || '0.0.0.0';
@@ -187,6 +187,16 @@ const server = http.createServer(async (req, res) => {
       if (url === '/v1/lottery/refresh' && req.method === 'POST') {
         const result = await refreshLotteryResults();
         return writeJson(res, result.success ? 200 : 503, result);
+      }
+      // Manual override for when GLO API is slow
+      if (url === '/v1/lottery/manual' && req.method === 'POST') {
+        try {
+          const body = await readJsonBody(req);
+          const result = setManualResults(body);
+          return writeJson(res, result.success ? 200 : 400, result);
+        } catch (err) {
+          return writeJson(res, 400, { success: false, error: 'Invalid data' });
+        }
       }
       return writeJson(res, 404, { success: false, error: 'Not found' });
     }

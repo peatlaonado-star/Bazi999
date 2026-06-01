@@ -124,3 +124,27 @@ export async function refreshLotteryResults() {
     return { success: false, message: 'ไม่สามารถเชื่อมต่อ GLO API: ' + err.message, data: null };
   }
 }
+
+// Manual results override (for when GLO API is slow)
+export function setManualResults(data) {
+  if (!data || !data.firstPrize) {
+    return { success: false, message: 'Missing required fields: firstPrize' };
+  }
+  
+  const result = {
+    available: true,
+    date: data.date || new Date().toISOString().split('T')[0],
+    displayDate: data.displayDate || { date: '', month: '', year: '' },
+    period: data.period || [],
+    firstPrize: data.firstPrize,
+    last3f: data.last3f || [],
+    last3b: data.last3b || [],
+    last2: data.last2 || [],
+    near1: data.near1 || [],
+    updatedAt: new Date().toISOString(),
+    source: 'manual'
+  };
+  
+  cacheResults(result);
+  return { success: true, message: 'Manual results saved', data: result };
+}
