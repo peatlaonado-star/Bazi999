@@ -30,6 +30,31 @@ function buildDailyBrief(p, dayOfWeek, personalColor) {
 
 
 
+// ═══ Conversion CTA Builder (ระบบชิมก่อนซื้อ) ═══
+function buildConversionCta(hook, desc, proof) {
+  return '<div class="conversion-cta">'
+    + '<div class="cta-hook">' + hook + '</div>'
+    + '<div class="cta-desc">' + desc + '</div>'
+    + (proof ? '<div class="cta-proof">' + proof + '</div>' : '')
+    + '<button class="cta-btn" data-action="unlock-premium">✦ ปลดล็อกรายงานเต็ม ✦</button>'
+    + '<div class="cta-price">199 บาท/เดือน · เท่ากับกาแฟ 2 แก้ว</div>'
+    + '</div>';
+}
+
+function buildWarningTeaser(text) {
+  return '<div class="warning-teaser">'
+    + '<span class="wt-icon">⚠️</span>'
+    + '<span class="wt-text">' + text + '</span>'
+    + '</div>';
+}
+
+function buildTeaserReveal(label, text) {
+  return '<div class="teaser-reveal">'
+    + '<div class="teaser-label">' + label + '</div>'
+    + '<div class="teaser-text">' + text + '</div>'
+    + '</div>';
+}
+
 function maskWindfallNumber(number, index){
   var text = String(number || '00');
   if (index % 2 === 0) return text.charAt(0) + '●';
@@ -81,9 +106,14 @@ function buildWindfallLuckHtml(guide, premiumUnlocked){
     + '<div class="wfl-mantra"><span>คาถาเรียกโชค</span>“' + escapeHTML(guide.mantra) + '”</div>'
     + '<div class="wfl-avoid"><strong>กันโชครั่ว:</strong> ' + escapeHTML(guide.avoid) + '</div>';
   if (!premiumUnlocked) {
-    html += buildPremiumLockOverlay(
-      'ปลดล็อกสูตรลาภลอยเฉพาะตัว',
-      'ดูเลขที่ควรลอง จังหวะซื้อหวย/ลอตเตอรี่ ทิศเปิดโชค คาถา และพิธีเสริมดวงแบบสายมูเต็มรูปแบบ'
+    // แสดง teaser: ทิศ + เวลาฟรี แต่ล็อกเลขและรายละเอียด
+    html += buildTeaserReveal('✦ ทิศเปิดโชคของคุณวันนี้ ✦',
+      'ทิศ <span class="teaser-highlight">' + escapeHTML(guide.direction) + '</span> · จังหวะเฮง <span class="teaser-highlight">' + escapeHTML(guide.sacredTime) + '</span>')
+    + buildWarningTeaser('คุณมีเลขนำโชคเฉพาะตัวที่คำนวณจากวันเกิด — ตัวเลขเหล่านี้มีผลกับหวย ลอตเตอรี่ และการเสี่ยงโชคทุกรูปแบบ')
+    + buildConversionCta(
+      '🔮 ดูเลขนำโชคของคุณ · ปลดล็อก 199 บาท',
+      'เลขที่คำนวณจากวันเกิด + คาถาเรียกโชค + พิธีเปิดทาง + สิ่งที่ต้องหลีกเลี่ยง',
+      '94% ของคนที่ดูเลขตัวเอง บอกว่า "ตรงจนตกใจ"'
     );
   }
   html += '</div>';
@@ -190,9 +220,14 @@ function buildMonthlyLifeMapHtml(model, premiumUnlocked){
     });
     html += '</div>';
   } else {
-    html += buildPremiumLockOverlay(
-      'ปลดล็อกแผนที่ชีวิตรายเดือนฉบับเต็ม',
-      'ดูดวงรายเดือนครบทุกด้าน ปฏิทินวันดีทั้งเดือน สรุปรายสัปดาห์ และภารกิจส่วนตัวตลอด 7 วัน'
+    // แสดง teaser: พลังงานหลัก + สัญญาณเตือน แต่ล็อกรายละเอียด
+    html += buildTeaserReveal('🌟 พลังงานหลักของเดือนนี้',
+      escapeHTML(model.elementFocus))
+    + buildWarningTeaser('เดือนนี้มีสัญญาณเตือน ' + model.domains.filter(function(d){ return d.phase === 'ต้องระวัง'; }).length + ' เรื่อง — ปลดล็อกเพื่อดูรายละเอียดและวิธีแก้')
+    + buildConversionCta(
+      '🔮 ดูหมอทักประจำเดือน · ปลดล็อก 199 บาท',
+      '5 ด้านชีวิต + ปฏิทินวันดี + สรุปรายสัปดาห์ + ภารกิจเสริมดวง 7 วัน',
+      'รู้ก่อน แก้ก่อน — ไม่ต้องรอให้ปัญหาเกิด'
     );
   }
 
@@ -605,10 +640,19 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + '</div>';
   var karmaHtml = karmaFull;
   if (!premiumUnlocked) {
-    karmaHtml = karmaFull.slice(0, -6) + buildPremiumLockOverlay(
-      'ปลดล็อกกระจกกรรมเฉพาะตัว',
-      'ดูแพตเทิร์นชีวิต บทเรียนของดาว เงาจากวันเกิด คำแนะนำรายเดือน และ ritual ส่วนตัว 7 วัน'
-    ) + '</div>';
+    // แสดง teaser: ชื่อ + บทเรียน แต่ล็อกรายละเอียด
+    karmaHtml = '<div class="karma-card">'
+      + '<div class="karma-kicker">พิมพ์เขียวชีวิตไทย</div>'
+      + '<div class="karma-title">✦ ' + escapeHTML(karma.title) + ' ✦</div>'
+      + '<div class="karma-desc">' + escapeHTML(karma.intro) + '</div>'
+      + buildTeaserReveal('✦ บทเรียนของดาว ✦', escapeHTML(karma.lesson))
+      + buildWarningTeaser('คุณมีรูปแบบชีวิตที่วนซ้ำอยู่ — รูปแบบนี้เกิดจากอะไร และจะแก้ยังไง?')
+      + buildConversionCta(
+        '🪞 ดูกระจกกรรมของคุณ · ปลดล็อก 199 บาท',
+        'รูปแบบที่วนซ้ำ + เงาจากวันเกิด + สิ่งที่ควรทำเดือนนี้ + พิธีเล็กๆ 7 วัน',
+        'เข้าใจอดีต เปลี่ยนอนาคต — เริ่มจากวันนี้'
+      )
+      + '</div>';
   }
 
   // ═══ Life Graph V2 — คำนวณก่อน ใช้ร่วมกับ Domain ═══
@@ -671,10 +715,17 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
       + '</div>';
   });
   if (!premiumUnlocked) {
-    domainHtml += '</div>' + buildPremiumLockOverlay(
-      'ปลดล็อกคัมภีร์แก้ดวง 6 ด้าน',
-      'วิเคราะห์ 6 ด้าน: โชค การเงิน สุขภาพ ความรัก การงาน และบริวาร พร้อมคำแนะนำแบบลงมือทำได้ — คำนวณเฉพาะบุคคลจากเลขชีวิตและวันเกิดของคุณ'
-    );
+    // แสดง teaser: คะแนนรวม + ด้านที่ต่ำสุด แต่ล็อกรายละเอียด
+    var lowestDomain = domainMatrix.domains.reduce(function(min, d){ return d.score < min.score ? d : min; }, domainMatrix.domains[0]);
+    domainHtml += '</div>'
+      + buildTeaserReveal('✦ ด้านที่ต้องระวังที่สุด ✦',
+        escapeHTML(lowestDomain.icon) + ' <span class="teaser-highlight">' + escapeHTML(lowestDomain.label) + '</span> คะแนน ' + lowestDomain.score + '/100 — "' + escapeHTML(lowestDomain.current) + '"')
+      + buildWarningTeaser('คุณมีจุดอ่อนซ่อนอยู่ใน ' + escapeHTML(lowestDomain.label) + ' — รู้ก่อน แก้ก่อน')
+      + buildConversionCta(
+        '📖 ดูคัมภีร์แก้ดวง 6 ด้าน · ปลดล็อก 199 บาท',
+        'โชค · การเงิน · สุขภาพ · ความรัก · การงาน · บริวาร — วิเคราะห์เฉพาะบุคคล',
+        '94% บอกว่า "ตรงจนตกใจ"'
+      );
   }
   domainHtml += '</div></div>';
   var lifeGraphSectionHtml = '<div class="life-graph-section">' + lifeGraphHtml + '</div>';
@@ -750,12 +801,12 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + badgesHtml
     + wrapCollapsible("✦ กำลังวันประจำตัว ✦", "วันเกิด · เทวดา · ธาตุ · สีมงคล", cosmicBriefHtml)
     + wrapCollapsible("✨ พลังงานเสริมดวง", "เลขและสีมงคลประจำวัน", powerCardHtml)
-    + wrapCollapsible("✦ สูตรเปิดดวงลาภลอย ✦", "เลขเด็ด หวย ทิศ คาถา สายมู 🔒 Premium", windfallLuckHtml, true)
-    + wrapCollapsible("🔮 หมอทักประจำเดือน", "5 ด้าน พร้อมสัญญาณ 🔒 Premium", monthlyLifeMapHtml, true)
+    + wrapCollapsible("✦ สูตรเปิดดวงลาภลอย ✦", "เลขเด็ด · หวย · ทิศ · คาถา สายมู", windfallLuckHtml, true)
+    + wrapCollapsible("🔮 หมอทักประจำเดือน", "5 ด้านชีวิต · สัญญาณเตือน · วิธีแก้", monthlyLifeMapHtml, true)
     + lifeGraphSectionHtml
-    + wrapCollapsible("✦ คัมภีร์แก้ดวง 6 ด้าน ✦", "คะแนน 6 ด้าน + 6 ด้านชีวิต 🔒 Premium", domainHtml, true)
+    + wrapCollapsible("✦ คัมภีร์แก้ดวง 6 ด้าน ✦", "โชค · การเงิน · สุขภาพ · ความรัก · การงาน · บริวาร", domainHtml, true)
     + wrapCollapsible("✦ สัดส่วนและสมดุลธาตุ ✦", "กราฟธาตุ + คำแนะนำเสริมใจ (แตะเพื่อดู)", buildElementRadar(p, r, l), true)
-    + wrapCollapsible("📋 ตัวตน · ความสัมพันธ์ · การงาน · เงิน", "ปลดล็อกเพื่ออ่านรายละเอียด 🔒 Premium", detailTabsShellHtml, true);
+    + wrapCollapsible("📋 ตัวตน · ความสัมพันธ์ · การงาน · เงิน", "ดูจุดอ่อนที่ซ่อนอยู่ + วิธีแก้", detailTabsShellHtml, true);
 
   // 6. อ้างอิงและเนื้อหาใน Tabs
   var refDesc = {

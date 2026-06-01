@@ -3555,3 +3555,155 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .rs-actions a{flex:1;min-width:120px;text-align:center;padding:8px 10px;border-radius:999px;background:rgba(142,114,216,.12);border:1px solid rgba(142,114,216,.22);color:#DDCEFF;text-decoration:none;font-size:12px;font-weight:700}
 @media(max-width:620px){.rs-grid{grid-template-columns:1fr}.rs-actions a{flex-basis:100%}}
 body.has-report .value-section{display:none}
+
+/* ═══ Conversion Teaser System (ระบบชิมก่อนซื้อ) ═══ */
+
+/* กล่อง teaser ที่แสดงเนื้อหายั่ว */
+.teaser-reveal {
+  background: linear-gradient(135deg, rgba(37,24,68,.6), rgba(15,9,38,.5));
+  border: 1px solid rgba(212,175,55,.2);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin: 12px 0;
+  position: relative;
+}
+.teaser-reveal .teaser-label {
+  font-size: 10px;
+  letter-spacing: .15em;
+  color: #A98FE8;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.teaser-reveal .teaser-text {
+  font-size: 14px;
+  color: var(--tx);
+  line-height: 1.7;
+}
+.teaser-reveal .teaser-highlight {
+  color: var(--g);
+  font-weight: 600;
+}
+
+/* เลขที่เบลอตัวหลัง */
+.blurred-digit {
+  display: inline-block;
+  filter: blur(6px);
+  user-select: none;
+  pointer-events: none;
+  color: var(--g);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: .05em;
+  transition: filter .3s;
+}
+.blurred-digit::after {
+  content: '?';
+  position: absolute;
+  filter: none;
+  color: var(--g);
+  opacity: .6;
+}
+
+/* กล่อง CTA แบบใหม่ — ไม่ใช่ lock-overlay แข็งๆ */
+.conversion-cta {
+  background: linear-gradient(135deg, rgba(42,27,16,.9), rgba(26,21,0,.9));
+  border: 1px solid rgba(201,162,39,.4);
+  border-radius: 16px;
+  padding: 20px 20px;
+  margin: 14px 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.conversion-cta::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(201,162,39,.06) 0%, transparent 60%);
+  animation: pulse 4s ease-in-out infinite;
+}
+.conversion-cta .cta-hook {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--g);
+  margin-bottom: 8px;
+  position: relative;
+}
+.conversion-cta .cta-desc {
+  font-size: 13px;
+  color: #e8dfc8;
+  line-height: 1.6;
+  margin-bottom: 14px;
+  position: relative;
+}
+.conversion-cta .cta-proof {
+  font-size: 11px;
+  color: #a89070;
+  margin-bottom: 14px;
+  position: relative;
+}
+.conversion-cta .cta-btn {
+  background: linear-gradient(90deg, #C9A227, #f0d96a, #C9A227);
+  background-size: 200% auto;
+  color: #1A1035;
+  padding: 12px 28px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: all .3s;
+  animation: sh 3s linear infinite;
+  position: relative;
+  letter-spacing: .04em;
+}
+.conversion-cta .cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(201,162,39,.4);
+}
+.conversion-cta .cta-price {
+  font-size: 11px;
+  color: #8B6914;
+  margin-top: 8px;
+  position: relative;
+}
+
+/* สัญญาณเตือน teaser */
+.warning-teaser {
+  background: rgba(255,152,0,.08);
+  border-left: 3px solid #FF9800;
+  border-radius: 0 10px 10px 0;
+  padding: 12px 16px;
+  margin: 10px 0;
+}
+.warning-teaser .wt-icon { font-size: 16px; margin-right: 6px; }
+.warning-teaser .wt-text {
+  font-size: 13px;
+  color: #e8dfc8;
+  line-height: 1.6;
+}
+
+/* Fade gradient สำหรับตัดเนื้อหา */
+.fade-cutoff {
+  position: relative;
+  max-height: 120px;
+  overflow: hidden;
+}
+.fade-cutoff::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(transparent, #0a0a1a);
+  pointer-events: none;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .7; }
+}

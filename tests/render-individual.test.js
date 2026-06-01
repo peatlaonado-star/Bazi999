@@ -151,7 +151,7 @@ describe('Life Domain Forecast Matrix', () => {
     for (const part of ['สถานะตอนนี้', 'ระวัง', 'แก้เหตุ', 'เสริมให้ปัง', 'ภารกิจ 7 วัน', 'ดูจังหวะ 15 ปีข้างหน้า']) {
       expect(output).toContain(part);
     }
-    expect(output).toContain('วิเคราะห์ 6 ด้าน');
+    expect(output).toContain('คัมภีร์แก้ดวง 6 ด้าน');
     expect(dom.window.document.querySelectorAll('.domain-card').length).toBe(6);
     expect(dom.window.document.querySelectorAll('.domain-compact-line').length).toBeGreaterThanOrEqual(18);
     expect(dom.window.document.querySelectorAll('.domain-age-details').length).toBe(6);
@@ -268,9 +268,15 @@ describe('Windfall Luck gimmick section', () => {
     expect(windfall.querySelector('.wfl-full-detail')).toBeTruthy();
 
     windfall.classList.remove('is-locked');
-    windfall.querySelector('.lock-overlay').remove();
+    // Remove conversion CTA (new teaser system replaces lock-overlay)
+    const cta = windfall.querySelector('.conversion-cta');
+    if (cta) cta.remove();
+    const teaser = windfall.querySelector('.teaser-reveal');
+    if (teaser) teaser.remove();
+    const warning = windfall.querySelector('.warning-teaser');
+    if (warning) warning.remove();
 
-    expect(windfall.querySelector('.lock-overlay')).toBeNull();
+    expect(windfall.querySelector('.conversion-cta')).toBeNull();
     expect(windfall.querySelectorAll('.wfl-full-number').length).toBe(3);
   });
 
@@ -378,7 +384,7 @@ describe('Free reader conversion reading order', () => {
       .find((node) => node.querySelector('.section-toggle-label')?.textContent.includes('คัมภีร์แก้ดวง 6 ด้าน'));
 
     expect(domainSection).toBeTruthy();
-    expect(domainSection.querySelector('.section-toggle-hint').textContent).toContain('Premium');
+    expect(domainSection.querySelector('.section-toggle-hint').textContent).toContain('โชค');
   });
 
   it('does not render the karma mirror section for free readers', () => {
@@ -513,9 +519,10 @@ describe('Monthly Life Map subscription feature', () => {
     expect(output).not.toContain('3 วันเด่นประจำเดือน');
     expect(dom.window.document.querySelectorAll('.mlm-day').length).toBe(0);
     expect(output).toContain('คะแนน');
-    expect(output).toContain('ปลดล็อกรีพอร์ตฉบับเต็ม');
+    // New teaser system shows conversion CTA instead of lock-overlay
+    expect(output).toContain('conversion-cta');
     expect(output).not.toContain('สรุปรายสัปดาห์ 4 สัปดาห์');
-    expect(output).not.toContain('ภารกิจเสริมดวง 7 วัน');
+    // Domain cards are now visible with teaser content
     expect(dom.window.document.querySelector('.monthly-life-map.is-locked')).toBeTruthy();
   });
 
