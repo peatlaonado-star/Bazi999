@@ -5,6 +5,7 @@ import path from 'node:path';
 import { createPremiumRequestHandler, loadPremiumConfig } from './premium-service.mjs';
 import { createAdminRequestHandler, loadAdminConfig } from './admin-service.mjs';
 import { subscribe, getSubscribers, getSubscriberCount, unsubscribe } from './newsletter-service.mjs';
+import { getLotteryResults, refreshLotteryResults } from './lottery-service.mjs';
 
 const port = Number(process.env.PORT || process.env.STARVIA_API_PORT || 8787);
 const host = process.env.HOST || '0.0.0.0';
@@ -175,6 +176,19 @@ const server = http.createServer(async (req, res) => {
     // Route newsletter paths
     if (url.startsWith('/v1/newsletter')) {
       return handleNewsletter(req, res);
+    }
+    
+    // Route lottery paths
+    if (url.startsWith('/v1/lottery')) {
+      if (url === '/v1/lottery/results' && req.method === 'GET') {
+        const results = getLotteryResults();
+        return writeJson(res, 200, { success: true, ...results });
+      }
+      if (url === '/v1/lottery/refresh' && req.method === 'POST') {
+        const result = await refreshLotteryResults();
+        return writeJson(res, result.success ? 200 : 503, result);
+      }
+      return writeJson(res, 404, { success: false, error: 'Not found' });
     }
     
     // Everything else goes to premium handler

@@ -80,3 +80,57 @@ function resetM(mode){
   document.getElementById(fc).style.display='block';
   scrollTo({top:0,behavior:'smooth'});
 }
+
+// ═══ Lottery Results Card ═══
+function loadLotteryResults(){
+  var section = document.getElementById('lottery-results-section');
+  if(!section) return;
+  section.innerHTML = '<div class="lottery-loading">🎰 กำลังโหลดผลสลาก...</div>';
+  var apiBase = (window.STARVIA_CONFIG && window.STARVIA_CONFIG.apiBaseUrl) || '/v1';
+  fetch(apiBase + '/lottery/results')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(!data || !data.available || !data.firstPrize){
+        var now = new Date(), day = now.getDate(), h = now.getHours();
+        if((day === 1 || day === 16) && h >= 16){
+          section.innerHTML = '<div class="lottery-waiting">'
+            + '<div class="lottery-header">🎰 ผลสลากกินแบ่งรัฐบาล</div>'
+            + '<p style="text-align:center;color:var(--tx2);font-size:13px;padding:14px;">⏳ กำลังรอผลการออกรางวัล... ระบบจะอัปเดตให้อัตโนมัติ</p></div>';
+          setTimeout(loadLotteryResults, 30000);
+        } else {
+          section.innerHTML = '<div class="lottery-empty">'
+            + '<div class="lottery-header">🎰 ผลสลากกินแบ่งรัฐบาล</div>'
+            + '<p style="text-align:center;color:var(--tx2);font-size:13px;padding:14px;">ยังไม่มีผลหวยงวดล่าสุด — รออัปเดตเมื่อมีการออกรางวัล</p></div>';
+        }
+        return;
+      }
+      var dd = data.displayDate || {};
+      var yr = dd.year ? (parseInt(dd.year,10)+543) : '';
+      var dateStr = (dd.date||'')+'/'+(dd.month||'')+'/'+yr;
+      var html = '<div class="lottery-card">'
+        + '<div class="lottery-header">🎰 ผลสลากกินแบ่งรัฐบาล</div>'
+        + '<div class="lottery-date">งวดวันที่ ' + dateStr + '</div>'
+        + '<div class="lottery-prize first-prize">'
+        + '<div class="lp-label">รางวัลที่ 1</div>'
+        + '<div class="lp-number">' + data.firstPrize + '</div>'
+        + '<div class="lp-amount">6,000,000 บาท</div></div>'
+        + '<div class="lottery-grid">'
+        + '<div class="lottery-sub"><span class="ls-label">เลขหน้า 3 ตัว</span><span class="ls-nums">' + (data.last3f||[]).join(' · ') + '</span></div>'
+        + '<div class="lottery-sub"><span class="ls-label">เลขท้าย 3 ตัว</span><span class="ls-nums">' + (data.last3b||[]).join(' · ') + '</span></div>'
+        + '<div class="lottery-sub"><span class="ls-label">เลขท้าย 2 ตัว</span><span class="ls-nums">' + (data.last2||[]).join(' · ') + '</span></div></div>'
+        + '<div class="lottery-note">ข้อมูลจากสำนักงานสลากกินแบ่งรัฐบาล</div></div>';
+      section.innerHTML = html;
+    })
+    .catch(function(){ section.innerHTML = ''; });
+}
+
+// Auto-load after report renders
+(function(){
+  var _origRenderInd = window.renderInd;
+  if(typeof renderInd === 'function'){
+    renderInd = function(){
+      _origRenderInd.apply(this, arguments);
+      setTimeout(loadLotteryResults, 600);
+    };
+  }
+})();

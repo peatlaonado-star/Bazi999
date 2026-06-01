@@ -3991,3 +3991,115 @@ body.has-report .value-section{display:none}
   margin-top: 10px;
   letter-spacing: 0.02em;
 }
+
+/* ═══ Lottery Results Card ═══ */
+.lottery-card {
+  background: linear-gradient(145deg, rgba(20,10,55,.82), rgba(10,5,30,.72));
+  border: 1px solid rgba(201,162,39,.2);
+  border-radius: 18px;
+  padding: 22px 20px 18px;
+  animation: fu .5s ease both;
+  overflow: hidden;
+  position: relative;
+}
+.lottery-card::before {
+  content: '';
+  position: absolute;
+  inset: -60%;
+  background: radial-gradient(ellipse at 30% 20%, rgba(201,162,39,.06), transparent 50%);
+  pointer-events: none;
+}
+.lottery-header {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: "Chakra Petch", "Kanit", "Sarabun", sans-serif;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+  position: relative;
+  z-index: 1;
+}
+.lottery-date {
+  text-align: center;
+  font-size: 11px;
+  color: var(--tx2);
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+}
+.lottery-prize {
+  text-align: center;
+  padding: 14px;
+  border-radius: 14px;
+  margin-bottom: 14px;
+  position: relative;
+  z-index: 1;
+}
+.lottery-prize.first-prize {
+  background: linear-gradient(135deg, rgba(201,162,39,.15), rgba(201,162,39,.06));
+  border: 1px solid rgba(201,162,39,.25);
+}
+.lp-label {
+  font-size: 11px;
+  color: var(--g);
+  letter-spacing: 0.1em;
+  margin-bottom: 4px;
+}
+.lp-number {
+  font-size: 28px;
+  font-weight: 700;
+  font-family: "Chakra Petch", "Kanit", "Sarabun", sans-serif;
+  letter-spacing: 0.12em;
+  color: var(--g);
+  line-height: 1.2;
+}
+.lp-amount {
+  font-size: 11px;
+  color: var(--tx2);
+  margin-top: 2px;
+}
+.lottery-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+}
+.lottery-sub {
+  flex: 1;
+  min-width: 100px;
+  background: rgba(37,24,68,.5);
+  border-radius: 12px;
+  padding: 10px 12px;
+  text-align: center;
+}
+.ls-label {
+  display: block;
+  font-size: 10px;
+  color: var(--tx2);
+  margin-bottom: 4px;
+  letter-spacing: 0.05em;
+}
+.ls-nums {
+  font-size: 14px;
+  font-weight: 700;
+  font-family: "Chakra Petch", "Kanit", "Sarabun", sans-serif;
+  color: var(--tx);
+  letter-spacing: 0.04em;
+}
+.lottery-note {
+  text-align: center;
+  font-size: 9px;
+  color: #5a4a7a;
+  margin-top: 12px;
+  position: relative;
+  z-index: 1;
+}
+.lottery-loading,
+.lottery-waiting,
+.lottery-empty {
+  background: linear-gradient(145deg, rgba(20,10,55,.7), rgba(10,5,30,.6));
+  border: 1px solid rgba(201,162,39,.12);
+  border-radius: 18px;
+  animation: fu .5s ease both;
+}

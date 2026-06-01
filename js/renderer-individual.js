@@ -972,6 +972,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + buildPremiumPreviewSummary()
     + buildPremiumPriceAnchor(false)
     + wrapCollapsible("✦ สูตรเปิดดวงลาภลอย ✦", "เลขเด็ด · หวย · ทิศ · คาถา สายมู", windfallLuckHtml, true)
+    + '<div id=\"lottery-results-section\" style=\"margin-bottom:14px;\"></div>'
     + wrapCollapsible("🔮 หมอทักประจำเดือน", "5 ด้านชีวิต · สัญญาณเตือน · วิธีแก้", monthlyLifeMapHtml, true)
     + lifeGraphSectionHtml
     + wrapCollapsible("✦ คัมภีร์แก้ดวง 6 ด้าน ✦", "โชค · การเงิน · สุขภาพ · ความรัก · การงาน · บริวาร", domainHtml, true)
