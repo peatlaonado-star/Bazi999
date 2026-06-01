@@ -131,8 +131,8 @@ function getPremiumStorage() {
 function restorePremiumStatus() {
   var cfg = getStarviaConfig();
   var token = getSavedPremiumToken();
-  if (cfg.demoMode || !token) {
-    return Promise.resolve({ active: false, mode: cfg.demoMode ? 'demo' : 'none' });
+  if (!token) {
+    return Promise.resolve({ active: false, mode: 'none' });
   }
 
   return fetch(cfg.apiBaseUrl + '/premium/status', {
@@ -161,8 +161,6 @@ window.isPremiumUnlockedFlag = false;
 function getStarviaConfig() {
   var cfg = (window && window.STARVIA_CONFIG) ? window.STARVIA_CONFIG : {};
   return {
-    demoMode: cfg.demoMode === false ? false : true,
-    demoPins: Array.isArray(cfg.demoPins) && cfg.demoPins.length ? cfg.demoPins : ['STAR199'],
     apiBaseUrl: (cfg.apiBaseUrl || '').replace(/\/$/, '')
   };
 }
@@ -244,22 +242,10 @@ function closePayment() {
   document.getElementById('payment-modal').style.display = 'none';
 }
 
-// 2. ระบบตรวจรหัสผ่าน และปลดความเบลอ
-// NOTE: โค้ดนี้เป็น DEMO MODE เท่านั้น — ห้ามใช้ใน production
-// Production ต้องเรียก backend API แทน
+// 2. ระบบตรวจรหัสผ่านจาก backend/admin-generated code เท่านั้น
 function verifyPin() {
   var pin = document.getElementById('pdf-pin').value.trim().toUpperCase();
   var cfg = getStarviaConfig();
-
-  if (cfg.demoMode) {
-    // Demo: check against configured local pins. Do not use demo mode for production.
-    if (cfg.demoPins.indexOf(pin) !== -1) {
-      onPremiumVerified(null);
-    } else {
-      onPremiumFailed();
-    }
-    return Promise.resolve({ success: cfg.demoPins.indexOf(pin) !== -1, mode: 'demo' });
-  }
 
   return callPremiumVerifyApi(pin, cfg);
 }

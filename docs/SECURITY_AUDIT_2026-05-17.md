@@ -55,7 +55,7 @@
 
 ## ข้อสังเกต
 
-1. **PIN ระบบ Premium hardcode ใน client-side** (`ui-actions.js:152: var correctPin = 'STAR199'`)
+1. **PIN ระบบ Premium hardcode ใน client-side** (`ui-actions.js:152: var correctPin = 'ADMIN-GENERATED-CODE'`)
    - ไม่ใช่ XSS แต่เป็นข้อจำกัดด้านความปลอดภัยที่ต้องย้ายไป backend ก่อนเปิดใช้จริง
    - ดูรายละเอียดใน `docs/PAYMENT_SECURITY_LIMITATIONS.md`
 

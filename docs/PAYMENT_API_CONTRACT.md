@@ -9,8 +9,7 @@
 
 API สำหรับระบบชำระเงินและยืนยัน Premium ของ STARVIA
 Frontend ปัจจุบันรองรับ 2 mode:
-- Local/demo: ไม่ตั้งค่า `window.STARVIA_CONFIG` หรือ `demoMode !== false` จะใช้ PIN demo สำหรับทดสอบ
-- Production adapter: ตั้ง `demoMode: false` เพื่อให้ frontend เรียก backend จริงที่ `/premium/verify`
+- Production: frontend เรียก backend จริงที่ `/premium/verify` เท่านั้น และรหัสถูกสร้างจากหน้า `/admin.html`
 
 Backend slice แรกมีแล้วใน repo:
 - `api/premium-service.mjs` — logic ตรวจ PIN และออก token
@@ -21,7 +20,6 @@ Backend slice แรกมีแล้วใน repo:
 ```html
 <script>
 window.STARVIA_CONFIG = {
-  demoMode: false,
   apiBaseUrl: 'https://api.starvia.app/v1'
 };
 </script>
@@ -49,7 +47,7 @@ Staging:    https://staging-api.starvia.app/v1
 **Request:**
 ```json
 {
-  "pin": "STAR199"
+  "pin": "ADMIN-GENERATED-CODE"
 }
 ```
 
@@ -98,7 +96,7 @@ Staging:    https://staging-api.starvia.app/v1
 สร้าง hash ด้วย Node:
 
 ```bash
-node -e "const crypto=require('node:crypto'); const pin=process.argv[1].trim().toUpperCase(); console.log(crypto.createHash('sha256').update(pin).digest('hex'))" STAR199
+node -e "const crypto=require('node:crypto'); const pin=process.argv[1].trim().toUpperCase(); console.log(crypto.createHash('sha256').update(pin).digest('hex'))" ADMIN-GENERATED-CODE
 ```
 
 หรือออก PIN สำหรับ manual payment ด้วย CLI:
@@ -240,12 +238,11 @@ Frontend เลือก mode จาก `window.STARVIA_CONFIG` และใน 
 
 ```js
 window.STARVIA_CONFIG = {
-  demoMode: false,
   apiBaseUrl: 'https://api.starvia.app/v1'
 };
 ```
 
-ถ้า `demoMode: false` จะเรียก `POST {apiBaseUrl}/premium/verify` พร้อม body `{ "pin": "..." }`
+Frontend จะเรียก `POST {apiBaseUrl}/premium/verify` พร้อม body `{ "pin": "..." }`
 
 ### Backend local start
 
@@ -259,7 +256,7 @@ npm run api:start
 หรือใช้ env PIN แบบทดลอง:
 
 ```bash
-STARVIA_PREMIUM_PINS="STAR199,LUCKY777" \
+STARVIA_PREMIUM_PINS="ADMIN-GENERATED-CODE,LUCKY777" \
 STARVIA_JWT_SECRET="replace-with-long-random-secret" \
 PORT=8787 \
 npm run api:start
@@ -276,6 +273,6 @@ POST http://localhost:8787/v1/premium/verify
 1. สร้าง secret จริงและตั้งใน hosting environment เป็น `STARVIA_JWT_SECRET`
 2. ตั้ง `STARVIA_PIN_STORE_FILE` ชี้ไปยังไฟล์ store ที่เก็บ `pinHash` เพื่อให้ PIN ใช้ครั้งเดียวและไม่เก็บรหัสจริงใน environment
 3. Deploy `api/server.mjs` เป็น Node service หลัง HTTPS/reverse proxy
-4. ตั้ง frontend `window.STARVIA_CONFIG.demoMode = false` และ `apiBaseUrl` เป็น production API
+4. ตั้ง frontend `window.STARVIA_CONFIG.apiBaseUrl` เป็น production API
 5. ทดสอบ end-to-end: กรอก PIN → ได้ token → ปลดล็อก Premium → reload หน้า → `GET /premium/status` คืนสถานะ Premium
 

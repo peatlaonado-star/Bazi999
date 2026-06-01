@@ -26,5 +26,5 @@ Backend API:
 - `api/server.mjs` — Node HTTP server for `POST /v1/premium/verify`
 - Local start example:
   ```bash
-  STARVIA_PREMIUM_PINS="STAR199" STARVIA_JWT_SECRET="replace-with-long-random-secret" npm run api:start
+  STARVIA_PIN_STORE_FILE="./data/pins.json" STARVIA_JWT_SECRET="replace-with-long-random-secret" npm run api:start
   ```

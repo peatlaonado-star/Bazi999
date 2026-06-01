@@ -10,7 +10,7 @@
 **ปัญหา:**
 ```javascript
 // ui-actions.js บรรทัดที่ 152
-var correctPin = 'STAR199';
+var correctPin = 'ADMIN-GENERATED-CODE';
 if(pin === correctPin) { ... }
 ```
 
@@ -113,7 +113,7 @@ Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'
 
 ## หมายเหตุ
 
-ระบบ PIN ปัจจุบัน (`STAR199`) มีวัตถุประสงค์เพื่อ:
+ระบบ PIN ปัจจุบัน (`ADMIN-GENERATED-CODE`) มีวัตถุประสงค์เพื่อ:
 - **ทดสอบและ demo เท่านั้น** — ไม่ใช่ระบบจ่ายเงินจริง
 - ใช้ในช่วง Early Access ให้ beta tester ลองใช้ฟีเจอร์ Premium
 - ก่อนเปิด public ต้องเปลี่ยนเป็นระบบ backend verification ทั้งหมด

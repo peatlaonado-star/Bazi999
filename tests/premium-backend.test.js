@@ -13,7 +13,7 @@ import {
 } from '../api/premium-service.mjs';
 
 const validConfig = {
-  allowedPins: ['STAR199', 'LUCKY777'],
+  allowedPins: ['ADMIN123', 'LUCKY777'],
   jwtSecret: 'test-secret-with-enough-length',
   plan: 'premium_199',
   tokenTtlSeconds: 86400,
@@ -22,7 +22,7 @@ const validConfig = {
 
 describe('Premium verify service', () => {
   it('accepts a valid PIN and returns a signed premium token', () => {
-    const result = verifyPremiumPin({ pin: 'STAR199' }, validConfig);
+    const result = verifyPremiumPin({ pin: 'ADMIN123' }, validConfig);
 
     expect(result.status).toBe(200);
     expect(result.body.success).toBe(true);
@@ -58,12 +58,12 @@ describe('Premium verify service', () => {
 
   it('requires production PIN source and JWT secret config', () => {
     expect(() => loadPremiumConfig({})).toThrow(/STARVIA_PREMIUM_PINS|STARVIA_PIN_STORE_FILE/);
-    expect(() => loadPremiumConfig({ STARVIA_PREMIUM_PINS: 'STAR199' })).toThrow(/STARVIA_JWT_SECRET/);
+    expect(() => loadPremiumConfig({ STARVIA_PREMIUM_PINS: 'ADMIN123' })).toThrow(/STARVIA_JWT_SECRET/);
   });
 
   it('loads configured CORS origins for staging and production deploys', () => {
     const config = loadPremiumConfig({
-      STARVIA_PREMIUM_PINS: 'STAR199',
+      STARVIA_PREMIUM_PINS: 'ADMIN123',
       STARVIA_JWT_SECRET: 'test-secret-with-enough-length',
       STARVIA_ALLOWED_ORIGINS: 'https://starvia.app, https://staging.starvia.app',
     });
@@ -74,7 +74,7 @@ describe('Premium verify service', () => {
 
 describe('Persistent premium PIN store', () => {
   it('loads config from STARVIA_PIN_STORE_FILE without env PINs', () => {
-    const storeFile = writePinStore([{ pin: 'STAR199', plan: 'premium_199' }]);
+    const storeFile = writePinStore([{ pin: 'ADMIN123', plan: 'premium_199' }]);
 
     const config = loadPremiumConfig({
       STARVIA_PIN_STORE_FILE: storeFile,
@@ -86,7 +86,7 @@ describe('Persistent premium PIN store', () => {
   });
 
   it('accepts an unused stored PIN and marks it used for one-time access', () => {
-    const storeFile = writePinStore([{ pin: 'STAR199', plan: 'premium_199' }]);
+    const storeFile = writePinStore([{ pin: 'ADMIN123', plan: 'premium_199' }]);
     const config = {
       allowedPins: [],
       pinStoreFile: storeFile,
@@ -96,8 +96,8 @@ describe('Persistent premium PIN store', () => {
       now: () => 1_800_000_000,
     };
 
-    const first = verifyPremiumPin({ pin: ' star199 ' }, config);
-    const second = verifyPremiumPin({ pin: 'STAR199' }, config);
+    const first = verifyPremiumPin({ pin: ' admin123 ' }, config);
+    const second = verifyPremiumPin({ pin: 'ADMIN123' }, config);
     const stored = JSON.parse(fs.readFileSync(storeFile, 'utf8'));
 
     expect(first.status).toBe(200);
@@ -127,7 +127,7 @@ describe('Persistent premium PIN store', () => {
 
 describe('Premium status service', () => {
   it('accepts a valid bearer token and returns active premium metadata', () => {
-    const verifyResult = verifyPremiumPin({ pin: 'STAR199' }, validConfig);
+    const verifyResult = verifyPremiumPin({ pin: 'ADMIN123' }, validConfig);
     const status = checkPremiumStatus({ authorization: `Bearer ${verifyResult.body.token}` }, validConfig);
 
     expect(status.status).toBe(200);
@@ -137,7 +137,7 @@ describe('Premium status service', () => {
   });
 
   it('rejects expired premium tokens', () => {
-    const verifyResult = verifyPremiumPin({ pin: 'STAR199' }, validConfig);
+    const verifyResult = verifyPremiumPin({ pin: 'ADMIN123' }, validConfig);
     const status = checkPremiumStatus(
       { authorization: `Bearer ${verifyResult.body.token}` },
       { ...validConfig, now: () => 1_800_086_401 }
@@ -167,7 +167,7 @@ describe('Premium verify HTTP handler', () => {
       const response = await fetch(`${baseUrl}/v1/premium/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pin: 'STAR199' }),
+        body: JSON.stringify({ pin: 'ADMIN123' }),
       });
       const body = await response.json();
 
@@ -206,7 +206,7 @@ describe('Premium verify HTTP handler', () => {
 
   it('handles GET /v1/premium/status with a bearer token', async () => {
     const { baseUrl, close } = await startTestServer(validConfig);
-    const verifyResult = verifyPremiumPin({ pin: 'STAR199' }, validConfig);
+    const verifyResult = verifyPremiumPin({ pin: 'ADMIN123' }, validConfig);
 
     try {
       const response = await fetch(`${baseUrl}/v1/premium/status`, {

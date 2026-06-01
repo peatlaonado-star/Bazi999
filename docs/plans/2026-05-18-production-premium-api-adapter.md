@@ -2,9 +2,9 @@
 
 > **For Hermes:** Use test-driven-development + static-web-refactoring. Preserve demo mode for local testing, but add a real backend adapter path for production.
 
-**Goal:** Replace the commented-out premium backend flow with a tested production API adapter controlled by frontend config, while keeping the current demo PIN available only when demo mode is enabled.
+**Goal:** Use the production Premium API with admin-generated access codes only; no client-side demo PIN fallback.
 
-**Architecture:** Add a small config resolver in `ui-actions.js` that reads `window.STARVIA_CONFIG`. `verifyPin()` should use local demo pins when `demoMode !== false`, and call `POST /premium/verify` when `demoMode === false`. The adapter should return a Promise so tests and future UI can await completion.
+**Architecture:** `ui-actions.js` reads `window.STARVIA_CONFIG.apiBaseUrl`. `verifyPin()` always calls `POST /premium/verify`; access codes are issued from `/admin.html` and validated by the backend.
 
 **Tech Stack:** Vanilla JavaScript, browser globals, Vitest, Node `vm` test harness.
 
@@ -38,7 +38,7 @@
 
 **Implementation notes:**
 - Add `getStarviaConfig()`.
-- Default should preserve current behavior: demo mode on, demo pin `STAR199`.
+- Default should preserve current behavior: backend/admin code mode.
 - When `demoMode === false`, call `fetch(apiBaseUrl + '/premium/verify', ...)`.
 - Return the Promise from `verifyPin()` in production mode.
 - Keep `onPremiumVerified(token)` and `onPremiumFailed()` as the single UI update paths.
@@ -59,7 +59,6 @@
 ```html
 <script>
 window.STARVIA_CONFIG = {
-  demoMode: false,
   apiBaseUrl: 'https://api.starvia.app/v1'
 };
 </script>
@@ -82,6 +81,6 @@ git status --short
 
 Expected:
 - All tests pass.
-- Existing demo PIN tests still pass.
-- New production API tests pass.
+- No client-side demo PIN fallback remains.
+- Production/admin-generated code tests pass.
 - Build succeeds.

@@ -98,57 +98,22 @@ describe('Premium state abstraction', () => {
     expect(ctx._premiumState).toEqual({ unlocked: false, token: null });
   });
 
-  it('verifyPin calls onPremiumVerified with demo PIN STAR199', () => {
-    let verified = false;
-    const ctx = loadUiContext({
-      document: {
-        getElementById: (id) => {
-          if (id === 'pdf-pin') return { value: 'STAR199' };
-          if (id === 'confirm-pay-btn') return { innerHTML: '', style: {}, disabled: false };
-          if (id === 'pin-error') return { style: { display: 'none' } };
-          return null;
-        },
-        querySelectorAll: () => [],
-        querySelector: () => null,
-        createElement: () => ({ style: {}, appendChild: () => {} }),
-        body: { appendChild: () => {} },
-      },
-    });
-    // Override onPremiumVerified to track calls
-    ctx.onPremiumVerified = function() { verified = true; };
-    ctx.verifyPin();
-    expect(verified).toBe(true);
+  it('does not include a client-side demo PIN fallback', () => {
+    const source = fs.readFileSync(path.resolve('ui-actions.js'), 'utf8');
+
+    expect(source).not.toContain('demoPins');
+    expect(source).not.toContain(['STAR', '199'].join(''));
+    expect(source).not.toContain("mode: 'demo'");
   });
 
-  it('verifyPin rejects wrong PIN', () => {
-    let failed = false;
-    const ctx = loadUiContext({
-      document: {
-        getElementById: (id) => {
-          if (id === 'pdf-pin') return { value: 'WRONG' };
-          if (id === 'confirm-pay-btn') return { innerHTML: '', style: {}, disabled: false };
-          if (id === 'pin-error') return { style: { display: 'none' } };
-          return null;
-        },
-        querySelectorAll: () => [],
-        querySelector: () => null,
-        createElement: () => ({ style: {}, appendChild: () => {} }),
-        body: { appendChild: () => {} },
-      },
-    });
-    ctx.onPremiumFailed = function() { failed = true; };
-    ctx.verifyPin();
-    expect(failed).toBe(true);
-  });
-
-  it('verifyPin posts to backend when demoMode is false', async () => {
+  it('verifyPin posts admin-generated codes to backend', async () => {
     let verifiedToken = null;
     let fetchUrl = null;
     let fetchOptions = null;
     const ctx = loadUiContext({
       window: {
         isPremiumUnlocked: false,
-        STARVIA_CONFIG: { demoMode: false, apiBaseUrl: 'https://api.example.test/v1' },
+        STARVIA_CONFIG: { apiBaseUrl: 'https://api.example.test/v1' },
       },
       fetch: (url, options) => {
         fetchUrl = url;
@@ -184,7 +149,7 @@ describe('Premium state abstraction', () => {
     const ctx = loadUiContext({
       window: {
         isPremiumUnlocked: false,
-        STARVIA_CONFIG: { demoMode: false, apiBaseUrl: 'https://api.example.test/v1' },
+        STARVIA_CONFIG: { apiBaseUrl: 'https://api.example.test/v1' },
       },
       fetch: () => Promise.resolve({ json: () => Promise.resolve({ success: false, error: 'INVALID_PIN' }) }),
       document: {
@@ -240,7 +205,7 @@ describe('Premium state abstraction', () => {
     const ctx = loadUiContext({
       window: {
         isPremiumUnlocked: false,
-        STARVIA_CONFIG: { demoMode: false, apiBaseUrl: 'https://api.example.test/v1' },
+        STARVIA_CONFIG: { apiBaseUrl: 'https://api.example.test/v1' },
       },
       localStorage: {
         getItem: (key) => key === 'starviaPremiumToken' ? 'token-abc' : null,
@@ -267,7 +232,7 @@ describe('Premium state abstraction', () => {
     const ctx = loadUiContext({
       window: {
         isPremiumUnlocked: false,
-        STARVIA_CONFIG: { demoMode: false, apiBaseUrl: 'https://api.example.test/v1' },
+        STARVIA_CONFIG: { apiBaseUrl: 'https://api.example.test/v1' },
       },
       localStorage: {
         getItem: (key) => key === 'starviaPremiumToken' ? 'expired-token' : null,
@@ -289,7 +254,7 @@ describe('Premium state abstraction', () => {
     loadUiContext({
       window: {
         isPremiumUnlocked: false,
-        STARVIA_CONFIG: { demoMode: false, apiBaseUrl: 'https://api.example.test/v1' },
+        STARVIA_CONFIG: { apiBaseUrl: 'https://api.example.test/v1' },
       },
       localStorage: {
         getItem: (key) => key === 'starviaPremiumToken' ? 'token-abc' : null,
