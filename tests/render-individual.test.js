@@ -153,8 +153,9 @@ describe('Life Domain Forecast Matrix', () => {
     }
     expect(output).toContain('คัมภีร์แก้ดวง 6 ด้าน');
     expect(dom.window.document.querySelectorAll('.domain-card').length).toBe(6);
-    expect(dom.window.document.querySelectorAll('.domain-compact-line').length).toBeGreaterThanOrEqual(18);
-    expect(dom.window.document.querySelectorAll('.domain-age-details').length).toBe(6);
+    // Top 2 domains show full content (5 lines each), rest show minimal
+    expect(dom.window.document.querySelectorAll('.domain-compact-line').length).toBeGreaterThanOrEqual(10);
+    expect(dom.window.document.querySelectorAll('.domain-age-details').length).toBe(2); // Only top 2 have age details
     expect(dom.window.document.querySelector('.domain-premium.is-locked')).toBeTruthy();
   });
 

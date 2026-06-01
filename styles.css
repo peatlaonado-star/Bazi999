@@ -3707,3 +3707,22 @@ body.has-report .value-section{display:none}
   0%, 100% { opacity: 1; }
   50% { opacity: .7; }
 }
+
+/* ═══ Domain Locked State (หมอทัก - แสดงเฉพาะด้านที่เด่นสุด) ═══ */
+.mlm-domain-locked {
+  opacity: 0.5;
+  filter: grayscale(0.3);
+}
+.mlm-domain-locked .mlm-moo-text {
+  font-size: 12px;
+  color: var(--tx2);
+}
+
+/* ═══ Domain Card Locked State (คัมภีร์ 6 ด้าน - แสดงเฉพาะ top 2) ═══ */
+.domain-card-locked {
+  opacity: 0.4;
+  filter: grayscale(0.5);
+}
+.domain-card-locked .domain-compact-body {
+  min-height: 40px;
+}
