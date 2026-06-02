@@ -7,7 +7,7 @@ import { createAdminRequestHandler, loadAdminConfig } from './admin-service.mjs'
 import { subscribe, getSubscribers, getSubscriberCount, unsubscribe } from './newsletter-service.mjs';
 import { getLotteryResults, refreshLotteryResults, setManualResults } from './lottery-service.mjs';
 import { createStreakReward, verifyStreakReward, getRewardStats } from './streak-service.mjs';
-import { sendEmail } from './email-service.mjs';
+import { sendEmail, sendWelcomeEmail } from './email-service.mjs';
 
 const port = Number(process.env.PORT || process.env.STARVIA_API_PORT || 8787);
 const host = process.env.HOST || '0.0.0.0';
@@ -74,6 +74,13 @@ async function handleNewsletter(req, res) {
     try {
       const body = await readJsonBody(req);
       const result = subscribe(body);
+      // Send welcome email (await so errors surface in response)
+      if (result.success && !result.alreadySubscribed) {
+        const emailResult = await sendWelcomeEmail(body.email?.toLowerCase()?.trim(), body.birthdate);
+        if (!emailResult.success) {
+          console.error('Welcome email failed:', emailResult.error);
+        }
+      }
       return writeJson(res, result.success ? 200 : 400, result);
     } catch (err) {
       return writeJson(res, 400, { success: false, error: 'ข้อมูลไม่ถูกต้อง' });
@@ -105,6 +112,12 @@ async function handleNewsletter(req, res) {
       'STARVIA Test Email ' + new Date().toISOString(),
       '<p>คาร่าทดสอบระบบอีเมลจาก Railway container 🐶</p>'
     );
+    return writeJson(res, result.success ? 200 : 500, result);
+  }
+  
+  // GET /v1/newsletter/test-welcome — send welcome email synchronously
+  if (req.method === 'GET' && url === '/v1/newsletter/test-welcome') {
+    const result = await sendWelcomeEmail('peatlaonado@gmail.com', null);
     return writeJson(res, result.success ? 200 : 500, result);
   }
   
