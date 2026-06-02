@@ -11,6 +11,11 @@ const SUBSCRIBERS_FILE = path.resolve(process.cwd(), 'data', 'newsletter-subscri
 // Fallback: committed seed file (persists across deploys)
 const SEED_FILE = path.resolve(__dirname, '..', 'data', 'newsletter-subscribers.json');
 
+// Hardcoded seed — survives even if data/ is missing from container
+const HARDCODED_SEED = [
+  {"email":"peatlaonado@gmail.com","birthdate":null,"subscribedAt":"2026-06-02T12:50:00.000Z","status":"active"}
+];
+
 // Ensure data directory exists
 function ensureDataDir() {
   const dir = path.dirname(SUBSCRIBERS_FILE);
@@ -19,9 +24,10 @@ function ensureDataDir() {
   }
 }
 
-// Load subscribers from file — try runtime first, then seed
+// Load subscribers — runtime file → seed file → hardcoded seed
 function loadSubscribers() {
   ensureDataDir();
+  // 1) Try runtime file
   try {
     if (fs.existsSync(SUBSCRIBERS_FILE)) {
       const data = fs.readFileSync(SUBSCRIBERS_FILE, 'utf8');
@@ -31,20 +37,25 @@ function loadSubscribers() {
   } catch (err) {
     console.error('Error loading runtime subscribers:', err.message);
   }
-  // Fallback: load from committed seed file
+  // 2) Try committed seed file
   try {
     if (fs.existsSync(SEED_FILE)) {
       const data = fs.readFileSync(SEED_FILE, 'utf8');
       const parsed = JSON.parse(data);
       if (Array.isArray(parsed) && parsed.length > 0) {
         console.log(`[newsletter] Loaded ${parsed.length} subscribers from seed file`);
-        // Copy seed to runtime file for future writes
         fs.writeFileSync(SUBSCRIBERS_FILE, JSON.stringify(parsed, null, 2), 'utf8');
         return parsed;
       }
     }
   } catch (err) {
     console.error('Error loading seed subscribers:', err.message);
+  }
+  // 3) Hardcoded fallback
+  if (HARDCODED_SEED.length > 0) {
+    console.log(`[newsletter] Using ${HARDCODED_SEED.length} hardcoded seed subscribers`);
+    fs.writeFileSync(SUBSCRIBERS_FILE, JSON.stringify(HARDCODED_SEED, null, 2), 'utf8');
+    return [...HARDCODED_SEED];
   }
   return [];
 }

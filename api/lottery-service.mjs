@@ -11,6 +11,9 @@ const RESULTS_FILE = path.resolve(process.cwd(), 'data', 'lottery-results.json')
 // Fallback: committed seed file (persists across deploys)
 const SEED_FILE = path.resolve(__dirname, '..', 'data', 'lottery-results.json');
 
+// Hardcoded seed — survives even if data/ is missing from container
+const HARDCODED_SEED = {"available":true,"date":"2026-06-01","displayDate":{"date":"01","month":"06","year":"2026"},"period":[],"firstPrize":"173770","last3f":["848","415"],"last3b":["410","938"],"last2":["95"],"near1":["173769","173771"],"updatedAt":"2026-06-02T08:30:00.000Z","source":"thairath.co.th"};
+
 function ensureDataDir() {
   const dir = path.dirname(RESULTS_FILE);
   if (!fs.existsSync(dir)) {
@@ -18,7 +21,7 @@ function ensureDataDir() {
   }
 }
 
-// Read cached results — try runtime first, then seed
+// Read cached results — try runtime first, then seed, then hardcoded
 function getCachedResults() {
   try {
     ensureDataDir();
@@ -41,6 +44,12 @@ function getCachedResults() {
     }
   } catch (e) {
     // ignore
+  }
+  // Hardcoded fallback
+  if (HARDCODED_SEED && HARDCODED_SEED.firstPrize) {
+    console.log('[lottery] Using hardcoded seed');
+    fs.writeFileSync(RESULTS_FILE, JSON.stringify(HARDCODED_SEED, null, 2), 'utf8');
+    return { ...HARDCODED_SEED };
   }
   return null;
 }
