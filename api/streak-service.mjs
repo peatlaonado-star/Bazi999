@@ -1,8 +1,13 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const REWARDS_FILE = path.resolve(process.cwd(), 'data', 'streak-rewards.json');
+const SEED_FILE = path.resolve(__dirname, '..', 'data', 'streak-rewards.json');
 
 // Ensure data directory exists
 function ensureDataDir() {
@@ -12,12 +17,26 @@ function ensureDataDir() {
   }
 }
 
-// Read rewards store
+// Read rewards store — try runtime first, then seed
 function readRewards() {
   try {
     ensureDataDir();
     if (fs.existsSync(REWARDS_FILE)) {
-      return JSON.parse(fs.readFileSync(REWARDS_FILE, 'utf8'));
+      const parsed = JSON.parse(fs.readFileSync(REWARDS_FILE, 'utf8'));
+      if (parsed && parsed.rewards && parsed.rewards.length > 0) return parsed;
+    }
+  } catch (e) {
+    // ignore
+  }
+  // Fallback: load from committed seed file
+  try {
+    if (fs.existsSync(SEED_FILE)) {
+      const parsed = JSON.parse(fs.readFileSync(SEED_FILE, 'utf8'));
+      if (parsed && parsed.rewards && parsed.rewards.length > 0) {
+        console.log(`[streak] Loaded ${parsed.rewards.length} rewards from seed file`);
+        fs.writeFileSync(REWARDS_FILE, JSON.stringify(parsed, null, 2), 'utf8');
+        return parsed;
+      }
     }
   } catch (e) {
     // ignore

@@ -1,8 +1,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { sendWelcomeEmail } from './email-service.mjs';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Primary: runtime file (ephemeral, survives until next deploy)
 const SUBSCRIBERS_FILE = path.resolve(process.cwd(), 'data', 'newsletter-subscribers.json');
+// Fallback: committed seed file (persists across deploys)
+const SEED_FILE = path.resolve(__dirname, '..', 'data', 'newsletter-subscribers.json');
 
 // Ensure data directory exists
 function ensureDataDir() {
@@ -12,16 +19,32 @@ function ensureDataDir() {
   }
 }
 
-// Load subscribers from file
+// Load subscribers from file — try runtime first, then seed
 function loadSubscribers() {
   ensureDataDir();
   try {
     if (fs.existsSync(SUBSCRIBERS_FILE)) {
       const data = fs.readFileSync(SUBSCRIBERS_FILE, 'utf8');
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
     }
   } catch (err) {
-    console.error('Error loading subscribers:', err.message);
+    console.error('Error loading runtime subscribers:', err.message);
+  }
+  // Fallback: load from committed seed file
+  try {
+    if (fs.existsSync(SEED_FILE)) {
+      const data = fs.readFileSync(SEED_FILE, 'utf8');
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        console.log(`[newsletter] Loaded ${parsed.length} subscribers from seed file`);
+        // Copy seed to runtime file for future writes
+        fs.writeFileSync(SUBSCRIBERS_FILE, JSON.stringify(parsed, null, 2), 'utf8');
+        return parsed;
+      }
+    }
+  } catch (err) {
+    console.error('Error loading seed subscribers:', err.message);
   }
   return [];
 }

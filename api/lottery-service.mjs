@@ -1,8 +1,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import https from 'node:https';
+import { fileURLToPath } from 'node:url';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Primary: runtime file (ephemeral)
 const RESULTS_FILE = path.resolve(process.cwd(), 'data', 'lottery-results.json');
+// Fallback: committed seed file (persists across deploys)
+const SEED_FILE = path.resolve(__dirname, '..', 'data', 'lottery-results.json');
 
 function ensureDataDir() {
   const dir = path.dirname(RESULTS_FILE);
@@ -11,12 +18,26 @@ function ensureDataDir() {
   }
 }
 
-// Read cached results
+// Read cached results — try runtime first, then seed
 function getCachedResults() {
   try {
     ensureDataDir();
     if (fs.existsSync(RESULTS_FILE)) {
-      return JSON.parse(fs.readFileSync(RESULTS_FILE, 'utf8'));
+      const parsed = JSON.parse(fs.readFileSync(RESULTS_FILE, 'utf8'));
+      if (parsed && parsed.firstPrize) return parsed;
+    }
+  } catch (e) {
+    // ignore
+  }
+  // Fallback: load from committed seed file
+  try {
+    if (fs.existsSync(SEED_FILE)) {
+      const parsed = JSON.parse(fs.readFileSync(SEED_FILE, 'utf8'));
+      if (parsed && parsed.firstPrize) {
+        console.log('[lottery] Loaded from seed file');
+        fs.writeFileSync(RESULTS_FILE, JSON.stringify(parsed, null, 2), 'utf8');
+        return parsed;
+      }
     }
   } catch (e) {
     // ignore

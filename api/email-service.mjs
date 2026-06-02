@@ -1,20 +1,40 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const NEWSLETTER_FROM = process.env.NEWSLETTER_FROM || 'STARVIA ⭐ <noreply@starvia.website>';
 const SUBSCRIBERS_FILE = path.resolve(process.cwd(), 'data', 'newsletter-subscribers.json');
+const SEED_FILE = path.resolve(__dirname, '..', 'data', 'newsletter-subscribers.json');
 
-// Load active subscribers
+// Load active subscribers — try runtime first, then seed
 function getActiveSubscribers() {
   try {
     if (fs.existsSync(SUBSCRIBERS_FILE)) {
       const data = fs.readFileSync(SUBSCRIBERS_FILE, 'utf8');
       const subscribers = JSON.parse(data);
-      return subscribers.filter(s => s.active);
+      if (Array.isArray(subscribers) && subscribers.length > 0) {
+        return subscribers.filter(s => s.active);
+      }
     }
   } catch (err) {
-    console.error('Error loading subscribers:', err.message);
+    console.error('Error loading runtime subscribers:', err.message);
+  }
+  // Fallback: load from committed seed file
+  try {
+    if (fs.existsSync(SEED_FILE)) {
+      const data = fs.readFileSync(SEED_FILE, 'utf8');
+      const subscribers = JSON.parse(data);
+      if (Array.isArray(subscribers) && subscribers.length > 0) {
+        console.log(`[email] Loaded ${subscribers.length} subscribers from seed file`);
+        return subscribers.filter(s => s.active);
+      }
+    }
+  } catch (err) {
+    console.error('Error loading seed subscribers:', err.message);
   }
   return [];
 }
