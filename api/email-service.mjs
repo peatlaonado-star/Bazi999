@@ -6,7 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const NEWSLETTER_FROM = process.env.NEWSLETTER_FROM || 'STARVIA ⭐ <noreply@starvia.website>';
+const NEWSLETTER_FROM = process.env.NEWSLETTER_FROM || 'STARVIA <noreply@starvia.website>';
 const SUBSCRIBERS_FILE = path.resolve(process.cwd(), 'data', 'newsletter-subscribers.json');
 const SEED_FILE = path.resolve(__dirname, '..', 'data', 'newsletter-subscribers.json');
 
@@ -40,25 +40,36 @@ function getActiveSubscribers() {
 }
 
 // Send email via Resend API
-async function sendEmail(to, subject, html) {
+async function sendEmail(to, subject, html, text) {
   if (!RESEND_API_KEY) {
     console.error('RESEND_API_KEY is not set');
     return { success: false, error: 'RESEND_API_KEY is not set' };
   }
 
   try {
+    const body = {
+      from: NEWSLETTER_FROM,
+      to: [to],
+      subject: subject,
+      html: html,
+      headers: {
+        'List-Unsubscribe': `<https://starvia.website/unsubscribe?email=${encodeURIComponent(to)}>`,
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+      }
+    };
+
+    // Add plain text version if provided (improves spam score)
+    if (text) {
+      body.text = text;
+    }
+
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${RESEND_API_KEY}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        from: NEWSLETTER_FROM,
-        to: [to],
-        subject: subject,
-        html: html
-      })
+      body: JSON.stringify(body)
     });
 
     const result = await response.json();
@@ -304,7 +315,22 @@ export async function sendWelcomeEmail(email, birthdate) {
 </html>
   `;
   
-  return sendEmail(email, subject, html);
+  const text = [
+    '✦ ยินดีต้อนรับสู่ STARVIA! ✦',
+    '',
+    'คุณได้สมัครรับดวงรายวันจาก STARVIA เรียบร้อยแล้ว',
+    'เราจะส่งดวงชะตารายวันให้คุณทุกเช้า',
+    '',
+    birthdate ? 'เราได้บันทึกวันเกิดของคุณแล้ว ดวงรายวันจะเป็นแบบเฉพาะบุคคล' : 'ถ้าต้องการดวงเฉพาะบุคคล สามารถกรอกวันเกิดได้ในเว็บไซต์',
+    '',
+    'ดูดวงเต็มรูปแบบ: https://starvia.website/',
+    '',
+    'ยกเลิก: https://starvia.website/unsubscribe?email=' + encodeURIComponent(email),
+    '',
+    'ดาวไม่ได้ตัดสินชีวิตคุณ — ดาวช่วยให้คุณมองเห็นตัวเองชัดขึ้น'
+  ].join('\n');
+
+  return sendEmail(email, subject, html, text);
 }
 
 export { sendEmail, getActiveSubscribers };
