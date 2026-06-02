@@ -74,8 +74,8 @@ async function handleNewsletter(req, res) {
     try {
       const body = await readJsonBody(req);
       const result = subscribe(body);
-      // Send welcome email (await so errors surface in response)
-      if (result.success && !result.alreadySubscribed) {
+      // Send welcome email (await so errors surface — only for new subscribers)
+      if (result.success && result.message === 'สมัครสำเร็จ!') {
         const emailResult = await sendWelcomeEmail(body.email?.toLowerCase()?.trim(), body.birthdate);
         if (!emailResult.success) {
           console.error('Welcome email failed:', emailResult.error);
