@@ -7,7 +7,7 @@ import { createAdminRequestHandler, loadAdminConfig } from './admin-service.mjs'
 import { subscribe, getSubscribers, getSubscriberCount, unsubscribe } from './newsletter-service.mjs';
 import { getLotteryResults, refreshLotteryResults, setManualResults } from './lottery-service.mjs';
 import { createStreakReward, verifyStreakReward, getRewardStats } from './streak-service.mjs';
-import { sendEmail, sendWelcomeEmail } from './email-service.mjs';
+import { sendWelcomeEmail } from './email-service.mjs';
 
 const port = Number(process.env.PORT || process.env.STARVIA_API_PORT || 8787);
 const host = process.env.HOST || '0.0.0.0';
@@ -103,22 +103,6 @@ async function handleNewsletter(req, res) {
   if (req.method === 'GET' && url === '/v1/newsletter/count') {
     const count = getSubscriberCount();
     return writeJson(res, 200, { success: true, count });
-  }
-  
-  // GET /v1/newsletter/test-email — send a test email synchronously
-  if (req.method === 'GET' && url === '/v1/newsletter/test-email') {
-    const result = await sendEmail(
-      'peatlaonado@gmail.com',
-      'STARVIA Test Email ' + new Date().toISOString(),
-      '<p>คาร่าทดสอบระบบอีเมลจาก Railway container 🐶</p>'
-    );
-    return writeJson(res, result.success ? 200 : 500, result);
-  }
-  
-  // GET /v1/newsletter/test-welcome — send welcome email synchronously
-  if (req.method === 'GET' && url === '/v1/newsletter/test-welcome') {
-    const result = await sendWelcomeEmail('peatlaonado@gmail.com', null);
-    return writeJson(res, result.success ? 200 : 500, result);
   }
   
   // POST /v1/newsletter/unsubscribe
