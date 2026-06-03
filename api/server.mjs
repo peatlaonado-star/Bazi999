@@ -8,6 +8,7 @@ import { getLotteryResults, refreshLotteryResults, setManualResults } from './lo
 import { createStreakReward, verifyStreakReward, getRewardStats } from './streak-service.mjs';
 import { createPaymentHandler } from './payment-service.mjs';
 import { createChatRequestHandler } from './chat-service.mjs';
+import { handleAgentRequest } from './agent-card.mjs';
 
 const port = Number(process.env.PORT || process.env.STARVIA_API_PORT || 8787);
 const host = process.env.HOST || '0.0.0.0';
@@ -207,7 +208,12 @@ const server = http.createServer(async (req, res) => {
   if (url === '/v1/chat' && chatHandler) {
     return chatHandler(req, res);
   }
-  
+
+  // A2A Agent Card + Task endpoint
+  if (url === '/.well-known/agent.json' || url === '/v1/agent/tasks' || url.startsWith('/v1/agent/tasks/')) {
+    return handleAgentRequest(req, res);
+  }
+
   // Health check
   if (url === '/healthz') {
     return writeJson(res, 200, { status: 'ok', timestamp: new Date().toISOString() });

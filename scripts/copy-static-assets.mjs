@@ -26,6 +26,7 @@ const files = [
   'js/chat-concierge.js',
   'css/chat-concierge.css',
   'analytics.html',
+  'agent-docs.md',
   'assets/html2canvas.min.js',
   'assets/og-image.png',
   'assets/og-share-story.png',
