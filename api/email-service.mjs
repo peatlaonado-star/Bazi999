@@ -6,7 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const NEWSLETTER_FROM = process.env.NEWSLETTER_FROM || 'STARVIA <noreply@starvia.website>';
+const NEWSLETTER_FROM = process.env.NEWSLETTER_FROM || 'STARVIA <hello@starvia.website>';
 const SUBSCRIBERS_FILE = path.resolve(process.cwd(), 'data', 'newsletter-subscribers.json');
 const SEED_FILE = path.resolve(__dirname, '..', 'data', 'newsletter-subscribers.json');
 
@@ -204,7 +204,7 @@ function getPersonalizedHoroscope(birthdate, dayOfWeek) {
   else zodiac = 'มกร';
 
   const horoscopes = {
-    'กุมภ์': 'วันนี้ราศีกุมภ์จะรู้สึกถึงพลังงานใหม่ๆ ที่เข้ามา ให้เปิดรับสิ่งใหม่ๆ แต่ไม่ต้องรีบตัดสินใจ ค่อยๆ คิดทีละ bước',
+    'กุมภ์': 'วันนี้ราศีกุมภ์จะรู้สึกถึงพลังงานใหม่ๆ ที่เข้ามา ให้เปิดรับสิ่งใหม่ๆ แต่ไม่ต้องรีบตัดสินใจ ค่อยๆ คิดทีละ步骤',
     'มีน': 'วันนี้ราศีมีนจะมีความรู้สึกลึกซึ้ง ให้เชื่อมั่นในสัญชาตญาณของตัวเอง แต่ระวังอย่าจมอยู่กับความคิดมากเกินไป',
     'เมษ': 'วันนี้ราศีเมษจะมีพลังงานสูง เหมาะกับการลงมือทำสิ่งที่ค้างไว้ แต่ระวังอย่าใจร้อนจนเกินไป',
     'พฤษภ': 'วันนี้ราศีพฤษภจะรู้สึกมั่นคงและปลอดภัย ให้ใช้เวลากับสิ่งที่รักและคนที่รัก',
