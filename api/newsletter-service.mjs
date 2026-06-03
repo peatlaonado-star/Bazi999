@@ -1,7 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { sendWelcomeEmail } from './email-service.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -78,7 +77,7 @@ function isValidEmail(email) {
   return regex.test(email);
 }
 
-// Subscribe to newsletter
+// Subscribe to newsletter (no email sending)
 export function subscribe(data) {
   const { email, birthdate } = data;
   
@@ -117,11 +116,6 @@ export function subscribe(data) {
   subscribers.push(newSubscriber);
   
   if (saveSubscribers(subscribers)) {
-    // Send welcome email asynchronously (don't block the response)
-    sendWelcomeEmail(normalizedEmail, birthdate).catch(err => {
-      console.error('Failed to send welcome email:', err.message);
-    });
-    
     return { success: true, message: 'สมัครสำเร็จ!' };
   } else {
     return { success: false, error: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล' };

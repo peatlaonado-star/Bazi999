@@ -7,7 +7,6 @@ import { createAdminRequestHandler, loadAdminConfig } from './admin-service.mjs'
 import { subscribe, getSubscribers, getSubscriberCount, unsubscribe } from './newsletter-service.mjs';
 import { getLotteryResults, refreshLotteryResults, setManualResults } from './lottery-service.mjs';
 import { createStreakReward, verifyStreakReward, getRewardStats } from './streak-service.mjs';
-import { sendWelcomeEmail } from './email-service.mjs';
 
 const port = Number(process.env.PORT || process.env.STARVIA_API_PORT || 8787);
 const host = process.env.HOST || '0.0.0.0';
@@ -74,13 +73,6 @@ async function handleNewsletter(req, res) {
     try {
       const body = await readJsonBody(req);
       const result = subscribe(body);
-      // Send welcome email (await so errors surface — only for new subscribers)
-      if (result.success && result.message === 'สมัครสำเร็จ!') {
-        const emailResult = await sendWelcomeEmail(body.email?.toLowerCase()?.trim(), body.birthdate);
-        if (!emailResult.success) {
-          console.error('Welcome email failed:', emailResult.error);
-        }
-      }
       return writeJson(res, result.success ? 200 : 400, result);
     } catch (err) {
       return writeJson(res, 400, { success: false, error: 'ข้อมูลไม่ถูกต้อง' });
@@ -99,7 +91,7 @@ async function handleNewsletter(req, res) {
     return writeJson(res, 200, { success: true, subscribers, count: subscribers.length });
   }
   
-  // GET /v1/newsletter/count
+  // GET /v1/newsletter/count (public)
   if (req.method === 'GET' && url === '/v1/newsletter/count') {
     const count = getSubscriberCount();
     return writeJson(res, 200, { success: true, count });
@@ -116,134 +108,160 @@ async function handleNewsletter(req, res) {
     }
   }
   
-  return writeJson(res, 404, { success: false, error: 'Not found' });
+  return null; // Not handled
 }
 
-// ── Static file server ──
-
-function serveStatic(req, res) {
-  let urlPath = req.url || '/';
-  // Clean the path
-  if (urlPath.includes('?')) urlPath = urlPath.split('?')[0];
-  if (urlPath.includes('#')) urlPath = urlPath.split('#')[0];
-
-  // SPA fallback: serve index.html for non-file paths
-  let filePath = path.join(STATIC_ROOT, urlPath === '/' ? 'index.html' : urlPath);
-
-  // If path doesn't have an extension, it's a client-side route → serve index.html
-  if (!path.extname(filePath)) {
-    filePath = path.join(STATIC_ROOT, 'index.html');
+// ── Lottery Handler ──
+async function handleLottery(req, res) {
+  const url = req.url || '/';
+  
+  // GET /v1/lottery/results
+  if (req.method === 'GET' && url === '/v1/lottery/results') {
+    const results = getLotteryResults();
+    return writeJson(res, 200, { success: true, ...results });
   }
-
-  const ext = path.extname(filePath).toLowerCase();
-  const contentType = MIME[ext] || 'application/octet-stream';
-
-  fs.readFile(filePath, (err, data) => {
-    if (err) {
-      // Try index.html as last resort for SPA
-      if (filePath !== path.join(STATIC_ROOT, 'index.html')) {
-        fs.readFile(path.join(STATIC_ROOT, 'index.html'), (err2, data2) => {
-          if (err2) {
-            res.writeHead(404);
-            res.end('Not Found');
-            return;
-          }
-          res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-          res.end(data2);
-        });
-        return;
-      }
-      res.writeHead(404);
-      res.end('Not Found');
-      return;
+  
+  // POST /v1/lottery/refresh
+  if (req.method === 'POST' && url === '/v1/lottery/refresh') {
+    try {
+      const results = await refreshLotteryResults();
+      return writeJson(res, 200, { success: true, ...results });
+    } catch (err) {
+      return writeJson(res, 500, { success: false, error: err.message });
     }
-    res.writeHead(200, { 'Content-Type': contentType });
-    res.end(data);
-  });
+  }
+  
+  // POST /v1/lottery/manual
+  if (req.method === 'POST' && url === '/v1/lottery/manual') {
+    try {
+      const body = await readJsonBody(req);
+      const result = setManualResults(body);
+      return writeJson(res, 200, result);
+    } catch (err) {
+      return writeJson(res, 400, { success: false, error: 'ข้อมูลไม่ถูกต้อง' });
+    }
+  }
+  
+  return null; // Not handled
 }
 
+// ── Streak Reward Handler ──
+async function handleStreak(req, res) {
+  const url = req.url || '/';
+  
+  // POST /v1/streak/create
+  if (req.method === 'POST' && url === '/v1/streak/create') {
+    try {
+      const body = await readJsonBody(req);
+      const result = createStreakReward(body);
+      return writeJson(res, result.success ? 200 : 400, result);
+    } catch (err) {
+      return writeJson(res, 400, { success: false, error: 'ข้อมูลไม่ถูกต้อง' });
+    }
+  }
+  
+  // POST /v1/streak/verify
+  if (req.method === 'POST' && url === '/v1/streak/verify') {
+    try {
+      const body = await readJsonBody(req);
+      const result = verifyStreakReward(body);
+      return writeJson(res, result.success ? 200 : 400, result);
+    } catch (err) {
+      return writeJson(res, 400, { success: false, error: 'ข้อมูลไม่ถูกต้อง' });
+    }
+  }
+  
+  // GET /v1/streak/stats
+  if (req.method === 'GET' && url === '/v1/streak/stats') {
+    const stats = getRewardStats();
+    return writeJson(res, 200, { success: true, ...stats });
+  }
+  
+  return null; // Not handled
+}
+
+// ── Main Request Handler ──
 const server = http.createServer(async (req, res) => {
   const url = req.url || '/';
-
-  // CORS for API routes
-  if (url.startsWith('/v1/')) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-
-    if (req.method === 'OPTIONS') {
-      res.writeHead(204);
-      res.end();
-      return;
-    }
-
-    // Route admin paths to admin handler
-    if (adminHandler && url.startsWith('/v1/admin')) {
-      return adminHandler(req, res);
-    }
-    
-    // Route newsletter paths
-    if (url.startsWith('/v1/newsletter')) {
-      return handleNewsletter(req, res);
-    }
-    
-    // Route lottery paths
-    if (url.startsWith('/v1/lottery')) {
-      if (url === '/v1/lottery/results' && req.method === 'GET') {
-        const results = getLotteryResults();
-        return writeJson(res, 200, { success: true, ...results });
-      }
-      if (url === '/v1/lottery/refresh' && req.method === 'POST') {
-        const result = await refreshLotteryResults();
-        return writeJson(res, result.success ? 200 : 503, result);
-      }
-      // Manual override for when GLO API is slow
-      if (url === '/v1/lottery/manual' && req.method === 'POST') {
-        try {
-          const body = await readJsonBody(req);
-          const result = setManualResults(body);
-          return writeJson(res, result.success ? 200 : 400, result);
-        } catch (err) {
-          return writeJson(res, 400, { success: false, error: 'Invalid data' });
-        }
-      }
-      return writeJson(res, 404, { success: false, error: 'Not found' });
-    }
-    
-    // Route streak reward paths
-    if (url.startsWith('/v1/streak')) {
-      // POST /v1/streak/reward — claim 7-day streak reward
-      if (url === '/v1/streak/reward' && req.method === 'POST') {
-        const result = createStreakReward(req);
-        return writeJson(res, result.success ? 200 : 400, result);
-      }
-      // POST /v1/streak/verify — verify streak reward code
-      if (url === '/v1/streak/verify' && req.method === 'POST') {
-        try {
-          const body = await readJsonBody(req);
-          const result = verifyStreakReward(body.code);
-          return writeJson(res, result.success ? 200 : 400, result);
-        } catch (err) {
-          return writeJson(res, 400, { success: false, error: 'Invalid data' });
-        }
-      }
-      // GET /v1/streak/stats — admin only
-      if (url === '/v1/streak/stats' && req.method === 'GET') {
-        const stats = getRewardStats();
-        return writeJson(res, 200, { success: true, ...stats });
-      }
-      return writeJson(res, 404, { success: false, error: 'Not found' });
-    }
-    
-    // Everything else goes to premium handler
+  
+  // CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+  
+  // Try newsletter handler
+  const newsletterResult = await handleNewsletter(req, res);
+  if (newsletterResult !== null) return;
+  
+  // Try lottery handler
+  const lotteryResult = await handleLottery(req, res);
+  if (lotteryResult !== null) return;
+  
+  // Try streak handler
+  const streakResult = await handleStreak(req, res);
+  if (streakResult !== null) return;
+  
+  // Premium endpoints
+  if (url.startsWith('/v1/premium/')) {
     return premiumHandler(req, res);
   }
-
-  // Serve static files
-  return serveStatic(req, res);
+  
+  // Admin endpoints
+  if (url.startsWith('/v1/admin/') || url === '/admin.html') {
+    if (adminHandler) {
+      return adminHandler(req, res);
+    } else {
+      return writeJson(res, 404, { success: false, error: 'Admin API not configured' });
+    }
+  }
+  
+  // Health check
+  if (url === '/healthz') {
+    return writeJson(res, 200, { status: 'ok', timestamp: new Date().toISOString() });
+  }
+  
+  // Static file serving
+  let filePath = path.join(STATIC_ROOT, url === '/' ? 'index.html' : url);
+  
+  // Security: prevent directory traversal
+  if (!filePath.startsWith(STATIC_ROOT)) {
+    res.writeHead(403);
+    res.end('Forbidden');
+    return;
+  }
+  
+  try {
+    const stat = fs.statSync(filePath);
+    if (stat.isDirectory()) {
+      filePath = path.join(filePath, 'index.html');
+    }
+    
+    const ext = path.extname(filePath).toLowerCase();
+    const contentType = MIME[ext] || 'application/octet-stream';
+    
+    const content = fs.readFileSync(filePath);
+    res.writeHead(200, { 'Content-Type': contentType });
+    res.end(content);
+  } catch (err) {
+    // Try index.html for SPA routing
+    try {
+      const indexPath = path.join(STATIC_ROOT, 'index.html');
+      const content = fs.readFileSync(indexPath);
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(content);
+    } catch (indexErr) {
+      res.writeHead(404);
+      res.end('Not Found');
+    }
+  }
 });
 
 server.listen(port, host, () => {
-  console.log(`STARVIA API + Static on http://${host}:${port}`);
-  console.log(`  Static root: ${STATIC_ROOT}`);
+  console.log(`STARVIA API running on http://${host}:${port}`);
 });
