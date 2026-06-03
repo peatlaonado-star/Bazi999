@@ -1,0 +1,23 @@
+name = "starvia"
+compatibility_date = "2024-09-23"
+pages_build_output_dir = "dist"
+
+# KV namespace for STARVIA data (lottery, streak, premium, admin)
+# Created: 2026-06-04 via `wrangler kv namespace create STARVIA_KV`
+[[kv_namespaces]]
+binding = "STARVIA_KV"
+id = "90a41835556b4f68967a1b4cd5df0951"
+
+# Plain (non-secret) vars — set in CF dashboard too
+[vars]
+STARVIA_PREMIUM_PLAN = "premium_199"
+STARVIA_TOKEN_TTL_SECONDS = "86400"
+STARVIA_ADMIN_TOKEN_TTL = "43200"
+STARVIA_API_VERSION = "2.0.0-cloudflare"
+
+# Secrets (set via `wrangler secret put` or dashboard):
+# - STARVIA_JWT_SECRET (premium JWT signing)
+# - STARVIA_ADMIN_PASSWORD (admin login)
+# - STARVIA_ADMIN_JWT_SECRET (admin JWT signing)
+# - OMISE_SECRET_KEY (when approved)
+# - OMISE_WEBHOOK_SECRET (when approved)

@@ -209,7 +209,7 @@
     }
     
     try {
-      var API_BASE = window.location.origin;
+      var API_BASE = (window.STARVIA_CONFIG && window.STARVIA_CONFIG.apiBaseUrl) || window.location.origin;
       var res = await fetch(API_BASE + '/v1/streak/reward', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
@@ -279,7 +279,7 @@
   // Activate code via verify endpoint
   async function activateCode(code) {
     try {
-      var API_BASE = window.location.origin;
+      var API_BASE = (window.STARVIA_CONFIG && window.STARVIA_CONFIG.apiBaseUrl) || window.location.origin;
       var res = await fetch(API_BASE + '/v1/streak/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

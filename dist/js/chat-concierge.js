@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  const API_PATH = '/v1/chat';
+  const API_PATH = ((window.STARVIA_CONFIG && window.STARVIA_CONFIG.apiBaseUrl) || '') + '/v1/chat';
   const STORAGE_KEY = 'starvia_chat_history';
   const MAX_HISTORY = 10;
 
