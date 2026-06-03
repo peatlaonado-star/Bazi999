@@ -1,0 +1,5 @@
+{
+  "pins": [],
+  "generatedAt": "2026-06-03T20:00:00Z",
+  "note": "Local dev store. Production uses Railway env vars."
+}
