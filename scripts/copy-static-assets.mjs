@@ -22,6 +22,7 @@ const files = [
   'js/share-viral.js',
   'js/social-proof.js',
   'js/analytics.js',
+  'js/ab-testing.js',
   'js/chat-concierge.js',
   'css/chat-concierge.css',
   'analytics.html',
