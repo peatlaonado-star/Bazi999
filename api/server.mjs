@@ -7,6 +7,7 @@ import { createAdminRequestHandler, loadAdminConfig } from './admin-service.mjs'
 import { subscribe, getSubscribers, getSubscriberCount, unsubscribe } from './newsletter-service.mjs';
 import { getLotteryResults, refreshLotteryResults, setManualResults } from './lottery-service.mjs';
 import { createStreakReward, verifyStreakReward, getRewardStats } from './streak-service.mjs';
+import { createPaymentHandler } from './payment-service.mjs';
 
 const port = Number(process.env.PORT || process.env.STARVIA_API_PORT || 8787);
 const host = process.env.HOST || '0.0.0.0';
@@ -40,6 +41,19 @@ try {
 }
 
 const premiumHandler = createPremiumRequestHandler(premiumConfig);
+
+// Payment handler (Omise) — gracefully disabled if no API key
+let paymentHandler = null;
+try {
+  if (process.env.OMISE_SECRET_KEY) {
+    paymentHandler = createPaymentHandler();
+    console.log('STARVIA Payment API (Omise) loaded');
+  } else {
+    console.log('STARVIA Payment API skipped: OMISE_SECRET_KEY not set');
+  }
+} catch (err) {
+  console.log('STARVIA Payment API skipped:', err.message);
+}
 
 // ── Helper: Read JSON body ──
 function readJsonBody(req) {
@@ -207,6 +221,12 @@ const server = http.createServer(async (req, res) => {
   const streakResult = await handleStreak(req, res);
   if (streakResult !== null) return;
   
+  // Payment endpoints (Omise)
+  if (url.startsWith('/v1/payment/') && paymentHandler) {
+    const handled = await paymentHandler(req, res);
+    if (handled !== false) return;
+  }
+
   // Premium endpoints
   if (url.startsWith('/v1/premium/')) {
     return premiumHandler(req, res);

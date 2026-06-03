@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>STARVIA · ชำระเงินสำเร็จ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Kanit',sans-serif;background:#0a0a14;color:#e8dfc8;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center}
+.card{background:rgba(255,255,255,0.05);border:1px solid rgba(201,162,39,0.3);border-radius:20px;padding:40px 30px;max-width:400px;width:90%}
+.check{font-size:64px;margin-bottom:16px}
+h1{color:#C9A227;font-size:24px;margin-bottom:8px}
+p{color:#b8a8d8;font-size:14px;line-height:1.6;margin-bottom:20px}
+.btn{display:inline-block;background:linear-gradient(135deg,#C9A227,#8B6914);color:#fff;border:none;padding:12px 32px;border-radius:50px;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;text-decoration:none}
+.btn:hover{opacity:0.9}
+.note{font-size:11px;color:#666;margin-top:16px}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="check">✅</div>
+  <h1>ชำระเงินสำเร็จ!</h1>
+  <p>ระบบกำลังปลดล็อก Premium ให้คุณ<br>กรุณากลับหน้าหลักเพื่อดูคำทำนายเต็ม</p>
+  <a href="/" class="btn">✦ กลับหน้าหลัก ✦</a>
+  <div class="note">หากมีปัญหา กรุณาติดต่อแอดมิน</div>
+</div>
+<script>
+// Auto-redirect after 5 seconds
+setTimeout(function(){ window.location.href = '/'; }, 5000);
+</script>
+</body>
+</html>
