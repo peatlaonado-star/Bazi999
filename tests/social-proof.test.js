@@ -1,6 +1,5 @@
 // ===== Social Proof Engine Tests =====
-const { describe, it, beforeEach } = require('node:test');
-const assert = require('node:assert/strict');
+import { describe, it, beforeEach, expect } from 'vitest';
 
 function loadContext(birthData) {
   const store = {};
@@ -54,16 +53,16 @@ describe('SocialProof', () => {
   describe('TESTIMONIALS', () => {
     it('should have at least 10 testimonials', () => {
       const SP = window.SocialProof;
-      assert.ok(SP.TESTIMONIALS.length >= 10);
+      expect(SP.TESTIMONIALS.length >= 10).toBeTruthy();
     });
 
     it('each testimonial should have text, author, loc, stars', () => {
       const SP = window.SocialProof;
       SP.TESTIMONIALS.forEach(t => {
-        assert.ok(t.text, 'Missing text');
-        assert.ok(t.author, 'Missing author');
-        assert.ok(t.loc, 'Missing loc');
-        assert.ok(t.stars >= 1 && t.stars <= 5, 'Invalid stars');
+        expect(t.text).toBeTruthy();
+        expect(t.author).toBeTruthy();
+        expect(t.loc).toBeTruthy();
+        expect(t.stars >= 1 && t.stars <= 5).toBeTruthy();
       });
     });
   });
@@ -71,14 +70,14 @@ describe('SocialProof', () => {
   describe('animateCounter', () => {
     it('should be a function', () => {
       const SP = window.SocialProof;
-      assert.equal(typeof SP.animateCounter, 'function');
+      expect(typeof SP.animateCounter).toBe('function');
     });
   });
 
   describe('Public API', () => {
     it('should expose TESTIMONIALS array', () => {
       const SP = window.SocialProof;
-      assert.ok(Array.isArray(SP.TESTIMONIALS));
+      expect(Array.isArray(SP.TESTIMONIALS)).toBeTruthy();
     });
   });
 });

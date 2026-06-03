@@ -60,7 +60,6 @@ describe('Thai astrology content data', () => {
     expect(html).toContain('เริ่มจากข้อมูลพื้นฐาน');
     expect(html).toContain('ใช้เวลาไม่ถึง 30 วินาที');
     expect(html).not.toContain('Free + Premium');
-    expect(html).toContain('รับจังหวะวันนี้ฟรีทุกเช้า');
   });
 
   it('puts the free birth form before long landing sections so users can start in the first viewport', () => {

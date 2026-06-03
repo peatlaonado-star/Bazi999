@@ -1,6 +1,5 @@
 // ===== Share & Viral Engine Tests =====
-const { describe, it, beforeEach } = require('node:test');
-const assert = require('node:assert/strict');
+import { describe, it, beforeEach, expect } from 'vitest';
 
 function loadContext(birthData) {
   const store = {};
@@ -30,7 +29,7 @@ function loadContext(birthData) {
   global.window = window;
   global.localStorage = window.localStorage;
   global.document = window.document;
-  global.navigator = { clipboard: null, share: null };
+  Object.defineProperty(global, "navigator", { value: { clipboard: null, share: null }, writable: true, configurable: true });
 
   // Load daily fortune first (dependency)
   delete require.cache[require.resolve('../js/daily-fortune.js')];
@@ -54,31 +53,30 @@ describe('ShareViral', () => {
     it('should return a non-empty string', () => {
       const SV = window.ShareViral;
       const msg = SV.generateShareMessage();
-      assert.ok(msg);
-      assert.ok(msg.length > 10);
+      expect(msg).toBeTruthy();
+      expect(msg.length > 10).toBeTruthy();
     });
 
     it('should include fortune teaser text', () => {
       const SV = window.ShareViral;
       const msg = SV.generateShareMessage();
       // Should contain some fortune-related content
-      assert.ok(msg.includes('🔮') || msg.includes('✨') || msg.includes('🌟') || msg.includes('💫') || msg.includes('⭐'),
-        `Message should have emoji: ${msg}`);
+      expect(msg.includes('🔮') || msg.includes('✨') || msg.includes('🌟') || msg.includes('💫') || msg.includes('⭐')).toBeTruthy();
     });
 
     it('should be deterministic for same user + day', () => {
       const SV = window.ShareViral;
       const a = SV.generateShareMessage();
       const b = SV.generateShareMessage();
-      assert.equal(a, b);
+      expect(a).toBe(b);
     });
 
     it('should work without birth data', () => {
       const ctx2 = loadContext(null);
       const SV = window.ShareViral;
       const msg = SV.generateShareMessage();
-      assert.ok(msg);
-      assert.ok(msg.length > 10);
+      expect(msg).toBeTruthy();
+      expect(msg.length > 10).toBeTruthy();
     });
   });
 
@@ -87,8 +85,8 @@ describe('ShareViral', () => {
       const SV = window.ShareViral;
       SV.recordShare('line');
       const data = JSON.parse(ctx.store['starvia_shares']);
-      assert.equal(data.total, 1);
-      assert.equal(data.platforms.line, 1);
+      expect(data.total).toBe(1);
+      expect(data.platforms.line).toBe(1);
     });
 
     it('should increment on multiple shares', () => {
@@ -97,9 +95,9 @@ describe('ShareViral', () => {
       SV.recordShare('facebook');
       SV.recordShare('line');
       const data = JSON.parse(ctx.store['starvia_shares']);
-      assert.equal(data.total, 3);
-      assert.equal(data.platforms.line, 2);
-      assert.equal(data.platforms.facebook, 1);
+      expect(data.total).toBe(3);
+      expect(data.platforms.line).toBe(2);
+      expect(data.platforms.facebook).toBe(1);
     });
 
     it('should track different platforms', () => {
@@ -110,21 +108,21 @@ describe('ShareViral', () => {
       SV.recordShare('copy');
       SV.recordShare('native');
       const data = JSON.parse(ctx.store['starvia_shares']);
-      assert.equal(data.total, 5);
-      assert.equal(Object.keys(data.platforms).length, 5);
+      expect(data.total).toBe(5);
+      expect(Object.keys(data.platforms).length).toBe(5);
     });
   });
 
   describe('Public API', () => {
     it('should expose all share functions', () => {
       const SV = window.ShareViral;
-      assert.equal(typeof SV.shareToLine, 'function');
-      assert.equal(typeof SV.shareToFacebook, 'function');
-      assert.equal(typeof SV.shareToX, 'function');
-      assert.equal(typeof SV.copyShareLink, 'function');
-      assert.equal(typeof SV.nativeShare, 'function');
-      assert.equal(typeof SV.generateShareMessage, 'function');
-      assert.equal(typeof SV.recordShare, 'function');
+      expect(typeof SV.shareToLine).toBe('function');
+      expect(typeof SV.shareToFacebook).toBe('function');
+      expect(typeof SV.shareToX).toBe('function');
+      expect(typeof SV.copyShareLink).toBe('function');
+      expect(typeof SV.nativeShare).toBe('function');
+      expect(typeof SV.generateShareMessage).toBe('function');
+      expect(typeof SV.recordShare).toBe('function');
     });
   });
 });
