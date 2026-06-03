@@ -124,26 +124,6 @@
       </div>
     </div>
 
-    <!-- Newsletter Subscribers -->
-    <div class="section">
-      <div class="section-title">📧 ผู้สมัคร Newsletter</div>
-      <div class="card">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-          <div class="stat-card" style="flex:0 0 auto;padding:10px 18px">
-            <div class="stat-num" id="sub-count" style="font-size:22px">-</div>
-            <div class="stat-label">ผู้สมัคร</div>
-          </div>
-          <button class="btn btn-outline btn-sm" onclick="loadSubscribers()">🔄 รีเฟรช</button>
-          <button class="btn btn-outline btn-sm" onclick="exportSubscribers()">📥 Export CSV</button>
-        </div>
-        <div style="overflow-x:auto">
-          <table>
-            <thead><tr><th>#</th><th>อีเมล</th><th>วันเกิด</th><th>สมัครเมื่อ</th><th>สถานะ</th></tr></thead>
-            <tbody id="sub-table"><tr><td colspan="5" class="loading">กำลังโหลด...</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
   </div>
 
   <div class="toast" id="toast"></div>
@@ -209,7 +189,7 @@ function api(path, options) {
 }
 
 // ── Data ──
-function refreshAll() { loadStats(); loadPins(); loadSubscribers(); }
+function refreshAll() { loadStats(); loadPins(); }
 
 function loadStats() {
   api('/stats').then(function(d){
@@ -277,90 +257,6 @@ function expirePin(note) {
     if (d.success) { toast('หมดอายุแล้ว: ' + d.expired); refreshAll(); }
     else { toast(d.message || 'ไม่สำเร็จ', true); }
   }).catch(function(){});
-}
-
-// ── Newsletter Subscribers ──
-var NEWSLETTER_API = '/v1/newsletter';
-
-function loadSubscribers() {
-  var tbody = document.getElementById('sub-table');
-  if (!tbody) return;
-  tbody.innerHTML = '<tr><td colspan="5" class="loading">กำลังโหลด...</td></tr>';
-  
-  // Ensure token exists
-  if (!token) {
-    token = localStorage.getItem(TOKEN_KEY);
-  }
-  
-  var headers = {};
-  if (token) {
-    headers['Authorization'] = 'Bearer ' + token;
-  }
-  
-  fetch(NEWSLETTER_API + '/subscribers', { headers: headers })
-  .then(function(r){ 
-    if (!r.ok) {
-      throw new Error('HTTP ' + r.status);
-    }
-    return r.json(); 
-  })
-  .then(function(d){
-    if (!d.success) {
-      tbody.innerHTML = '<tr><td colspan="5" style="color:#F44336;text-align:center">ไม่สามารถโหลดข้อมูล: ' + (d.error || 'Unknown') + '</td></tr>';
-      return;
-    }
-    
-    var subs = d.subscribers || [];
-    document.getElementById('sub-count').textContent = subs.length;
-    
-    if (subs.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--tx2)">ยังไม่มีผู้สมัคร</td></tr>';
-      return;
-    }
-    
-    tbody.innerHTML = subs.map(function(s, i) {
-      var status = s.active !== false ? 
-        '<span class="badge badge-active">Active</span>' : 
-        '<span class="badge badge-expired">Unsubscribed</span>';
-      return '<tr>' +
-        '<td>' + (i + 1) + '</td>' +
-        '<td style="font-family:monospace;font-size:12px">' + esc(s.email) + '</td>' +
-        '<td>' + (s.birthdate || '-') + '</td>' +
-        '<td>' + fmtDate(s.subscribedAt) + '</td>' +
-        '<td>' + status + '</td>' +
-        '</tr>';
-    }).join('');
-  })
-  .catch(function(err){
-    tbody.innerHTML = '<tr><td colspan="5" style="color:#F44336;text-align:center">เกิดข้อผิดพลาด: ' + esc(err.message || 'Unknown') + '</td></tr>';
-  });
-}
-
-function exportSubscribers() {
-  fetch(NEWSLETTER_API + '/subscribers', {
-    headers: {'Authorization': 'Bearer ' + token}
-  }).then(function(r){ return r.json(); }).then(function(d){
-    if (!d.success || !d.subscribers.length) {
-      toast('ไม่มีข้อมูลให้ export', true);
-      return;
-    }
-    
-    var csv = 'Email,Birthdate,Subscribed At,Active\n';
-    d.subscribers.forEach(function(s) {
-      csv += '"' + (s.email||'') + '","' + (s.birthdate||'') + '","' + (s.subscribedAt||'') + '",' + (s.active !== false) + '\n';
-    });
-    
-    var blob = new Blob(['\ufeff' + csv], {type: 'text/csv;charset=utf-8'});
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = 'starvia-newsletter-subscribers.csv';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast('Export CSV สำเร็จ (' + d.subscribers.length + ' รายการ)');
-  }).catch(function(){ toast('Export ไม่สำเร็จ', true); });
 }
 
 // ── Helpers ──

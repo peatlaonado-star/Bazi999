@@ -4,10 +4,10 @@ import path from 'node:path';
 
 import { createPremiumRequestHandler, loadPremiumConfig } from './premium-service.mjs';
 import { createAdminRequestHandler, loadAdminConfig } from './admin-service.mjs';
-import { subscribe, getSubscribers, getSubscriberCount, unsubscribe } from './newsletter-service.mjs';
 import { getLotteryResults, refreshLotteryResults, setManualResults } from './lottery-service.mjs';
 import { createStreakReward, verifyStreakReward, getRewardStats } from './streak-service.mjs';
 import { createPaymentHandler } from './payment-service.mjs';
+import { createChatRequestHandler } from './chat-service.mjs';
 
 const port = Number(process.env.PORT || process.env.STARVIA_API_PORT || 8787);
 const host = process.env.HOST || '0.0.0.0';
@@ -55,6 +55,19 @@ try {
   console.log('STARVIA Payment API skipped:', err.message);
 }
 
+// Chat handler (Ollama) — gracefully disabled if STARVIA_CHAT_ENABLED not true
+let chatHandler = null;
+try {
+  if (String(process.env.STARVIA_CHAT_ENABLED || '').toLowerCase() === 'true') {
+    chatHandler = createChatRequestHandler(process.env);
+    console.log(`STARVIA Chat API loaded (model: ${process.env.STARVIA_CHAT_MODEL || 'qwen2.5:1.5b-instruct'})`);
+  } else {
+    console.log('STARVIA Chat API skipped: STARVIA_CHAT_ENABLED not set to true');
+  }
+} catch (err) {
+  console.log('STARVIA Chat API skipped:', err.message);
+}
+
 // ── Helper: Read JSON body ──
 function readJsonBody(req) {
   return new Promise((resolve, reject) => {
@@ -76,53 +89,6 @@ function readJsonBody(req) {
 function writeJson(res, status, data) {
   res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
   res.end(JSON.stringify(data));
-}
-
-// ── Newsletter Handler ──
-async function handleNewsletter(req, res) {
-  const url = req.url || '/';
-  
-  // POST /v1/newsletter/subscribe
-  if (req.method === 'POST' && url === '/v1/newsletter/subscribe') {
-    try {
-      const body = await readJsonBody(req);
-      const result = subscribe(body);
-      return writeJson(res, result.success ? 200 : 400, result);
-    } catch (err) {
-      return writeJson(res, 400, { success: false, error: 'ข้อมูลไม่ถูกต้อง' });
-    }
-  }
-  
-  // GET /v1/newsletter/subscribers (admin only)
-  if (req.method === 'GET' && url === '/v1/newsletter/subscribers') {
-    // Simple auth check - require admin token
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return writeJson(res, 401, { success: false, error: 'Unauthorized' });
-    }
-    
-    const subscribers = getSubscribers();
-    return writeJson(res, 200, { success: true, subscribers, count: subscribers.length });
-  }
-  
-  // GET /v1/newsletter/count (public)
-  if (req.method === 'GET' && url === '/v1/newsletter/count') {
-    const count = getSubscriberCount();
-    return writeJson(res, 200, { success: true, count });
-  }
-  
-  // POST /v1/newsletter/unsubscribe
-  if (req.method === 'POST' && url === '/v1/newsletter/unsubscribe') {
-    try {
-      const body = await readJsonBody(req);
-      const result = unsubscribe(body.email);
-      return writeJson(res, result.success ? 200 : 400, result);
-    } catch (err) {
-      return writeJson(res, 400, { success: false, error: 'ข้อมูลไม่ถูกต้อง' });
-    }
-  }
-  
-  return null; // Not handled
 }
 
 // ── Lottery Handler ──
@@ -209,10 +175,6 @@ const server = http.createServer(async (req, res) => {
     return;
   }
   
-  // Try newsletter handler
-  const newsletterResult = await handleNewsletter(req, res);
-  if (newsletterResult !== null) return;
-  
   // Try lottery handler
   const lotteryResult = await handleLottery(req, res);
   if (lotteryResult !== null) return;
@@ -239,6 +201,11 @@ const server = http.createServer(async (req, res) => {
     } else {
       return writeJson(res, 404, { success: false, error: 'Admin API not configured' });
     }
+  }
+
+  // Chat concierge endpoint (Ollama local)
+  if (url === '/v1/chat' && chatHandler) {
+    return chatHandler(req, res);
   }
   
   // Health check

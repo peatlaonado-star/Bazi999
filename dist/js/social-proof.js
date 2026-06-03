@@ -269,23 +269,6 @@
       + '</div>';
   }
 
-  // ===== NEWSLETTER TEASER =====
-  function renderNewsletterTeaser() {
-    var teaserText = document.getElementById('newsletter-teaser-text');
-    if (!teaserText) return;
-
-    var PF = window.PersonalizedFortune;
-    if (PF) {
-      var birthData = PF.getBirthData();
-      var fortune = PF.buildPersonalizedFortune(birthData);
-      var text = fortune.quote;
-      if (text.length > 80) text = text.substring(0, 77) + '...';
-      teaserText.textContent = '"' + text + '"';
-    } else {
-      teaserText.textContent = '"วันนี้ดาวเจ้าชะตาโคจรผ่านจุดสำคัญ — มีบางอย่างที่คุณควรรู้ก่อนออกจากบ้าน..."';
-    }
-  }
-
   function escapeHTML(str) {
     if (!str) return '';
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -296,7 +279,6 @@
     renderAuthorityBadge();
     renderStats();
     setupTestimonialRotation();
-    renderNewsletterTeaser();
   }
 
   if (document.readyState === 'loading') {
