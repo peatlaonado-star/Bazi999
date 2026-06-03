@@ -14,6 +14,7 @@ import {
   withAdminAuth,
 } from '../_lib/admin.js';
 import { createPayment, paymentWebhook, verifyPayment, paymentStatus } from '../_lib/payment.js';
+import { handleChat, chatInfo } from '../_lib/chat.js';
 import { handleAgentRequest } from '../_lib/agent-card.js';
 
 function json(data, status = 200) {
@@ -117,13 +118,10 @@ export async function onRequest(context) {
       if (segments[1] === 'status' && request.method === 'GET') return paymentStatus(context);
     }
 
-    // ── Chat (Ollama local) — DISABLED on Cloudflare ──
-    if (segments[0] === 'chat' && request.method === 'POST') {
-      return json({
-        success: false,
-        error: 'CHAT_DISABLED',
-        message: 'แชทดูดวง AI ยังไม่พร้อมใช้งานบน Cloudflare (ต้องใช้ local Ollama)',
-      }, 503);
+    // ── Chat (Workers AI — "Dara" persona) ──
+    if (segments[0] === 'chat') {
+      if (request.method === 'POST') return handleChat(context);
+      if (request.method === 'GET') return chatInfo();
     }
 
     // ── A2A Agent Card tasks ──
