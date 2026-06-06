@@ -124,13 +124,14 @@ var Onboarding = (function() {
   }
 
   function renderWelcomeScreen() {
-    // Pull live review count from SocialProof so the "ร่วมกับผู้ใช้ X คน"
-    // figure stays in sync with the homepage counter. Fall back to a
-    // sane default if SocialProof hasn't loaded yet (e.g. before DOMContentLoaded).
-    var socialProof = (typeof SocialProof !== 'undefined' && SocialProof.getReviewCount)
-      ? SocialProof.getReviewCount()
-      : 2373;
-    var formatted = socialProof.toLocaleString('th-TH');
+    // Early-adopter framing — a hardcoded small-but-credible base
+    // (137 users, 45 reviews) reads more authentically than a big
+    // round number like "2,373" for a site that's still growing.
+    // Once the site has been live longer, bump the values here.
+    var earlyUsers = 137;
+    var earlyReviews = 45;
+    var usersFormatted = earlyUsers.toLocaleString('th-TH');
+    var reviewsFormatted = earlyReviews.toLocaleString('th-TH');
 
     return '<div class="ob-overlay" id="onboarding-overlay">'
       + '<div class="ob-card ob-welcome">'
@@ -138,8 +139,8 @@ var Onboarding = (function() {
       + '<h2 class="ob-title">✨ ค้นพบตัวตนที่แท้จริง<br>ใน 30 วินาที</h2>'
       + '<p class="ob-subtitle">ระบบอ่านแผนที่ชีวิตด้วยโหราศาสตร์ไทย สำหรับคนยุคใหม่</p>'
       + '<div class="ob-social-proof">'
-      + '🌟 ร่วมกับผู้ใช้ <strong>' + formatted + '</strong> คน<br>'
-      + '<span class="ob-social-sub">ที่ค้นพบดวงของตัวเองแล้ว · 4.8★ (2,373 รีวิว)</span>'
+      + '🌱 เริ่มต้นด้วยกัน — <strong>' + usersFormatted + '</strong> คนเปิดดวงแล้ว<br>'
+      + '<span class="ob-social-sub">★ 4.8 จาก ' + reviewsFormatted + ' รีวิว · เรากำลังเติบโตไปด้วยกัน</span>'
       + '</div>'
       + '<div class="ob-features">'
       + '<div class="ob-feature">🌟 พิมพ์เขียวชีวิตไทย — รู้จักตัวเองลึกกว่าเดิม</div>'
