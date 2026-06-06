@@ -47,7 +47,7 @@ function buildTabs(tid,sid,pre,TB,p,u){
     sec.className='sec'+(i===0?' on':'');
     sec.id=pre+i;
 
-    var isPremiumTab = true;
+    var isPremiumTab = (i > 0); // แท็บแรก (ตัวตน) = ฟรี, แท็บ 2-4 = Premium
     if (isPremiumTab && !premiumIsUnlocked()) {
        sec.classList.add('is-locked');
     }
@@ -66,7 +66,7 @@ function buildTabs(tid,sid,pre,TB,p,u){
         + '</div></div>';
     });
 
-    if (isPremiumTab && !premiumIsUnlocked()) {
+    if (i > 0 && !premiumIsUnlocked()) {
         html += buildPremiumLockOverlay(
           'เนื้อหาเจาะลึกเฉพาะคุณ (Premium)',
           'ปลดล็อกเพื่ออ่านกระจกกรรม วิเคราะห์ 6 ด้าน อดีต-ปัจจุบัน-อนาคต และคำแนะนำที่นำไปใช้ได้จริง'

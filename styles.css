@@ -729,25 +729,10 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   margin-top: 10px;
 }
 
-/* Freemium Lock System (ระบบเบลอเนื้อหา) */
-.is-locked { 
-  position: relative; 
-  overflow: hidden; 
-  min-height: 280px; 
-}
-/* เบลอเนื้อหาทุกอย่างที่อยู่ในแท็บที่โดนล็อค */
-.is-locked > .orn,
-.is-locked > .st,
-.is-locked > .rb, 
-.is-locked > .hi, 
-.is-locked > .career-blueprint,
-.is-locked > .love-blueprint {
-  filter: blur(8px); 
-  opacity: 0.3; 
-  pointer-events: none; 
-  user-select: none;
-  transition: all 0.5s ease;
-}
+/* Freemium Lock System — Zone-Based (ไม่ใช้ is-locked บน parent อีกต่อไป)
+ * ใช้ zone containers: .mlm-domains-locked, .domain-locked-zone, .wfl-locked-zone
+ * เฉพาะ tab content ที่ใช้ .is-locked → ใช้ generic rule ด้านล่าง (line ~2573)
+ */
 
 /* Monthly Life Map — เฉพาะ locked zone ที่เบลอ */
 .mlm-domains-locked {
@@ -771,18 +756,6 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   pointer-events: none;
   user-select: none;
 }
-/* Karma Mirror — กระจกกรรม (Premium) */
-.is-locked > .karma-kicker,
-.is-locked > .karma-title,
-.is-locked > .karma-desc,
-.is-locked > .karma-grid,
-.is-locked > .karma-ritual {
-  filter: blur(8px);
-  opacity: 0.3;
-  pointer-events: none;
-  user-select: none;
-  transition: all 0.5s ease;
-}
 /* Windfall Luck — เฉพาะ locked zone ที่เบลอ */
 .wfl-locked-zone {
   position: relative;
@@ -794,20 +767,6 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   opacity: 0.35;
   pointer-events: none;
   user-select: none;
-}
-/* กล่องแม่กุญแจที่ทับอยู่ด้านบน */
-.lock-overlay {
-  position: absolute; 
-  inset: 0; 
-  z-index: 10; 
-  display: flex; 
-  flex-direction: column;
-  align-items: center; 
-  justify-content: center;
-  background: linear-gradient(180deg, rgba(26,16,53,0.2) 0%, rgba(26,16,53,0.95) 50%, #1A1035 100%);
-  text-align: center; 
-  padding: 20px; 
-  border-radius: 12px;
 }
 
 /* Premium Banner & Button */
@@ -2221,6 +2180,16 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .share-btn-fb:hover{background:rgba(66,103,178,.15);border-color:rgba(66,103,178,.4);color:#4267B2}
 .share-btn-x:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.3);color:#fff}
 .share-btn-copy:hover{background:rgba(201,162,39,.15);border-color:rgba(201,162,39,.4);color:var(--g)}
+
+/* Personalized Share Section (inside report) */
+.ind-share-section {
+  margin: 16px 0;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(42,27,16,.6), rgba(26,21,0,.6));
+  border: 1px solid rgba(201,162,39,.2);
+  border-radius: 14px;
+  text-align: center;
+}
 .share-btn-native:hover{background:rgba(142,114,216,.15);border-color:rgba(142,114,216,.4);color:var(--pu)}
 
 /* Copy success state */
@@ -2569,16 +2538,25 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   letter-spacing: 0.03em;
 }
 
-/* ===== PREMIUM BLUR / PAYWALL ===== */
+/* ===== PREMIUM BLUR / PAYWALL (Tab Content) ===== */
 .is-locked {
   position: relative;
   overflow: hidden;
 }
 
+/* เบลอเนื้อหาทั้งหมดใน locked tab — แต่เบลอเบาๆ ให้เห็น teaser */
 .is-locked > *:not(.lock-overlay):not(.lock-preview-text) {
-  filter: blur(6px);
+  filter: blur(3px);
+  opacity: .35;
   pointer-events: none;
   user-select: none;
+  transition: all 0.3s ease;
+}
+
+/* การ์ดแรกเบลอเบากว่า — เป็น teaser ดึงดูด */
+.is-locked .tab-section-card:first-child .tsc-body {
+  opacity: .5;
+  filter: blur(2px);
 }
 
 .lock-overlay {
