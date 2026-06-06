@@ -133,6 +133,11 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .value-icon{display:inline-flex;width:34px;height:34px;align-items:center;justify-content:center;border-radius:12px;background:rgba(214,173,69,.12);color:var(--g2);margin-bottom:12px}
 .value-card h3{font-size:18px;margin-bottom:8px;color:var(--tx)}
 .value-card p{font-size:14px;line-height:1.75;color:var(--tx2)}
+.value-quote{font-style:italic;color:var(--g2);font-size:13.5px;line-height:1.6;margin:6px 0 10px;padding-left:10px;border-left:2px solid rgba(214,173,69,.35)}
+.value-feat{font-size:12.5px;color:var(--tx2);opacity:.85;letter-spacing:.02em;line-height:1.5}
+.value-cta{text-align:center;margin-top:22px}
+.value-cta .hero-primary{display:inline-block;padding:14px 32px;font-size:16px;font-weight:700;border-radius:999px;background:linear-gradient(135deg,#d6ad45,#b8902f);color:#1a1230;text-decoration:none;box-shadow:0 8px 24px rgba(214,173,69,.32);transition:transform .2s ease}
+.value-cta .hero-primary:hover{transform:translateY(-2px)}
 .preview-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .preview-card{display:flex;flex-direction:column;gap:8px;background:rgba(255,255,255,.045);border:1px solid rgba(214,173,69,.16);border-radius:18px;padding:15px;min-height:150px}
 .preview-card span{width:max-content;padding:4px 9px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.05em;background:rgba(255,255,255,.07);color:var(--tx2)}
