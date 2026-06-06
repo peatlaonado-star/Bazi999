@@ -2547,6 +2547,21 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   transition: all 0.3s ease;
 }
 
+/* Cards that use is-locked directly (without .locked-content wrapper)
+   — blur all children except .lock-overlay so unlock pattern stays consistent
+   Used by: .cg2 (couple score breakdown), .karma-card (individual),
+   .ausp-week-card (auspicious week), .wellness-card (cosmic routine) */
+.cg2.is-locked > .ci2,
+.karma-card.is-locked > *:not(.lock-overlay),
+.ausp-week-card.is-locked > *:not(.lock-overlay),
+.wellness-card.is-locked > *:not(.lock-overlay) {
+  filter: blur(3px);
+  opacity: .35;
+  pointer-events: none;
+  user-select: none;
+  transition: all 0.3s ease;
+}
+
 /* การ์ดแรกเบลอเบากว่า — เป็น teaser ดึงดูด */
 .is-locked .tab-section-card:first-child .tsc-body {
   opacity: .5;
