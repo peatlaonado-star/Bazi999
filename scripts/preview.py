@@ -184,7 +184,7 @@ def screenshot(url, out_path, viewport):
         browser = p.chromium.launch(headless=True)
         ctx = browser.new_context(
             viewport=viewport,
-            device_scale_factor=2,
+            device_scale_factor=1,  # smaller PNGs (was 2)
             user_agent="Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1",
         )
         page = ctx.new_page()
@@ -194,7 +194,9 @@ def screenshot(url, out_path, viewport):
             page.goto(url, wait_until="domcontentloaded", timeout=20000)
         # Let the app hydrate + streak tracker run
         page.wait_for_timeout(2500)
-        page.screenshot(path=str(out_path), full_page=True)
+        # Above-the-fold only by default to keep PNGs small (Telegram-friendly).
+        # full_page=True captures entire scroll height — files balloon to 2-4 MB.
+        page.screenshot(path=str(out_path), full_page=False)
         browser.close()
 
 
