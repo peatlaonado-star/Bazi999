@@ -211,6 +211,17 @@ function buildVinaiSection(p, now) {
   };
 
   var vinai = VINAI[p.el] || VINAI['ไฟ'];
+  // Add structured days array for the 7-day challenge (dharma-style rendering)
+  vinai.days = [
+    { day: 'จันทร์', action: vinai.weekChallenge.split('\n')[1].replace('จันทร์: ', '') },
+    { day: 'อังคาร', action: vinai.weekChallenge.split('\n')[2].replace('อังคาร: ', '') },
+    { day: 'พุธ', action: vinai.weekChallenge.split('\n')[3].replace('พุธ: ', '') },
+    { day: 'พฤหัสบดี', action: vinai.weekChallenge.split('\n')[4].replace('พฤหัส: ', '') },
+    { day: 'ศุกร์', action: vinai.weekChallenge.split('\n')[5].replace('ศุกร์: ', '') },
+    { day: 'เสาร์', action: vinai.weekChallenge.split('\n')[6].replace('เสาร์: ', '') },
+    { day: 'อาทิตย์', action: vinai.weekChallenge.split('\n')[7].replace('อาทิตย์: ', '') }
+  ];
+
   var html = '<div class="ausp-vinai-card">'
     + '<div class="avc-header">'
     + '<div class="avc-title">' + vinai.title + '</div>'
@@ -228,9 +239,25 @@ function buildVinaiSection(p, now) {
       + '</div></div>';
   });
 
+  // ===== แบบฝึก 7 วัน — สไตล์ธรรมทาน =====
+  // แต่ละวันเป็น card ย่อย น่าเชื่อถือและน่าอ่าน
+  var daysHtml = '';
+  var dayIcons = ['🌄','🌞','🌤','🌅','🌇','🌙','✨'];
+  vinai.days.forEach(function(d, i) {
+    daysHtml += '<div class="avc-day-compact">'
+      + '<div class="avc-day-num">' + dayIcons[i] + ' ' + (i + 1) + '</div>'
+      + '<div class="avc-day-content">'
+      + '<div class="avc-day-label">' + d.day + '</div>'
+      + '<div class="avc-day-action">' + d.action + '</div>'
+      + '</div></div>';
+  });
+
+  var elName = p.el || 'ธาตุ';
   html += '<div class="avc-challenge">'
-    + '<div class="avc-challenge-title">🎯 แบบฝึก 7 วัน</div>'
-    + '<div class="avc-challenge-text">' + vinai.weekChallenge.replace(/\n/g, '<br>') + '</div>'
+    + '<div class="avc-challenge-title">🪷 แบบฝึก 7 วัน ' + elName + '<span>เริ่มจากวันนี้ — ทำวันละนิด</span></div>'
+    + '<div class="avc-dharma-blessing">"การฝึกตนครั้งละ 7 วัน คือเมล็ดพันธุ์แห่งความดีที่จะเบ่งบานในชีวิต"</div>'
+    + '<div class="avc-days-grid">' + daysHtml + '</div>'
+    + '<div class="avc-dharma-seal">🙏 ขอให้เจริญในธรรม พบความสงบและพลังที่แท้จริง</div>'
     + '</div>'
     + '<div class="avc-ref">พลังงานจักรวาล 5 ระดับ — ให้ → รักษา → ส่งพลังดี → เข้าใจ → ตื่นรู้</div>'
     + '</div>';

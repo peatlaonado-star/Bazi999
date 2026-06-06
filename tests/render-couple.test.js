@@ -245,7 +245,16 @@ describe('Couple mode rendering', () => {
     expect(output).toContain('อ้างอิงเชิงระบบ');
     expect(output).toContain('ดาวประจำวัน/ธาตุ');
     expect(output).toContain('จังหวะรักของทั้งคู่');
-    expect(output).not.toContain('ความสม่ำเสมอ 21 วัน');
+    // Premium love timing content is now inside a <details> element (hidden by default)
+    // and flagged as free-unlock-summary content. Check it's not in the visible text
+    // outside the <details> element.
+    var details = dom.window.document.querySelector('details.couple-premium-details');
+    var outsideDetails = output;
+    if (details) {
+      outsideDetails = output.replace(details.outerHTML, '');
+    }
+    expect(outsideDetails).not.toContain('ความสม่ำเสมอ 21 วัน');
+    expect(outsideDetails).not.toContain('กติกา 3 คำถาม');
   });
 
   it('marks love timing cycles that already passed and shifts to the next 7-year window', () => {
@@ -309,7 +318,7 @@ describe('Couple mode rendering', () => {
     expect(output).toContain('ราศี/พลังที่มีแนวโน้มเข้ามา');
     expect(output).toContain('นิสัยคนที่มีแนวโน้มเข้ากัน');
     expect(output).toContain('อ้างอิงเชิงระบบ');
-    expect(output).toContain('ปลดล็อกแผนเปิดทางความรัก');
+    expect(output).toContain('แผนเปิดทางความรัก 3 ขั้น');
   });
 
 });

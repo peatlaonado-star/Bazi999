@@ -2249,9 +2249,18 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .avc-step-action{font-size:11px;color:var(--tx2);line-height:1.5;margin-top:2px}
 .avc-step-why{font-size:9px;color:#7a6a9a;font-style:italic;margin-top:3px}
 .avc-step-level{font-size:9px;color:#b08040;margin-top:2px;letter-spacing:.02em}
-.avc-challenge{margin-top:14px;padding:12px 14px;background:rgba(201,162,39,.06);border:1px dashed rgba(201,162,39,.25);border-radius:14px;text-align:center}
-.avc-challenge-title{font-size:12px;color:#C9A227;font-weight:700;margin-bottom:6px}
-.avc-challenge-text{font-size:11px;color:var(--tx2);line-height:1.6}
+.avc-challenge{margin-top:16px;padding:16px;background:linear-gradient(135deg,rgba(40,25,10,.35),rgba(60,35,10,.3));border:1px solid rgba(201,162,39,.3);border-radius:16px}
+.avc-challenge-title{font-size:12px;color:#C9A227;font-weight:700;text-align:center;letter-spacing:.08em;margin-bottom:0}
+.avc-challenge-title span{display:block;font-size:9px;color:#b08040;font-weight:400;letter-spacing:.06em;margin-top:2px}
+.avc-dharma-blessing{font-size:10px;color:#b89860;text-align:center;font-style:italic;line-height:1.6;padding:0 4px 8px;border-bottom:1px solid rgba(201,162,39,.15);margin-bottom:10px}
+.avc-days-grid{display:flex;flex-direction:column;gap:5px;margin:10px 0}
+.avc-day-compact{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;background:rgba(142,114,216,.03);border:1px solid rgba(201,162,39,.08);border-radius:10px;transition:background .2s}
+.avc-day-num{min-width:36px;text-align:center;font-size:11px;color:#b08040;font-weight:700;font-family:'Noto Sans Thai Looped',sans-serif;padding-top:1px}
+.avc-day-content{flex:1;min-width:0}
+.avc-day-label{font-size:11px;color:#C9A227;font-weight:600;letter-spacing:.04em}
+.avc-day-action{font-size:10.5px;color:var(--tx2);line-height:1.5;margin-top:1px}
+.avc-day-dot{display:inline-block;width:4px;height:4px;border-radius:50%;background:rgba(201,162,39,.35);margin:0 4px 0 2px;vertical-align:middle}
+.avc-dharma-seal{text-align:center;font-size:9px;color:#7a5a30;letter-spacing:.06em;margin-top:8px;padding-top:6px;border-top:1px solid rgba(201,162,39,.1)}
 .avc-ref{font-size:9px;color:#5a4a7a;text-align:center;margin-top:10px;letter-spacing:.04em}
 .social-proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
 @media(max-width:480px){.social-proof-grid{grid-template-columns:1fr 1fr}}
