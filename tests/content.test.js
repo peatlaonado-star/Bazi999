@@ -56,7 +56,8 @@ describe('Thai astrology content data', () => {
     expect(html).toContain('รู้จักตัวเองจากวันเกิด');
     expect(html).toContain('ไม่ใช่แค่ดูดวง');
     expect(html).toContain('Premium 199 บาท/เดือน');
-    expect(html).toContain('สิ่งที่คุณจะได้จาก STARVIA');
+    expect(html).toContain('รู้จักตัวเองลึกกว่าที่เคย');
+    expect(html).toContain('4 มิติที่จะเปลี่ยนมุมมอง');
     expect(html).toContain('เริ่มจากข้อมูลพื้นฐาน');
     expect(html).toContain('ใช้เวลาไม่ถึง 30 วินาที');
     expect(html).not.toContain('Free + Premium');
