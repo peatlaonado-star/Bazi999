@@ -297,7 +297,8 @@
 <script>
 // Version-based cache busting
 (function() {
-  var APP_VERSION = 'tab-teaser-v1'; // Update this on each deploy
+  var APP_VERSION = "tab-teaser-v1"; // Update this on each deploy
+  // Test: post-commit hook + reward preview deploy
   var stored = localStorage.getItem('starvia_version');
   
   if (stored && stored !== APP_VERSION) {
