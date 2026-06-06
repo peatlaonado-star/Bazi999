@@ -753,16 +753,16 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
   var elementInsight = ''; var elementAction = '';
   if (p.ei === 0) {
     elementInsight = 'พลังแห่งไฟ <span style="font-size:14px">🔥</span> ทำให้คุณมีแรงขับเคลื่อนมหาศาล แต่มักเผาผลาญพลังงานไปกับความใจร้อน — โทสะคือไฟที่เผาทั้งตัวเองและคนรอบข้าง';
-    elementAction = 'นั่งสมาธิ "พุท-โธ" <strong class="hl-gold">5 นาทีทุกเช้า</strong> <span style="font-size:14px">🧘</span> — อานาปานสติช่วยดับไฟในใจ พระพุทธเจ้าสอนว่า "ผู้ชนะในสงครามพันครั้ง สู้ชนะใจตัวเองไม่ได้"';
+    elementAction = 'นั่งนิ่งกำหนดลมหายใจ <strong class="hl-gold">5 นาทีทุกเช้า</strong> <span style="font-size:14px">🧘</span> — การนั่งนิ่งช่วยดับไฟในใจ จักรวาลสอนว่า "ผู้ชนะที่แท้จริงคือผู้ชนะใจตัวเอง"';
   } else if (p.ei === 1) {
-    elementInsight = 'พลังแห่งดิน <span style="font-size:14px">🌱</span> ทำให้คุณมั่นคงและรอบคอบ แต่ความกลัวความผิดพลาดมักทำให้ยึดติด — อนิจจัง: ทุกสิ่งเปลี่ยนแปลง แม้แต่ความกลัว';
-    elementAction = 'เดินจงกรม <strong class="hl-gold">10 นาที/วัน</strong> <span style="font-size:14px">🚶</span> — กรรมฐาน 4 อิริยาบถ หลวงปู่ชาสอน "เดินก็รู้ว่าเดิน" ช่วยให้ดินยืดหยุ่นขึ้น';
+    elementInsight = 'พลังแห่งดิน <span style="font-size:14px">🌱</span> ทำให้คุณมั่นคงและรอบคอบ แต่ความกลัวความผิดพลาดมักทำให้ยึดติด — ทุกสิ่งในจักรวาลเปลี่ยนแปลงเสมอ แม้แต่ความกลัว';
+    elementAction = 'เดินช้าๆ <strong class="hl-gold">10 นาที/วัน</strong> <span style="font-size:14px">🚶</span> — การเดินอย่างมีสติช่วยให้ดินยืดหยุ่นขึ้น รู้สึกเท้าแตะพื้น หายใจเข้า-ออก ปล่อยวางความคิด';
   } else if (p.ei === 2) {
     elementInsight = 'พลังแห่งลม <span style="font-size:14px">💨</span> ทำให้ความคิดแล่นไว แต่มักกระจัดกระจาย — จิตที่ไม่ตั้งมั่นเหมือนลมที่พัดไปเรื่อยไม่มีทิศทาง';
-    elementAction = 'นั่งสมาธิ <strong class="hl-gold">3 นาที ดูลมหายใจ</strong> <span style="font-size:14px">🎯</span> — ไม่ต้องคิดอะไร แค่รู้ "พุท" เข้า "โธ" ออก จิตฟุ้งก็กลับมา ลมนิ่ง = จิตนิ่ง';
+    elementAction = 'นั่งนิ่ง <strong class="hl-gold">3 นาที ดูลมหายใจ</strong> <span style="font-size:14px">🎯</span> — ไม่ต้องคิดอะไร แค่รู้ตัวว่าหายใจเข้า-ออก จิตฟุ้งก็แค่กลับมา ลมนิ่ง = จิตนิ่ง';
   } else {
-    elementInsight = 'พลังแห่งน้ำ <span style="font-size:14px">🌊</span> ทำให้ลึกซึ้งและเข้าถึงจิตใจคน แต่ขอบเขตอารมณ์ที่พร่ามัวมักทำให้รับเอาความรู้สึกคนอื่นมาแบก — เมตตาเริ่มจากตัวเอง';
-    elementAction = 'แผ่เมตตาให้ตัวเอง <strong class="hl-gold">3 นาทีก่อนนอน</strong> <span style="font-size:14px">💛</span> — "สุขิโต โหมิ — ขอให้ข้าพเจ้ามีความสุข" เติมน้ำในถังก่อนให้คนอื่น';
+    elementInsight = 'พลังแห่งน้ำ <span style="font-size:14px">🌊</span> ทำให้ลึกซึ้งและเข้าถึงจิตใจคน แต่ขอบเขตอารมณ์ที่พร่ามัวมักทำให้รับเอาความรู้สึกคนอื่นมาแบก — เริ่มรักตัวเองก่อน';
+    elementAction = 'ส่งพลังงานดีให้ตัวเอง <strong class="hl-gold">3 นาทีก่อนนอน</strong> <span style="font-size:14px">💛</span> — หลับตา หายใจลึกๆ แล้วพูดกับตัวเองว่า "ฉันมีความสุข ฉันปลอดภัย" เติมน้ำในถังก่อนให้คนอื่น';
   }
   var wkFull = '<div style="font-size:14px; line-height:1.9; color:var(--tx); margin-bottom:15px;">'
     + 'สิ่งที่คุณมองว่าเป็นจุดอ่อน แท้จริงแล้วคือพลังงานแห่งดาว' + p.n + ' ที่ถูกใช้ผิดทิศทาง — <span class="hl-purple">' + tk.kala + '</span><br><br>'
@@ -771,9 +771,9 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + '<div class="action-plan-card">'
     + '<div class="ap-title">✦ พิมพ์เขียวเพื่อปรับฐานชีวิต ✦</div>'
     + '<div style="text-align:center; font-size:11px; color:#7a6a9a; margin-bottom:20px; letter-spacing:0.05em;"></div>'
-    + '<div class="ap-step"><div class="ap-num">1</div><div class="ap-content"><h4><span style="font-size:15px; margin-right:4px;">👁️</span> สติรับรู้</h4><p>เมื่อไหร่ก็ตามที่คุณเริ่มรู้สึกว่า <strong class="hl-purple">"' + tk.kala + '"</strong> กำลังก่อตัวขึ้น ให้ถือว่านั่นคือสัญญาณเตือน — หยุด 3 ลมหายใจ รับรู้ว่าความรู้สึกนี้ไม่เที่ยง (อนิจจัง) อย่ากล่าวโทษตัวเอง</p></div></div>'
+    + '<div class="ap-step"><div class="ap-num">1</div><div class="ap-content"><h4><span style="font-size:15px; margin-right:4px;">👁️</span> สติรับรู้</h4><p>เมื่อไหร่ก็ตามที่คุณเริ่มรู้สึกว่า <strong class="hl-purple">"' + tk.kala + '"</strong> กำลังก่อตัวขึ้น ให้ถือว่านั่นคือสัญญาณเตือน — หยุด 3 ลมหายใจ รับรู้ว่าความรู้สึกนี้ไม่เที่ยง ทุกอย่างในจักรวาลเปลี่ยนแปลงเสมอ อย่ากล่าวโทษตัวเอง</p></div></div>'
     + '<div class="ap-step"><div class="ap-num">2</div><div class="ap-content"><h4><span style="font-size:15px; margin-right:4px;">🧭</span> ลงมือปรับจูน </h4><p><span class="hl-gold">✧</span> ' + p.wkfix + '<br><br><span class="hl-gold">✧</span> กุญแจสำคัญของคนธาตุ' + p.el + 'คือ <strong>' + elementAction + '</strong> <span style="font-size:13px">⏳</span> เริ่มต้นทำสิ่งนี้ให้เป็นนิสัยใน 21 วันข้างหน้า</p></div></div>'
-    + '<div class="ap-step"><div class="ap-num">3</div><div class="ap-content"><h4><span style="font-size:15px; margin-right:4px;">🧘</span> เหตุเสริมจากพระไตรปิฎก </h4><p>นั่งสมาธิ <span class="hl-gold">"พุท-โธ" 3 นาที</span> ทุกวัน — อานาปานสติช่วยสงบจิต เมื่อจิตสงบแล้ว พลังงานแห่ง <strong class="hl-gold">✨ ' + tk.sri + '</strong> จะถูกปลดล็อกเอง ผู้คน โอกาส และโชคลาภจะเข้ามาหาคุณอย่างเป็นธรรมชาติ</p></div></div>'
+    + '<div class="ap-step"><div class="ap-num">3</div><div class="ap-content"><h4><span style="font-size:15px; margin-right:4px;">🧘</span> เหตุเสริมจากพลังงานจักรวาล </h4><p>นั่งนิ่งกำหนดลมหายใจ <span class="hl-gold">3 นาที</span> ทุกวัน — การนั่งนิ่งช่วยสงบจิต เมื่อจิตสงบแล้ว พลังงานแห่ง <strong class="hl-gold">✨ ' + tk.sri + '</strong> จะถูกปลดล็อกเอง ผู้คน โอกาส และโชคลาภจะเข้ามาหาคุณอย่างเป็นธรรมชาติ</p></div></div>'
     + '<div class="ap-quote">"จุดอ่อนที่ถูกเยียวยา จะกลายเป็นจุดแข็งที่แข็งแกร่งที่สุดของคุณ <span style="font-style:normal">🤍</span>"</div>'
     + '</div>';
 
@@ -1024,6 +1024,11 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     '<div class="mc"><div class="mc-l">✦ '+u.mn+' · '+nm+' ✦</div>'
     +'<div class="mc-t">"'+p.man+'"</div></div>'
     + consultHtml
+    +'<div id="ind-share-section" class="ind-share-section"></div>'
     +'<div class="rbt"><button class="rbtn" data-action="reset-mode" data-mode="0">'+u.r0+'</button></div>'
   );
+  // Render personalized share section
+  if (typeof ShareViral !== 'undefined' && ShareViral.renderPersonalizedShare) {
+    ShareViral.renderPersonalizedShare('ind-share-section', p.man, nm);
+  }
 }

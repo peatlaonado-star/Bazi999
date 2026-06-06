@@ -263,6 +263,67 @@
     init();
   }
 
+  // ===== Render Personalized Share Section =====
+  function renderPersonalizedShare(containerId, fortuneQuote, userName) {
+    var container = document.getElementById(containerId);
+    if (!container) return;
+
+    // Create teaser from fortune quote
+    var teaser = fortuneQuote || 'ดวงวันนี้ของฉันน่าสนใจมาก!';
+    if (teaser.length > 80) {
+      teaser = teaser.substring(0, 77) + '...';
+    }
+
+    var html = '<div class="share-header">'
+      + '<span class="share-icon">📤</span>'
+      + '<span class="share-title">แชร์ผลดวงของคุณ</span>'
+      + '</div>'
+      + '<div class="share-teaser">"' + escapeHTML(teaser) + '"</div>'
+      + '<div class="share-buttons">';
+
+    // LINE
+    html += '<button class="share-btn share-btn-line" onclick="ShareViral.shareToLine()" title="ส่งทาง LINE">'
+      + '<span class="share-btn-icon">💬</span>'
+      + '<span class="share-btn-label">LINE</span>'
+      + '</button>';
+
+    // Facebook
+    html += '<button class="share-btn share-btn-fb" onclick="ShareViral.shareToFacebook()" title="แชร์บน Facebook">'
+      + '<span class="share-btn-icon">📘</span>'
+      + '<span class="share-btn-label">Facebook</span>'
+      + '</button>';
+
+    // X
+    html += '<button class="share-btn share-btn-x" onclick="ShareViral.shareToX()" title="แชร์บน X">'
+      + '<span class="share-btn-icon">🐦</span>'
+      + '<span class="share-btn-label">X</span>'
+      + '</button>';
+
+    // Copy
+    html += '<button class="share-btn share-btn-copy" id="ind-share-copy-btn" onclick="ShareViral.copyShareLink()" title="คัดลอกลิงก์">'
+      + '<span class="share-btn-icon">🔗</span>'
+      + '<span class="share-btn-label">คัดลอก</span>'
+      + '</button>';
+
+    // Native share (mobile)
+    if (navigator.share) {
+      html += '<button class="share-btn share-btn-native" onclick="ShareViral.nativeShare()" title="แชร์">'
+        + '<span class="share-btn-icon">📱</span>'
+        + '<span class="share-btn-label">แชร์</span>'
+        + '</button>';
+    }
+
+    html += '</div>';
+    html += '<div class="share-hint">✦ ยิ่งแชร์ ยิ่งเสริมพลังดวง ✦</div>';
+
+    container.innerHTML = html;
+  }
+
+  function escapeHTML(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
   // ===== Public API =====
   window.ShareViral = {
     shareToLine: shareToLine,
@@ -272,6 +333,7 @@
     nativeShare: nativeShare,
     generateShareMessage: generateShareMessage,
     recordShare: recordShare,
-    getShareUrl: getShareUrl
+    getShareUrl: getShareUrl,
+    renderPersonalizedShare: renderPersonalizedShare
   };
 })();

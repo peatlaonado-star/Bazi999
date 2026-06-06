@@ -2568,7 +2568,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   overflow: hidden;
 }
 
-.is-locked > *:not(.lock-overlay) {
+.is-locked > *:not(.lock-overlay):not(.lock-preview-text) {
   filter: blur(6px);
   pointer-events: none;
   user-select: none;
@@ -4107,4 +4107,42 @@ body.has-report .value-section{display:none}
   color: var(--tx2);
   opacity: .7;
   margin-bottom: 12px;
+}
+
+/* Personalized Share Section (after result) */
+.ind-share-section {
+  padding: 18px 20px;
+  margin: 16px 0;
+  background: linear-gradient(135deg, rgba(142,114,216,.08), rgba(201,162,39,.06));
+  border: 1px solid rgba(142,114,216,.15);
+  border-radius: 16px;
+  text-align: center;
+}
+.share-teaser {
+  font-size: 14px;
+  color: var(--tx2, #b8a9d4);
+  font-style: italic;
+  margin-bottom: 12px;
+  line-height: 1.5;
+  opacity: .85;
+}
+
+/* Lock Preview Text — visible teaser above blurred content */
+.lock-preview-text {
+  position: relative;
+  z-index: 5;
+  padding: 14px 18px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--tx2, #b8a9d4);
+  border-bottom: 1px solid rgba(201,162,39,.1);
+  background: linear-gradient(180deg, rgba(13,8,40,.6), transparent);
+  pointer-events: none;
+  user-select: none;
+  opacity: .75;
+  font-style: italic;
+}
+.lock-preview-text::before {
+  content: '✦ ';
+  color: #C9A227;
 }

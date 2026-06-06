@@ -13,8 +13,13 @@ function buildPremiumLockOverlay(title, description){
     + '</div>';
 }
 
-function premiumLockedCard(className, teaserHtml, title, description){
+function premiumLockedCard(className, teaserHtml, title, description, previewText){
+  var previewHtml = '';
+  if (previewText) {
+    previewHtml = '<div class="lock-preview-text">' + previewText + '</div>';
+  }
   return '<div class="' + className + ' is-locked">'
+    + previewHtml
     + teaserHtml
     + buildPremiumLockOverlay(title || 'เนื้อหาเจาะลึกเฉพาะคุณ (Premium)', description || 'ปลดล็อกรีพอร์ตฉบับเต็มเพื่ออ่านคำวิเคราะห์เชิงลึกและคำแนะนำที่นำไปใช้ได้จริง')
     + '</div>';
