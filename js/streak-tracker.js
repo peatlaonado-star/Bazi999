@@ -398,10 +398,12 @@
     }, 600);
   }
 
-  // Public API
+  // Public API. `getStreak` is the most-called entrypoint — route it through
+  // updateStreak() so it always reflects the Onboarding journey day (the
+  // legacy helper below only reads the now-stale consecutive counter).
   window.StreakReward = {
     init: init,
-    getStreak: getStreak,
+    getStreak: updateStreak,
     isPremiumUnlocked: isPremiumUnlocked,
     isPremiumExpired: isPremiumExpired,
     claimReward: claimReward,
