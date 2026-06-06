@@ -389,13 +389,48 @@
       }, 800);
     }
 
-    // Inject progress bar into report
-    setTimeout(function() {
+    // Inject progress bar into report. The render section may not exist
+    // yet when DOMContentLoaded fires (renderer-individual.js runs after
+    // us in script load order), so try once now and watch the DOM for the
+    // anchor to appear so we inject as soon as it does.
+    function injectProgress(streak) {
       var anchor = document.querySelector('.streak-progress-anchor');
-      if (anchor && streak.count >= 1 && streak.count < 7) {
+      if (anchor && streak.count >= 1 && streak.count < 7
+          && !anchor.querySelector('.streak-container')) {
         anchor.innerHTML = buildStreakProgress(streak);
+        return true;
       }
-    }, 600);
+      return false;
+    }
+    function injectDiscount() {
+      var container = document.querySelector('.streak-discount-anchor');
+      if (container && !container.querySelector('.streak-discount-banner')) {
+        var html = buildDiscountBanner();
+        if (html) container.innerHTML = html;
+      }
+    }
+
+    if (!injectProgress(streak)) {
+      // Watch for late-rendered anchors (race with renderer-individual.js).
+      if (typeof MutationObserver !== 'undefined' && document.body) {
+        var obs = new MutationObserver(function() {
+          var now = updateStreak();
+          if (injectProgress(now)) obs.disconnect();
+          injectDiscount();
+        });
+        obs.observe(document.body, { childList: true, subtree: true });
+        // Stop watching after 10s to avoid leaking the observer.
+        setTimeout(function() { try { obs.disconnect(); } catch (e) {} }, 10000);
+      } else {
+        // Fallback: poll
+        var attempts = 0;
+        var poll = setInterval(function() {
+          attempts++;
+          if (injectProgress(streak) || attempts > 20) clearInterval(poll);
+        }, 300);
+      }
+    }
+    injectDiscount();
   }
 
   // Public API. `getStreak` is the most-called entrypoint — route it through
