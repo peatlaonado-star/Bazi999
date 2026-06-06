@@ -165,8 +165,36 @@ describe('Couple mode rendering', () => {
     expect(output).toContain('ปลดล็อกรีพอร์ตฉบับเต็ม');
     expect(output).not.toContain('สิ่งที่คู่นี้มาเรียนรู้ร่วมกัน');
     expect(output).not.toContain('พิมพ์เขียวความสัมพันธ์');
-    expect(dom.window.document.querySelector('.cg2.is-locked')).toBeTruthy();
-    expect(dom.window.document.querySelector('.dharma-card.is-locked')).toBeTruthy();
+    // 3 premium sections folded into 1 <details>
+    // The score breakdown is still marked is-locked but now lives inside
+    // the consolidated <details> card. Use [class~="is-locked"] to avoid
+    // JSDOM compound-selector quirks.
+    const lockedCount = dom.window.document.querySelectorAll('[class*="is-locked"]').length;
+    expect(lockedCount).toBeGreaterThan(0); // at least the breakdown + lock overlay
+    expect(dom.window.document.querySelector('.couple-premium-details')).toBeTruthy();
+  });
+
+  it('renders consolidated premium as <details> collapsed by default', () => {
+    const dom = new JSDOM('<!doctype html><div id="r1"></div><div id="tt1"></div><div id="ts1"></div>');
+    const pa = planet('อาทิตย์', 'ไฟ', 0);
+    const pb = planet('เสาร์', 'ไฟ', 0);
+    const context = loadContext(dom, {
+      getPL: () => [pa, pb],
+      ELC: [[78]],
+      PLC: [[78, 78], [78, 78]],
+      getELD: () => [['ไฟเจอไฟ']],
+      rasiAngle: () => [78, 'มุม'],
+    });
+    const ra = sign('เมษ');
+    const rb = sign('สิงห์');
+    const RA2 = [ra, rb];
+
+    context.renderCouple('A', pa, ra, ra, 0, 0, 'B', pb, rb, rb, 1, 1, coupleUi(), RA2);
+
+    const details = dom.window.document.querySelector('details.couple-premium-details');
+    expect(details).toBeTruthy();
+    expect(details.hasAttribute('open')).toBe(false);
+    expect(details.querySelectorAll('.ci2').length).toBe(4);
   });
 
   it('shows couple premium details after unlock', () => {
