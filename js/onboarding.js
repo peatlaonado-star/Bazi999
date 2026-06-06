@@ -124,18 +124,31 @@ var Onboarding = (function() {
   }
 
   function renderWelcomeScreen() {
+    // Pull live review count from SocialProof so the "ร่วมกับผู้ใช้ X คน"
+    // figure stays in sync with the homepage counter. Fall back to a
+    // sane default if SocialProof hasn't loaded yet (e.g. before DOMContentLoaded).
+    var socialProof = (typeof SocialProof !== 'undefined' && SocialProof.getReviewCount)
+      ? SocialProof.getReviewCount()
+      : 2373;
+    var formatted = socialProof.toLocaleString('th-TH');
+
     return '<div class="ob-overlay" id="onboarding-overlay">'
       + '<div class="ob-card ob-welcome">'
       + '<div class="ob-logo">✦ STARVIA ✦</div>'
-      + '<h2 class="ob-title">ยินดีต้อนรับสู่ STARVIA</h2>'
+      + '<h2 class="ob-title">✨ ค้นพบตัวตนที่แท้จริง<br>ใน 30 วินาที</h2>'
       + '<p class="ob-subtitle">ระบบอ่านแผนที่ชีวิตด้วยโหราศาสตร์ไทย สำหรับคนยุคใหม่</p>'
+      + '<div class="ob-social-proof">'
+      + '🌟 ร่วมกับผู้ใช้ <strong>' + formatted + '</strong> คน<br>'
+      + '<span class="ob-social-sub">ที่ค้นพบดวงของตัวเองแล้ว · 4.8★ (2,373 รีวิว)</span>'
+      + '</div>'
       + '<div class="ob-features">'
       + '<div class="ob-feature">🌟 พิมพ์เขียวชีวิตไทย — รู้จักตัวเองลึกกว่าเดิม</div>'
       + '<div class="ob-feature">🔮 ดวงรายวัน — ทุกวันมีคำทำนายส่วนตัว</div>'
       + '<div class="ob-feature">💕 ดูดวงคู่ — เข้าใจความสัมพันธ์</div>'
       + '</div>'
-      + '<button class="ob-btn ob-btn-primary" data-action="onboarding-next">เริ่มเดินทาง →</button>'
-      + '<p class="ob-hint">ใช้เวลาไม่ถึง 1 นาที</p>'
+      + '<button class="ob-btn ob-btn-primary" data-action="onboarding-next">🔮 เปิดดวงชะตา →</button>'
+      + '<button class="ob-btn ob-btn-secondary" data-action="onboarding-preview">👁️ ดูตัวอย่างก่อน</button>'
+      + '<p class="ob-hint">ใช้เวลาไม่ถึง 30 วินาที · ไม่ต้องสมัครสมาชิก</p>'
       + '</div>'
       + '</div>';
   }
@@ -362,6 +375,23 @@ var Onboarding = (function() {
         var ob = document.getElementById('onboarding-overlay');
         if (ob) ob.remove();
         advanceStep();
+      } else if (action === 'onboarding-preview') {
+        // Soft dismiss — close the welcome overlay WITHOUT marking the
+        // onboarding as started. The user can browse the landing page
+        // (daily fortune, social proof, value sections) before deciding
+        // to start the birth-data flow. Re-shows on next visit.
+        try { localStorage.removeItem('onboarding_previewed'); } catch(e) {}
+        var pv = document.getElementById('onboarding-overlay');
+        if (pv) pv.remove();
+        // Smooth-scroll to the value section so the user lands on context,
+        // not the top of the page (which would feel like the overlay is
+        // still hovering over the content).
+        var valueSection = document.querySelector('.value-section');
+        if (valueSection && typeof valueSection.scrollIntoView === 'function') {
+          valueSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          window.scrollTo({ top: 600, behavior: 'smooth' });
+        }
       } else if (action === 'onboarding-premium') {
         window.location.hash = '#premium';
       }
