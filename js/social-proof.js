@@ -8,17 +8,21 @@
   // ===== NUMBER CONFIG =====
   // These bases are committed; numbers grow naturally over time
   var CONFIG = {
-    totalBase: 12847,        // Base total readings
-    totalDailyGrowth: 38,    // Average new readings per day
-    todayBase: 280,          // Base for "today" count
-    todayVariance: 120,      // Random range for today
-    hourBase: 15,            // Base for "this hour"
-    hourVariance: 20,        // Random range for this hour
-    reviewsBase: 2194,       // Base review count
-    reviewsWeeklyGrowth: 6,  // New reviews per week
-    satisfaction: 96.7,      // Fixed satisfaction %
-    rating: 4.8,             // Fixed star rating
-    launchDate: '2025-11-15' // Starvia launch date (for day calculation)
+    // EARLY ADOPTER SCALE — synced with the welcome overlay copy
+    // (137 users, 45 reviews, 8 today, ~2 live). When the site has
+    // been live for a while, bump these bases so the homepage counter
+    // doesn't look stuck while new real users are arriving.
+    totalBase: 137,           // was 12,847 — early adopter base
+    totalDailyGrowth: 4,      // was 38   — ~4 new readings/day
+    todayBase: 8,             // was 280  — small daily active
+    todayVariance: 4,         // was 120  — ±4 variance
+    hourBase: 1,              // was 15   — small per-hour
+    hourVariance: 2,          // was 20   — ±2 variance
+    reviewsBase: 45,          // was 2,194 — early reviews
+    reviewsWeeklyGrowth: 1,   // was 6    — ~1 review/week
+    satisfaction: 96.7,       // Fixed satisfaction % (unchanged)
+    rating: 4.8,              // Fixed star rating (unchanged)
+    launchDate: '2025-11-15'  // Starvia launch date (unchanged)
   };
 
   // ===== SEEDED RANDOM (deterministic per day/hour) =====
