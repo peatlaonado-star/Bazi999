@@ -1,10 +1,10 @@
-name: CI
+name: CI + Deploy
 
 on:
   push:
-    branches: [master]
+    branches: [main, master]
   pull_request:
-    branches: [master]
+    branches: [main, master]
 
 jobs:
   test:
@@ -19,3 +19,37 @@ jobs:
       - run: npm test
       - run: npm run check:js
       - run: npm run build
+
+  # CF Pages GitHub webhook is unreliable in this project (deploys show
+  # type=ad_hoc), so we explicitly trigger a deploy via the CF API after
+  # tests pass on main. Skipped on PRs (preview deploys are created by
+  # the webhook when it works).
+  deploy:
+    needs: test
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Trigger Cloudflare Pages deploy
+        env:
+          CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_KEY }}
+          CLOUDFLARE_EMAIL: ${{ secrets.CLOUDFLARE_EMAIL }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -e
+          pip install --quiet requests 2>/dev/null || true
+          COMMIT=$(git rev-parse HEAD)
+          echo "🚀 Triggering deploy for commit ${COMMIT:0:10}..."
+          RESP=$(curl -s -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/starvia/deployments" \
+            -H "X-Auth-Email: ${CLOUDFLARE_EMAIL}" \
+            -H "X-Auth-Key: ${CLOUDFLARE_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "{\"deployment_trigger\":{\"type\":\"ad_hoc\",\"metadata\":{\"branch\":\"main\",\"commit_hash\":\"${COMMIT}\"}}}")
+          echo "$RESP" | python3 -m json.tool
+          DEPLOY_ID=$(echo "$RESP" | python3 -c "import json,sys; print(json.load(sys.stdin)['result']['id'])")
+          echo "✅ Deploy ID: $DEPLOY_ID"
+          echo "::set-output name=deploy_id::$DEPLOY_ID"
+          echo "DEPLOY_ID=$DEPLOY_ID" >> $GITHUB_OUTPUT
