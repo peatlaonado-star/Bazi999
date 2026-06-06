@@ -1020,13 +1020,18 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
   if (typeof initCollapsibleSections === 'function') initCollapsibleSections();
   // Load lottery results after report renders
   if (typeof loadLotteryResults === 'function') setTimeout(loadLotteryResults, 400);
-  document.getElementById('ts0').insertAdjacentHTML('beforeend',
-    '<div class="mc"><div class="mc-l">✦ '+u.mn+' · '+nm+' ✦</div>'
-    +'<div class="mc-t">"'+p.man+'"</div></div>'
-    + '<div id="ind-share-section" class="ind-share-section"></div>'
-    + consultHtml
-    +'<div class="rbt"><button class="rbtn" data-action="reset-mode" data-mode="0">'+u.r0+'</button></div>'
-  );
+  
+  // Insert content AFTER the tabs section (not inside tabs)
+  var tabsCard = document.querySelector('.detail-tabs-card');
+  if (tabsCard) {
+    tabsCard.insertAdjacentHTML('afterend',
+      '<div class="mc"><div class="mc-l">✦ '+u.mn+' · '+nm+' ✦</div>'
+      +'<div class="mc-t">"'+p.man+'"</div></div>'
+      + '<div id="ind-share-section" class="ind-share-section"></div>'
+      + consultHtml
+      +'<div class="rbt"><button class="rbtn" data-action="reset-mode" data-mode="0">'+u.r0+'</button></div>'
+    );
+  }
 
   // Render personalized share buttons
   if (typeof ShareViral !== 'undefined' && ShareViral.renderPersonalizedShare) {

@@ -2024,21 +2024,6 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   margin-bottom: 8px;
 }
 
-/* Locked tab — show teaser content with blur */
-.is-locked .tab-section-card .tsc-body,
-.is-locked .tab-section-card .tsc-ref {
-  opacity: .35;
-  filter: blur(3px);
-  user-select: none;
-  transition: all 0.3s ease;
-}
-
-/* Show first card more clearly as teaser */
-.is-locked .tab-section-card:first-child .tsc-body {
-  opacity: .5;
-  filter: blur(2px);
-}
-
 /* Final premium landing overrides */
 
 /* World-class typography/layout calibration: Apple/Linear/Stripe-inspired scale */
@@ -2562,7 +2547,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .lock-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(13,8,40,0.15) 0%, rgba(13,8,40,0.7) 30%, rgba(13,8,40,0.9) 60%, rgba(13,8,40,0.95) 100%);
+  background: linear-gradient(180deg, rgba(13,8,40,0.05) 0%, rgba(13,8,40,0.4) 40%, rgba(13,8,40,0.7) 70%, rgba(13,8,40,0.85) 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2571,7 +2556,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   border-radius: inherit;
   padding: 20px;
   text-align: center;
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(1px);
 }
 
 .lock-icon {
