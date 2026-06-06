@@ -171,6 +171,11 @@ function renderSingleLoveOpportunity(na,pa,ra,la,ria,lia,u,RA2,dateA){
     + '</ol>'
     + '<div class="ld-note"><strong>สัญญาณคนที่ควรให้โอกาส:</strong> ' + escapeHTML(model.signal) + '</div>'
     + '</div>';
+  // Free users: show teaser instead of locked card (consistent with couple mode)
+  var freeTeaser = '<div class="love-destiny-teaser">'
+    + '<div class="ld-section-title">🔒 แผนเปิดทางความรัก 3 ขั้น + สัญญาณคนที่ควรให้โอกาส</div>'
+    + '<p style="color:var(--tx2); font-size:13px; text-align:center; margin:8px 0;">ปลดล็อกเพื่อดูแผน 3 ขั้น วิธีเปิดโอกาส และสัญญาณคนที่ควรให้โอกาส</p>'
+    + '</div>';
   wrap.innerHTML = '<div class="love-destiny-card single-love-card">'
     + '<div class="ld-kicker">Single Love Timing</div>'
     + '<div class="ld-title">💖 โอกาสเจอคู่ของคุณ</div>'
@@ -183,7 +188,7 @@ function renderSingleLoveOpportunity(na,pa,ra,la,ria,lia,u,RA2,dateA){
     + '<div><b>ราศี/พลังที่มีแนวโน้มเข้ามา</b><br>' + escapeHTML(model.partnerSignSymbol + ' ' + model.partnerSignName) + ' · ธาตุ' + escapeHTML(model.partnerElement) + '</div>'
     + '<div><b>นิสัยคนที่มีแนวโน้มเข้ากัน</b><br>' + escapeHTML(model.traits) + '</div>'
     + '</div>'
-    + (premiumUnlocked ? premiumHtml : '<div class="love-destiny-locked">' + premiumLockedCard('love-destiny-lock-card', '<div class="ld-section-title">ปลดล็อกเพื่อดูแผน 3 ขั้น วิธีเปิดโอกาส และสัญญาณคนที่ควรให้โอกาส</div>', 'ปลดล็อกแผนเปิดทางความรัก', 'ดูสถานที่ควรไป วิธีคัดคน และสัญญาณคู่ที่เหมาะกับดวงคุณแบบละเอียด') + '</div>')
+    + (premiumUnlocked ? premiumHtml : freeTeaser)
     + '<div class="ld-ref">' + escapeHTML(model.reference) + '</div>'
     + '</div>'
     + '<div class="rbt"><button class="rbtn" data-action="reset-mode" data-mode="1">' + (u.r1 || 'เริ่มใหม่') + '</button></div>';
@@ -194,6 +199,11 @@ function buildLoveDestinyCard(model, premiumUnlocked, na, nb){
     + '<div class="ld-section-title">แผนเพิ่มโอกาสให้ได้คู่ที่เข้ากัน</div>'
     + '<ol>' + model.premiumPlan.map(function(item){ return '<li>' + escapeHTML(item) + '</li>'; }).join('') + '</ol>'
     + '<div class="ld-note"><strong>จุดที่ต้องระวัง:</strong> ' + escapeHTML(model.risk) + '</div>'
+    + '</div>';
+  // Free users: show teaser instead of locked card (consolidated into couple-premium-details)
+  var freeTeaser = '<div class="love-destiny-teaser">'
+    + '<div class="ld-section-title">🔒 แผนเพิ่มโอกาส 3 ขั้น + จุดระวัง</div>'
+    + '<p style="color:var(--tx2); font-size:13px; text-align:center; margin:8px 0;">ปลดล็อกรีพอร์ตคู่รักเพื่อดูแผนเพิ่มโอกาส 3 ขั้น และจุดที่ต้องระวังของคู่นี้</p>'
     + '</div>';
   return '<div class="love-destiny-card">'
     + '<div class="ld-kicker">Love Timing Method</div>'
@@ -208,7 +218,7 @@ function buildLoveDestinyCard(model, premiumUnlocked, na, nb){
     + '<div><b>' + na + '</b><br>จังหวะเปิดเด่น: ' + escapeHTML(model.wa.label) + '</div>'
     + '<div><b>' + nb + '</b><br>จังหวะเปิดเด่น: ' + escapeHTML(model.wb.label) + '</div>'
     + '</div>'
-    + (premiumUnlocked ? premiumHtml : '<div class="love-destiny-locked">' + premiumLockedCard('love-destiny-lock-card', '<div class="ld-section-title">ปลดล็อกเพื่อดูแผน 3 ขั้น วิธีเพิ่มโอกาส และสัญญาณว่าคนนี้ใช่จริงไหม</div>', 'ปลดล็อกแผนความรักเฉพาะคู่', 'ดูวิธีเข้าหา สภาพแวดล้อมที่ควรไป และจุดระวังของคู่นี้แบบละเอียด') + '</div>')
+    + (premiumUnlocked ? premiumHtml : freeTeaser)
     + '<div class="ld-ref">' + escapeHTML(model.reference) + '</div>'
     + '</div>';
 }
@@ -313,23 +323,33 @@ function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2,dateA,dateB
   // <summary> to peek at the teasers, then unlocks via the single CTA.
   // Inside we mark the breakdown boxes as is-locked so the existing CSS
   // rule keeps the score numbers blurred until the card is opened.
+  // NOW INCLUDES: Love Timing premium plan (consolidated from love-destiny-locked)
   var visibleActionPlanHtml;
   if (premiumUnlocked) {
     visibleActionPlanHtml = '';
   } else {
     var lockedBreakdown = scoreBreakdownHtml
       .replace('<div class="cg2">', '<div class="cg2 is-locked">');
+    // Build love timing premium plan content for consolidated view
+    var loveTimingPremiumHtml = '<div class="lt-premium-section">'
+      + '<div class="lt-premium-title">💖 แผนเพิ่มโอกาส 3 ขั้น + จุดระวัง</div>'
+      + '<ol style="margin:12px 0 12px 20px; color:var(--tx); line-height:1.8;">'
+      + loveDestiny.premiumPlan.map(function(item){ return '<li>' + escapeHTML(item) + '</li>'; }).join('')
+      + '</ol>'
+      + '<div class="lt-premium-risk"><strong>จุดที่ต้องระวัง:</strong> ' + escapeHTML(loveDestiny.risk) + '</div>'
+      + '</div>';
     visibleActionPlanHtml = '<details class="couple-premium-details">'
-      + '<summary><span class="cpd-icon">🔒</span> ปลดล็อกรีพอร์ตคู่รักฉบับเต็ม — 3 หัวข้อ (Dharma · คะแนนย่อย · แผนความสัมพันธ์)</summary>'
+      + '<summary><span class="cpd-icon">🔒</span> ปลดล็อกรีพอร์ตคู่รักฉบับเต็ม — 4 หัวข้อ (Love Timing · Dharma · คะแนนย่อย · แผนความสัมพันธ์)</summary>'
       + '<div class="cpd-body">'
+      +   loveTimingPremiumHtml
       +   dharmaTeaser
       +   lockedBreakdown
       +   actionPlanTeaserHtml
       +   '<div class="lock-overlay">'
       +     '<div style="font-size:35px; margin-bottom:10px; filter:drop-shadow(0 2px 5px rgba(0,0,0,0.5));">🔒</div>'
       +     '<div style="color:#C9A227; font-size:16px; font-weight:700; margin-bottom:5px;">ปลดล็อกรีพอร์ตคู่รักฉบับเต็ม</div>'
-      +     '<div style="color:#b8a8d8; font-size:13px; margin-bottom:15px; max-width:340px; line-height:1.6;">อ่านบทเรียนความสัมพันธ์ คะแนนย่อย 4 ด้าน และแผน 3 ขั้นสำหรับคู่ของคุณ</div>'
-      +     '<button class="pdf-btn" data-action="open-payment" style="padding:10px 24px; font-size:13px; box-shadow:0 4px 15px rgba(201,162,39,0.3);">ปลดล็อกรีพอร์ตฉบับเต็ม 199 THB</button>'
+      +     '<div style="color:#b8a8d8; font-size:13px; margin-bottom:15px; max-width:340px; line-height:1.6;">อ่านแผน Love Timing บทเรียนความสัมพันธ์ คะแนนย่อย 4 ด้าน และแผน 3 ขั้นสำหรับคู่ของคุณ</div>'
+      +     '<button class="pdf-btn" data-action="open-payment" style="padding:10px 24px; font-size:13px; box-shadow:0 4px 15px rgba(201,162,39,0.3);">ปลดล็อกรีพอร์ตฉบับเต็ม 199/เดือน</button>'
       +   '</div>'
       + '</div>'
       + '</details>';

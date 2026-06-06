@@ -9,7 +9,7 @@ function buildPremiumLockOverlay(title, description){
     + '<div style="font-size:35px; margin-bottom:10px; filter:drop-shadow(0 2px 5px rgba(0,0,0,0.5));">🔒</div>'
     + '<div style="color:#C9A227; font-size:16px; font-weight:700; margin-bottom:5px;">' + title + '</div>'
     + '<div style="color:#b8a8d8; font-size:13px; margin-bottom:15px; max-width:300px; line-height:1.6;">' + description + '</div>'
-    + '<button class="pdf-btn" data-action="open-payment" style="padding:10px 24px; font-size:13px; box-shadow:0 4px 15px rgba(201,162,39,0.3);">ปลดล็อกรีพอร์ตฉบับเต็ม 199 THB</button>'
+    + '<button class="pdf-btn" data-action="open-payment" style="padding:10px 24px; font-size:13px; box-shadow:0 4px 15px rgba(201,162,39,0.3);">ปลดล็อกรีพอร์ตฉบับเต็ม 199/เดือน</button>'
     + '</div>';
 }
 

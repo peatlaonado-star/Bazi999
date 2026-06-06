@@ -238,7 +238,7 @@ function buildPaymentModalHtml() {
     + '<div style="font-size:20px; color:#8B6914; text-decoration:line-through; margin-bottom:2px;">590 THB</div>'
     + '<div style="font-size:30px; font-weight:700; color:#fff; line-height:1.1;">199 THB</div>'
     + '<div style="font-size:11px; color:#4CAF50; font-weight:600; margin-top:4px;">🔥 ลด 66% — Early Access ราคานี้เท่านั้น</div>'
-    + '<div style="font-size:9px; color:#7a6a9a; margin-top:3px;">เหลืออีก <strong style="color:#C9A227;">18</strong> ที่นั่งในราคานี้</div>'
+    + '<div style="font-size:9px; color:#7a6a9a; margin-top:3px;">ชำระทุกเดือน · ไม่มีข้อผูกมัด ยกเลิกเมื่อไหร่ก็ได้</div>'
     + '</div>'
 
     // Benefits checklist
@@ -313,7 +313,7 @@ function buildPaymentModalHtml() {
     + '</div>'
 
     // Guarantee
-    + '<div style="text-align:center; font-size:9px; color:#5a4a7a; margin-top:10px; letter-spacing:.04em;">🔒 ชำระครั้งเดียว — ปลดล็อกถาวร ไม่มีต่ออายุ</div>'
+    + '<div style="text-align:center; font-size:9px; color:#5a4a7a; margin-top:10px; letter-spacing:.04em;">📅 199 THB/เดือน · ยกเลิกเมื่อไหร่ก็ได้ · ยิ่งอ่านยิ่งคุ้ม</div>'
     + '</div>'
 
     + '</div>';
