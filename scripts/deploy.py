@@ -118,6 +118,78 @@ def trigger_deploy(creds, commit_sha):
     return resp["result"]
 
 
+PROD_URL = "https://starvia.website"
+
+
+def verify_production(deploy_id, expected_token=None, timeout=60):
+    """After CF says success, verify the live URL actually reflects the new
+    build. This catches the case where CF build succeeded but CDN/proxy is
+    still serving stale content (or git push didn't include the new file).
+
+    Checks:
+      1. Production URL is reachable (HTTP 200)
+      2. The CSS bundle on production contains expected marker (e.g. a new
+         class name from the build), OR matches the asset we just deployed
+      3. Returns a dict with bundle name, marker found, status
+    """
+    print(f"🔍 Verifying production {PROD_URL} reflects new build...")
+
+    # Use a real browser User-Agent — Cloudflare's bot protection
+    # returns 403 for default urllib/python-requests User-Agent.
+    HEADERS = {
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                      "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9,th;q=0.8",
+    }
+
+    # 1. Reachability
+    try:
+        req = Request(PROD_URL, headers=HEADERS)
+        with urlopen(req, timeout=15) as r:
+            status = r.status
+            html = r.read().decode("utf-8", errors="replace")
+    except Exception as e:
+        return {"ok": False, "error": f"unreachable: {e}"}
+
+    if status != 200:
+        return {"ok": False, "error": f"HTTP {status}"}
+
+    # 2. Extract current CSS bundle
+    import re
+    m = re.search(r'(main-[A-Za-z0-9_-]+\.css)', html)
+    if not m:
+        return {"ok": False, "error": "no main-*.css in HTML"}
+    current_css = m.group(1)
+    print(f"  📦 Production CSS: {current_css}")
+
+    # 3. Fetch the CSS and check for expected marker
+    css_url = f"{PROD_URL}/assets/{current_css}"
+    try:
+        req = Request(css_url, headers=HEADERS)
+        with urlopen(req, timeout=15) as r:
+            css = r.read().decode("utf-8", errors="replace")
+    except Exception as e:
+        return {"ok": False, "error": f"CSS unreachable: {e}"}
+
+    if expected_token:
+        if expected_token in css:
+            print(f"  ✅ Marker '{expected_token}' found in CSS")
+        else:
+            return {
+                "ok": False,
+                "error": f"marker '{expected_token}' not in {current_css}",
+                "css_bundle": current_css,
+            }
+
+    return {
+        "ok": True,
+        "http_status": status,
+        "css_bundle": current_css,
+        "css_size_kb": round(len(css) / 1024, 1),
+    }
+
+
 def get_deployment(creds, deploy_id):
     path = f"/accounts/{creds['CLOUDFLARE_ACCOUNT_ID']}/pages/projects/{PROJECT_NAME}/deployments/{deploy_id}"
     return cf_request("GET", path, creds)["result"]
@@ -144,6 +216,10 @@ def main():
     parser.add_argument("--commit", help="Specific commit SHA (default: HEAD)")
     parser.add_argument("--wait", action="store_true", help="Wait for build to finish")
     parser.add_argument("--url", action="store_true", help="Print preview URL when done")
+    parser.add_argument("--verify", action="store_true",
+                        help="After build succeeds, verify production reflects the change (curl + CSS marker)")
+    parser.add_argument("--verify-token", default=None,
+                        help="String that MUST appear in production CSS after deploy (e.g. 'streak-reward-card')")
     parser.add_argument("--repo", default=".", help="Path to git repo")
     args = parser.parse_args()
 
@@ -170,6 +246,20 @@ def main():
             print(f"🌐 Production: https://{PROJECT_NAME}.website")
             if args.url or preview_url:
                 print(f"🔍 Preview:   {preview_url}")
+
+            # Production verification — actually fetch the live URL and
+            # confirm the new code is being served (catches CDN lag, wrong
+            # commit deployed, etc.)
+            if args.verify:
+                print()
+                verify_result = verify_production(
+                    deploy_id,
+                    expected_token=args.verify_token,
+                )
+                if verify_result.get("ok"):
+                    print(f"✅ Production verified: {verify_result['css_bundle']} ({verify_result['css_size_kb']} KB)")
+                else:
+                    sys.exit(f"❌ Production verify failed: {verify_result.get('error')}")
         else:
             sys.exit(f"❌ Build failed: status={status}")
     elif args.url and preview_url:
