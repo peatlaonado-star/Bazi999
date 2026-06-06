@@ -130,22 +130,25 @@ async function handleLottery(req, res) {
 async function handleStreak(req, res) {
   const url = req.url || '/';
   
-  // POST /v1/streak/create
-  if (req.method === 'POST' && url === '/v1/streak/create') {
+  // POST /v1/streak/reward — claim 7-day streak reward
+  if (req.method === 'POST' && url === '/v1/streak/reward') {
     try {
-      const body = await readJsonBody(req);
-      const result = createStreakReward(body);
+      const result = createStreakReward(req);  // pass raw req so service can read UA + IP for fingerprint
       return writeJson(res, result.success ? 200 : 400, result);
     } catch (err) {
       return writeJson(res, 400, { success: false, error: 'ข้อมูลไม่ถูกต้อง' });
     }
   }
   
-  // POST /v1/streak/verify
+  // POST /v1/streak/verify — activate STREAK-XXXX code
   if (req.method === 'POST' && url === '/v1/streak/verify') {
     try {
       const body = await readJsonBody(req);
-      const result = verifyStreakReward(body);
+      const code = body && body.code;
+      if (!code) {
+        return writeJson(res, 400, { success: false, error: 'กรุณากรอกรหัส' });
+      }
+      const result = verifyStreakReward(code);
       return writeJson(res, result.success ? 200 : 400, result);
     } catch (err) {
       return writeJson(res, 400, { success: false, error: 'ข้อมูลไม่ถูกต้อง' });
