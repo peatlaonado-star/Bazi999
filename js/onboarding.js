@@ -225,21 +225,58 @@ var Onboarding = (function() {
   }
 
   function renderPremiumCTA(streak) {
+    // Use StreakReward (single source of truth) so "ดูดวงมา X วัน" matches
+    // the unlock counter and the countdown lines up.
     var day = streak + 1;
-    var remaining = Math.max(0, 11 - day);
-    if (remaining > 0) {
-      return '<div class="ob-premium-teaser">'
-        + '<p>🔒 ปลดล็อกผลทำนายเชิงลึก</p>'
-        + '<p class="ob-premium-price">199 บาท/เดือน</p>'
-        + '<p class="ob-hint">ทดลอง Premium ฟรี 3 วัน — เหลืออีก ' + remaining + ' วัน</p>'
+    // Trial offer: Day 7 unlocks the streak reward, Day 11 unlocks the free
+    // trial countdown ends. Show countdown for the full week so the goal is
+    // always visible.
+    var rewardDay = 7;
+    var trialEndsDay = 11;
+    var rewardRemaining = Math.max(0, rewardDay - day);
+    var trialRemaining = Math.max(0, trialEndsDay - day);
+
+    // Has the user already unlocked the streak reward this cycle?
+    var alreadyUnlocked = (typeof StreakReward !== 'undefined')
+      ? StreakReward.isPremiumUnlocked() : false;
+    var rewardExpired = (typeof StreakReward !== 'undefined')
+      ? StreakReward.isPremiumExpired() : false;
+
+    var teaserHtml = '<div class="ob-premium-teaser">'
+      + '<p>🔒 ปลดล็อกผลทำนายเชิงลึก</p>'
+      + '<p class="ob-premium-price">199 บาท/เดือน</p>';
+
+    if (day >= 7 && alreadyUnlocked) {
+      // Premium is currently active — confirm it
+      teaserHtml += '<p class="ob-hint ob-hint-active">✦ Premium เปิดใช้งานแล้ว — ใช้ได้อีก 24 ชม.</p>';
+    } else if (day >= 7 && rewardExpired) {
+      // Free trial used → upsell
+      teaserHtml += '<p class="ob-hint">ทดลองใช้ Premium 1 วันไปแล้ว — สมัครต่อเพียง 159 บาท/เดือน</p>';
+    } else if (day >= 7) {
+      // Eligible to claim
+      teaserHtml += '<p class="ob-hint ob-hint-claim">🎁 ครบ 7 วันแล้ว! กดรับ Premium ฟรี 1 วัน →</p>';
+    } else {
+      // Pre-claim countdown
+      teaserHtml += '<p class="ob-hint">ทดลอง Premium ฟรี 1 วัน — อีก ' + rewardRemaining + ' วัน!</p>';
+      teaserHtml += '<div class="ob-reward-preview">'
+        + '<span class="ob-reward-mini-badge">✦ PREMIUM 1 วัน</span>'
+        + '<span class="ob-reward-mini-desc">ปลดล็อกดวงเต็ม · ลาภลอย · หมอทัก</span>'
         + '</div>';
     }
-    return '<div class="ob-premium-teaser ob-premium-offer">'
-      + '<div class="ob-premium-badge">🎁 ข้อเสนอพิเศษ</div>'
-      + '<p>ทดลอง Premium ฟรี 3 วัน!</p>'
-      + '<p class="ob-premium-price">199 บาท/เดือน (หลังทดลอง)</p>'
-      + '<button class="ob-btn ob-btn-premium" data-action="onboarding-premium">ปลดล็อกทุกอย่าง →</button>'
-      + '</div>';
+
+    teaserHtml += '</div>';
+
+    // Day 11+: full offer for the 3-day free trial
+    if (day >= 11) {
+      teaserHtml = '<div class="ob-premium-teaser ob-premium-offer">'
+        + '<div class="ob-premium-badge">🎁 ข้อเสนอพิเศษ</div>'
+        + '<p>ทดลอง Premium ฟรี 3 วัน!</p>'
+        + '<p class="ob-premium-price">199 บาท/เดือน (หลังทดลอง)</p>'
+        + '<button class="ob-btn ob-btn-premium" data-action="onboarding-premium">ปลดล็อกทุกอย่าง →</button>'
+        + '</div>';
+    }
+
+    return teaserHtml;
   }
 
   function renderWeeklySummary(streak) {

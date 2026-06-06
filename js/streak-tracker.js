@@ -35,31 +35,47 @@
     return Math.round((b - a) / 86400000);
   }
 
-  // Update streak on each visit
+  // Update streak — uses Onboarding journey day (consecutive since signup)
+  // so the UI text "ดูดวงมา X วัน" matches the unlock counter.
   function updateStreak() {
-    var streak = getStreak();
+    var streak = { count: 0, lastDate: null, startDate: null };
+
+    // Try to read from Onboarding state first (single source of truth)
+    try {
+      var raw = localStorage.getItem('starvia_onboarding');
+      if (raw) {
+        var ob = JSON.parse(raw);
+        if (ob && ob.startedAt) {
+          var startedAt = new Date(ob.startedAt);
+          if (!isNaN(startedAt.getTime())) {
+            var today = new Date(todayStr() + 'T00:00:00');
+            var day = Math.max(0, Math.floor((today - startedAt) / 86400000));
+            // day 0 = signup day, day 1 = next day, etc. Reward unlocks at day 7.
+            streak.count = day + 1;
+            streak.startDate = ob.startedAt;
+            streak.lastDate = todayStr();
+            return streak;
+          }
+        }
+      }
+    } catch (e) { /* fall through to legacy */ }
+
+    // Legacy: consecutive day count from localStorage (back-compat for users
+    // who somehow landed here before the Onboarding flow set up state).
+    var legacy = { count: 0, lastDate: null, startDate: null };
+    try {
+      var rawLegacy = localStorage.getItem(STREAK_KEY);
+      if (rawLegacy) legacy = JSON.parse(rawLegacy);
+    } catch (e) {}
     var today = todayStr();
-
-    if (streak.lastDate === today) {
-      // Already visited today — no change
-      return streak;
-    }
-
-    var gap = streak.lastDate ? daysBetween(streak.lastDate, today) : 999;
-
-    if (gap === 1) {
-      // Consecutive day!
-      streak.count += 1;
-    } else if (gap > 1) {
-      // Streak broken — restart
-      streak.count = 1;
-      streak.startDate = today;
-    }
-
-    streak.lastDate = today;
-    if (!streak.startDate) streak.startDate = today;
-    saveStreak(streak);
-    return streak;
+    if (legacy.lastDate === today) return legacy;
+    var gap = legacy.lastDate ? daysBetween(legacy.lastDate, today) : 999;
+    if (gap === 1) legacy.count += 1;
+    else if (gap > 1) { legacy.count = 1; legacy.startDate = today; }
+    legacy.lastDate = today;
+    if (!legacy.startDate) legacy.startDate = today;
+    saveStreak(legacy);
+    return legacy;
   }
 
   // Check if Premium is currently unlocked via streak
@@ -125,12 +141,13 @@
     return null;
   }
 
-  // Build streak progress bar HTML
+  // Build streak progress bar HTML — shows users EXACTLY what reward they'll
+  // get when they hit 7 days, so the goal is visible before the popup fires.
   function buildStreakProgress(streak) {
     var count = streak.count;
     var target = 7;
     var percent = Math.min(100, Math.round((count / target) * 100));
-    var remaining = target - count;
+    var remaining = Math.max(0, target - count);
 
     // Don't show if already used the reward
     if (isPremiumExpired() || isDiscountOffered()) return '';
@@ -159,13 +176,34 @@
       dots += '</span>';
     }
 
+    // Reward preview — always visible so users know what they're working toward
+    var rewardPreview = ''
+      + '<div class="streak-reward-card">'
+      + '<div class="streak-reward-icon">🎁</div>'
+      + '<div class="streak-reward-body">'
+      + '<div class="streak-reward-title">ครบ 7 วัน — รับฟรีทันที!</div>'
+      + '<div class="streak-reward-detail">'
+      + '<span class="streak-reward-badge">✦ PREMIUM 1 วัน</span>'
+      + '<span class="streak-reward-desc">ปลดล็อกดวงเต็ม · ลาภลอย · หมอทัก · คัมภีร์ 6 ด้าน</span>'
+      + '</div>'
+      + (count >= 7
+          ? '<button class="streak-reward-cta" onclick="StreakReward.claimReward()">🔓 รับรางวัลเลย</button>'
+          : '<div class="streak-reward-progress">'
+            + '<div class="streak-reward-bar-wrap">'
+            + '<div class="streak-reward-bar" style="width:' + percent + '%"></div>'
+            + '</div>'
+            + '<div class="streak-reward-count">' + count + '/' + target + ' วัน</div>'
+            + '</div>')
+      + '</div>'
+      + '</div>';
+
     return '<div class="streak-container">'
       + '<div class="streak-message">' + message + '</div>'
       + '<div class="streak-dots">' + dots + '</div>'
       + '<div class="streak-bar-wrap">'
       + '<div class="streak-bar" style="width:' + percent + '%"></div>'
       + '</div>'
-      + '<div class="streak-reward">🎁 ครบ 7 วัน — ปลดล็อก Premium ฟรี 1 วัน!</div>'
+      + rewardPreview
       + '</div>';
   }
 
