@@ -10,9 +10,13 @@ const onboardingSource = fs.readFileSync(path.resolve('js/onboarding.js'), 'utf8
 
 function loadContext(overrides = {}) {
   const store = {};
+  const streakRewardSource = overrides.withStreakReward
+    ? fs.readFileSync(path.resolve('js/streak-tracker.js'), 'utf8')
+    : null;
   const context = {
     window: {
       Onboarding: null,
+      StreakReward: null,
       localStorage: {
         getItem: (k) => store[k] || null,
         setItem: (k, v) => { store[k] = v; },
@@ -22,6 +26,7 @@ function loadContext(overrides = {}) {
         getElementById: () => null,
         querySelector: () => null,
         querySelectorAll: () => [],
+        addEventListener: () => {},
         createElement: (tag) => ({
           tagName: tag.toUpperCase(),
           className: '',
@@ -48,6 +53,14 @@ function loadContext(overrides = {}) {
     isNaN,
   };
   vm.createContext(context);
+  // StreakReward reads `document` directly (not window.document) on auto-init
+  // and uses setInterval — expose both to match a real browser environment.
+  if (streakRewardSource) {
+    context.document = context.window.document;
+    context.setInterval = setInterval;
+    context.clearInterval = clearInterval;
+    vm.runInContext(streakRewardSource, context, { filename: 'js/streak-tracker.js' });
+  }
   vm.runInContext(onboardingSource, context, { filename: 'js/onboarding.js' });
   return context;
 }
@@ -198,14 +211,78 @@ describe('Onboarding Engine', () => {
       expect(ctx.window.Onboarding.getStreak()).toBe(0);
     });
 
-    it('should return days since start (capped at 30)', () => {
+    it('should return 1 on the signup day (signup counts as day 1)', () => {
+      // On the same day as signup the streak is already 1 — both StreakReward
+      // and Onboarding.getStreak agree on this so the ob-streak counter and
+      // the gamification trophy stay in lockstep from the first visit.
+      const ctx = loadContext();
+      const d = new Date(Date.now() - 86400000 * 0).toISOString();
+      ctx.window.localStorage.setItem('starvia_onboarding', JSON.stringify({
+        startedAt: d, step: 1,
+        birthData: { name: 'test', dob: '1990-01-01', time: '', gender: 'male' },
+      }));
+      expect(ctx.window.Onboarding.getStreak()).toBe(1);
+    });
+
+    it('should return days since start, capped at 30', () => {
       const ctx = loadContext();
       const d = new Date(Date.now() - 86400000 * 5).toISOString();
       ctx.window.localStorage.setItem('starvia_onboarding', JSON.stringify({
         startedAt: d, step: 1,
         birthData: { name: 'test', dob: '1990-01-01', time: '', gender: 'male' },
       }));
-      expect(ctx.window.Onboarding.getStreak()).toBe(5);
+      // 5 days ago = journeyDay 5 = streak 6 (signup day counts as day 1, +1 per day)
+      expect(ctx.window.Onboarding.getStreak()).toBe(6);
+    });
+
+    it('should match StreakReward.count for the same signup date', () => {
+      // Single source of truth: ob-streak-count and the gamification trophy
+      // must show the same number, otherwise users see "ดูต่อเนื่อง 6 วัน" up
+      // top but "ดูดวงมา 7 วัน" in the weekly summary and assume one is wrong.
+      const ctx = loadContext({ withStreakReward: true });
+      const d = new Date(Date.now() - 86400000 * 6).toISOString();
+      ctx.window.localStorage.setItem('starvia_onboarding', JSON.stringify({
+        startedAt: d, step: 1,
+        birthData: { name: 'test', dob: '1990-01-01', time: '', gender: 'male' },
+      }));
+      // Re-read after StreakReward's auto-init may have written a fresh streak
+      // based on the just-set onboarding date — both should converge on the
+      // same number once onboarding is in place.
+      expect(ctx.window.Onboarding.getStreak()).toBe(ctx.window.StreakReward.getStreak().count);
+    });
+  });
+
+  describe('renderWeeklySummary', () => {
+    it('should show the same day count as getStreak (no +1)', () => {
+      // BUG FIX: previously used `(streak + 1)` which gave "ดูดวงมา 7 วัน" when
+      // the rest of the UI said "ดูต่อเนื่อง 6 วัน". Now both numbers match.
+      const ctx = loadContext();
+      const d = new Date(Date.now() - 86400000 * 6).toISOString();
+      ctx.window.localStorage.setItem('starvia_onboarding', JSON.stringify({
+        startedAt: d, step: 1,
+        birthData: { name: 'test', dob: '1990-01-01', time: '', gender: 'male' },
+      }));
+      const streak = ctx.window.Onboarding.getStreak();
+      const html = ctx.window.Onboarding.renderWeeklySummary(streak);
+      // Should show "ดูดวงมา 6 วัน" — matches the streak counter
+      expect(html).toContain('ดูดวงมา ' + streak + ' วัน');
+      // And NOT "ดูดวงมา 7 วัน" (the old off-by-one bug)
+      expect(html).not.toContain('ดูดวงมา ' + (streak + 1) + ' วัน');
+    });
+
+    it('should compute week number using streak (not streak+1)', () => {
+      // Pre-fix: Math.ceil((streak + 1) / 7) rolled over to "สัปดาห์ที่ 2" on
+      // day 6. Post-fix uses streak directly so day 6 = สัปดาห์ที่ 1.
+      const ctx = loadContext();
+      const d = new Date(Date.now() - 86400000 * 6).toISOString();
+      ctx.window.localStorage.setItem('starvia_onboarding', JSON.stringify({
+        startedAt: d, step: 1,
+        birthData: { name: 'test', dob: '1990-01-01', time: '', gender: 'male' },
+      }));
+      const streak = ctx.window.Onboarding.getStreak();
+      const html = ctx.window.Onboarding.renderWeeklySummary(streak);
+      const expectedWeek = Math.ceil(streak / 7);
+      expect(html).toContain('สัปดาห์ที่ ' + expectedWeek);
     });
   });
 

@@ -100,8 +100,25 @@ var Onboarding = (function() {
   }
 
   function getStreak() {
+    // Single source of truth: StreakReward (returns `count` where signup day
+    // counts as day 1, so a user who joined 5 days ago has streak 6). We
+    // route through StreakReward here so the ob-streak counter and the
+    // gamification trophy always show the same number, even when the user
+    // comes back after a multi-day gap (StreakReward handles the reset).
+    if (typeof window !== 'undefined' && window.StreakReward
+        && typeof window.StreakReward.getStreak === 'function') {
+      try {
+        var s = window.StreakReward.getStreak();
+        return s && typeof s.count === 'number' ? Math.min(s.count, 30) : 0;
+      } catch (e) { /* fall through to legacy */ }
+    }
+    // Legacy fallback for tests that don't load streak-tracker.js — counts
+    // signup day as day 1 to match StreakReward's numbering. Without
+    // `startedAt` we have no journey baseline so the streak is 0.
+    var journeyState = getState();
+    if (!journeyState.startedAt) return 0;
     var day = getJourneyDay();
-    return Math.min(day, 30);
+    return Math.min(day + 1, 30);
   }
 
   function isOnboarded() {
@@ -294,10 +311,14 @@ var Onboarding = (function() {
   }
 
   function renderWeeklySummary(streak) {
+    // `streak` already counts signup day as day 1 (matches StreakReward), so
+    // we display it directly. The previous (streak + 1) caused "ดูดวงมา 7 วัน"
+    // to show in the weekly summary while the ob-streak counter said 6 — users
+    // thought one of them was broken.
     return '<div class="ob-weekly" id="onboarding-weekly">'
       + '<div class="ob-weekly-header">'
-      + '<h3>📊 สรุปสัปดาห์ที่ ' + Math.ceil((streak + 1) / 7) + '</h3>'
-      + '<p>คุณดูดวงมา ' + (streak + 1) + ' วันแล้ว</p>'
+      + '<h3>📊 สรุปสัปดาห์ที่ ' + Math.ceil(streak / 7) + '</h3>'
+      + '<p>คุณดูดวงมา ' + streak + ' วันแล้ว</p>'
       + '</div>'
       + '<div class="ob-weekly-content">'
       + '<p>🔮 สัปดาห์นี้ดาวของคุณเดินทางผ่านหลายตำแหน่ง</p>'
