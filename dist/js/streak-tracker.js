@@ -102,13 +102,20 @@
     } catch(e) {}
   }
 
-  // Check if Premium was unlocked but now expired
+  // Check if Premium was unlocked but now expired.
+  // IMPORTANT: only return true if the user has actually earned a 7-day
+  // streak unlock. Stale localStorage (e.g. from a previous session, test
+  // data, or pre-Day-1 debugging) must not surface the "Premium expired"
+  // banner before Day 7 — that message is meaningless to a Day 1 user.
   function isPremiumExpired() {
     try {
       var raw = localStorage.getItem(PREMIUM_UNLOCK_KEY);
       if (!raw) return false;
       var data = JSON.parse(raw);
-      return data.unlocked && data.expiresAt <= Date.now();
+      if (!data.unlocked) return false;
+      if (data.expiresAt > Date.now()) return false; // still active
+      var streak = getStreak();
+      return streak.count >= 7;
     } catch(e) {}
     return false;
   }
@@ -380,7 +387,7 @@
     }
 
     // Check if Premium expired — show discount
-    if (isPremiumExpired() && !isDiscountOffered()) {
+    if (streak.count >= 7 && isPremiumExpired() && !isDiscountOffered()) {
       setTimeout(function() {
         var container = document.querySelector('.streak-discount-anchor');
         if (container) {
@@ -403,6 +410,11 @@
       return false;
     }
     function injectDiscount() {
+      var current = updateStreak();
+      // Day 1–6 users must not see the "Premium expired" banner — they
+      // never earned the reward in the first place. (Belt-and-braces
+      // guard alongside isPremiumExpired().)
+      if (current.count < 7) return;
       var container = document.querySelector('.streak-discount-anchor');
       if (container && !container.querySelector('.streak-discount-banner')) {
         var html = buildDiscountBanner();
