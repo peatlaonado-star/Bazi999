@@ -294,6 +294,25 @@
 <script src="js/ab-testing.js"></script>
 <script src="app.js"></script>
 <script src="js/chat-concierge.js"></script>
+<script>
+// Version-based cache busting
+(function() {
+  var APP_VERSION = '3a33d6a'; // Update this on each deploy
+  var stored = localStorage.getItem('starvia_version');
+  
+  if (stored && stored !== APP_VERSION) {
+    // New version available - show refresh banner
+    var banner = document.createElement('div');
+    banner.id = 'update-banner';
+    banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#8b6cf6,#6d4fe8);color:white;padding:12px 16px;display:flex;align-items:center;justify-content:center;gap:12px;font-size:14px;box-shadow:0 -4px 20px rgba(0,0,0,.3)';
+    banner.innerHTML = '🔄 <span>มีเวอร์ชันใหม่!</span> <button onclick="localStorage.setItem(\'starvia_version\',\'${APP_VERSION}\');location.reload(true)" style="background:white;color:#6d4fe8;border:none;padding:8px 16px;border-radius:8px;font-weight:700;cursor:pointer">อัพเดทเลย</button> <button onclick="this.parentElement.remove()" style="background:transparent;border:1px solid rgba(255,255,255,.3);color:white;padding:8px 12px;border-radius:8px;cursor:pointer">ไว้ก่อน</button>';
+    document.body.appendChild(banner);
+  }
+  
+  // Always update stored version
+  localStorage.setItem('starvia_version', APP_VERSION);
+})();
+</script>
 <script>if(typeof Onboarding!=="undefined"){Onboarding.init();}if(typeof Gamification!=="undefined"){Gamification.init();}</script>
 </body>
 </html>
