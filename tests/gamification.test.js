@@ -42,6 +42,22 @@ describe('Gamification Engine', () => {
       const ctx = loadContext();
       expect(ctx.window.Gamification.getStreak()).toBe(0);
     });
+    it('should mirror StreakReward.getStreak().count when available', () => {
+      const ctx = loadContext();
+      // Simulate a user who has 6 onboarding journey days.
+      ctx.window.StreakReward = {
+        getStreak: () => ({ count: 6, lastDate: '2026-06-06', startDate: '2026-06-01' })
+      };
+      expect(ctx.window.Gamification.getStreak()).toBe(6);
+    });
+    it('should fall back to totalVisits when StreakReward is missing', () => {
+      const ctx = loadContext();
+      ctx.window.localStorage.setItem(
+        'starvia_gamification',
+        JSON.stringify({ lastVisit: new Date().toISOString().slice(0,10), totalVisits: 5 })
+      );
+      expect(ctx.window.Gamification.getStreak()).toBe(5);
+    });
   });
 
   describe('checkBadges', () => {

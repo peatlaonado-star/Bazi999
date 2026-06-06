@@ -73,23 +73,30 @@ var Gamification = (function() {
   }
 
   function getStreak() {
+    // Single source of truth: StreakReward (uses Onboarding journey day)
+    // This guarantees the trophy counter matches the "ดูดวงมา X/7 วัน" progress
+    // bar shown by streak-tracker.js. Falling back to the legacy local counter
+    // only when StreakReward is unavailable (older test harnesses).
+    if (typeof window !== 'undefined' && window.StreakReward
+        && typeof window.StreakReward.getStreak === 'function') {
+      try {
+        var s = window.StreakReward.getStreak();
+        return s && typeof s.count === 'number' ? s.count : 0;
+      } catch (e) { /* fall through to legacy */ }
+    }
+
+    // Legacy fallback (approximate). The previous version of this loop
+    // blindly incremented streak 30 times regardless of actual visit log,
+    // which caused the trophy to drift behind the streak-tracker progress
+    // bar (e.g. 5 days vs 6 days). We now trust the legacy visit counter
+    // and only count a streak as long as the last visit was within 2 days.
     var state = getState();
     if (!state.lastVisit) return 0;
     var today = new Date();
     var last = new Date(state.lastVisit);
     var diff = Math.floor((today - last) / 86400000);
     if (diff > 1) return 0; // streak broken
-    // Count consecutive days backwards
-    var streak = 1;
-    var checkDate = new Date(last);
-    for (var i = 0; i < 30; i++) {
-      checkDate.setDate(checkDate.getDate() - 1);
-      var dateStr = checkDate.toISOString().slice(0, 10);
-      // Check if this date was a visit (approximate: if lastVisit is within 1 day)
-      if (diff === 0 && i === 0) continue; // skip today
-      streak++;
-    }
-    return Math.min(streak, state.totalVisits);
+    return Math.min(state.totalVisits, 30);
   }
 
   function checkBadges(streak) {
