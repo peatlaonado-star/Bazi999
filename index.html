@@ -17,6 +17,7 @@
 
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="css/chat-concierge.css">
+<link rel="stylesheet" href="css/tarot.css">
 
 <script src="assets/html2canvas.min.js"></script>
 
@@ -44,6 +45,9 @@
     <p class="hero-desc">STARVIA ช่วยถอดรหัสจุดแข็ง ความรัก งาน เงิน และจังหวะชีวิต ผ่านโหราศาสตร์ไทยโบราณแบบอ่านง่าย</p>
     <div class="hero-actions" aria-label="ทางลัดเริ่มใช้งาน">
       <a class="hero-primary" href="#fc0">เริ่มดูดวงฟรี</a>
+      <button class="tarot-trigger" onclick="openTarot()" aria-label="เปิดไพ่ทำนาย">
+        <span class="tarot-trigger-emoji">🎴</span> หยิบไพ่ทำนาย
+      </button>
     </div>
     <div id="brand-promise" class="brand-promise">ดาวไม่ได้ตัดสินชีวิตคุณ - ดาวช่วยให้คุณมองเห็นตัวเองชัดขึ้น</div>
   </div>
@@ -301,6 +305,74 @@
 <script src="js/ab-testing.js"></script>
 <script src="app.js"></script>
 <script src="js/chat-concierge.js"></script>
+
+<!-- 🎴 Tarot Modal -->
+<div id="tarot-modal" role="dialog" aria-modal="true" aria-labelledby="tarot-title">
+  <div class="tarot-container">
+    <button class="tarot-close" onclick="closeTarot()" aria-label="ปิด">✕</button>
+
+    <!-- Step 1: Category Selection -->
+    <div class="tarot-step active" id="tarot-step-category">
+      <h2 id="tarot-title">🎴 เปิดไพ่ทำนาย</h2>
+      <p class="tarot-subtitle">เลือกหัวข้อที่อยากรู้ — ไพ่จะเปิดเผยสิ่งที่ซ่อนอยู่</p>
+      <div class="tarot-categories">
+        <button class="tarot-category" onclick="selectTarotCategory('love')">
+          <div class="tarot-category-emoji">💕</div>
+          <div class="tarot-category-name">ความรัก</div>
+          <div class="tarot-category-desc">ความสัมพันธ์ คนรัก คนที่ชอบ</div>
+        </button>
+        <button class="tarot-category" onclick="selectTarotCategory('career')">
+          <div class="tarot-category-emoji">💼</div>
+          <div class="tarot-category-name">การงาน</div>
+          <div class="tarot-category-desc">งาน อาชีพ การสอบ</div>
+        </button>
+        <button class="tarot-category" onclick="selectTarotCategory('money')">
+          <div class="tarot-category-emoji">💰</div>
+          <div class="tarot-category-name">การเงิน</div>
+          <div class="tarot-category-desc">รายรับ รายจ่าย การลงทุน</div>
+        </button>
+        <button class="tarot-category" onclick="selectTarotCategory('health')">
+          <div class="tarot-category-emoji">🌿</div>
+          <div class="tarot-category-name">สุขภาพ</div>
+          <div class="tarot-category-desc">ร่างกาย จิตใจ</div>
+        </button>
+        <button class="tarot-category" onclick="selectTarotCategory('general')" style="grid-column: span 2;">
+          <div class="tarot-category-emoji">✨</div>
+          <div class="tarot-category-name">ทั่วไป</div>
+          <div class="tarot-category-desc">เรื่องอื่นๆ ที่อยากรู้</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 2: Card Picker -->
+    <div class="tarot-step" id="tarot-step-pick">
+      <h2>ใช้สัญชาตญาณเลือกไพ่ 1 ใบ</h2>
+      <p class="tarot-subtitle">หยิบไพ่ที่ "ดึงดูด" คุณที่สุด — ไม่ต้องคิดมาก</p>
+      <div class="tarot-picker" id="tarot-picker-cards"></div>
+      <div style="text-align: center; margin-top: 8px;">
+        <button class="tarot-btn-secondary" onclick="resetTarot()">← เปลี่ยนหัวข้อ</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Result -->
+    <div class="tarot-step" id="tarot-step-result">
+      <h2>✨ ไพ่ของคุณ</h2>
+      <div id="tarot-result-content"></div>
+      <div class="tarot-actions">
+        <button class="tarot-btn-secondary" onclick="resetTarot()">เปลี่ยนหัวข้อ</button>
+        <button class="tarot-btn-primary" onclick="shareTarotResult()">📤 แชร์</button>
+      </div>
+    </div>
+
+    <!-- Step 4: Daily Limit -->
+    <div class="tarot-step" id="tarot-step-limit">
+      <div id="tarot-limit-content"></div>
+    </div>
+  </div>
+</div>
+
+<script src="js/tarot.js"></script>
+<script src="js/tarot-ui.js"></script>
 <script>
 // Version-based cache busting
 (function() {
