@@ -2526,11 +2526,15 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 /* ===== PREMIUM BLUR / PAYWALL (Tab Content) ===== */
 .is-locked {
   position: relative;
+}
+
+/* Locked content wrapper — เบลออยู่ในนี้ ไม่รวม teaser */
+.locked-content {
+  position: relative;
   overflow: hidden;
 }
 
-/* เบลอเนื้อหาทั้งหมดใน locked tab — แต่เบลอเบาๆ ให้เห็น teaser */
-.is-locked > *:not(.lock-overlay):not(.lock-preview-text) {
+.locked-content > *:not(.lock-overlay):not(.lock-preview-text) {
   filter: blur(3px);
   opacity: .35;
   pointer-events: none;
@@ -2542,6 +2546,63 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .is-locked .tab-section-card:first-child .tsc-body {
   opacity: .5;
   filter: blur(2px);
+}
+
+/* Lock Preview Text — Teaser ที่แสดงให้เห็น (ไม่เบลอ) */
+.lock-preview-text {
+  position: relative;
+  z-index: 5;
+  pointer-events: auto;
+  background: linear-gradient(135deg, rgba(201,162,39,.12), rgba(139,108,246,.08));
+  border: 1px solid rgba(201,162,39,.35);
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+.lock-preview-text .teaser-icon {
+  font-size: 32px;
+  margin-bottom: 6px;
+  filter: drop-shadow(0 2px 8px rgba(201,162,39,.4));
+}
+.lock-preview-text .teaser-hook {
+  font-size: 16px;
+  font-weight: 700;
+  color: #c9a227;
+  margin-bottom: 10px;
+  font-family: 'Chakra Petch', 'Noto Serif Thai', serif;
+}
+.lock-preview-text .teaser-content {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text);
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  background: rgba(10,10,26,.4);
+  border-radius: 10px;
+  font-style: italic;
+  opacity: .9;
+}
+.lock-preview-text .teaser-question {
+  font-size: 13.5px;
+  color: #e8dfc8;
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+.lock-preview-text .teaser-cta {
+  display: inline-block;
+  padding: 8px 18px;
+  background: linear-gradient(135deg, #c9a227, #8b6cf6);
+  color: white;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(201,162,39,.3);
+  cursor: pointer;
+  transition: transform .2s;
+}
+.lock-preview-text .teaser-cta:hover {
+  transform: translateY(-2px);
 }
 
 .lock-overlay {

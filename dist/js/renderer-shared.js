@@ -25,6 +25,67 @@ function premiumLockedCard(className, teaserHtml, title, description, previewTex
     + '</div>';
 }
 
+// ===== Teaser for Locked Tabs =====
+// สร้างข้อความ teaser ที่น่าสนใจ ให้ผู้ใช้อยากปลดล็อค
+function buildTabTeaser(tb, i, p) {
+  // ดึงข้อความจากเนื้อหาเต็ม เอาแค่ 1-2 ประโยคแรก
+  var fullContent = '';
+  if (tb.secs && tb.secs[0] && tb.secs[0].c) {
+    fullContent = String(tb.secs[0].c);
+  }
+
+  // Strip HTML tags + decode entities
+  var plain = fullContent
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  // เอาแค่ 120 ตัวอักษรแรก
+  var teaserText = plain.length > 120 ? plain.substring(0, 120) + '...' : plain;
+
+  // เพิ่มคำชวนปลดล็อคตามแต่ละแท็บ
+  var hooks = {
+    'คู่สัมพันธ์': {
+      hook: '💕 คุณกับคนรัก...',
+      question: 'คุณเข้ากันได้แค่ไหน? ปลดล็อกเพื่อดูคำทำนายความสัมพันธ์เชิงลึก',
+      icon: '💞'
+    },
+    'การงาน': {
+      hook: '💼 สายอาชีพที่ใช่...',
+      question: 'คุณเหมาะกับงานแบบไหน? ดูเส้นทางอาชีพ + โอกาสที่รออยู่',
+      icon: '💼'
+    },
+    'การเงิน': {
+      hook: '💰 พิมพ์เขียวความมั่งคั่ง...',
+      question: 'เงินของคุณไหลไปทางไหน? ดูแผนการเงินเฉพาะตัว',
+      icon: '💰'
+    }
+  };
+
+  var label = tb.lb;
+  var hook = hooks[label] || {
+    hook: '🔮 เนื้อหาเจาะลึก...',
+    question: 'ปลดล็อกเพื่อดูคำทำนายเต็ม',
+    icon: '✦'
+  };
+
+  // สร้าง HTML teaser
+  return ''
+    + '<div class="teaser-icon">' + hook.icon + '</div>'
+    + '<div class="teaser-hook">' + hook.hook + '</div>'
+    + '<div class="teaser-content">' + escapeHtml(teaserText) + '</div>'
+    + '<div class="teaser-question">' + hook.question + '</div>'
+    + '<div class="teaser-cta">🔒 ปลดล็อกเพื่ออ่านต่อ →</div>';
+}
+
+function escapeHtml(str) {
+  var div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 function buildTabs(tid,sid,pre,TB,p,u){
   var tt=document.getElementById(tid), ts2=document.getElementById(sid);
   // Icon map for each tab position
@@ -48,8 +109,21 @@ function buildTabs(tid,sid,pre,TB,p,u){
     sec.id=pre+i;
 
     var isPremiumTab = (i > 0); // แท็บแรก (ตัวตน) = ฟรี, แท็บ 2-4 = Premium
-    if (isPremiumTab && !premiumIsUnlocked()) {
+    var isLocked = isPremiumTab && !premiumIsUnlocked();
+    if (isLocked) {
        sec.classList.add('is-locked');
+    }
+
+    // ★ Teaser แยกออกมา ไม่อยู่ใน .is-locked เพื่อไม่ให้ overlay ทับ
+    if (isLocked) {
+      var teaser = buildTabTeaser(tb, i, p);
+      if (teaser) {
+        sec.insertAdjacentHTML('beforeend', '<div class="lock-preview-text">' + teaser + '</div>');
+      }
+      // Wrap content ที่จะ blur ใน .locked-content
+      var lockedWrapper = document.createElement('div');
+      lockedWrapper.className = 'locked-content';
+      sec.appendChild(lockedWrapper);
     }
 
     var html='';
@@ -66,14 +140,19 @@ function buildTabs(tid,sid,pre,TB,p,u){
         + '</div></div>';
     });
 
-    if (i > 0 && !premiumIsUnlocked()) {
-        html += buildPremiumLockOverlay(
-          'เนื้อหาเจาะลึกเฉพาะคุณ (Premium)',
-          'ปลดล็อกเพื่ออ่านกระจกกรรม วิเคราะห์ 6 ด้าน อดีต-ปัจจุบัน-อนาคต และคำแนะนำที่นำไปใช้ได้จริง'
-        );
+    // ใส่ content ใน locked wrapper (ถ้ามี) หรือ sec ตรงๆ (ถ้าฟรี)
+    if (isLocked) {
+      var lockedWrapperEl = sec.querySelector('.locked-content');
+      lockedWrapperEl.innerHTML = html;
+      // เพิ่ม overlay ใน locked wrapper
+      lockedWrapperEl.insertAdjacentHTML('beforeend', buildPremiumLockOverlay(
+        'เนื้อหาเจาะลึกเฉพาะคุณ (Premium)',
+        'ปลดล็อกเพื่ออ่านกระจกกรรม วิเคราะห์ 6 ด้าน อดีต-ปัจจุบัน-อนาคต และคำแนะนำที่นำไปใช้ได้จริง'
+      ));
+    } else {
+      sec.innerHTML += html;
     }
 
-    sec.innerHTML=html;
     ts2.appendChild(sec);
   });
 }
