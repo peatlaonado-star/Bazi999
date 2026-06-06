@@ -1024,11 +1024,6 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     '<div class="mc"><div class="mc-l">✦ '+u.mn+' · '+nm+' ✦</div>'
     +'<div class="mc-t">"'+p.man+'"</div></div>'
     + consultHtml
-    +'<div id="ind-share-section" class="ind-share-section"></div>'
     +'<div class="rbt"><button class="rbtn" data-action="reset-mode" data-mode="0">'+u.r0+'</button></div>'
   );
-  // Render personalized share section
-  if (typeof ShareViral !== 'undefined' && ShareViral.renderPersonalizedShare) {
-    ShareViral.renderPersonalizedShare('ind-share-section', p.man, nm);
-  }
 }
