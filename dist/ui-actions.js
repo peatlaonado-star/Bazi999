@@ -213,15 +213,45 @@ function openPayment() {
 
 // ── Build payment modal HTML ──
 function buildPaymentModalHtml() {
+  // Get user's name from storage if available
+  var userName = '';
+  try { userName = localStorage.getItem('starvia_display_name') || ''; } catch(e) {}
+
+  var greeting = userName
+    ? '<div style="font-size:11px;color:#7a6a9a;margin-bottom:8px;">สวัสดีคุณ ' + escapeHtml(userName) + '</div>'
+    : '';
+
   return '<div class="modal-content" style="position:relative; max-height: 90vh; overflow-y: auto;">'
     + '<button class="modal-close" data-action="close-payment">✕</button>'
-    + '<div style="color:#C9A227; font-size:16px; font-weight:700; margin-bottom:5px;">✦ ปลดล็อกคัมภีร์ดวงชะตา ✦</div>'
-    + '<div style="color:#e8dfc8; font-size:12px; margin-bottom:15px;">The Complete Life Blueprint</div>'
 
-    // Price anchoring
-    + '<div style="font-size:28px; font-weight:700; color:#fff; margin-bottom:5px;">'
-    + '<span style="font-size:14px; color:#8B6914; text-decoration:line-through; margin-right:10px;">590 THB</span>199 THB</div>'
-    + '<div style="font-size:11px; color:#4CAF50; font-weight:600; margin-bottom:15px;">🔥 ราคาพิเศษเฉพาะช่วง Early Access</div>'
+    // Hero section
+    + '<div style="text-align:center; padding:5px 0 12px;">'
+    + greeting
+    + '<div style="color:#C9A227; font-size:13px; font-weight:600; letter-spacing:.06em; margin-bottom:2px;">✦ STARVIA PREMIUM ✦</div>'
+    + '<div style="color:#fff; font-size:17px; font-weight:700; line-height:1.4; margin-bottom:4px;">ปลดล็อกดวงชะตาฉบับเต็ม</div>'
+    + '<div style="color:#b8a8d8; font-size:11px; line-height:1.5;">เจาะลึกทุกมิติชีวิต — ตัวตน · ความรัก · การงาน · การเงิน<br>พร้อมคัมภีร์แก้ดวง 6 ด้าน และเครื่องมือเสริมดวงรายเดือน</div>'
+    + '</div>'
+
+    // Price card with anchoring and urgency
+    + '<div style="background:rgba(201,162,39,0.08); border:1px solid rgba(201,162,39,0.25); border-radius:12px; padding:14px; margin-bottom:16px; text-align:center;">'
+    + '<div style="font-size:10px; color:#888; letter-spacing:.04em; margin-bottom:4px;">ราคาปกติ</div>'
+    + '<div style="font-size:20px; color:#8B6914; text-decoration:line-through; margin-bottom:2px;">590 THB</div>'
+    + '<div style="font-size:30px; font-weight:700; color:#fff; line-height:1.1;">199 THB</div>'
+    + '<div style="font-size:11px; color:#4CAF50; font-weight:600; margin-top:4px;">🔥 ลด 66% — Early Access ราคานี้เท่านั้น</div>'
+    + '<div style="font-size:9px; color:#7a6a9a; margin-top:3px;">ชำระทุกเดือน · ไม่มีข้อผูกมัด ยกเลิกเมื่อไหร่ก็ได้</div>'
+    + '</div>'
+
+    // Benefits checklist
+    + '<div style="background:rgba(0,0,0,0.25); border-radius:10px; padding:12px; margin-bottom:15px;">'
+    + '<div style="font-size:11px; color:#C9A227; font-weight:600; margin-bottom:8px;">✦ สิ่งที่คุณจะได้รับ:</div>'
+    + '<div style="display:flex; flex-direction:column; gap:6px;">'
+    + '<div style="display:flex; gap:8px; align-items:flex-start; font-size:10.5px; color:var(--tx2); line-height:1.4;"><span style="color:#4CAF50; font-size:12px;">✓</span> รายงานตัวตน + จุดอ่อนที่ซ่อนอยู่ 5 ด้าน</div>'
+    + '<div style="display:flex; gap:8px; align-items:flex-start; font-size:10.5px; color:var(--tx2); line-height:1.4;"><span style="color:#4CAF50; font-size:12px;">✓</span> ดวงความรัก วิเคราะห์คู่แท้ + จังหวะเปิดหัวใจ</div>'
+    + '<div style="display:flex; gap:8px; align-items:flex-start; font-size:10.5px; color:var(--tx2); line-height:1.4;"><span style="color:#4CAF50; font-size:12px;">✓</span> การงาน/การเงิน — ดาวเด่น ดาวเตือน + วิธีแก้</div>'
+    + '<div style="display:flex; gap:8px; align-items:flex-start; font-size:10.5px; color:var(--tx2); line-height:1.4;"><span style="color:#4CAF50; font-size:12px;">✓</span> ภารกิจแก้ดวง 6 ด้าน พร้อมฤกษ์เปิดทางรายเดือน</div>'
+    + '<div style="display:flex; gap:8px; align-items:flex-start; font-size:10.5px; color:var(--tx2); line-height:1.4;"><span style="color:#4CAF50; font-size:12px;">✓</span> คะแนนย่อย 4 ด้านในหน้าดูดวงคู่</div>'
+    + '</div>'
+    + '</div>'
 
     // QR area — dynamic (Omise) or static (fallback)
     + '<div id="payment-qr-area">'
@@ -239,27 +269,51 @@ function buildPaymentModalHtml() {
     + '</div>'
     + '</div>'
 
-    // Fallback: manual slip flow
-    + '<div id="manual-payment">'
-    + '<div style="background:rgba(255,255,255,0.03); border-radius:12px; padding:15px; margin-bottom:15px; border:1px solid rgba(255,255,255,0.08);">'
-    + '<div class="step-txt"><strong>ขั้นตอนที่ 1:</strong> สแกนชำระเงิน แล้วกดปุ่มเพื่อส่งสลิปให้แอดมิน</div>'
-    + '<a href="https://m.me/61573341702581" target="_blank" class="pdf-btn" style="display:block; text-decoration:none; background:linear-gradient(90deg, #2196F3, #1976D2); color:#fff; font-size:13px; padding:12px; margin-bottom:15px; box-shadow:none; animation:none;">💬 ส่งสลิปทาง Inbox</a>'
+    // Manual slip flow — cleaner, less friction
+    + '<div id="manual-payment" style="margin-top:5px;">'
+    + '<div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:15px;">'
 
-    + '<div class="step-txt" style="border-top:1px dashed rgba(255,255,255,0.1); padding-top:15px;"><strong>ขั้นตอนที่ 2:</strong> นำ "รหัสผ่าน" ที่ได้รับมากรอกที่นี่</div>'
-    + '<input type="text" id="pdf-pin" class="pin-input" placeholder="รหัสผ่าน 6 หลัก">'
-    + '<button id="confirm-pay-btn" class="pdf-btn" style="width:100%; font-size:14px; padding:12px;" data-action="verify-pin">🔓 ยืนยันรหัสปลดล็อก</button>'
+    // Step 1: Scan + Send
+    + '<div style="display:flex; gap:10px; margin-bottom:12px;">'
+    + '<div style="background:linear-gradient(135deg,#C9A227,#b08040); color:#1a0a2e; min-width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; margin-top:1px;">1</div>'
+    + '<div style="flex:1;">'
+    + '<div style="font-size:11px; color:#C9A227; font-weight:600; margin-bottom:2px;">สแกน QR — ชำระผ่าน Mobile Banking</div>'
+    + '<div style="font-size:10px; color:#888; line-height:1.4;">ทุกธนาคาร · PromptPay</div>'
+    + '</div></div>'
+
+    + '<a href="https://m.me/61573341702581" target="_blank" class="pdf-btn" style="display:flex; align-items:center; justify-content:center; gap:6px; text-decoration:none; background:linear-gradient(90deg, #2196F3, #1565C0); color:#fff; font-size:13px; padding:11px; margin-bottom:10px; box-shadow:0 4px 12px rgba(33,150,243,0.25); animation:none;">💬 แนบสลิปส่งทาง Messenger</a>'
+
+    // Step 2: Enter PIN
+    + '<div style="display:flex; gap:10px; margin-bottom:10px;">'
+    + '<div style="background:rgba(201,162,39,0.3); color:#C9A227; min-width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; margin-top:1px;">2</div>'
+    + '<div style="flex:1;">'
+    + '<div style="font-size:11px; color:#C9A227; font-weight:600; margin-bottom:2px;">กรอกรหัสปลดล็อก (แอดมินจะส่งให้ทาง Inbox)</div>'
+    + '<input type="text" id="pdf-pin" class="pin-input" placeholder="รหัส 6 หลัก" style="margin-bottom:0; margin-top:4px;">'
+    + '</div></div>'
+
+    + '<button id="confirm-pay-btn" class="pdf-btn" style="width:100%; font-size:13px; padding:11px; margin-top:2px;" data-action="verify-pin">🔓 ยืนยัน — ปลดล็อก Premium</button>'
     + '</div>'
 
+    // PIN error
     + '<div id="pin-error" style="color:#F44336; font-size:12px; display:none; margin-top:-5px; margin-bottom:10px;">❌ รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง</div>'
     + '</div>'
 
-    // Review box
-    + '<div style="text-align:left; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 15px; margin-top: 5px;">'
-    + '<div style="font-size: 11px; color: #b8a8d8; margin-bottom: 8px; letter-spacing: 0.05em;">💬 เสียงจากผู้ปลดล็อกคัมภีร์:</div>'
-    + '<div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; border-left: 2px solid #C9A227; margin-bottom: 8px;">'
-    + '<div style="font-size: 11.5px; color: #e8dfc8; font-style: italic; line-height: 1.5;">"ตอนแรกนึกว่าจะเหมือนแอปดูดวงทั่วไป แต่พออ่านเรื่องหลุมพรางการงานแล้วขนลุกเลยค่ะ เอาไปปรับใช้ได้จริง คุ้มเกินราคามาก"</div>'
-    + '<div style="font-size: 9px; color: #7a6a9a; margin-top: 6px; text-align: right;">— คุณ น. ผู้ทดลองใช้งาน</div>'
+    // Trust signals: reviews + guarantee
+    + '<div style="margin-top:12px; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px;">'
+    // Testimonials in a cleaner format
+    + '<div style="display:flex; flex-direction:column; gap:8px;">'
+    + '<div style="background:rgba(0,0,0,0.2); padding:10px 12px; border-radius:8px; border-left:2px solid #C9A227;">'
+    + '<div style="font-size:10.5px; color:#d0c8a0; font-style:italic; line-height:1.5;">"ดูดวงมาเยอะ แต่ STARVIA คือเจอตรงจุดอ่อนเราเป๊ะ อ่านแล้วเอาไปปรับใช้ได้จริง ไม่ใช่แค่คำทำนายลอยๆ"</div>'
+    + '<div style="font-size:9px; color:#7a6a9a; margin-top:5px; text-align:right;">— จุฑารัตน์, กรุงเทพฯ (ปลดล็อกแล้ว)</div>'
     + '</div>'
+    + '<div style="background:rgba(0,0,0,0.2); padding:10px 12px; border-radius:8px; border-left:2px solid rgba(201,162,39,0.5);">'
+    + '<div style="font-size:10.5px; color:#d0c8a0; font-style:italic; line-height:1.5;">"ส่วนการงานนี่ตรงมาก ช่วงนี้เจอปัญหาพอดี คำแนะนำช่วยให้ตัดสินใจได้ชัดขึ้น"</div>'
+    + '<div style="font-size:9px; color:#7a6a9a; margin-top:5px; text-align:right;">— วิโรจน์, เชียงใหม่ (ปลดล็อกแล้ว)</div>'
+    + '</div>'
+    + '</div>'
+
+    // Guarantee
+    + '<div style="text-align:center; font-size:9px; color:#5a4a7a; margin-top:10px; letter-spacing:.04em;">📅 199 THB/เดือน · ยกเลิกเมื่อไหร่ก็ได้ · ยิ่งอ่านยิ่งคุ้ม</div>'
     + '</div>'
 
     + '</div>';

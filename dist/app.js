@@ -671,3 +671,95 @@ if(document.readyState === 'loading'){
 } else {
   bindUIEvents();
 }
+
+// ===== Form State Persistence (Quick Win #3) =====
+// Save user input across page refreshes & mode switches
+(function(){
+  var KEY = "starvia_form_state_v1";
+  var MODE_KEY = "starvia_active_mode_v1";
+  // Field IDs to persist (3 modes)
+  var FIELDS = [
+    "n0","g0","d0","t0",
+    "n1a","g1a","d1a","t1a",
+    "n1b","g1b","d1b","t1b",
+    "n2","g2x","d2"
+  ];
+
+  function readState(){
+    var s = {};
+    for(var i=0;i<FIELDS.length;i++){
+      var el = document.getElementById(FIELDS[i]);
+      if(el && el.value) s[FIELDS[i]] = el.value;
+    }
+    return s;
+  }
+
+  function writeState(s){
+    try {
+      localStorage.setItem(KEY, JSON.stringify(s));
+    } catch(e){ /* quota or disabled - silent fail */ }
+  }
+
+  function save(){
+    writeState(readState());
+  }
+
+  function restore(){
+    try {
+      var raw = localStorage.getItem(KEY);
+      if(!raw) return;
+      var s = JSON.parse(raw);
+      for(var k in s){
+        var el = document.getElementById(k);
+        if(el && !el.value) el.value = s[k];
+      }
+      // Trigger button-enable check
+      if(typeof chkBtn === "function"){
+        try { chkBtn(0); chkBtn(1); chkBtn(2); } catch(_){}
+      }
+    } catch(e){}
+  }
+
+  function saveMode(m){
+    try { localStorage.setItem(MODE_KEY, String(m)); } catch(_){}
+  }
+
+  function restoreMode(){
+    try {
+      var m = localStorage.getItem(MODE_KEY);
+      if(m !== null && typeof setMode === "function"){
+        setMode(parseInt(m, 10));
+      }
+    } catch(_){}
+  }
+
+  // Public API: window.StarviaForm
+  window.StarviaForm = { save: save, restore: restore, clear: function(){
+    try { localStorage.removeItem(KEY); } catch(_){}
+  }, saveMode: saveMode, restoreMode: restoreMode };
+
+  // Hook into setMode to save active mode
+  if(typeof setMode === "function"){
+    var _orig = setMode;
+    setMode = function(m){
+      _orig(m);
+      saveMode(m);
+    };
+  }
+
+  // Listen to all form changes
+  function attach(){
+    for(var i=0;i<FIELDS.length;i++){
+      var el = document.getElementById(FIELDS[i]);
+      if(!el) continue;
+      el.addEventListener("input", save);
+      el.addEventListener("change", save);
+    }
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", function(){ attach(); restore(); restoreMode(); });
+  } else {
+    attach(); restore(); restoreMode();
+  }
+})();
