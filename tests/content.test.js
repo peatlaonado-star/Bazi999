@@ -101,11 +101,14 @@ describe('Thai astrology content data', () => {
     expect(appSource).toContain('openPayment();');
   });
 
-  it('loads only 3 essential Google Fonts families (Charm, Kanit, Sarabun)', () => {
+  it('loads only 2 essential Google Fonts families (Chakra Petch + Sarabun)', () => {
     const html = fs.readFileSync(path.resolve('index.html'), 'utf8');
-    expect(html).toContain('family=Charm');
-    expect(html).toContain('family=Kanit');
+    expect(html).toContain('family=Chakra+Petch');
     expect(html).toContain('family=Sarabun');
+    // Removed: Charmonman, Kanit, Noto Serif Thai (CSS still references them, browser falls back to next in stack)
+    expect(html).not.toContain('family=Charmonman');
+    expect(html).not.toContain('family=Kanit');
+    expect(html).not.toContain('family=Noto+Serif+Thai');
     expect(html).not.toContain('family=Chonburi');
     expect(html).not.toContain('family=Maitree');
   });

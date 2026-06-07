@@ -13,10 +13,11 @@
 <!-- Premium Thai Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Charmonman:wght@400;700&family=Kanit:wght@400;600;700&family=Noto+Serif+Thai:wght@400;700&family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- Fonts reduced 5->2 (Quick Win #4): keep Chakra Petch (heading) + Sarabun (body). Kanit/Noto Serif Thai/Charmonman removed from URL - browser falls back to next font in CSS stack -->
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
 
 
-<script src="assets/html2canvas.min.js"></script>
+<script defer src="assets/html2canvas.min.js"></script>
 
 <!-- STARVIA Runtime Config (set before app.js loads) -->
 <!-- Note: real config ตั้งที่ STARVIA CONFIG block ด้านล่าง — block นี้เป็น fallback -->
@@ -29,13 +30,13 @@
 
 <!-- Umami Analytics (Privacy-friendly) -->
 <script defer src="https://cloud.umami.is/script.js" data-website-id="21ed818b-d83b-4d45-a007-34f096db715f"></script>
-  <link rel="stylesheet" crossorigin href="/assets/main-fnRQt0K7.css">
+  <link rel="stylesheet" crossorigin href="/assets/main-D-ivSWcw.css">
 </head>
 <body>
 <canvas id="cv"></canvas>
 <div class="w">
   <div class="hd premium-hero">
-    <div class="hd-tag" id="hd-tag">✦ ค้นพบตัวเองผ่านดวงดาว ✦</div>
+    <div class="hd-tag" id="hd-tag" aria-hidden="false">✦ ค้นพบตัวเองผ่านดวงดาว ✦</div>
     <h1 id="hd-ttl">STARVIA</h1>
     <div class="hero-kicker" id="hd-sub">นพเคราะห์ · ราศีจักร · ลัคนา · ดวงชะตา</div>
     <div class="hero-price">✦ Premium 199 บาท/เดือน · รู้จักตัวเองลึกกว่านี้ ✦</div>
@@ -44,7 +45,7 @@
     <div class="hero-actions" aria-label="ทางลัดเริ่มใช้งาน">
       <a class="hero-primary" href="#fc0">เริ่มดูดวงฟรี</a>
       <button class="tarot-trigger" onclick="openTarot()" aria-label="เปิดไพ่ทำนาย">
-        <span class="tarot-trigger-emoji">🎴</span> หยิบไพ่ทำนาย
+        <span class="tarot-trigger-emoji" aria-hidden="true">🎴</span> หยิบไพ่ทำนาย
       </button>
     </div>
     <div id="brand-promise" class="brand-promise">ดาวไม่ได้ตัดสินชีวิตคุณ - ดาวช่วยให้คุณมองเห็นตัวเองชัดขึ้น</div>
@@ -67,14 +68,14 @@
         </div>
       </div>
       <div class="row">
-        <div class="f"><label id="lb-n0">ชื่อ</label><input id="n0" type="text" placeholder="ชื่อของคุณ"></div>
-        <div class="f"><label id="lb-g0">เพศ</label>
+        <div class="f"><label for="n0">ชื่อ</label><input id="n0" type="text" placeholder="ชื่อของคุณ"></div>
+        <div class="f"><label for="g0">เพศ</label>
           <select id="g0"><option id="g0m">ชาย</option><option id="g0f">หญิง</option><option id="g0o">ไม่ระบุ</option></select>
         </div>
       </div>
       <div class="row">
-        <div class="f"><label id="lb-d0">วันเกิด (ค.ศ.)</label><input id="d0" type="date"></div>
-        <div class="f"><label id="lb-t0">เวลาเกิด <span class="opt-label">(ไม่บังคับ)</span></label><input id="t0" type="time" placeholder="06:00"></div>
+        <div class="f"><label for="d0">วันเกิด (ค.ศ.)</label><input id="d0" type="date"></div>
+        <div class="f"><label for="t0">เวลาเกิด <span class="opt-label">(ไม่บังคับ)</span></label><input id="t0" type="time" placeholder="06:00"></div>
       </div>
       <button class="btn" id="btn0" disabled>✦ เปิดดวงชะตา ✦</button>
       <div class="trust-strip">🔒 ข้อมูลวันเกิดของคุณใช้ประมวลผลบนหน้าจอเท่านั้น ระบบไม่บันทึกข้อมูลส่วนตัวลงเซิร์ฟเวอร์</div>
@@ -84,7 +85,7 @@
   <section class="daily-fortune-section compact-daily" aria-label="ดวงวันนี้">
     <div class="daily-fortune-card">
       <div class="df-header">
-        <span class="df-emoji">✦</span>
+        <span class="df-emoji" aria-hidden="true">✦</span>
         <span class="df-label">จังหวะของวันนี้</span>
         <span class="df-streak" id="df-streak" title="เช็กติดต่อกัน"></span>
         <span class="df-date" id="df-date"></span>
@@ -175,25 +176,25 @@
       <p class="section-desc">เจาะลึกทั้ง 4 ด้านที่ส่งผลต่อชีวิตจริง — ไม่ใช่แค่ดูดวง แต่เข้าใจตัวเองและวางแผนได้ดีขึ้น</p>
       <div class="value-grid">
         <article class="value-card featured">
-          <span class="value-icon">🌟</span>
+          <span class="value-icon" aria-hidden="true">🌟</span>
           <h3>ตัวตน — ค้นพบพลังประจำวันเกิด</h3>
           <p class="value-quote">"รู้ว่าเมื่อไหร่ productivity พีค เมื่อไหร่ควรพัก"</p>
           <p class="value-feat">✦ เลขนำโชค · ธาตุเสริม · สีมงคล</p>
         </article>
         <article class="value-card">
-          <span class="value-icon">💕</span>
+          <span class="value-icon" aria-hidden="true">💕</span>
           <h3>ความรัก — เข้าใจสไตล์รัก</h3>
           <p class="value-quote">"รู้ว่าคุณตกหลุมรักใครแบบไหน + ใครเหมาะจริงๆ"</p>
           <p class="value-feat">✦ compatibility · lucky partner traits</p>
         </article>
         <article class="value-card">
-          <span class="value-icon">💼</span>
+          <span class="value-icon" aria-hidden="true">💼</span>
           <h3>งาน/เงิน — จังหวะที่ใช่</h3>
           <p class="value-quote">"รู้ช่วงเงินเข้า ช่วงลงทุน ช่วงออม"</p>
           <p class="value-feat">✦ career peaks · lucky dates</p>
         </article>
         <article class="value-card">
-          <span class="value-icon">🌙</span>
+          <span class="value-icon" aria-hidden="true">🌙</span>
           <h3>ฤกษ์ดี — เลือกวันเริ่มสำคัญ</h3>
           <p class="value-quote">"เพิ่มโอกาสสำเร็จ 30% (จากสถิติผู้ใช้)"</p>
           <p class="value-feat">✦ auspicious times · daily horoscope</p>
@@ -217,26 +218,26 @@
       <div id="heart-container" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0;"></div>
       <div class="phd" id="phd1a">✦ บุคคลที่หนึ่ง</div>
       <div class="row">
-        <div class="f"><label id="lb-n1a">ชื่อ</label><input id="n1a" type="text" placeholder="ชื่อคนที่หนึ่ง"></div>
-        <div class="f"><label id="lb-g1a">เพศ</label>
+        <div class="f"><label for="n1a">ชื่อ</label><input id="n1a" type="text" placeholder="ชื่อคนที่หนึ่ง"></div>
+        <div class="f"><label for="g1a">เพศ</label>
           <select id="g1a"><option id="g1am">ชาย</option><option id="g1af">หญิง</option><option id="g1ao">ไม่ระบุ</option></select>
         </div>
       </div>
       <div class="row">
-        <div class="f"><label id="lb-d1a">วันเดือนปีเกิด (ค.ศ.)</label><input id="d1a" type="date"></div>
-        <div class="f"><label id="lb-t1a">เวลาเกิด <span class="opt-label">(ไม่บังคับ)</span></label><input id="t1a" type="time" placeholder="06:00"></div>
+        <div class="f"><label for="d1a">วันเดือนปีเกิด (ค.ศ.)</label><input id="d1a" type="date"></div>
+        <div class="f"><label for="t1a">เวลาเกิด <span class="opt-label">(ไม่บังคับ)</span></label><input id="t1a" type="time" placeholder="06:00"></div>
       </div>
       <div class="cdiv" id="cdiv1">✦ พบกับ ✦</div>
       <div class="phd" id="phd1b">✦ บุคคลที่สอง</div>
       <div class="row">
-        <div class="f"><label id="lb-n1b">ชื่อ</label><input id="n1b" type="text" placeholder="ชื่อคนที่สอง"></div>
-        <div class="f"><label id="lb-g1b">เพศ</label>
+        <div class="f"><label for="n1b">ชื่อ</label><input id="n1b" type="text" placeholder="ชื่อคนที่สอง"></div>
+        <div class="f"><label for="g1b">เพศ</label>
           <select id="g1b"><option id="g1bm">ชาย</option><option id="g1bf">หญิง</option><option id="g1bo">ไม่ระบุ</option></select>
         </div>
       </div>
       <div class="row">
-        <div class="f"><label id="lb-d1b">วันเดือนปีเกิด (ค.ศ.)</label><input id="d1b" type="date"></div>
-        <div class="f"><label id="lb-t1b">เวลาเกิด <span class="opt-label">(ไม่บังคับ)</span></label><input id="t1b" type="time" placeholder="06:00"></div>
+        <div class="f"><label for="d1b">วันเดือนปีเกิด (ค.ศ.)</label><input id="d1b" type="date"></div>
+        <div class="f"><label for="t1b">เวลาเกิด <span class="opt-label">(ไม่บังคับ)</span></label><input id="t1b" type="time" placeholder="06:00"></div>
       </div>
       <button class="btn" id="btn1" disabled>💖 เปิดดวงความรัก</button>
       <div class="trust-strip">กรอกเฉพาะข้อมูลของคุณก่อนก็ได้ — ระบบจะแสดงช่วงอายุ สถานที่ ราศี และนิสัยคนที่มีแนวโน้มเข้ามา</div>
@@ -248,12 +249,12 @@
   <div class="mode" id="m2">
     <div class="card" id="fc2">
       <div class="row">
-        <div class="f"><label id="lb-n2">ชื่อ</label><input id="n2" type="text" placeholder="ชื่อของคุณ"></div>
-        <div class="f"><label id="lb-g2">เพศ</label>
+        <div class="f"><label for="n2">ชื่อ</label><input id="n2" type="text" placeholder="ชื่อของคุณ"></div>
+        <div class="f"><label for="g2">เพศ</label>
           <select id="g2x"><option id="g2m">ชาย</option><option id="g2f">หญิง</option><option id="g2o">ไม่ระบุ</option></select>
         </div>
       </div>
-        <div class="f"><label id="lb-d2">วันเดือนปีเกิด (ค.ศ.)</label><input id="d2" type="date"></div>
+        <div class="f"><label for="d2">วันเดือนปีเกิด (ค.ศ.)</label><input id="d2" type="date"></div>
       <button class="btn" id="btn2" disabled>◈ ดูฤกษ์งามยามดี ◈</button>
     </div>
     <div id="r2"></div>
@@ -284,25 +285,25 @@
   };
 </script>
 
-<script src="js/daily-fortune.js"></script>
-<script src="js/share-viral.js"></script>
-<script src="js/social-proof.js"></script>
-<script src="astrology-core.js"></script>
-<script src="data/thai-astrology-content.js"></script>
-<script src="js/reading-helpers.js"></script>
-<script src="js/life-graph.js"></script>
-<script src="js/renderer-shared.js"></script>
-<script src="js/streak-tracker.js"></script>
-<script src="js/renderer-individual.js"></script>
-<script src="js/renderer-couple.js"></script>
-<script src="js/renderer-auspicious.js"></script>
-<script src="js/onboarding.js"></script>
-<script src="js/gamification.js"></script>
-<script src="ui-actions.js"></script>
-<script src="js/analytics.js"></script>
-<script src="js/ab-testing.js"></script>
-<script src="app.js"></script>
-<script src="js/chat-concierge.js"></script>
+<script defer src="js/daily-fortune.js"></script>
+<script defer src="js/share-viral.js"></script>
+<script defer src="js/social-proof.js"></script>
+<script defer src="astrology-core.js"></script>
+<script defer src="data/thai-astrology-content.js"></script>
+<script defer src="js/reading-helpers.js"></script>
+<script defer src="js/life-graph.js"></script>
+<script defer src="js/renderer-shared.js"></script>
+<script defer src="js/streak-tracker.js"></script>
+<script defer src="js/renderer-individual.js"></script>
+<script defer src="js/renderer-couple.js"></script>
+<script defer src="js/renderer-auspicious.js"></script>
+<script defer src="js/onboarding.js"></script>
+<script defer src="js/gamification.js"></script>
+<script defer src="ui-actions.js"></script>
+<script defer src="js/analytics.js"></script>
+<script defer src="js/ab-testing.js"></script>
+<script defer src="app.js"></script>
+<script defer src="js/chat-concierge.js"></script>
 
 <!-- 🎴 Tarot Modal -->
 <div id="tarot-modal" role="dialog" aria-modal="true" aria-labelledby="tarot-title">
@@ -315,27 +316,27 @@
       <p class="tarot-subtitle">เลือกหัวข้อที่อยากรู้ — ไพ่จะเปิดเผยสิ่งที่ซ่อนอยู่</p>
       <div class="tarot-categories">
         <button class="tarot-category" onclick="selectTarotCategory('love')">
-          <div class="tarot-category-emoji">💕</div>
+          <div class="tarot-category-emoji" aria-hidden="true">💕</div>
           <div class="tarot-category-name">ความรัก</div>
           <div class="tarot-category-desc">ความสัมพันธ์ คนรัก คนที่ชอบ</div>
         </button>
         <button class="tarot-category" onclick="selectTarotCategory('career')">
-          <div class="tarot-category-emoji">💼</div>
+          <div class="tarot-category-emoji" aria-hidden="true">💼</div>
           <div class="tarot-category-name">การงาน</div>
           <div class="tarot-category-desc">งาน อาชีพ การสอบ</div>
         </button>
         <button class="tarot-category" onclick="selectTarotCategory('money')">
-          <div class="tarot-category-emoji">💰</div>
+          <div class="tarot-category-emoji" aria-hidden="true">💰</div>
           <div class="tarot-category-name">การเงิน</div>
           <div class="tarot-category-desc">รายรับ รายจ่าย การลงทุน</div>
         </button>
         <button class="tarot-category" onclick="selectTarotCategory('health')">
-          <div class="tarot-category-emoji">🌿</div>
+          <div class="tarot-category-emoji" aria-hidden="true">🌿</div>
           <div class="tarot-category-name">สุขภาพ</div>
           <div class="tarot-category-desc">ร่างกาย จิตใจ</div>
         </button>
         <button class="tarot-category" onclick="selectTarotCategory('general')" style="grid-column: span 2;">
-          <div class="tarot-category-emoji">✨</div>
+          <div class="tarot-category-emoji" aria-hidden="true">✨</div>
           <div class="tarot-category-name">ทั่วไป</div>
           <div class="tarot-category-desc">เรื่องอื่นๆ ที่อยากรู้</div>
         </button>
@@ -369,8 +370,8 @@
   </div>
 </div>
 
-<script src="js/tarot.js"></script>
-<script src="js/tarot-ui.js"></script>
+<script defer src="js/tarot.js"></script>
+<script defer src="js/tarot-ui.js"></script>
 <script>
 // Version-based cache busting
 (function() {

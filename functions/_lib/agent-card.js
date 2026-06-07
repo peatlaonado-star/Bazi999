@@ -1,6 +1,17 @@
 // STARVIA Agent Card (A2A Protocol v0.2.0)
 // Ported to Cloudflare Pages Functions — pure JSON, no Node.js deps
 // Spec: https://github.com/google/A2A
+//
+// Skill dispatch (wired 2026-06-07):
+//   - birthday_reading  → inline (pure JS, no backend)
+//   - daily_fortune     → inline (sun-sign + weekday, no backend)
+//   - lottery_results   → handleLotteryResults (KV-backed)
+//   - premium_verify    → verifyPremiumPin (KV + JWT)
+//   - chat_consultation → handleChat (Workers AI)
+
+import { handleLotteryResults } from './lottery.js';
+import { verifyPremiumPin } from './premium.js';
+import { handleChat } from './chat.js';
 
 function getAgentCard(origin) {
   return {
@@ -181,6 +192,72 @@ function handleBirthdayReading(input) {
   };
 }
 
+// Daily fortune — pure JS, deterministic from birth date + today
+// Returns a short personalized snippet per category
+const dailyMessages = {
+  love: {
+    good: '💕 พลังดาวเสริมความสัมพันธ์ — วันนี้เหมาะบอกรักหรือคืนดี',
+    mid: '🌸 ความรักนิ่ง — ใช้เวลาเข้าใจกันมากกว่าเร่งหาคำตอบ',
+    bad: '🌧️ ระวังคำพูด — ใจเย็นก่อนตอบโพสต์/แชทวันนี้',
+  },
+  work: {
+    good: '🚀 พลังงานการงานพีค — ลุยโปรเจกต์ใหม่ได้เลย',
+    mid: '🛠️ การงานนิ่ง — เน้นงานประจำให้สำเร็จก่อน',
+    bad: '⚠️ วันนี้ควรหลีกเลี่ยงการตัดสินใจใหญ่ เก็บไว้พรุ่งนี้',
+  },
+  money: {
+    good: '💰 โชคลาภดี — เหมาะลงทุน/เริ่มธุรกิจเล็กๆ',
+    mid: '💵 การเงินนิ่ง — เก็บออมดีกว่าใช้จ่ายฟุ่มเฟือย',
+    bad: '🛑 ระวังการใช้จ่าย — วันนี้ควรพกแต่จำเป็น',
+  },
+  general: {
+    good: '✨ ดวงเปิด — จักรวาลเปิดทางให้ทุกเรื่อง',
+    mid: '🌙 พลังงานสมดุล — รักษาจังหวะปกติ',
+    bad: '🌑 วันพักใจ — ลดกิจกรรมหนัก ดูแลตัวเอง',
+  },
+};
+
+function handleDailyFortune(input) {
+  const date = new Date(input.birthDate);
+  if (isNaN(date.getTime())) {
+    return { success: false, error: 'INVALID_DATE' };
+  }
+  const category = ['love', 'work', 'money', 'general'].includes(input.category) ? input.category : 'general';
+  // Deterministic bucket from (birth day-of-year + today's day-of-year) modulo 3
+  const birthDoy = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000);
+  const todayDoy = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+  const bucket = (birthDoy + todayDoy) % 3; // 0=good, 1=mid, 2=bad
+  const tone = ['good', 'mid', 'bad'][bucket];
+  const element = elements[(date.getMonth() + 1) % 10];
+  const constellation = constellations[date.getDate() % 12];
+  const luckyNumbers = [(date.getDate() % 9) + 1, (todayDoy % 9) + 1, ((birthDoy + todayDoy) % 9) + 1];
+
+  return {
+    success: true,
+    fortune: {
+      date: new Date().toISOString().slice(0, 10),
+      category,
+      tone,
+      message: dailyMessages[category][tone],
+      element,
+      constellation,
+      luckyNumbers: Array.from(new Set(luckyNumbers)).slice(0, 3),
+      note: 'สำหรับคำทำนายฉบับเต็ม (รายสัปดาห์ + ช่วงเวลาดี-ร้าย) กรุณาซื้อ Premium 199 บาท',
+    },
+  };
+}
+
+// Internal dispatch helper — invoke another _lib handler with a synthetic body
+// Used so the A2A layer can call /v1/* endpoints without an HTTP round-trip
+async function dispatchHandler(context, handler, body) {
+  const syntheticRequest = new Request(context.request.url, {
+    method: context.request.method,
+    headers: context.request.headers,
+    body: body !== undefined ? JSON.stringify(body) : null,
+  });
+  return handler({ ...context, request: syntheticRequest });
+}
+
 export async function handleAgentRequest(context) {
   const { request, env, params } = context;
   const url = new URL(request.url);
@@ -203,24 +280,51 @@ export async function handleAgentRequest(context) {
 
     if (skillId === 'birthday_reading') {
       const result = handleBirthdayReading(input);
-      return json({
-        success: true,
-        taskId,
-        status: 'completed',
-        result,
-      });
+      return json({ success: true, taskId, status: 'completed', result });
     }
 
-    // Other skills need to be dispatched to other endpoints
+    if (skillId === 'daily_fortune') {
+      const result = handleDailyFortune(input);
+      return json({ success: true, taskId, status: 'completed', result });
+    }
+
+    // lottery_results — proxy to handleLotteryResults, wrap A2A envelope around response
+    if (skillId === 'lottery_results') {
+      const innerResp = await handleLotteryResults(context);
+      const inner = await innerResp.json();
+      return json({ success: true, taskId, status: 'completed', result: inner });
+    }
+
+    // premium_verify — needs { pin } in body
+    if (skillId === 'premium_verify') {
+      if (!input.pin) {
+        return json({
+          success: true, taskId, status: 'completed',
+          result: { success: false, error: 'PIN_REQUIRED', message: 'ต้องระบุ pin (รูปแบบ STAR-XXXX-XXXX)' },
+        });
+      }
+      const innerResp = await dispatchHandler(context, verifyPremiumPin, { pin: input.pin });
+      const inner = await innerResp.json();
+      return json({ success: true, taskId, status: 'completed', result: inner });
+    }
+
+    // chat_consultation — needs { message } in body
+    if (skillId === 'chat_consultation') {
+      if (!input.message) {
+        return json({
+          success: true, taskId, status: 'completed',
+          result: { success: false, error: 'MESSAGE_REQUIRED', message: 'ต้องระบุ message (คำถามภาษาไทย)' },
+        });
+      }
+      const innerResp = await dispatchHandler(context, handleChat, { message: input.message });
+      const inner = await innerResp.json();
+      return json({ success: true, taskId, status: 'completed', result: inner });
+    }
+
+    // Unknown skill — return clear error instead of generic proxy stub
     return json({
-      success: true,
-      taskId,
-      status: 'completed',
-      result: {
-        success: false,
-        error: 'SKILL_PROXY_NOT_MIGRATED',
-        message: `${skillId} requires calling the live endpoint directly. This skill handler will be wired in the next migration phase.`,
-      },
+      success: true, taskId, status: 'completed',
+      result: { success: false, error: 'UNKNOWN_SKILL', skillId, available: ['birthday_reading','daily_fortune','lottery_results','premium_verify','chat_consultation'] },
     });
   }
 
