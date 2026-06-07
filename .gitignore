@@ -7,3 +7,5 @@ coverage/
 .env
 .env.local
 .env.*.local
+# Backup files (Starvia 2026-06-07)
+*.bak
