@@ -9,3 +9,5 @@ coverage/
 .env.*.local
 # Backup files (Starvia 2026-06-07)
 *.bak
+# Legacy Netlify config (Starvia moved to Cloudflare Pages 2026-06-04)
+.netlify/
