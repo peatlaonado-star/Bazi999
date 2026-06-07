@@ -3221,6 +3221,65 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .gk-notif-title { font-family: 'Kanit', sans-serif; font-size: 13px; color: #c9a227; }
 .gk-notif-name { font-family: 'Kanit', sans-serif; font-size: 16px; color: #f0e6d3; font-weight: 600; }
 .gk-notif-desc { font-family: 'Sarabun', sans-serif; font-size: 12px; color: #a09880; }
+/* Enhanced badge notification — sparkle overlay */
+.gk-notif-celebrate { border-color: rgba(201,162,39,0.6) !important; box-shadow: 0 0 30px rgba(201,162,39,0.2), 0 10px 40px rgba(0,0,0,0.5); }
+.gk-notif-sparkle {
+position: absolute;
+top: -1px; left: -1px; right: -1px;
+height: 4px;
+background: linear-gradient(90deg, transparent, #c9a227, #e8c547, #c9a227, transparent);
+border-radius: 16px 16px 0 0;
+animation: sparkleGlow 2s ease-in-out infinite;
+}
+@keyframes sparkleGlow {
+0%, 100% { opacity: 0.4; }
+50% { opacity: 1; }
+}
+/* Milestone toast — color-coded celebration */
+.gk-notif-milestone {
+border-width: 2px !important;
+animation: gkSlideUp 0.5s cubic-bezier(0.34,1.56,0.64,1), gkFadeOut 0.4s ease 4.6s forwards;
+}
+.gk-notif-milestone .gk-notif-sparkle { background: linear-gradient(90deg, transparent, currentColor, transparent); height: 3px; }
+
+/* First-reading celebration card */
+.ob-reading-celebrate { position: relative; overflow: hidden; }
+.ob-sparkle-row {
+position: absolute;
+top: -8px; left: 0; right: 0;
+text-align: center;
+font-size: 11px;
+color: #c9a227;
+letter-spacing: 10px;
+animation: sparkleFloat 3s ease-in-out infinite;
+opacity: 0.5;
+pointer-events: none;
+}
+@keyframes sparkleFloat {
+0%, 100% { transform: translateY(0); opacity: 0.3; }
+50% { transform: translateY(-6px); opacity: 0.7; }
+}
+
+/* Banner progress bar */
+.ob-banner-progress {
+height: 3px;
+background: rgba(201,162,39,0.12);
+border-radius: 2px;
+margin-top: 8px;
+overflow: hidden;
+}
+.ob-banner-progress-fill {
+height: 100%;
+background: linear-gradient(90deg, #c9a227, #e8c547);
+border-radius: 2px;
+transition: width 0.8s ease;
+}
+.ob-banner-progress-wow {
+background: linear-gradient(90deg, #E8A0CF, #c9a227);
+}
+.ob-banner-anticipation {
+background: linear-gradient(135deg, #1a1a2e, #16213e);
+}
 /* ===== REPORT BADGES SECTION ===== */
 .report-badges {
   margin: 0 0 20px;

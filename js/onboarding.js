@@ -208,7 +208,8 @@ var Onboarding = (function() {
   function renderFirstReading(birthData) {
     var name = birthData ? birthData.name : 'คุณ';
     return '<div class="ob-overlay ob-overlay-soft" id="onboarding-overlay">'
-      + '<div class="ob-card ob-reading">'
+      + '<div class="ob-card ob-reading ob-reading-celebrate">'
+      + '<div class="ob-sparkle-row">✦ ✧ ✦ ✧ ✦ ✧ ✦ ✧ ✦</div>'
       + '<div class="ob-reading-badge">🌟 วันแรกของคุณบน STARVIA</div>'
       + '<h2 class="ob-title">ยินดีต้อนรับ ' + escapeHTML(name) + '</h2>'
       + '<p class="ob-subtitle">นี่คือดวงของคุณ — วันแรกที่ STARVIA ได้พบคุณ</p>'
@@ -227,31 +228,36 @@ var Onboarding = (function() {
   }
 
   function renderAnticipation(streak) {
-    return '<div class="ob-banner" id="onboarding-banner">'
+    var pct = Math.min(streak * 10, 100);
+    return '<div class="ob-banner ob-banner-anticipation" id="onboarding-banner">'
       + '<div class="ob-banner-content">'
       + '<span class="ob-banner-icon">🔮</span>'
       + '<span class="ob-banner-text">วันนี้ดาวมีการเคลื่อนไหว — ดวงของคุณกำลังจะเปลี่ยน!</span>'
-      + '<span class="ob-banner-day">Day ' + (streak + 1) + '</span>'
+      + '<span class="ob-banner-day">Day ' + streak + '</span>'
       + '</div>'
+      + '<div class="ob-banner-progress"><div class="ob-banner-progress-fill" style="width:' + pct + '%"></div></div>'
       + '</div>';
   }
 
   function renderWowDay(streak) {
+    var pct = Math.min(streak * 10, 100);
     return '<div class="ob-banner ob-banner-wow" id="onboarding-banner">'
       + '<div class="ob-banner-content">'
       + '<span class="ob-banner-icon">✨</span>'
       + '<span class="ob-banner-text">วันนี้คือวันพิเศษของคุณ — ดาวกำลังส่งสัญญาณสำคัญ!</span>'
-      + '<span class="ob-banner-day">Day ' + (streak + 1) + ' 🔥</span>'
+      + '<span class="ob-banner-day">Day ' + streak + ' 🔥</span>'
       + '</div>'
+      + '<div class="ob-banner-progress"><div class="ob-banner-progress-fill ob-banner-progress-wow" style="width:' + pct + '%"></div></div>'
       + '</div>';
   }
 
   function renderStreakCounter(streak) {
     if (streak < 2) return '';
     var fireEmoji = streak >= 7 ? '🔥🔥🔥' : streak >= 3 ? '🔥🔥' : '🔥';
+    var label = streak >= 30 ? 'จอมเวทย์' : streak >= 14 ? 'หมอดู' : streak >= 7 ? 'สายมู' : 'นักดูดวง';
     return '<div class="ob-streak">'
       + '<span class="ob-streak-count">' + streak + ' วัน</span>'
-      + '<span class="ob-streak-label">ดูดวงต่อเนื่อง ' + fireEmoji + '</span>'
+      + '<span class="ob-streak-label">' + fireEmoji + ' ' + label + '</span>'
       + '</div>';
   }
 

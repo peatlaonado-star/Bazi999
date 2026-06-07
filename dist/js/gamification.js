@@ -14,7 +14,7 @@ var Gamification = (function() {
     { id: 'day-3', name: 'นักดูดวงมือใหม่', icon: '🔮', desc: 'ดูดวง 3 วันติด', requirement: 'streak', day: 3 },
     { id: 'day-7', name: 'สายมูตัวจริง', icon: '✨', desc: 'ดูดวง 7 วันติด', requirement: 'streak', day: 7 },
     { id: 'day-14', name: 'หมอดูประจำตัว', icon: '🌙', desc: 'ดูดวง 14 วันติด', requirement: 'streak', day: 14 },
-    { id: 'day-30', name: '_master of stars', icon: '👑', desc: 'ดูดวง 30 วันติด', requirement: 'streak', day: 30 },
+    { id: 'day-30', name: 'จอมเวทย์แห่งดวงดาว', icon: '👑', desc: 'ดูดวง 30 วันติด', requirement: 'streak', day: 30 },
     { id: 'couple-reader', name: 'คู่รักนักดูดวง', icon: '💕', desc: 'ดูดวงคู่ครั้งแรก', requirement: 'couple', day: 0 },
     { id: 'deep-reader', name: 'นักวิเคราะห์ลึก', icon: '🔍', desc: 'ปลดล็อก Premium ครั้งแรก', requirement: 'premium', day: 0 },
   ];
@@ -244,7 +244,8 @@ var Gamification = (function() {
   }
 
   function renderNewBadgeNotification(badge) {
-    return '<div class="gk-notification" id="gk-badge-notification">'
+    return '<div class="gk-notification gk-notif-celebrate" id="gk-badge-notification">'
+      + '<div class="gk-notif-sparkle"></div>'
       + '<div class="gk-notif-content">'
       + '<span class="gk-notif-icon">' + badge.icon + '</span>'
       + '<div class="gk-notif-text">'
@@ -256,8 +257,35 @@ var Gamification = (function() {
       + '</div>';
   }
 
+  function renderMilestoneToast(streak) {
+    var milestones = {
+      3:  { emoji: '🔮', title: '3 วันแรกสำเร็จ!', sub: 'คุณเริ่มเดินทางบนเส้นทางดวงดาวแล้ว', color: '#6EC89A' },
+      7:  { emoji: '✨', title: 'ครบ 7 วัน!', sub: 'พลังดวงของคุณแข็งแกร่งขึ้นเรื่อยๆ', color: '#E8A0CF' },
+      14: { emoji: '🌙', title: '14 วัน!', sub: 'คุณคือนักดูดวงตัวจริงแล้ว', color: '#9B8AB8' },
+      30: { emoji: '👑', title: '30 วัน!', sub: 'จอมเวทย์แห่งดวงดาว — คุณพิชิต STARVIA แล้ว!', color: '#c9a227' },
+    };
+    var m = milestones[streak];
+    if (!m) return '';
+    return '<div class="gk-notification gk-notif-milestone" id="gk-milestone-toast" style="border-color:' + m.color + '40">'
+      + '<div class="gk-notif-sparkle"></div>'
+      + '<div class="gk-notif-content">'
+      + '<span class="gk-notif-icon">' + m.emoji + '</span>'
+      + '<div class="gk-notif-text">'
+      + '<div class="gk-notif-title" style="color:' + m.color + '">' + m.title + '</div>'
+      + '<div class="gk-notif-name">' + m.sub + '</div>'
+      + '<div class="gk-notif-desc">ดูดวงต่อเนื่อง ' + streak + ' วัน! 🔥</div>'
+      + '</div>'
+      + '</div>'
+      + '</div>';
+  }
+
   function dismissNotification() {
     var el = document.getElementById('gk-badge-notification');
+    if (el) el.remove();
+  }
+
+  function dismissMilestone() {
+    var el = document.getElementById('gk-milestone-toast');
     if (el) el.remove();
   }
 
@@ -276,6 +304,16 @@ var Gamification = (function() {
           setTimeout(dismissNotification, 4000);
         }, i * 1500);
       });
+    }
+
+    // Show milestone celebration toast (day 3, 7, 14, 30)
+    var milestoneDays = [3, 7, 14, 30];
+    if (milestoneDays.indexOf(streak) !== -1) {
+      var mDelay = newBadges.length > 0 ? newBadges.length * 1500 + 1500 : 500;
+      setTimeout(function() {
+        document.body.insertAdjacentHTML('beforeend', renderMilestoneToast(streak));
+        setTimeout(dismissMilestone, 5000);
+      }, mDelay);
     }
 
     // Auto-complete daily-visit challenge
@@ -304,7 +342,9 @@ var Gamification = (function() {
     renderProgressBar: renderProgressBar,
     renderChallenges: renderChallenges,
     renderNewBadgeNotification: renderNewBadgeNotification,
+    renderMilestoneToast: renderMilestoneToast,
     dismissNotification: dismissNotification,
+    dismissMilestone: dismissMilestone,
     BADGES: BADGES,
     CHALLENGES: CHALLENGES,
   };

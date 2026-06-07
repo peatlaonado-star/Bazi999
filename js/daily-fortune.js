@@ -389,10 +389,10 @@
   }
 
   function getStreakBadge(count) {
-    if (count >= 30) return { emoji: '👑', label: 'ราชาแห่งดวงดาว' };
-    if (count >= 14) return { emoji: '🌟', label: 'นักอ่านดวงระดับเซียน' };
-    if (count >= 7)  return { emoji: '⭐', label: 'พลังดวงแข็งแกร่ง' };
-    if (count >= 3)  return { emoji: '🔥', label: 'ติดตามดวงต่อเนื่อง' };
+    if (count >= 30) return { emoji: '👑', label: 'จอมเวทย์แห่งดวงดาว' };
+    if (count >= 14) return { emoji: '🌟', label: 'หมอดูประจำตัว' };
+    if (count >= 7)  return { emoji: '⭐', label: 'สายมูตัวจริง' };
+    if (count >= 3)  return { emoji: '🔥', label: 'นักดูดวงมือใหม่' };
     return { emoji: '🌱', label: 'เริ่มต้นเดินทาง' };
   }
 
@@ -413,10 +413,14 @@
     if (footerEl) {
       if (streakData.count === 1) {
         footerEl.textContent = '🎉 ยินดีด้วย! นี่คือวันแรกของการเดินทาง ✨ กลับมาพรุ่งนี้เพื่อไม่ให้สตรีคขาดนะ';
+      } else if (streakData.count === 3) {
+        footerEl.textContent = '🔮 ครบ 3 วันแล้ว! คุณเริ่มเห็นรูปแบบของดวงดาวชัดขึ้น — กลับมาต่อวันพรุ่งนี้ ✨';
       } else if (streakData.count === 7) {
         footerEl.textContent = '⭐ ครบ 7 วันแล้ว! พลังดวงของคุณแข็งแกร่งขึ้นทุกวัน — อย่าหยุดนะ ✨';
+      } else if (streakData.count === 14) {
+        footerEl.textContent = '🌙 ครบ 14 วัน! คุณคือนักดูดวงตัวจริง — ดวงของคุณกำลังเปลี่ยนแปลง!';
       } else if (streakData.count === 30) {
-        footerEl.textContent = '👑 ครบ 30 วัน! คุณคือผู้พิชิตดวงดาว — STARVIA ภูมิใจในตัวคุณ ✨';
+        footerEl.textContent = '👑 ครบ 30 วัน! คุณคือจอมเวทย์แห่งดวงดาว — STARVIA ภูมิใจในตัวคุณ ✨';
       } else {
         footerEl.textContent = 'อัปเดตทุกวัน — กลับมาเช็กใหม่พรุ่งนี้เพื่อรักษาสตรีค ' + badge.emoji + ' ✨';
       }
