@@ -271,4 +271,114 @@ describe('Premium state abstraction', () => {
 
     expect(fetchCount).toBe(1);
   });
+
+  // === 7-day streak reward unlock path (sets localStorage starvia_streak_premium) ===
+  // Regression: when a user completes the 7-day trial and clicks "ใช้รหัสเลย"
+  // (activateCode), the streak module writes a 24h unlock flag to localStorage
+  // and reloads. The previous restorePremiumStatus() only checked the JWT
+  // token, so trial-completed users were silently locked out after reload.
+  it('unlocks premium from a valid 7-day streak flag when no JWT is saved', async () => {
+    const expiresAt = Date.now() + 24 * 60 * 60 * 1000;
+    const fetchCalls = [];
+    const ctx = loadUiContext({
+      window: {
+        isPremiumUnlocked: false,
+        STARVIA_CONFIG: { apiBaseUrl: 'https://api.example.test/v1' },
+      },
+      localStorage: {
+        getItem: (key) => key === 'starvia_streak_premium'
+          ? JSON.stringify({ unlocked: true, expiresAt: expiresAt })
+          : null,
+        setItem: () => {},
+        removeItem: () => {},
+      },
+      fetch: (url) => { fetchCalls.push(url); return Promise.reject(new Error('should not fetch')); },
+    });
+
+    const result = await ctx.restorePremiumStatus();
+
+    expect(fetchCalls).toEqual([]); // no backend round-trip
+    expect(result.active).toBe(true);
+    expect(result.mode).toBe('streak');
+    expect(ctx.isPremiumUnlocked()).toBe(true);
+  });
+
+  it('stays locked when the 7-day streak flag is expired', async () => {
+    const expiredAt = Date.now() - 60 * 1000; // expired 1 min ago
+    const ctx = loadUiContext({
+      window: {
+        isPremiumUnlocked: false,
+        STARVIA_CONFIG: { apiBaseUrl: 'https://api.example.test/v1' },
+      },
+      localStorage: {
+        getItem: (key) => key === 'starvia_streak_premium'
+          ? JSON.stringify({ unlocked: true, expiresAt: expiredAt })
+          : null,
+        setItem: () => {},
+        removeItem: () => {},
+      },
+    });
+
+    const result = await ctx.restorePremiumStatus();
+
+    expect(result.active).toBe(false);
+    expect(result.mode).toBe('none');
+    expect(ctx.isPremiumUnlocked()).toBe(false);
+  });
+
+  it('falls back to streak unlock when the JWT is rejected by the backend', async () => {
+    const expiresAt = Date.now() + 24 * 60 * 60 * 1000;
+    const removed = [];
+    const ctx = loadUiContext({
+      window: {
+        isPremiumUnlocked: false,
+        STARVIA_CONFIG: { apiBaseUrl: 'https://api.example.test/v1' },
+      },
+      localStorage: {
+        getItem: (key) => {
+          if (key === 'starviaPremiumToken') return 'stale-token';
+          if (key === 'starvia_streak_premium')
+            return JSON.stringify({ unlocked: true, expiresAt: expiresAt });
+          return null;
+        },
+        setItem: () => {},
+        removeItem: (key) => { removed.push(key); },
+      },
+      fetch: () => Promise.resolve({ json: () => Promise.resolve({ active: false, error: 'TOKEN_EXPIRED' }) }),
+    });
+
+    const result = await ctx.restorePremiumStatus();
+
+    expect(removed).toContain('starviaPremiumToken');
+    expect(result.active).toBe(true);
+    expect(result.mode).toBe('streak');
+    expect(ctx.isPremiumUnlocked()).toBe(true);
+  });
+
+  it('falls back to streak unlock when /premium/status fetch errors out', async () => {
+    const expiresAt = Date.now() + 24 * 60 * 60 * 1000;
+    const ctx = loadUiContext({
+      window: {
+        isPremiumUnlocked: false,
+        STARVIA_CONFIG: { apiBaseUrl: 'https://api.example.test/v1' },
+      },
+      localStorage: {
+        getItem: (key) => {
+          if (key === 'starviaPremiumToken') return 'token';
+          if (key === 'starvia_streak_premium')
+            return JSON.stringify({ unlocked: true, expiresAt: expiresAt });
+          return null;
+        },
+        setItem: () => {},
+        removeItem: () => {},
+      },
+      fetch: () => Promise.reject(new Error('network down')),
+    });
+
+    const result = await ctx.restorePremiumStatus();
+
+    expect(result.active).toBe(true);
+    expect(result.mode).toBe('streak');
+    expect(ctx.isPremiumUnlocked()).toBe(true);
+  });
 });

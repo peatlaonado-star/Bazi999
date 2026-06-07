@@ -128,11 +128,36 @@ function getPremiumStorage() {
   return null;
 }
 
+// Fallback: check the 7-day streak reward localStorage flag set by
+// StreakReward.activateCode() / StreakReward.claimReward(). The streak
+// unlock is a 24h window stored locally — no backend round-trip, no JWT
+// token. We use it as a fallback when the JWT path is absent (user never
+// paid) or fails (network down, token expired/cleared) so a user who
+// legitimately completed the 7-day trial still sees unlocked content.
+function checkStreakUnlock() {
+  try {
+    var storage = getPremiumStorage();
+    if (!storage) return { active: false, mode: 'none' };
+    var raw = storage.getItem('starvia_streak_premium');
+    if (raw) {
+      var data = JSON.parse(raw);
+      if (data && data.unlocked && data.expiresAt > Date.now()) {
+        setPremiumUnlocked(true);
+        return { active: true, mode: 'streak', expiresAt: data.expiresAt };
+      }
+    }
+  } catch (e) { /* fall through to locked state */ }
+  setPremiumUnlocked(false);
+  return { active: false, mode: 'none' };
+}
+
 function restorePremiumStatus() {
   var cfg = getStarviaConfig();
   var token = getSavedPremiumToken();
   if (!token) {
-    return Promise.resolve({ active: false, mode: 'none' });
+    // No JWT — try the 7-day streak unlock so trial-completed users
+    // don't get locked out after a reload.
+    return Promise.resolve(checkStreakUnlock());
   }
 
   return fetch(cfg.apiBaseUrl + '/premium/status', {
@@ -147,11 +172,14 @@ function restorePremiumStatus() {
     }
     clearPremiumToken();
     setPremiumUnlocked(false);
-    return data || { active: false };
+    // JWT path failed (expired/invalid) — check streak unlock before
+    // giving up entirely.
+    return checkStreakUnlock();
   })
   .catch(function() {
-    setPremiumUnlocked(false);
-    return { active: false, error: 'NETWORK_ERROR' };
+    // Network error — try streak unlock as a best-effort fallback so
+    // offline users with an active streak unlock still see premium.
+    return checkStreakUnlock();
   });
 }
 
