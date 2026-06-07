@@ -142,7 +142,7 @@ describe('Couple mode rendering', () => {
     expect(output).toContain('data-mode="1"');
   });
 
-  it('locks couple dharma details, score breakdown, and action plan for free readers', () => {
+  it('renders full couple dharma, score breakdown, and action plan unconditionally (couple mode is always unlocked)', () => {
     const dom = new JSDOM('<!doctype html><div id="r1"></div><div id="tt1"></div><div id="ts1"></div>');
     const pa = planet('อาทิตย์', 'ไฟ', 0);
     const pb = planet('เสาร์', 'ไฟ', 0);
@@ -157,24 +157,24 @@ describe('Couple mode rendering', () => {
     const rb = sign('สิงห์');
     const RA2 = [ra, rb];
 
+    // Default context (isPremiumUnlocked = false) — couple mode still renders full content
     context.renderCouple('A', pa, ra, ra, 0, 0, 'B', pb, rb, rb, 1, 1, coupleUi(), RA2);
 
     const output = dom.window.document.getElementById('r1').innerHTML;
     expect(output).toContain('Compatibility Matrix');
     expect(output).toContain('คู่');
-    expect(output).toContain('ปลดล็อกรีพอร์ตฉบับเต็ม');
-    expect(output).not.toContain('สิ่งที่คู่นี้มาเรียนรู้ร่วมกัน');
-    expect(output).not.toContain('พิมพ์เขียวความสัมพันธ์');
-    // 3 premium sections folded into 1 <details>
-    // The score breakdown is still marked is-locked but now lives inside
-    // the consolidated <details> card. Use [class~="is-locked"] to avoid
-    // JSDOM compound-selector quirks.
-    const lockedCount = dom.window.document.querySelectorAll('[class*="is-locked"]').length;
-    expect(lockedCount).toBeGreaterThan(0); // at least the breakdown + lock overlay
-    expect(dom.window.document.querySelector('.couple-premium-details')).toBeTruthy();
+    // Premium content always visible (per user decision 2026-06-07)
+    expect(output).toContain('สิ่งที่คู่นี้มาเรียนรู้ร่วมกัน');
+    expect(output).toContain('พิมพ์เขียวความสัมพันธ์');
+    expect(output).toContain('วิธีดูแลความสัมพันธ์');
+    // No lock wrappers anywhere
+    expect(dom.window.document.querySelector('[class*="is-locked"]')).toBeNull();
+    expect(dom.window.document.querySelector('.couple-premium-details')).toBeNull();
+    expect(dom.window.document.querySelector('.lock-overlay')).toBeNull();
+    expect(output).not.toContain('ปลดล็อกรีพอร์ตฉบับเต็ม');
   });
 
-  it('renders consolidated premium as <details> collapsed by default', () => {
+  it('renders couple full content without collapsible details (always-expanded couple mode)', () => {
     const dom = new JSDOM('<!doctype html><div id="r1"></div><div id="tt1"></div><div id="ts1"></div>');
     const pa = planet('อาทิตย์', 'ไฟ', 0);
     const pb = planet('เสาร์', 'ไฟ', 0);
@@ -191,13 +191,14 @@ describe('Couple mode rendering', () => {
 
     context.renderCouple('A', pa, ra, ra, 0, 0, 'B', pb, rb, rb, 1, 1, coupleUi(), RA2);
 
-    const details = dom.window.document.querySelector('details.couple-premium-details');
-    expect(details).toBeTruthy();
-    expect(details.hasAttribute('open')).toBe(false);
-    expect(details.querySelectorAll('.ci2').length).toBe(4);
+    // No <details> element at all — content is rendered directly
+    expect(dom.window.document.querySelector('details.couple-premium-details')).toBeNull();
+    // All 4 score breakdown boxes are visible (not hidden behind a details)
+    const breakdown = dom.window.document.querySelectorAll('.cg2 .ci2');
+    expect(breakdown.length).toBe(4);
   });
 
-  it('shows couple premium details after unlock', () => {
+  it('renders couple premium content the same way regardless of unlock state', () => {
     const dom = new JSDOM('<!doctype html><div id="r1"></div><div id="tt1"></div><div id="ts1"></div>');
     const pa = planet('อาทิตย์', 'ไฟ', 0);
     const pb = planet('เสาร์', 'ไฟ', 0);
@@ -245,16 +246,10 @@ describe('Couple mode rendering', () => {
     expect(output).toContain('อ้างอิงเชิงระบบ');
     expect(output).toContain('ดาวประจำวัน/ธาตุ');
     expect(output).toContain('จังหวะรักของทั้งคู่');
-    // Premium love timing content is now inside a <details> element (hidden by default)
-    // and flagged as free-unlock-summary content. Check it's not in the visible text
-    // outside the <details> element.
-    var details = dom.window.document.querySelector('details.couple-premium-details');
-    var outsideDetails = output;
-    if (details) {
-      outsideDetails = output.replace(details.outerHTML, '');
-    }
-    expect(outsideDetails).not.toContain('ความสม่ำเสมอ 21 วัน');
-    expect(outsideDetails).not.toContain('กติกา 3 คำถาม');
+    // Love timing premium plan is now always visible (not hidden behind <details>).
+    // Couple mode unlocked 2026-06-07 — content shows for everyone.
+    expect(output).toContain('ความสม่ำเสมอ 21 วัน');
+    expect(output).toContain('กติกา 3 คำถาม');
   });
 
   it('marks love timing cycles that already passed and shifts to the next 7-year window', () => {
@@ -274,7 +269,7 @@ describe('Couple mode rendering', () => {
     expect(model.timingStatus).toContain('ระบบอ่านรอบถัดไป');
   });
 
-  it('unlocks love timing action plan for premium readers', () => {
+  it('renders love timing action plan unconditionally (couple mode unlocked 2026-06-07)', () => {
     const dom = new JSDOM('<!doctype html><div id="r1"></div><div id="tt1"></div><div id="ts1"></div>');
     const pa = planet('อาทิตย์', 'ไฟ', 0);
     const pb = planet('พุธ', 'ลม', 1);
@@ -284,7 +279,6 @@ describe('Couple mode rendering', () => {
       PLC: [[82, 74], [74, 80]],
       getELD: () => [['ไฟเจอลม'], ['ลมเจอไฟ']],
       rasiAngle: () => [76, 'มุมส่งเสริม'],
-      isPremiumUnlocked: () => true,
     });
     const ra = sign('เมษ');
     const rb = sign('เมถุน');
@@ -295,6 +289,7 @@ describe('Couple mode rendering', () => {
     const output = dom.window.document.getElementById('r1').innerHTML;
     expect(output).toContain('แผนเพิ่มโอกาสให้ได้คู่ที่เข้ากัน');
     expect(output).toContain('ความสม่ำเสมอ 21 วัน');
+    // No "unlock" CTA in couple mode
     expect(output).not.toContain('ปลดล็อกแผนความรักเฉพาะคู่');
   });
 

@@ -160,9 +160,10 @@ function buildSingleLoveOpportunityModel(dateA, pa, ra, la, ria, lia, RA2){
 function renderSingleLoveOpportunity(na,pa,ra,la,ria,lia,u,RA2,dateA){
   var wrap=document.getElementById('r1');
   na = escapeHTML(na);
-  var premiumUnlocked = premiumIsUnlocked();
   var model = buildSingleLoveOpportunityModel(dateA, pa, ra, la, ria, lia, RA2);
-  var premiumHtml = '<div class="love-destiny-premium">'
+  // Couple mode is fully unlocked (per user decision 2026-06-07) —
+  // premium plan always renders. No lock overlay, no teaser, no paywall.
+  var loveTimingHtml = '<div class="love-destiny-premium">'
     + '<div class="ld-section-title">แผนเปิดทางความรัก 3 ขั้น</div>'
     + '<ol>'
     + '<li>เลือกออกไปอยู่ในพื้นที่ที่ตรงกับธาตุของคนที่มีแนวโน้มเข้ามา: ' + escapeHTML(model.channel) + '</li>'
@@ -170,11 +171,6 @@ function renderSingleLoveOpportunity(na,pa,ra,la,ria,lia,u,RA2,dateA){
     + '<li>ช่วง ' + escapeHTML(model.monthHint) + ' ให้เพิ่มโอกาสเจอคนใหม่อย่างน้อยสัปดาห์ละ 1 ครั้ง</li>'
     + '</ol>'
     + '<div class="ld-note"><strong>สัญญาณคนที่ควรให้โอกาส:</strong> ' + escapeHTML(model.signal) + '</div>'
-    + '</div>';
-  // Free users: show teaser instead of locked card (consistent with couple mode)
-  var freeTeaser = '<div class="love-destiny-teaser">'
-    + '<div class="ld-section-title">🔒 แผนเปิดทางความรัก 3 ขั้น + สัญญาณคนที่ควรให้โอกาส</div>'
-    + '<p style="color:var(--tx2); font-size:13px; text-align:center; margin:8px 0;">ปลดล็อกเพื่อดูแผน 3 ขั้น วิธีเปิดโอกาส และสัญญาณคนที่ควรให้โอกาส</p>'
     + '</div>';
   wrap.innerHTML = '<div class="love-destiny-card single-love-card">'
     + '<div class="ld-kicker">Single Love Timing</div>'
@@ -188,22 +184,18 @@ function renderSingleLoveOpportunity(na,pa,ra,la,ria,lia,u,RA2,dateA){
     + '<div><b>ราศี/พลังที่มีแนวโน้มเข้ามา</b><br>' + escapeHTML(model.partnerSignSymbol + ' ' + model.partnerSignName) + ' · ธาตุ' + escapeHTML(model.partnerElement) + '</div>'
     + '<div><b>นิสัยคนที่มีแนวโน้มเข้ากัน</b><br>' + escapeHTML(model.traits) + '</div>'
     + '</div>'
-    + (premiumUnlocked ? premiumHtml : freeTeaser)
+    + loveTimingHtml
     + '<div class="ld-ref">' + escapeHTML(model.reference) + '</div>'
     + '</div>'
     + '<div class="rbt"><button class="rbtn" data-action="reset-mode" data-mode="1">' + (u.r1 || 'เริ่มใหม่') + '</button></div>';
 }
 
-function buildLoveDestinyCard(model, premiumUnlocked, na, nb){
-  var premiumHtml = '<div class="love-destiny-premium">'
+function buildLoveDestinyCard(model, na, nb){
+  // Couple mode fully unlocked — always render the full plan + risk note.
+  var loveDestinyHtml = '<div class="love-destiny-premium">'
     + '<div class="ld-section-title">แผนเพิ่มโอกาสให้ได้คู่ที่เข้ากัน</div>'
     + '<ol>' + model.premiumPlan.map(function(item){ return '<li>' + escapeHTML(item) + '</li>'; }).join('') + '</ol>'
     + '<div class="ld-note"><strong>จุดที่ต้องระวัง:</strong> ' + escapeHTML(model.risk) + '</div>'
-    + '</div>';
-  // Free users: show teaser instead of locked card (consolidated into couple-premium-details)
-  var freeTeaser = '<div class="love-destiny-teaser">'
-    + '<div class="ld-section-title">🔒 แผนเพิ่มโอกาส 3 ขั้น + จุดระวัง</div>'
-    + '<p style="color:var(--tx2); font-size:13px; text-align:center; margin:8px 0;">ปลดล็อกรีพอร์ตคู่รักเพื่อดูแผนเพิ่มโอกาส 3 ขั้น และจุดที่ต้องระวังของคู่นี้</p>'
     + '</div>';
   return '<div class="love-destiny-card">'
     + '<div class="ld-kicker">Love Timing Method</div>'
@@ -218,7 +210,7 @@ function buildLoveDestinyCard(model, premiumUnlocked, na, nb){
     + '<div><b>' + na + '</b><br>จังหวะเปิดเด่น: ' + escapeHTML(model.wa.label) + '</div>'
     + '<div><b>' + nb + '</b><br>จังหวะเปิดเด่น: ' + escapeHTML(model.wb.label) + '</div>'
     + '</div>'
-    + (premiumUnlocked ? premiumHtml : freeTeaser)
+    + loveDestinyHtml
     + '<div class="ld-ref">' + escapeHTML(model.reference) + '</div>'
     + '</div>';
 }
@@ -227,13 +219,14 @@ function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2,dateA,dateB
   var wrap=document.getElementById('r1');
   na = escapeHTML(na);
   nb = escapeHTML(nb);
-  var premiumUnlocked = premiumIsUnlocked();
+  // Couple mode is fully unlocked — no premium gating. All sections
+  // (Dharma, score breakdown, action plan) render for everyone.
   var elS=ELC[pa.ei][pb.ei];
   var piA=getPL().indexOf(pa), piB=getPL().indexOf(pb);
   var plS=PLC[piA>=0?piA:0][piB>=0?piB:0];
   var ang=rasiAngle(ria,rib), angS=ang[0], angD=ang[1];
   var lgS=ELC[RA2[lia].el][RA2[lib].el];
-  
+
   // คำนวณคะแนนความเข้ากันได้
   var total=Math.round(elS*.3+plS*.3+angS*.25+lgS*.15);
   var ELD=getELD();
@@ -241,21 +234,18 @@ function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2,dateA,dateB
 
   // ระบบตัดเกรด (S, A, B, C, D)
   var gradeLtr = total >= 90 ? 'S' : total >= 80 ? 'A' : total >= 70 ? 'B' : total >= 60 ? 'C' : 'D';
-  var gradeLbl = total >= 90 ? 'Soulmate Energy (คู่แท้ส่งเสริมกัน)' : 
-                 total >= 80 ? 'Harmonious Pair (คู่ที่เข้ากันได้ดีเยี่ยม)' : 
-                 total >= 70 ? 'Growing Together (คู่ที่ต้องเรียนรู้และเติบโต)' : 
-                 total >= 60 ? 'Understanding Needed (คู่ที่ต้องใช้ความเข้าใจสูง)' : 
+  var gradeLbl = total >= 90 ? 'Soulmate Energy (คู่แท้ส่งเสริมกัน)' :
+                 total >= 80 ? 'Harmonious Pair (คู่ที่เข้ากันได้ดีเยี่ยม)' :
+                 total >= 70 ? 'Growing Together (คู่ที่ต้องเรียนรู้และเติบโต)' :
+                 total >= 60 ? 'Understanding Needed (คู่ที่ต้องใช้ความเข้าใจสูง)' :
                                'Karmic Lesson (คู่เวรคู่กรรม/บทเรียนสำคัญ)';
 
   var loveDestiny = buildLoveDestinyModel(dateA, dateB, total, elS, plS, angS, lgS, pa, pb, ria, rib);
-  var loveDestinyHtml = buildLoveDestinyCard(loveDestiny, premiumUnlocked, na, nb);
+  var loveDestinyHtml = buildLoveDestinyCard(loveDestiny, na, nb);
 
   var dharma = getCoupleDharmaType(total, elS, pa.ei === pb.ei);
-  var dharmaTeaser = '<div class="dharma-kicker">Couple Dharma Map</div>'
-    + '<div class="dharma-label">' + escapeHTML(dharma.label) + '</div>'
-    + '<div class="dharma-title">' + escapeHTML(dharma.title) + '</div>'
-    + '<div class="dharma-intro">ปลดล็อกเพื่ออ่านบทเรียนร่วมกัน วิธีดูแลความสัมพันธ์ และแผนที่ความสัมพันธ์ฉบับเต็ม</div>';
-  var dharmaFull = '<div class="dharma-card">'
+  // Always render the full Dharma card (no teaser)
+  var dharmaHtml = '<div class="dharma-card">'
     + '<div class="dharma-kicker">Couple Dharma Map</div>'
     + '<div class="dharma-label">' + escapeHTML(dharma.label) + '</div>'
     + '<div class="dharma-title">' + escapeHTML(dharma.title) + '</div>'
@@ -266,9 +256,7 @@ function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2,dateA,dateB
     + '</div>'
     + '</div>';
 
-  // Build the 4-dimensional score breakdown once. For premium readers we
-  // show the real numbers; for free readers we still render the boxes but
-  // blur them and surface a single unlock CTA on the consolidated card.
+  // 4-dimensional score breakdown — always render
   var scoreBreakdownHtml = '<div class="cg2">'
     +'<div class="ci2"><div class="ci2l">'+u.ec+'</div><div class="ci2s">'+pa.el+' + '+pb.el+'</div><div class="ci2v">'+elS+'%</div></div>'
     +'<div class="ci2"><div class="ci2l">'+u.pc+'</div><div class="ci2s">'+pa.s+' + '+pb.s+'</div><div class="ci2v">'+plS+'%</div></div>'
@@ -283,7 +271,7 @@ function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2,dateA,dateB
     + '<div class="mx-heart">♡</div>'
     + '<div class="mx-person"><div class="mx-n">' + nb + '</div><div class="mx-p">' + pb.s + ' ' + pb.n + ' · ธาตุ' + pb.el + '</div></div>'
     + '</div>'
-    
+
     + '<div class="mx-score-wrap">'
     + '<div class="mx-title">The Compatibility Matrix</div>'
     + '<div class="mx-score">' + total + '% <span class="mx-grade">' + gradeLtr + '</span></div>'
@@ -298,17 +286,7 @@ function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2,dateA,dateB
     + '</div>' // ปิด matrix-card
     // ปุ่มเซฟรูปภาพถูกเอาออกตามคำขอผู้ใช้
 
-  // ใช้ teaser dharma เป็นตัวแทน (ไม่ใช้ locked card แล้ว — รวมอยู่ใน consolidated)
-  var dharmaHtml = dharmaTeaser;
-
-  // Free readers see Dharma + 4 score boxes + Action Plan folded into a
-  // single <details> card so the locked content never stacks on top of
-  // itself. Premium readers get all three rendered as full-width cards
-  // (the <details> wrapper is omitted entirely).
-  var actionPlanTeaserHtml = '<div class="ap-title">✦ แผนความสัมพันธ์ Premium ✦</div>'
-    + '<p style="text-align:center;color:var(--tx2);line-height:1.7;margin:0;">ปลดล็อกเพื่อดูจุดแข็ง หลุมพราง และคำแนะนำเฉพาะคู่</p>';
-
-  // สร้าง Action Plan HTML สำหรับคู่รัก (ใช้ทั้งใน free + premium render)
+  // สร้าง Action Plan HTML — always full version
   var strG = elS>=80 ? 'ธาตุ'+pa.el+'และ'+pb.el+'ที่ส่งเสริมกันอย่างเป็นธรรมชาติ' : 'ความแตกต่างของธาตุที่ทำให้อีกฝ่ายได้เห็นมุมมองใหม่';
   var strW = pa.ei===pb.ei ? 'การสะท้อนจุดอ่อนของกันและกันจนขยายใหญ่ขึ้น' : 'การตีความความแตกต่างว่าเป็นความขัดแย้งแทนที่จะมองว่าเป็นการเติมเต็ม';
   var actionPlanFullHtml = '<div class="action-plan-card" style="margin-top:0;">'
@@ -318,49 +296,11 @@ function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2,dateA,dateB
     + '<div class="ap-step"><div class="ap-num">3</div><div class="ap-content"><h4>คำแนะนำจากดวงดาว</h4><p>ความสัมพันธ์ที่ยั่งยืนไม่ได้เกิดจากดวงที่สมบูรณ์แบบ แต่เกิดจากคนสองคนที่ไม่ยอมแพ้ต่อกัน หมั่นสื่อสารความต้องการอย่างตรงไปตรงมาและให้เกียรติกันเสมอ</p></div></div>'
     + '</div>';
 
-  // Free-reader: render the locked content inside one collapsible <details>
-  // card. Starts collapsed so it doesn't overlap anything; the user clicks
-  // <summary> to peek at the teasers, then unlocks via the single CTA.
-  // Inside we mark the breakdown boxes as is-locked so the existing CSS
-  // rule keeps the score numbers blurred until the card is opened.
-  // NOW INCLUDES: Love Timing premium plan (consolidated from love-destiny-locked)
-  var visibleActionPlanHtml;
-  if (premiumUnlocked) {
-    visibleActionPlanHtml = '';
-  } else {
-    var lockedBreakdown = scoreBreakdownHtml
-      .replace('<div class="cg2">', '<div class="cg2 is-locked">');
-    // Build love timing premium plan content for consolidated view
-    var loveTimingPremiumHtml = '<div class="lt-premium-section">'
-      + '<div class="lt-premium-title">💖 แผนเพิ่มโอกาส 3 ขั้น + จุดระวัง</div>'
-      + '<ol style="margin:12px 0 12px 20px; color:var(--tx); line-height:1.8;">'
-      + loveDestiny.premiumPlan.map(function(item){ return '<li>' + escapeHTML(item) + '</li>'; }).join('')
-      + '</ol>'
-      + '<div class="lt-premium-risk"><strong>จุดที่ต้องระวัง:</strong> ' + escapeHTML(loveDestiny.risk) + '</div>'
-      + '</div>';
-    visibleActionPlanHtml = '<details class="couple-premium-details">'
-      + '<summary><span class="cpd-icon">🔒</span> ปลดล็อกรีพอร์ตคู่รักฉบับเต็ม — 4 หัวข้อ (Love Timing · Dharma · คะแนนย่อย · แผนความสัมพันธ์)</summary>'
-      + '<div class="cpd-body">'
-      +   loveTimingPremiumHtml
-      +   dharmaTeaser
-      +   lockedBreakdown
-      +   actionPlanTeaserHtml
-      +   '<div class="lock-overlay">'
-      +     '<div style="font-size:35px; margin-bottom:10px; filter:drop-shadow(0 2px 5px rgba(0,0,0,0.5));">🔒</div>'
-      +     '<div style="color:#C9A227; font-size:16px; font-weight:700; margin-bottom:5px;">ปลดล็อกรีพอร์ตคู่รักฉบับเต็ม</div>'
-      +     '<div style="color:#b8a8d8; font-size:13px; margin-bottom:15px; max-width:340px; line-height:1.6;">อ่านแผน Love Timing บทเรียนความสัมพันธ์ คะแนนย่อย 4 ด้าน และแผน 3 ขั้นสำหรับคู่ของคุณ</div>'
-      +     '<button class="pdf-btn" data-action="open-payment" style="padding:10px 24px; font-size:13px; box-shadow:0 4px 15px rgba(201,162,39,0.3);">ปลดล็อกรีพอร์ตฉบับเต็ม 199/เดือน</button>'
-      +   '</div>'
-      + '</div>'
-      + '</details>';
-  }
-
   wrap.innerHTML = matrixHtml
     + loveDestinyHtml
-    + (premiumUnlocked ? dharmaFull : '')
-    + (premiumUnlocked ? scoreBreakdownHtml : '')
-    + (premiumUnlocked ? actionPlanFullHtml : '')
-    + visibleActionPlanHtml;
+    + dharmaHtml
+    + scoreBreakdownHtml
+    + actionPlanFullHtml;
 
   // ปิดท้ายด้วย closing card + reset button
   wrap.insertAdjacentHTML('beforeend',
