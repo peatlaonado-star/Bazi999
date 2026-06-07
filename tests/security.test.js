@@ -72,6 +72,9 @@ describe('HTML escaping security helpers', () => {
 
     const output = dom.window.document.getElementById('r0').innerHTML;
     expect(output).toContain('&lt;img src=x onerror="alert(1)"&gt;');
-    expect(dom.window.document.querySelector('img')).toBeNull();
+    // The malicious name should not become an executable <img> element.
+    // (Note: legitimate rasi-icon <img> tags are rendered as part of the
+    // report — they are not user-controlled and use the rasiIconHtml helper.)
+    expect(dom.window.document.querySelector('img[src="x"]')).toBeNull();
   });
 });
