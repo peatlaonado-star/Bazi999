@@ -274,8 +274,15 @@ export async function handleAgentRequest(context) {
       return json({ success: false, error: 'INVALID_JSON' }, 400);
     }
 
-    const skillId = body.skillId || body.skill_id;
-    const input = body.input && typeof body.input === 'object' ? body.input : (body.message ? { message: body.message } : {});
+    // A2A protocol v0.2.0 wraps params: { id, params: { skillId, input } }
+    // Also accept top-level { skillId, input } for simple clients
+    const params = (body && typeof body.params === 'object' && body.params) || body || {};
+    const skillId = params.skillId || params.skill_id || body.skillId || body.skill_id;
+    const input = (params.input && typeof params.input === 'object')
+      ? params.input
+      : (body.input && typeof body.input === 'object'
+          ? body.input
+          : (body.message ? { message: body.message } : {}));
     const taskId = `task-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
     if (skillId === 'birthday_reading') {

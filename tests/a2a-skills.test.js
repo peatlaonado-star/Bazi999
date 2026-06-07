@@ -137,3 +137,73 @@ describe('A2A Error Paths', () => {
     expect((await resp.json()).error).toBe('TASK_NOT_FOUND');
   });
 });
+
+describe('A2A Protocol v0.2.0 format (body.params wrapper)', () => {
+  // Per A2A spec v0.2.0 the request body wraps inputs in a `params` field:
+  //   { id: "1", params: { skillId: "birthday_reading", input: {...} } }
+  // This is the format real A2A clients (Claude Code, Codex, OpenCode)
+  // send. Tests below verify we accept this format AND the legacy
+  // top-level format.
+
+  function makeA2AContext(skillId, input) {
+    return makeContext({ body: { id: '1', params: { skillId, input } } });
+  }
+
+  it('accepts birthday_reading via params wrapper', async () => {
+    const ctx = makeA2AContext('birthday_reading', { birthDate: '1990-01-15' });
+    const resp = await handleAgentRequest(ctx);
+    const body = await resp.json();
+    expect(resp.status).toBe(200);
+    expect(body.success).toBe(true);
+    expect(body.result.success).toBe(true);
+    expect(body.result.reading).toBeDefined();
+  });
+
+  it('accepts daily_fortune via params wrapper', async () => {
+    const ctx = makeA2AContext('daily_fortune', { birthDate: '1990-01-15', category: 'love' });
+    const resp = await handleAgentRequest(ctx);
+    const body = await resp.json();
+    expect(body.success).toBe(true);
+    expect(body.result.fortune).toBeDefined();
+    expect(body.result.fortune.category).toBe('love');
+  });
+
+  it('accepts lottery_results via params wrapper', async () => {
+    const ctx = makeA2AContext('lottery_results', {});
+    const resp = await handleAgentRequest(ctx);
+    const body = await resp.json();
+    expect(body.success).toBe(true);
+    expect(typeof body.result).toBe('object');
+  });
+
+  it('accepts premium_verify with pin via params wrapper', async () => {
+    const ctx = makeA2AContext('premium_verify', { pin: 'STAR-TEST-1234' });
+    const resp = await handleAgentRequest(ctx);
+    const body = await resp.json();
+    expect(body.success).toBe(true);
+    expect(body.result.token || body.result.error).toBeDefined();
+  });
+
+  it('accepts chat_consultation with message via params wrapper', async () => {
+    const ctx = makeA2AContext('chat_consultation', { message: 'ดวงวันนี้เป็นยังไง' });
+    const resp = await handleAgentRequest(ctx);
+    const body = await resp.json();
+    expect(body.success).toBe(true);
+    expect(body.result.reply || body.result.error).toBeDefined();
+  });
+
+  it('returns PIN_REQUIRED when params.input is empty', async () => {
+    const ctx = makeA2AContext('premium_verify', {});
+    const resp = await handleAgentRequest(ctx);
+    const body = await resp.json();
+    expect(body.result.error).toBe('PIN_REQUIRED');
+  });
+
+  it('returns UNKNOWN_SKILL when skillId is in params but unknown', async () => {
+    const ctx = makeA2AContext('not_a_real_skill', {});
+    const resp = await handleAgentRequest(ctx);
+    const body = await resp.json();
+    expect(body.result.error).toBe('UNKNOWN_SKILL');
+    expect(body.result.skillId).toBe('not_a_real_skill');
+  });
+});
