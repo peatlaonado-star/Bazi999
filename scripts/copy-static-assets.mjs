@@ -52,4 +52,20 @@ for (const file of files) {
   fs.copyFileSync(source, target);
 }
 
+// Recursively copy any subdirectories of assets/ not already in the explicit list
+// (e.g. assets/zodiac/ — the 12 brand SVG icons used by rasiIconHtml()).
+const extraDirs = ['assets/zodiac'];
+for (const dir of extraDirs) {
+  const sourceDir = path.join(root, dir);
+  if (!fs.existsSync(sourceDir)) continue;
+  const entries = fs.readdirSync(sourceDir, { withFileTypes: true });
+  for (const entry of entries) {
+    if (!entry.isFile()) continue;
+    const source = path.join(sourceDir, entry.name);
+    const target = path.join(dist, dir, entry.name);
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.copyFileSync(source, target);
+  }
+}
+
 console.log(`Copied ${files.length} static files to dist/`);

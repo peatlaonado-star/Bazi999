@@ -148,6 +148,7 @@ function buildSingleLoveOpportunityModel(dateA, pa, ra, la, ria, lia, RA2){
     chance: chance,
     monthHint: monthHint,
     partnerSignName: partnerSign.n || fallbackSigns[signIdx],
+    partnerSignIndex: signIdx,
     partnerSignSymbol: partnerSign.s || '',
     partnerElement: partnerEl,
     channel: channelMap[partnerEl] || channelMap['ลม'],
@@ -181,7 +182,7 @@ function renderSingleLoveOpportunity(na,pa,ra,la,ria,lia,u,RA2,dateA){
     + '<div class="ld-box"><small>มีแนวโน้มเจอที่ไหน</small><p>' + escapeHTML(model.channel) + '</p></div>'
     + '</div>'
     + '<div class="ld-two">'
-    + '<div><b>ราศี/พลังที่มีแนวโน้มเข้ามา</b><br>' + escapeHTML(model.partnerSignSymbol + ' ' + model.partnerSignName) + ' · ธาตุ' + escapeHTML(model.partnerElement) + '</div>'
+    + '<div><b>ราศี/พลังที่มีแนวโน้มเข้ามา</b><br>' + rasiIconHtml(model.partnerSignIndex, model.partnerSignName, 28) + ' <strong>' + escapeHTML(model.partnerSignName) + '</strong> · ธาตุ' + escapeHTML(model.partnerElement) + '</div>'
     + '<div><b>นิสัยคนที่มีแนวโน้มเข้ากัน</b><br>' + escapeHTML(model.traits) + '</div>'
     + '</div>'
     + loveTimingHtml

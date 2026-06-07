@@ -9,6 +9,19 @@ function escapeHTML(value){
     .replace(/'/g, '&#39;');
 }
 
+// ===== Cosmic zodiac icons (STARVIA brand style) =====
+// Used by both renderer-individual.js and renderer-couple.js.
+// RASI_EN_NAMES[i] must match the rashi index from getRasi() (0-11).
+var RASI_EN_NAMES = ['aries','taurus','gemini','cancer','leo','virgo','libra','scorpio','sagittarius','capricorn','aquarius','pisces'];
+function rasiIconUrl(idx) {
+  var num = String(idx + 1).padStart(2, '0');
+  return 'assets/zodiac/' + num + '-' + (RASI_EN_NAMES[idx] || 'aries') + '.svg';
+}
+function rasiIconHtml(idx, name, size) {
+  size = size || 40;
+  return '<img class="rasi-icon" src="' + rasiIconUrl(idx) + '" width="' + size + '" height="' + size + '" alt="' + (name || '') + '" loading="lazy">';
+}
+
 var FALLBACK_KARMA_MIRROR = {
   intro: 'กระจกกรรมไม่ใช่คำตัดสิน แต่คือรูปแบบที่ชีวิตมักพาคุณกลับมาเรียนรู้ซ้ำ เพื่อให้คุณเลือกทางใหม่ได้ชัดขึ้น',
   elements: {

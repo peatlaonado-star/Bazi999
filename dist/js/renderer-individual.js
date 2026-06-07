@@ -1,7 +1,8 @@
 // Individual reading renderer (Mode 0)
 // Provides: buildDailyBrief, renderInd, go0, life timeline helpers
 // Renderers extracted from app.js
-// Shared helpers are loaded from js/reading-helpers.js.
+// Shared helpers (rasiIconHtml, escapeHTML) are loaded from js/reading-helpers.js.
+
 function buildDailyBrief(p, dayOfWeek, personalColor) {
   var content = (typeof THAI_ASTRO_CONTENT !== 'undefined') ? THAI_ASTRO_CONTENT : null;
   var db = content && content.dailyBrief ? content.dailyBrief : null;
@@ -778,7 +779,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + '</div>';
 
   // 3. พลังแห่งราศี
-  var rasiHtml = '<strong class="hl-gold">✦ พลังแห่งราศี' + r.n + ' :</strong><br>'
+  var rasiHtml = '<div class="rasi-header">' + rasiIconHtml(ri, r.n, 36) + ' <strong class="hl-gold">✦ พลังแห่งราศี' + r.n + ' :</strong></div>'
     + 'จักรราศีมอบ <span class="hl-purple">"' + (r.trait || 'พลังประจำตัว') + '"</span> ให้เป็นอาวุธประจำตัวของคุณ คุณสมบัติเด่นที่คุณควรดึงออกมาใช้ให้เกิดประโยชน์สูงสุดคือ <strong style="color:var(--tx);">' + (r.apply || 'ความเป็นตัวของตัวเอง') + '</strong><br><br>'
     + '<span style="font-size:12px; color:var(--tx2);">' + (r.add || '') + '</span>';
 
@@ -939,8 +940,8 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + '<div class="bp-age-meta"><span>เจ้าของดวง</span><strong>✦ ' + nm + ' ✦</strong><small>' + ageTxt + '</small></div>'
     + '</div>'
     + '<div class="bp-axis-grid">'
-    + '<div class="bp-axis-card"><span class="bp-axis-label">ตัวตนภายนอก</span><div class="bp-axis-symbol" style="color:' + r.c + '">' + r.s + '</div><strong style="color:' + r.c + '">' + r.n + '</strong><small>' + (r.trait || 'โทนบุคลิกและแรงขับหลัก') + '</small><p class="bp-axis-desc">' + (r.apply || '') + '</p></div>'
-    + '<div class="bp-axis-card"><span class="bp-axis-label">วิธีที่โลกมองเห็น</span><div class="bp-axis-symbol" style="color:' + l.c + '">' + l.s + '</div><strong style="color:' + l.c + '">' + l.n + '</strong><small>' + (l.trait || 'ภาพแรกที่คนอื่นสัมผัสได้') + '</small>' + (ts ? '<p class="bp-axis-desc">' + (l.apply || '') + '</p>' : '<p class="bp-axis-hint">⚠️ ใส่เวลาเกิดเพื่อดูลัคนาที่แม่นยำ</p>') + '</div>'
+    + '<div class="bp-axis-card"><span class="bp-axis-label">ตัวตนภายนอก</span><div class="bp-axis-symbol rasi-symbol">' + rasiIconHtml(ri, r.n, 52) + '</div><strong style="color:' + r.c + '">' + r.n + '</strong><small>' + (r.trait || 'โทนบุคลิกและแรงขับหลัก') + '</small><p class="bp-axis-desc">' + (r.apply || '') + '</p></div>'
+    + '<div class="bp-axis-card"><span class="bp-axis-label">วิธีที่โลกมองเห็น</span><div class="bp-axis-symbol rasi-symbol">' + rasiIconHtml(li, l.n, 52) + '</div><strong style="color:' + l.c + '">' + l.n + '</strong><small>' + (l.trait || 'ภาพแรกที่คนอื่นสัมผัสได้') + '</small>' + (ts ? '<p class="bp-axis-desc">' + (l.apply || '') + '</p>' : '<p class="bp-axis-hint">⚠️ ใส่เวลาเกิดเพื่อดูลัคนาที่แม่นยำ</p>') + '</div>'
     + '</div>'
     + '<div class="bp-summary">พิมพ์เขียวนี้สรุปแรงขับเดิมของคุณก่อนอ่านดวงรายเดือน — อายุเป็นเพียงบริบทเสริม ไม่ใช่ตัวตัดสินดวงทั้งหมด</div>'
     + '</div>';
