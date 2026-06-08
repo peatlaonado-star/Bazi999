@@ -111,9 +111,10 @@ if (fs.existsSync(indexHtml)) {
     // Escape for regex (dots in paths)
     const escaped = original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     // Match src="original" or src='/original' — with or without leading slash
-    const regex = new RegExp(`(src=["'])(/?)${escaped}(["'])`, 'g');
+    // Also strip ?v=... cache-buster from the src before matching
+    const regex = new RegExp(`(src=["'])(/?)${escaped}(\\?[^"']*)?(["'])`, 'g');
     
-    html = html.replace(regex, (match, prefix, slash, suffix) => {
+    html = html.replace(regex, (match, prefix, slash, _query, suffix) => {
       replacements++;
       return `${prefix}${slash}${hashed}${suffix}`;
     });
