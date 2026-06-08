@@ -7,6 +7,7 @@
 
   var SITE_URL = 'https://starvia.website';
   var SHARE_TEXT_FALLBACK = '✦ STARVIA — ดูดวงไทยโบราณแบบคนยุคใหม่ ✦';
+  var ONBOARDING_KEY = 'starvia_onboarding';
 
   // ===== Share Message Templates =====
   // Short, punchy, creates Information Gap
