@@ -1,10 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 
 const root = process.cwd();
 const dist = path.join(root, 'dist');
 
-const files = [
+// JS files that need cache-busting hashes
+const jsFiles = [
   'app.js',
   'astrology-core.js',
   'ui-actions.js',
@@ -26,6 +28,10 @@ const files = [
   'js/chat-concierge.js',
   'js/tarot.js',
   'js/tarot-ui.js',
+];
+
+// Other static files (no hash needed)
+const otherFiles = [
   'css/chat-concierge.css',
   'css/tarot.css',
   'analytics.html',
@@ -38,22 +44,49 @@ const files = [
   'terms.html',
   'admin.html',
   'share.html',
+  '_headers',
 ];
 
-for (const file of files) {
-  const source = path.join(root, file);
-  const target = path.join(dist, file);
+// Compute short hash for a file
+function fileHash(filePath) {
+  const data = fs.readFileSync(filePath);
+  return crypto.createHash('md5').update(data).digest('hex').slice(0, 8);
+}
 
+// Map original filename → hashed filename for index.html rewriting
+const hashMap = {};
+
+// Copy JS files with hashes
+for (const file of jsFiles) {
+  const source = path.join(root, file);
   if (!fs.existsSync(source)) {
     throw new Error(`Static asset not found: ${file}`);
   }
+  const hash = fileHash(source);
+  const ext = path.extname(file);
+  const base = file.slice(0, -ext.length);
+  const hashedName = `${base}-${hash}${ext}`;
+  const target = path.join(dist, hashedName);
 
+  fs.mkdirSync(path.dirname(target), { recursive: true });
+  fs.copyFileSync(source, target);
+
+  // Store mapping: original path → hashed path (for index.html rewrite)
+  hashMap[file] = hashedName;
+}
+
+// Copy other files without hashing
+for (const file of otherFiles) {
+  const source = path.join(root, file);
+  if (!fs.existsSync(source)) {
+    throw new Error(`Static asset not found: ${file}`);
+  }
+  const target = path.join(dist, file);
   fs.mkdirSync(path.dirname(target), { recursive: true });
   fs.copyFileSync(source, target);
 }
 
-// Recursively copy any subdirectories of assets/ not already in the explicit list
-// (e.g. assets/zodiac/ — the 12 brand SVG icons used by rasiIconHtml()).
+// Recursively copy subdirectories (assets/zodiac/)
 const extraDirs = ['assets/zodiac'];
 for (const dir of extraDirs) {
   const sourceDir = path.join(root, dir);
@@ -68,4 +101,28 @@ for (const dir of extraDirs) {
   }
 }
 
-console.log(`Copied ${files.length} static files to dist/`);
+// Rewrite dist/index.html to use hashed JS filenames
+const indexHtml = path.join(dist, 'index.html');
+if (fs.existsSync(indexHtml)) {
+  let html = fs.readFileSync(indexHtml, 'utf-8');
+  for (const [original, hashed] of Object.entries(hashMap)) {
+    // Match src="original" or src="/original" or href="original"
+    const patterns = [
+      new RegExp(`(src|href)=["']/?${escapeRegex(original)}["']`, 'g'),
+    ];
+    for (const pat of patterns) {
+      html = html.replace(pat, (match, attr) => {
+        const prefix = match.startsWith(`${attr}="/`) ? `${attr}="/` : `${attr}="`;
+        return `${prefix}${hashed}"`;
+      });
+    }
+  }
+  fs.writeFileSync(indexHtml, html);
+  console.log(`✅ Rewrote index.html with ${Object.keys(hashMap).length} hashed JS references`);
+}
+
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+console.log(`Copied ${jsFiles.length} JS (hashed) + ${otherFiles.length} static files to dist/`);
