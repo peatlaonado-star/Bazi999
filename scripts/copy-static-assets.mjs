@@ -53,7 +53,7 @@ function fileHash(filePath) {
   return crypto.createHash('md5').update(data).digest('hex').slice(0, 8);
 }
 
-// Map original filename → hashed filename for index.html rewriting
+// Map: original src path → hashed filename
 const hashMap = {};
 
 // Copy JS files with hashes
@@ -71,7 +71,7 @@ for (const file of jsFiles) {
   fs.mkdirSync(path.dirname(target), { recursive: true });
   fs.copyFileSync(source, target);
 
-  // Store mapping: original path → hashed path (for index.html rewrite)
+  // Store: original src value → hashed filename
   hashMap[file] = hashedName;
 }
 
@@ -105,24 +105,24 @@ for (const dir of extraDirs) {
 const indexHtml = path.join(dist, 'index.html');
 if (fs.existsSync(indexHtml)) {
   let html = fs.readFileSync(indexHtml, 'utf-8');
+  let replacements = 0;
+  
   for (const [original, hashed] of Object.entries(hashMap)) {
-    // Match src="original" or src="/original" or href="original"
-    const patterns = [
-      new RegExp(`(src|href)=["']/?${escapeRegex(original)}["']`, 'g'),
-    ];
-    for (const pat of patterns) {
-      html = html.replace(pat, (match, attr) => {
-        const prefix = match.startsWith(`${attr}="/`) ? `${attr}="/` : `${attr}="`;
-        return `${prefix}${hashed}"`;
-      });
-    }
+    // Escape for regex (dots in paths)
+    const escaped = original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // Match src="original" or src='/original' — with or without leading slash
+    const regex = new RegExp(`(src=["'])(/?)${escaped}(["'])`, 'g');
+    
+    html = html.replace(regex, (match, prefix, slash, suffix) => {
+      replacements++;
+      return `${prefix}${slash}${hashed}${suffix}`;
+    });
   }
+  
   fs.writeFileSync(indexHtml, html);
-  console.log(`✅ Rewrote index.html with ${Object.keys(hashMap).length} hashed JS references`);
-}
-
-function escapeRegex(str) {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  console.log(`✅ Rewrote index.html: ${replacements} JS references → hashed`);
+} else {
+  console.warn('⚠️ dist/index.html not found — skipping rewrite');
 }
 
 console.log(`Copied ${jsFiles.length} JS (hashed) + ${otherFiles.length} static files to dist/`);
