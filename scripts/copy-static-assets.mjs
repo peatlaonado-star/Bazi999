@@ -126,4 +126,23 @@ if (fs.existsSync(indexHtml)) {
   console.warn('⚠️ dist/index.html not found — skipping rewrite');
 }
 
+// Also rewrite share.html with hashed JS filenames (same logic)
+const shareHtml = path.join(dist, 'share.html');
+if (fs.existsSync(shareHtml)) {
+  let html = fs.readFileSync(shareHtml, 'utf-8');
+  let replacements = 0;
+  for (const [original, hashed] of Object.entries(hashMap)) {
+    const escaped = original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(src=["'])(/?)${escaped}(\\?[^"']*)?(["'])`, 'g');
+    html = html.replace(regex, (match, prefix, slash, _query, suffix) => {
+      replacements++;
+      return `${prefix}${slash}${hashed}${suffix}`;
+    });
+  }
+  fs.writeFileSync(shareHtml, html);
+  console.log(`✅ Rewrote share.html: ${replacements} JS references → hashed`);
+} else {
+  console.warn('⚠️ dist/share.html not found — skipping rewrite');
+}
+
 console.log(`Copied ${jsFiles.length} JS (hashed) + ${otherFiles.length} static files to dist/`);
