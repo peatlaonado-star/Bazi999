@@ -41,8 +41,38 @@
     return Math.abs(h);
   }
 
+  // ===== Reading context (set when rendering on result page) =====
+  var _readingQuote = null;
+  var _readingName = null;
+
   // ===== Generate Share Message =====
   function generateShareMessage() {
+    // If we're on the reading result page, use the stored reading data
+    if (_readingQuote) {
+      var teaser = _readingQuote;
+      if (teaser.length > 60) {
+        teaser = teaser.substring(0, 57) + '...';
+      }
+      var seed = _readingName + ':' + getTodayKey();
+      var templateIdx = seededRandom(seed) % SHARE_MESSAGES.length;
+      var template = SHARE_MESSAGES[templateIdx];
+      // For card/color, try daily fortune as fallback (deterministic from birth data)
+      var cardName = '', colorName = '';
+      try {
+        var PF = window.PersonalizedFortune;
+        if (PF) {
+          var bd = PF.getBirthData();
+          var ft = PF.buildPersonalizedFortune(bd);
+          cardName = ft.fortuneCard.name;
+          colorName = ft.luckyColor.name;
+        }
+      } catch(e) {}
+      return template
+        .replace('{teaser}', teaser)
+        .replace('{card}', cardName)
+        .replace('{color}', colorName);
+    }
+
     var PF = window.PersonalizedFortune;
     if (!PF) return SHARE_TEXT_FALLBACK;
 
@@ -199,6 +229,10 @@
 
   // ===== Render Share Section =====
   function renderShareSection() {
+    // Clear any stale reading context — this section is on the landing page
+    _readingQuote = null;
+    _readingName = null;
+
     var container = document.getElementById('df-share-section');
     if (!container) return;
 
@@ -266,6 +300,10 @@
 
   // ===== Render Personalized Share Section =====
   function renderPersonalizedShare(containerId, fortuneQuote, userName) {
+    // Store reading context so generateShareMessage() can use it
+    _readingQuote = fortuneQuote || null;
+    _readingName = userName || 'คุณ';
+
     var container = document.getElementById(containerId);
     if (!container) return;
 
