@@ -30,6 +30,8 @@
     'lottery_viewed',       // ดูผลหวย
     'streak_started',       // เริ่ม streak
     'reading_shared',       // แชร์คำทำนาย
+    'tab_viewed',           // กดเปลี่ยน tab (ตัวตน/คู่สัมพันธ์/การงาน/การเงิน)
+    'premium_popup_shown',  // เห็น popup พรีเมียม
   ];
   events.forEach((e) => {
     if (typeof counters[e] !== 'number') counters[e] = 0;
@@ -134,5 +136,39 @@
         track('payment_initiated');
       }
     }, true);
+
+    // ── Tab view tracking ──
+    document.addEventListener('click', (e) => {
+      var tab = e.target.closest('.tab');
+      if (tab) {
+        var tabIndex = Array.prototype.indexOf.call(tab.parentNode.children, tab);
+        var tabLabel = (tab.querySelector('.tab-text') || {}).textContent || 'tab-' + tabIndex;
+        track('tab_viewed', { tab: tabLabel, index: tabIndex });
+      }
+    }, true);
+
+    // ── Premium popup impression (MutationObserver, track once per session) ──
+    var _popupTracked = false;
+    var popupObserver = new MutationObserver(function (mutations) {
+      if (_popupTracked) return;
+      mutations.forEach(function (m) {
+        m.addedNodes.forEach(function (node) {
+          if (_popupTracked) return;
+          if (node.nodeType === 1) {
+            if (node.matches && node.matches('.lock-overlay, .premium-popup, [data-premium-overlay]')) {
+              _popupTracked = true;
+              track('premium_popup_shown');
+            }
+            if (!_popupTracked && node.querySelectorAll) {
+              if (node.querySelectorAll('.lock-overlay, .premium-popup, [data-premium-overlay]').length > 0) {
+                _popupTracked = true;
+                track('premium_popup_shown');
+              }
+            }
+          }
+        });
+      });
+    });
+    popupObserver.observe(document.body, { childList: true, subtree: true });
   });
 })();

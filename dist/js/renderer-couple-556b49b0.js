@@ -13,6 +13,7 @@ function go1(){
   var lia=getLagna(da,ta);
   document.getElementById('fc1').style.display='none';
   showLoad();
+  if (document.body && document.body.classList) document.body.classList.add('has-report');
   setTimeout(function(){
     hideLoad();
     if(!db){

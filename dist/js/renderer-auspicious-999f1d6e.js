@@ -10,6 +10,7 @@ function go2(){
   var pw=new Date(ds).getDay(), p=PL2[pw];
   document.getElementById('fc2').style.display='none';
   showLoad();
+  if (document.body && document.body.classList) document.body.classList.add('has-report');
   setTimeout(function(){ hideLoad(); renderAusp(nm,p,pw,u); }, 700);
 }
 

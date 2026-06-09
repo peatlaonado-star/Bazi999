@@ -247,7 +247,7 @@
 
     // Preview link
     html += '<div class="share-preview">'
-      + '<a class="share-preview-link" href="' + (ShareViral.getShareUrl ? ShareViral.getShareUrl() : '/share.html') + '" target="_blank">👁️ ดูตัวอย่างบัตรดวงชะตา</a>'
+      + '<a class="share-preview-link" href="' + (typeof ShareViral !== 'undefined' && ShareViral.getShareUrl ? ShareViral.getShareUrl() : '/share.html') + '" target="_blank">👁️ ดูตัวอย่างบัตรดวงชะตา</a>'
       + '</div>';
 
     container.innerHTML = html;

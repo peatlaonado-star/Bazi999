@@ -374,8 +374,9 @@
   function init() {
     var streak = updateStreak();
 
-    // Check if we need to show the unlock popup
-    if (streak.count >= 7 && !isPremiumUnlocked() && !isPremiumExpired()) {
+    // Show unlock popup ONLY on Day 7 (one-time window).
+    // Day 8+ means the offer window is closed — user either claimed or missed it.
+    if (streak.count === 7 && !isPremiumUnlocked() && !isPremiumExpired()) {
       // Show unlock popup after a short delay
       setTimeout(function() {
         var existing = document.getElementById('streak-unlock-popup');

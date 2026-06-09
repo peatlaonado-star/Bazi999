@@ -286,11 +286,14 @@ var Onboarding = (function() {
     if (day >= 7 && alreadyUnlocked) {
       // Premium is currently active — confirm it
       teaserHtml += '<p class="ob-hint ob-hint-active">✦ Premium เปิดใช้งานแล้ว — ใช้ได้อีก 24 ชม.</p>';
-    } else if (day >= 7 && rewardExpired) {
-      // Free trial used → upsell
+    } else if (day > 7) {
+      // Day 8+: offer window is closed — upsell regardless of claim status
+      teaserHtml += '<p class="ob-hint">ทดลองใช้ Premium 1 วันหมดอายุแล้ว — สมัครต่อเพียง 159 บาท/เดือน</p>';
+    } else if (day === 7 && rewardExpired) {
+      // Claimed on Day 7 but already expired (same-day edge case)
       teaserHtml += '<p class="ob-hint">ทดลองใช้ Premium 1 วันไปแล้ว — สมัครต่อเพียง 159 บาท/เดือน</p>';
-    } else if (day >= 7) {
-      // Eligible to claim
+    } else if (day === 7) {
+      // Day 7 — eligible to claim
       teaserHtml += '<p class="ob-hint ob-hint-claim">🎁 ครบ 7 วันแล้ว! กดรับ Premium ฟรี 1 วัน →</p>';
     } else {
       // Pre-claim countdown
