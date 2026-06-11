@@ -32,6 +32,7 @@
     'reading_shared',       // แชร์คำทำนาย
     'tab_viewed',           // กดเปลี่ยน tab (ตัวตน/คู่สัมพันธ์/การงาน/การเงิน)
     'premium_popup_shown',  // เห็น popup พรีเมียม
+    'ab_exposed',           // A/B test variant shown
   ];
   events.forEach((e) => {
     if (typeof counters[e] !== 'number') counters[e] = 0;
