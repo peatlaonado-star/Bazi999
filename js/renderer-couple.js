@@ -312,7 +312,7 @@ function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2,dateA,dateB
   );
   // Staggered card animation
   (function(){
-    var cards = wrap.querySelectorAll(':scope > .card, :scope > .love-destiny-card, :scope > .collapsible-section');
+    var cards = wrap.querySelectorAll(':scope > .card, :scope > .mc, :scope > .love-destiny-card, :scope > .collapsible-section');
     for(var ci = 0; ci < cards.length; ci++){
       cards[ci].classList.add('stagger-card');
       cards[ci].style.setProperty('--i', ci);

@@ -1022,7 +1022,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
   if (typeof initCollapsibleSections === 'function') initCollapsibleSections();
   // Staggered card animation — cards fade in one by one
   (function(){
-    var cards = wrap.querySelectorAll(':scope > .card, :scope > .blueprint-card, :scope > .detail-tabs-card, :scope > .collapsible-section, :scope > .life-graph-card');
+    var cards = wrap.querySelectorAll(':scope > .card, :scope > .mc, :scope > .blueprint-card, :scope > .detail-tabs-card, :scope > .collapsible-section, :scope > .life-graph-card');
     for(var ci = 0; ci < cards.length; ci++){
       cards[ci].classList.add('stagger-card');
       cards[ci].style.setProperty('--i', ci);
