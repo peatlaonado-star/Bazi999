@@ -58,7 +58,30 @@ function chkBtn(mode){
   if(mode===2) document.getElementById('btn2').disabled=!document.getElementById('d2').value;
 }
 
-function showLoad(){ document.getElementById('load').style.display='block'; }
+function showLoad(){
+  document.getElementById('load').style.display='block';
+  // Inject skeleton cards
+  var sk = document.getElementById('skeleton-wrap');
+  if(sk) sk.innerHTML =
+    '<div class="skeleton-card skeleton-header">'
+    + '<div class="skeleton-circle skeleton-shine"></div>'
+    + '<div class="skeleton-lines">'
+    + '<div class="skeleton-line w80 skeleton-shine"></div>'
+    + '<div class="skeleton-line w50 skeleton-shine" style="animation-delay:.1s"></div>'
+    + '<div class="skeleton-line w40 skeleton-shine" style="animation-delay:.2s"></div>'
+    + '</div></div>'
+    + '<div class="skeleton-card">'
+    + '<div class="skeleton-line w60 skeleton-shine" style="height:14px;margin-bottom:14px"></div>'
+    + '<div class="skeleton-bar"><div class="skeleton-line w40 skeleton-shine"></div><div class="skeleton-line w20 skeleton-shine" style="width:25%"></div></div>'
+    + '<div class="skeleton-bar"><div class="skeleton-line w50 skeleton-shine" style="animation-delay:.1s"></div><div class="skeleton-line w20 skeleton-shine" style="width:20%;animation-delay:.1s"></div></div>'
+    + '<div class="skeleton-bar"><div class="skeleton-line w60 skeleton-shine" style="animation-delay:.2s"></div><div class="skeleton-line w20 skeleton-shine" style="width:30%;animation-delay:.2s"></div></div>'
+    + '</div>'
+    + '<div class="skeleton-section">'
+    + '<div class="skeleton-badge skeleton-shine"><div class="skeleton-circle" style="width:16px;height:16px;border-radius:50%"></div><div class="skeleton-line w40 skeleton-shine"></div></div>'
+    + '<div class="skeleton-badge skeleton-shine" style="animation-delay:.15s"><div class="skeleton-circle" style="width:16px;height:16px;border-radius:50%"></div><div class="skeleton-line w50 skeleton-shine" style="animation-delay:.15s"></div></div>'
+    + '<div class="skeleton-badge skeleton-shine" style="animation-delay:.3s"><div class="skeleton-circle" style="width:16px;height:16px;border-radius:50%"></div><div class="skeleton-line w60 skeleton-shine" style="animation-delay:.3s"></div></div>'
+    + '</div>';
+}
 function hideLoad(){ document.getElementById('load').style.display='none'; }
 
 // Language toggle

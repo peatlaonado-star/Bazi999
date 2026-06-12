@@ -310,4 +310,12 @@ function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2,dateA,dateB
     +'<div class="mc-t">"'+u.cv2+'"</div></div>'
     +'<div class="rbt"><button class="rbtn" data-action="reset-mode" data-mode="1">'+u.r1+'</button></div>'
   );
+  // Staggered card animation
+  (function(){
+    var cards = wrap.querySelectorAll(':scope > .card, :scope > .love-destiny-card, :scope > .collapsible-section');
+    for(var ci = 0; ci < cards.length; ci++){
+      cards[ci].classList.add('stagger-card');
+      cards[ci].style.setProperty('--i', ci);
+    }
+  })();
 }

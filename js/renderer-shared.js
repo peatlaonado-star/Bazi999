@@ -97,10 +97,21 @@ function buildTabs(tid,sid,pre,TB,p,u){
     var lockSpan = '<span class="tab-lock">🔒</span>';
     btn.innerHTML = '<span class="tab-icon">' + (tabIcons[i] || '✦') + '</span><span class="tab-text">' + tb.lb + '</span>' + lockSpan;
     btn.addEventListener('click', function(){
+      var nextSec = document.getElementById(pre+i);
+      // Smooth tab switching: fade-out old, fade-in new via CSS animation
       document.querySelectorAll('#'+tid+' .tab').forEach(function(t){t.classList.remove('on');});
-      document.querySelectorAll('#'+sid+' .sec').forEach(function(s){s.classList.remove('on');});
+      var prevSecs = document.querySelectorAll('#'+sid+' .sec.on');
+      for(var pi=0; pi<prevSecs.length; pi++){
+        prevSecs[pi].classList.add('tab-exit');
+        prevSecs[pi].classList.remove('on');
+      }
       btn.classList.add('on');
-      document.getElementById(pre+i).classList.add('on');
+      nextSec.classList.add('on');
+      // Clean up exit class after animation completes
+      setTimeout(function(){
+        var exits = document.querySelectorAll('#'+sid+' .sec.tab-exit');
+        for(var ei=0; ei<exits.length; ei++) exits[ei].classList.remove('tab-exit');
+      }, 250);
     });
     tt.appendChild(btn);
     

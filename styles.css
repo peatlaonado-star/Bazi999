@@ -46,7 +46,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .tabs{display:flex;gap:5px;min-width:max-content}
 .tab{padding:7px 14px;border-radius:50px;border:1px solid rgba(212,175,55,.28);background:rgba(255,255,255,.018);color:#b8a8d8;font-family:"Leelawadee UI","Segoe UI",Tahoma,sans-serif;font-size:12.5px;cursor:pointer;transition:all .25s;white-space:nowrap}
 .tab:hover,.tab:focus{border-color:rgba(201,162,39,.42);color:#e8dfc8;background:rgba(201,162,39,.06);outline:none}.tab.on{background:rgba(201,162,39,.16);border-color:rgba(201,162,39,.58);color:var(--g)}
-.sec{display:none;animation:fu .4s ease both}.sec.on{display:block}
+.sec{display:none;opacity:0;transform:translateY(6px);transition:opacity .25s ease,transform .25s ease}.sec.on{display:block;opacity:1;transform:translateY(0)}
 .st {font-size:12px; letter-spacing:0.12em; color:#d3c7ee; text-transform:uppercase; margin-bottom:12px; display:flex; align-items:center; gap:8px; font-weight:700;}
 .st::after {content:""; flex:1; height:1px; background:linear-gradient(90deg, rgba(201,162,39,0.3), transparent);}
 .rb{background:var(--cd);border:1px solid rgba(212,175,55,.14);border-radius:12px;padding:18px;margin-bottom:12px;font-size:14.5px;line-height:2;color:#efe8d6}
@@ -81,14 +81,45 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .rbt{text-align:center;margin-top:20px}
 .rbtn{background:transparent;border:1px solid rgba(201,162,39,.3);color:var(--g);font-family:"Leelawadee UI","Segoe UI",Tahoma,sans-serif;padding:8px 22px;border-radius:50px;cursor:pointer;font-size:12px;letter-spacing:.08em;transition:all .3s}
 .rbtn:hover{background:rgba(201,162,39,.1)}
-#load{display:none;text-align:center;padding:60px 0}
+#load{display:none;text-align:center;padding:20px 0}
 .sp{width:48px;height:48px;border:2px solid rgba(212,175,55,.1);border-top-color:var(--g);border-radius:50%;margin:0 auto 14px;animation:spin 1.4s linear infinite}
 #load p{color:var(--pu);font-size:12px;letter-spacing:.2em}
-@keyframes sh{0%{background-position:-200% center}100%{background-position:200% center}}
+
+/* ── Skeleton Loading ── */
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+@keyframes skeletonFadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.skeleton-wrap{max-width:480px;margin:0 auto;padding:0 14px;animation:skeletonFadeIn .4s ease both}
+.skeleton-header{display:flex;align-items:center;gap:14px;padding:20px;margin-bottom:14px;background:linear-gradient(145deg,var(--surface),rgba(14,8,35,.78));border:1px solid var(--br);border-radius:var(--radius);backdrop-filter:blur(18px);box-shadow:var(--shadow)}
+.skeleton-circle{width:52px;height:52px;border-radius:50%;flex-shrink:0}
+.skeleton-lines{flex:1;display:flex;flex-direction:column;gap:8px}
+.skeleton-line{height:12px;border-radius:6px}
+.skeleton-line.w60{width:60%}
+.skeleton-line.w40{width:40%}
+.skeleton-line.w80{width:80%}
+.skeleton-line.w50{width:50%}
+.skeleton-card{padding:20px;margin-bottom:14px;background:linear-gradient(145deg,var(--surface),rgba(14,8,35,.78));border:1px solid var(--br);border-radius:var(--radius);backdrop-filter:blur(18px);box-shadow:var(--shadow)}
+.skeleton-section{margin-bottom:14px;padding:18px;background:linear-gradient(145deg,rgba(37,24,68,.72),rgba(10,5,30,.62));border:1px solid rgba(201,162,39,.18);border-radius:18px}
+.skeleton-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.skeleton-badge{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(201,162,39,.14);border-radius:9px;padding:8px 12px;margin-bottom:8px}
+.skeleton-shine{background:linear-gradient(90deg,rgba(201,162,39,.06) 0%,rgba(201,162,39,.12) 40%,rgba(201,162,39,.06) 80%);background-size:800px 100%;animation:shimmer 1.8s ease-in-out infinite}
+.skeleton-steps{display:flex;gap:8px;margin-top:14px;justify-content:center}
+.skeleton-step{width:8px;height:8px;border-radius:50%;animation:skeletonPulse 1.4s ease-in-out infinite}
+.skeleton-step:nth-child(2){animation-delay:.2s}
+.skeleton-step:nth-child(3){animation-delay:.4s}
+.skeleton-step:nth-child(4){animation-delay:.6s}
+@keyframes skeletonPulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.1)}}
+#load-txt{margin-top:12px}
+
+/* ── Staggered Card Animation ── */
 @keyframes fu{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+@keyframes sh{0%{background-position:-200% center}100%{background-position:200% center}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes pg{0%,100%{box-shadow:0 0 12px rgba(201,162,39,.15)}50%{box-shadow:0 0 26px rgba(201,162,39,.38)}}
 @keyframes radarIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+.stagger-card{opacity:0;animation:fu .5s ease both;animation-delay:calc(var(--i,0) * 100ms)}
+
+/* ── Smooth Tab Switching ── */
+.sec.tab-exit{display:block!important;opacity:0!important;transform:translateY(-6px)!important}
 @keyframes polygonDraw{from{opacity:0}to{opacity:1}}
 .radar-wrap{animation:radarIn .7s cubic-bezier(.22,1,.36,1) both}
 .radar-polygon{animation:polygonDraw 1.2s ease .3s both}
