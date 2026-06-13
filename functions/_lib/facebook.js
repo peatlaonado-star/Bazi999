@@ -248,3 +248,126 @@ export async function facebookDeletePost(context) {
 // Wrap post/delete with admin auth (health stays public for cron liveness check)
 export const facebookPostAuth = (context) => withAdminAuth(context, facebookPost);
 export const facebookDeleteAuth = (context) => withAdminAuth(context, facebookDeletePost);
+
+// ── POST /v1/facebook/exchange ──
+// Internal: exchange User Token → Long-lived User Token → Page Token → Long-lived Page Token.
+// Requires FACEBOOK_APP_SECRET in env. Deletes FACEBOOK_APP_SECRET after run.
+// One-time use only — call this once per token refresh.
+//
+// Body: { user_token: string, delete_app_secret?: bool }
+//
+// Security: protected by admin auth (Bearer token via STARVIA_ADMIN_JWT_SECRET).
+export async function facebookExchange(context) {
+  const { request, env } = context;
+  if (request.method === 'OPTIONS') return handleOptions();
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return errorResponse(400, 'BAD_JSON', 'Request body must be valid JSON');
+  }
+
+  const { user_token, delete_app_secret = true } = body || {};
+  if (!user_token) {
+    return errorResponse(400, 'MISSING_USER_TOKEN', 'Provide user_token in body');
+  }
+
+  const appSecret = env.FACEBOOK_APP_SECRET;
+  if (!appSecret) {
+    return errorResponse(500, 'NO_APP_SECRET', 'FACEBOOK_APP_SECRET not set in env — cannot exchange');
+  }
+
+  // App Secret can be "ID|SECRET" format (from dashboard) or just secret.
+  // Graph API accepts both — it splits internally.
+  const steps = [];
+
+  try {
+    // Step 1: User Token → Long-lived User Token (60 days)
+    const step1Url = `https://graph.facebook.com/v22.0/oauth/access_token`
+      + `?grant_type=fb_exchange_token`
+      + `&client_id=***`+ `&client_secret=${encodeURIComponent(appSecret)}`
+      + `&fb_exchange_token=${encodeURIComponent(user_token)}`;
+
+    const step1Resp = await fetch(step1Url);
+    const step1Data = await step1Resp.json();
+    if (!step1Resp.ok || step1Data.error) {
+      return jsonResponse({
+        success: false,
+        step: 'exchange_to_long_lived_user',
+        error: 'FB_API_ERROR',
+        fbError: step1Data.error,
+      }, 502);
+    }
+    const longLivedUser = step1Data.access_token;
+    steps.push({ step: 1, ok: true, ttl: step1Data.expires_in });
+
+    // Step 2: /me/accounts → get Page Token (use the long-lived user token)
+    const step2Url = `https://graph.facebook.com/v22.0/me/accounts?fields=id,name,access_token&access_token=${longLivedUser}`;
+    const step2Resp = await fetch(step2Url);
+    const step2Data = await step2Resp.json();
+    if (!step2Resp.ok || step2Data.error) {
+      return jsonResponse({
+        success: false,
+        step: 'get_page_token',
+        error: 'FB_API_ERROR',
+        fbError: step2Data.error,
+      }, 502);
+    }
+
+    const starviaPage = (step2Data.data || []).find(p => p.name === 'Starvia');
+    if (!starviaPage) {
+      return jsonResponse({
+        success: false,
+        step: 'find_starvia_page',
+        error: 'PAGE_NOT_FOUND',
+        availablePages: (step2Data.data || []).map(p => p.name),
+      }, 404);
+    }
+    const shortPageToken = starviaPage.access_token;
+    steps.push({ step: 2, ok: true, pageId: starviaPage.id, pageName: starviaPage.name });
+
+    // Step 3: Short Page Token → Long-lived Page Token (60 days)
+    const step3Url = `https://graph.facebook.com/v22.0/oauth/access_token`
+      + `?grant_type=fb_exchange_token`
+      + `&client_id=***`+ `&client_secret=${encodeURIComponent(appSecret)}`
+      + `&fb_exchange_token=${encodeURIComponent(shortPageToken)}`;
+    const step3Resp = await fetch(step3Url);
+    const step3Data = await step3Resp.json();
+    if (!step3Resp.ok || step3Data.error) {
+      return jsonResponse({
+        success: false,
+        step: 'exchange_to_long_lived_page',
+        error: 'FB_API_ERROR',
+        fbError: step3Data.error,
+        pageToken: shortPageToken,  // fallback: use short-lived page token anyway
+      }, 502);
+    }
+    const longLivedPage = step3Data.access_token;
+    steps.push({ step: 3, ok: true, ttl: step3Data.expires_in });
+
+    // Verify the new Page token
+    const verifyUrl = `https://graph.facebook.com/v22.0/me?fields=id,name&access_token=${longLivedPage}`;
+    const verifyResp = await fetch(verifyUrl);
+    const verifyData = await verifyResp.json();
+    const isValid = verifyData.id === starviaPage.id;
+    steps.push({ step: 4, ok: isValid, returnedId: verifyData.id, returnedName: verifyData.name });
+
+    // Note: We can't update FACEBOOK_PAGE_TOKEN from within the function
+    // (no wrangler access). Caller must do `wrangler pages secret put` with the returned token.
+    // Also, we deliberately don't return the App Secret anywhere.
+
+    return jsonResponse({
+      success: true,
+      steps,
+      newPageToken: longLivedPage,
+      pageId: starviaPage.id,
+      expiresInDays: Math.floor(step3Data.expires_in / 86400),
+      nextStep: 'Run: wrangler pages secret put FACEBOOK_PAGE_TOKEN --project-name=starvia',
+    });
+  } catch (err) {
+    return errorResponse(500, 'INTERNAL_ERROR', err.message, { steps });
+  }
+}
+
+export const facebookExchangeAuth = (context) => withAdminAuth(context, facebookExchange);

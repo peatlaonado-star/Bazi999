@@ -8,6 +8,7 @@ import {
   facebookHealth,
   facebookPostAuth,
   facebookDeleteAuth,
+  facebookExchangeAuth,
 } from '../../_lib/facebook.js';
 
 export async function onRequest(context) {
@@ -47,6 +48,11 @@ export async function onRequest(context) {
     // DELETE /v1/facebook/post?id=…
     if (path === 'post' && request.method === 'DELETE') {
       return facebookDeleteAuth(context);
+    }
+
+    // POST /v1/facebook/exchange (admin only — one-time token refresh)
+    if (path === 'exchange' && request.method === 'POST') {
+      return facebookExchangeAuth(context);
     }
 
     return new Response(
