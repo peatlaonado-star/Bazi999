@@ -1074,10 +1074,18 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   min-height: 56px;
   margin: 4px 0 8px;
 }
+/* Zodiac icon glow animation — HiDream AI generated */
 .bp-axis-symbol.rasi-symbol .rasi-icon {
   width: 52px;
   height: 52px;
   display: block;
+  filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.5))
+          drop-shadow(0 0 15px rgba(212, 175, 55, 0.25));
+  animation: zodiac-glow 2.5s ease-in-out infinite alternate;
+}
+@keyframes zodiac-glow {
+  0%   { filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.5)) drop-shadow(0 0 15px rgba(212, 175, 55, 0.2)); }
+  100% { filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.7)) drop-shadow(0 0 28px rgba(212, 175, 55, 0.4)); }
 }
 /* Gemini glow effect — AI-generated PNG with animated glow */
 .bp-axis-symbol.rasi-symbol .rasi-icon[src*="gemini"] {
