@@ -8,13 +8,45 @@ function go2(){
   var u=U(), PL2=getPL();
   var nm=document.getElementById('n2').value||(u.pdef||'บุคคลนี้');
   var pw=new Date(ds).getDay(), p=PL2[pw];
-  document.getElementById('fc2').style.display='none';
-  showLoad();
-  if (document.body && document.body.classList) document.body.classList.add('has-report');
-  setTimeout(function(){ hideLoad(); renderAusp(nm,p,pw,u);
-    var r2 = document.getElementById('r2');
-    if(r2) r2.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 700);
+
+  // ✨ Smooth transition: fade out form first
+  var formCard = document.getElementById('fc2');
+  formCard.style.transition = 'opacity .3s ease, transform .3s ease';
+  formCard.style.opacity = '0';
+  formCard.style.transform = 'translateY(-10px)';
+
+  setTimeout(function(){
+    formCard.style.display='none';
+    formCard.style.opacity = '';
+    formCard.style.transform = '';
+
+    // Show skeleton with fade-in
+    var loadEl = document.getElementById('load');
+    loadEl.style.opacity = '0';
+    loadEl.style.transition = 'opacity .4s ease';
+    showLoad();
+    requestAnimationFrame(function(){
+      loadEl.style.opacity = '1';
+    });
+
+    if (document.body && document.body.classList) document.body.classList.add('has-report');
+    setTimeout(function(){
+      // ✨ Smooth transition: fade out skeleton
+      loadEl.style.opacity = '0';
+      setTimeout(function(){
+        hideLoad();
+        loadEl.style.opacity = '';
+        loadEl.style.transition = '';
+
+        renderAusp(nm,p,pw,u);
+        var r2 = document.getElementById('r2');
+        if(r2) {
+          var targetY = r2.getBoundingClientRect().top + window.scrollY - 20;
+          window.scrollTo({ top: targetY, behavior: 'smooth' });
+        }
+      }, 400);
+    }, 700);
+  }, 300);
 }
 
 function renderAusp(nm,p,pw,u){

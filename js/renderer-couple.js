@@ -11,25 +11,58 @@ function go1(){
   var pa=PL2[new Date(da).getDay()];
   var ria=getRasi(da);
   var lia=getLagna(da,ta);
-  document.getElementById('fc1').style.display='none';
-  showLoad();
-  if (document.body && document.body.classList) document.body.classList.add('has-report');
+
+  // ✨ Smooth transition: fade out form first
+  var formCard = document.getElementById('fc1');
+  formCard.style.transition = 'opacity .3s ease, transform .3s ease';
+  formCard.style.opacity = '0';
+  formCard.style.transform = 'translateY(-10px)';
+
   setTimeout(function(){
-    hideLoad();
-    if(!db){
-      renderSingleLoveOpportunity(na,pa,RA2[ria],RA2[lia],ria,lia,u,RA2,da);
-      var r1 = document.getElementById('r1');
-      if(r1) r1.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      return;
-    }
-    var nb=document.getElementById('n1b').value||def[1];
-    var tb=document.getElementById('t1b').value||'06:00';
-    var pb=PL2[new Date(db).getDay()];
-    var rib=getRasi(db), lib=getLagna(db,tb);
-    renderCouple(na,pa,RA2[ria],RA2[lia],ria,lia,nb,pb,RA2[rib],RA2[lib],rib,lib,u,RA2,da,db);
-    var r1 = document.getElementById('r1');
-    if(r1) r1.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  },900);
+    formCard.style.display='none';
+    formCard.style.opacity = '';
+    formCard.style.transform = '';
+
+    // Show skeleton with fade-in
+    var loadEl = document.getElementById('load');
+    loadEl.style.opacity = '0';
+    loadEl.style.transition = 'opacity .4s ease';
+    showLoad();
+    requestAnimationFrame(function(){
+      loadEl.style.opacity = '1';
+    });
+
+    if (document.body && document.body.classList) document.body.classList.add('has-report');
+    setTimeout(function(){
+      // ✨ Smooth transition: fade out skeleton
+      loadEl.style.opacity = '0';
+      setTimeout(function(){
+        hideLoad();
+        loadEl.style.opacity = '';
+        loadEl.style.transition = '';
+
+        if(!db){
+          renderSingleLoveOpportunity(na,pa,RA2[ria],RA2[lia],ria,lia,u,RA2,da);
+          var r1 = document.getElementById('r1');
+          if(r1) {
+            var targetY = r1.getBoundingClientRect().top + window.scrollY - 20;
+            window.scrollTo({ top: targetY, behavior: 'smooth' });
+          }
+          return;
+        }
+        var nb=document.getElementById('n1b').value||def[1];
+        var tb=document.getElementById('t1b').value||'06:00';
+        var pb=PL2[new Date(db).getDay()];
+        var rib=getRasi(db), lib=getLagna(db,tb);
+        renderCouple(na,pa,RA2[ria],RA2[lia],ria,lia,nb,pb,RA2[rib],RA2[lib],rib,lib,u,RA2,da,db);
+        var r1 = document.getElementById('r1');
+        if(r1) {
+          var targetY = r1.getBoundingClientRect().top + window.scrollY - 20;
+          window.scrollTo({ top: targetY, behavior: 'smooth' });
+        }
+      }, 400);
+    }, 900);
+  }, 300);
 }
 
 function parseBirthDateSafe(value){

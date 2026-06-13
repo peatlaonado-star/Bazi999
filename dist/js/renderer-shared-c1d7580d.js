@@ -278,9 +278,35 @@ function buildVinaiSection(p, now) {
 function resetM(mode){
   var fc=['fc0','fc1','fc2'][mode], r=['r0','r1','r2'][mode];
   if (document.body && document.body.classList) document.body.classList.remove('has-report');
-  document.getElementById(r).innerHTML='';
-  document.getElementById(fc).style.display='block';
-  scrollTo({top:0,behavior:'smooth'});
+
+  // ✨ Smooth transition: fade out report first
+  var reportEl = document.getElementById(r);
+  reportEl.style.transition = 'opacity .3s ease, transform .3s ease';
+  reportEl.style.opacity = '0';
+  reportEl.style.transform = 'translateY(10px)';
+
+  setTimeout(function(){
+    reportEl.innerHTML='';
+    reportEl.style.opacity = '';
+    reportEl.style.transform = '';
+    reportEl.style.transition = '';
+
+    // Show form with fade-in
+    var formCard = document.getElementById(fc);
+    formCard.style.opacity = '0';
+    formCard.style.transition = 'opacity .4s ease';
+    formCard.style.display='block';
+    requestAnimationFrame(function(){
+      formCard.style.opacity = '1';
+    });
+
+    setTimeout(function(){
+      formCard.style.opacity = '';
+      formCard.style.transition = '';
+    }, 400);
+
+    scrollTo({top:0,behavior:'smooth'});
+  }, 300);
 }
 
 // ═══ Lottery Results Card ═══

@@ -435,25 +435,54 @@ function go0(){
   var p=PL2[new Date(ds).getDay()];
   var ri=getRasi(ds), li=ts ? getLagna(ds,ts) : ri;
   var r=RA2[ri], l=RA2[li];
-  document.getElementById('fc0').style.display='none';
-  showLoad();
 
-  // 💡 กลยุทธ์ Illusion of Labor (เปลี่ยนข้อความบิ้วด์อารมณ์)
-  var loadTxt = document.getElementById('load-txt');
-  loadTxt.innerHTML = '✨ กำลังคำนวณตำแหน่งดวงดาว...';
+  // ✨ Smooth transition: fade out form first
+  var formCard = document.getElementById('fc0');
+  formCard.style.transition = 'opacity .3s ease, transform .3s ease';
+  formCard.style.opacity = '0';
+  formCard.style.transform = 'translateY(-10px)';
 
-  setTimeout(function(){ loadTxt.innerHTML = '🔮 กำลังถอดรหัสราศีและลัคนา...'; }, 1000);
-  setTimeout(function(){ loadTxt.innerHTML = '📜 กำลังสร้างพิมพ์เขียวชีวิตของคุณ...'; }, 2000);
-
-  // ยืดเวลาโหลดเป็น 3 วินาทีเพื่อให้ลูกค้ารู้สึกว่าระบบทำงานลึกซึ้งจริงๆ
   setTimeout(function(){
-    hideLoad();
-    loadTxt.innerHTML = u.ld; // คืนค่าเดิม
-    renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE);
-    // Auto-scroll to report after render
-    var reportEl = document.getElementById('r0');
-    if(reportEl) reportEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 3200);
+    formCard.style.display='none';
+    formCard.style.opacity = '';
+    formCard.style.transform = '';
+
+    // Show skeleton with fade-in
+    var loadEl = document.getElementById('load');
+    loadEl.style.opacity = '0';
+    loadEl.style.transition = 'opacity .4s ease';
+    showLoad();
+    requestAnimationFrame(function(){
+      loadEl.style.opacity = '1';
+    });
+
+    // 💡 กลยุทธ์ Illusion of Labor (เปลี่ยนข้อความบิ้วด์อารมณ์)
+    var loadTxt = document.getElementById('load-txt');
+    loadTxt.innerHTML = '✨ กำลังคำนวณตำแหน่งดวงดาว...';
+    setTimeout(function(){ loadTxt.innerHTML = '🔮 กำลังถอดรหัสราศีและลัคนา...'; }, 1000);
+    setTimeout(function(){ loadTxt.innerHTML = '📜 กำลังสร้างพิมพ์เขียวชีวิตของคุณ...'; }, 2000);
+
+    // ยืดเวลาโหลดเป็น 3 วินาทีเพื่อให้ลูกค้ารู้สึกว่าระบบทำงานลึกซึ้งจริงๆ
+    setTimeout(function(){
+      // ✨ Smooth transition: fade out skeleton
+      loadEl.style.opacity = '0';
+      setTimeout(function(){
+        hideLoad();
+        loadEl.style.opacity = '';
+        loadEl.style.transition = '';
+
+        // Render report
+        renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE);
+
+        // Auto-scroll to report with smooth animation
+        var reportEl = document.getElementById('r0');
+        if(reportEl) {
+          var targetY = reportEl.getBoundingClientRect().top + window.scrollY - 20;
+          window.scrollTo({ top: targetY, behavior: 'smooth' });
+        }
+      }, 400);
+    }, 3200);
+  }, 300);
 }
 
 // ===== PERSONALIZED LIFE GRAPH =====
