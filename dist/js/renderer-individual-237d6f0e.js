@@ -977,7 +977,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + wrapCollapsible("✨ พลังงานเสริมดวง", "เลขและสีมงคลประจำวัน", powerCardHtml)
     + buildPremiumPreviewSummary()
     + buildPremiumPriceAnchor(false)
-    + wrapCollapsible("🙏 เหตุเสริมแกร่งธาตุ — ธรรมทานฟรี", "ทาน · จิต · เมตตา · ปัญญา · แบบฝึก 7 วัน", buildVinaiSection(p, new Date()))
+    // + wrapCollapsible("🙏 เหตุเสริมแกร่งธาตุ — ธรรมทานฟรี", "ทาน · จิต · เมตตา · ปัญญา · แบบฝึก 7 วัน", buildVinaiSection(p, new Date()))  // hidden per request
     + wrapCollapsible("✦ สูตรเปิดดวงลาภลอย ✦", "เลขเด็ด · หวย · ทิศ · คาถา สายมู", windfallLuckHtml, true)
     + '<div id=\"lottery-results-section\" style=\"margin-bottom:14px;\"></div>'
     + wrapCollapsible("🔮 หมอทักประจำเดือน", "5 ด้านชีวิต · สัญญาณเตือน · วิธีแก้", monthlyLifeMapHtml, true)
