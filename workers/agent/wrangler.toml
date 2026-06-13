@@ -1,7 +1,0 @@
-name = "starvia-agent"
-main = "index.js"
-compatibility_date = "2024-06-13"
-compatibility_flags = ["nodejs_compat"]
-
-[vars]
-STARVIA_PUBLIC_URL = "https://starvia.website"
