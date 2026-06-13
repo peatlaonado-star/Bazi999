@@ -51,6 +51,16 @@ export async function facebookHealth(context) {
       }, 200);
     }
 
+    // Check if this is actually a Page token by listing accounts
+    // User tokens return all pages, Page tokens return [] (or error)
+    const accountsResp = await fetch(
+      `${GRAPH_BASE}/me/accounts?fields=id,name&access_token=${encodeURIComponent(token)}`
+    );
+    const accountsData = await accountsResp.json();
+    const isPageToken = Array.isArray(accountsData.data) && accountsData.data.length === 0
+      && accountsData.data?.length !== undefined;
+    // Page tokens return empty data[]; User tokens return list of pages
+
     return jsonResponse({
       ok: true,
       page: {
@@ -58,6 +68,14 @@ export async function facebookHealth(context) {
         name: data.name,
         configuredPageId: pageId,
         idsMatch: data.id === pageId,
+      },
+      tokenType: {
+        isPageToken,
+        hint: isPageToken
+          ? 'Looks like Page token (empty accounts list)'
+          : 'Looks like User token (has pages). Use "Get Page Access Token" in Explorer to get a real Page token.',
+        pagesAvailable: accountsData.data?.length || 0,
+        pageNames: accountsData.data?.map(p => p.name) || [],
       },
     });
   } catch (err) {
