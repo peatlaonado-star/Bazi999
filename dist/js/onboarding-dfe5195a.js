@@ -146,7 +146,7 @@ var Onboarding = (function() {
     // round number like "2,373" for a site that's still growing.
     // Once the site has been live longer, bump the values here.
     var earlyUsers = 137;
-    var earlyReviews = 45;
+    var earlyReviews = 75;
     var usersFormatted = earlyUsers.toLocaleString('th-TH');
     var reviewsFormatted = earlyReviews.toLocaleString('th-TH');
 
