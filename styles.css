@@ -1785,45 +1785,34 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 }
 
 /* ── Collapsible Sections ── */
+/* ═══ Collapsible Sections — Card Design ═══ */
 .collapsible-section {
   position: relative;
   margin-bottom: 14px;
 }
+/* ── Normal (expanded) state ── */
 .section-toggle {
   display: flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
   user-select: none;
-  padding: 14px 16px;
+  padding: 12px 16px;
   margin-bottom: 0;
   border-radius: 14px 14px 0 0;
-  background: linear-gradient(135deg, rgba(142,114,216,.08) 0%, rgba(214,173,69,.12) 100%);
-  border: 1px solid rgba(214,173,69,.18);
+  background: linear-gradient(135deg, rgba(142,114,216,.06) 0%, rgba(214,173,69,.1) 100%);
+  border: 1px solid rgba(214,173,69,.15);
   border-bottom: none;
-  transition: all .25s cubic-bezier(.4,0,.2,1);
-  position: relative;
-  overflow: hidden;
-}
-.section-toggle::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(214,173,69,.06), transparent);
-  opacity: 0;
-  transition: opacity .3s;
+  transition: background .2s;
 }
 .section-toggle:hover {
-  background: linear-gradient(135deg, rgba(142,114,216,.14) 0%, rgba(214,173,69,.18) 100%);
-  border-color: rgba(214,173,69,.35);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(214,173,69,.12);
+  background: linear-gradient(135deg, rgba(142,114,216,.1) 0%, rgba(214,173,69,.14) 100%);
 }
-.section-toggle:hover::before {
-  opacity: 1;
-}
-.section-toggle:active {
-  transform: translateY(0) scale(.99);
+.section-toggle-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 .section-toggle-arrow {
   display: inline-block;
@@ -1832,36 +1821,109 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   transition: transform .3s cubic-bezier(.4,0,.2,1);
   width: 14px;
   text-align: center;
-  filter: drop-shadow(0 0 4px rgba(214,173,69,.4));
-}
-.collapsible-section.collapsed .section-toggle-arrow {
-  transform: rotate(-90deg);
 }
 .section-toggle-label {
-  flex: 1;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--g);
   letter-spacing: .04em;
-  text-shadow: 0 0 12px rgba(214,173,69,.25);
 }
 .section-toggle-hint {
   font-size: 11px;
   color: var(--tx2);
   font-weight: 400;
   letter-spacing: .03em;
-  opacity: .8;
 }
+.section-toggle-cta {
+  display: none;
+}
+/* ── Body ── */
 .section-body {
   position: relative;
-  border: 1px solid rgba(214,173,69,.18);
+  border: 1px solid rgba(214,173,69,.15);
   border-top: none;
   border-radius: 0 0 14px 14px;
   overflow: hidden;
   opacity: 1;
   max-height: var(--section-h, 3000px);
   transition: max-height .4s cubic-bezier(.4,0,.2,1), opacity .3s ease, padding .3s ease, margin .3s ease;
-  background: linear-gradient(180deg, rgba(37,24,68,.3) 0%, rgba(20,12,40,.5) 100%);
+  background: linear-gradient(180deg, rgba(37,24,68,.25) 0%, rgba(20,12,40,.45) 100%);
+}
+/* ── Collapsed = Card style ── */
+.collapsible-section.collapsed .section-toggle {
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0;
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(37,24,68,.82), rgba(20,12,40,.92));
+  border: 1px solid rgba(214,173,69,.22);
+  border-bottom: 1px solid rgba(214,173,69,.22);
+  box-shadow: 0 8px 28px rgba(0,0,0,.25);
+  transition: all .3s cubic-bezier(.4,0,.2,1);
+  position: relative;
+}
+.collapsible-section.collapsed .section-toggle:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 40px rgba(0,0,0,.35), 0 0 24px rgba(214,173,69,.08);
+  border-color: rgba(214,173,69,.4);
+  background: linear-gradient(145deg, rgba(42,28,78,.88), rgba(25,15,48,.95));
+}
+.collapsible-section.collapsed .section-toggle:active {
+  transform: translateY(-1px) scale(.99);
+}
+.collapsible-section.collapsed .section-toggle-main {
+  flex: none;
+  width: calc(100% - 24px);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.collapsible-section.collapsed .section-toggle-label {
+  font-size: 16px;
+  text-shadow: 0 0 12px rgba(214,173,69,.25);
+  line-height: 1.3;
+}
+.collapsible-section.collapsed .section-toggle-hint {
+  font-size: 12.5px;
+  line-height: 1.5;
+  opacity: .85;
+  display: block;
+}
+.collapsible-section.collapsed .section-toggle-arrow {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  transform: rotate(-90deg);
+  font-size: 11px;
+  color: var(--g);
+  opacity: .6;
+  transition: all .3s;
+}
+.collapsible-section.collapsed .section-toggle:hover .section-toggle-arrow {
+  opacity: 1;
+  transform: rotate(-90deg) scale(1.15);
+  filter: drop-shadow(0 0 6px rgba(214,173,69,.5));
+}
+/* CTA button — visible on hover in collapsed state */
+.collapsible-section.collapsed .section-toggle-cta {
+  display: block;
+  font-size: 12px;
+  color: var(--g);
+  font-weight: 600;
+  background: rgba(214,173,69,.1);
+  border: 1px solid rgba(214,173,69,.2);
+  padding: 5px 12px;
+  border-radius: 8px;
+  margin-top: 10px;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: all .25s ease;
+  letter-spacing: .02em;
+}
+.collapsible-section.collapsed .section-toggle:hover .section-toggle-cta {
+  opacity: 1;
+  transform: translateY(0);
 }
 .collapsible-section.collapsed .section-body {
   max-height: 0 !important;
@@ -1871,18 +1933,25 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   margin: 0;
   border: none;
 }
-.collapsible-section.collapsed .section-toggle {
-  border-radius: 14px;
-  border-bottom: 1px solid rgba(214,173,69,.18);
+/* ── Shimmer on collapsed cards ── */
+@keyframes cardShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
-/* Glow animation on expand */
-@keyframes sectionGlow {
-  0% { box-shadow: 0 0 0 rgba(214,173,69,0); }
-  50% { box-shadow: 0 0 20px rgba(214,173,69,.15); }
-  100% { box-shadow: 0 0 0 rgba(214,173,69,0); }
+.collapsible-section.collapsed .section-toggle::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  background: linear-gradient(90deg, transparent 0%, rgba(214,173,69,.04) 50%, transparent 100%);
+  background-size: 200% 100%;
+  opacity: 0;
+  transition: opacity .3s;
+  pointer-events: none;
 }
-.collapsible-section:not(.collapsed) .section-toggle {
-  animation: sectionGlow .6s ease-out;
+.collapsible-section.collapsed .section-toggle:hover::after {
+  opacity: 1;
+  animation: cardShimmer 1.5s ease-in-out infinite;
 }
 
 /* ── กำลังวันประจำตัว (Weekday Power Card) ── */

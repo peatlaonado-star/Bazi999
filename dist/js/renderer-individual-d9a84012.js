@@ -704,7 +704,14 @@ function buildLifeTimeline(kind, p, ageY, ageM){
 function wrapCollapsible(label, hint, content, startCollapsed) {
   var collapsedClass = startCollapsed ? ' collapsed' : '';
   return '<div class="collapsible-section' + collapsedClass + '">'
-    + '<div class="section-toggle"><span class="section-toggle-arrow">▼</span><span class="section-toggle-label">' + label + '</span><span class="section-toggle-hint">' + hint + '</span></div>'
+    + '<div class="section-toggle">'
+    + '<span class="section-toggle-arrow">▼</span>'
+    + '<div class="section-toggle-main">'
+    + '<span class="section-toggle-label">' + label + '</span>'
+    + '<span class="section-toggle-hint">' + hint + '</span>'
+    + '</div>'
+    + '<span class="section-toggle-cta">ดูเพิ่มเติม →</span>'
+    + '</div>'
     + '<div class="section-body">' + content + '</div>'
     + '</div>';
 }
