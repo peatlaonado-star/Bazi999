@@ -15,7 +15,7 @@ function escapeHTML(value){
 var RASI_EN_NAMES = ['aries','taurus','gemini','cancer','leo','virgo','libra','scorpio','sagittarius','capricorn','aquarius','pisces'];
 function rasiIconUrl(idx) {
   var num = String(idx + 1).padStart(2, '0');
-  return 'assets/zodiac/' + num + '-' + (RASI_EN_NAMES[idx] || 'aries') + '.svg';
+  return 'assets/zodiac/' + num + '-' + (RASI_EN_NAMES[idx] || 'aries') + '.svg?v=2';
 }
 function rasiIconHtml(idx, name, size) {
   size = size || 40;

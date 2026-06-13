@@ -101,7 +101,7 @@ var CosmicEvents = (function() {
     if (idx === undefined) return '';
     size = size || 24;
     var num = String(idx + 1).padStart(2, '0');
-    return '<img class="ceb-zodiac-icon" src="assets/zodiac/' + num + '-' + ZODIAC_EN[idx] + '.svg" width="' + size + '" height="' + size + '" alt="ราศี' + thaiName + '">';
+    return '<img class="ceb-zodiac-icon" src="assets/zodiac/' + num + '-' + ZODIAC_EN[idx] + '.svg?v=2" width="' + size + '" height="' + size + '" alt="ราศี' + thaiName + '">';
   }
 
   function createBannerElement(emoji, title, subtitle, cta, subtle, zodiacName) {
