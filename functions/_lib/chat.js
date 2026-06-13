@@ -99,7 +99,16 @@ export async function handleChat(context) {
 
   // Get all available API keys
   const apiKeys = getApiKeys(env);
-  if (apiKeys.length === 0) {
+
+  // CHAT DISABLED: feature temporarily offline
+  return json({
+    success: false,
+    error: 'CHAT_DISABLED',
+    message: 'ดาราขอพักฟื้นพลังดาวสักครู่ค่ะ โปรดกลับมาใหม่นะคะ',
+  }, 503);
+
+  // Original code preserved below for re-enable
+  /*
     return json({
       success: false,
       error: 'API_KEY_NOT_CONFIGURED',
@@ -178,6 +187,7 @@ export async function handleChat(context) {
           : 'ขอโทษค่ะ ระบบขัดข้องชั่วคราว'),
     detail: lastErr?.message?.slice(0, 200),
   }, isTimeout ? 504 : (isRateLimit ? 429 : 502));
+  */
 }
 
 // GET /v1/chat — health/info
@@ -187,7 +197,7 @@ export function chatInfo(context) {
     success: true,
     service: 'starvia-chat-concierge',
     provider: 'opencode-zen',
-    status: apiKeys.length > 0 ? 'active' : 'no-keys',
+    status: 'disabled', // Temporarily disabled
     models: MODELS,
     primary: MODELS[0],
     api_keys_configured: apiKeys.length,
