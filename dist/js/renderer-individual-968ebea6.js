@@ -450,6 +450,9 @@ function go0(){
     hideLoad();
     loadTxt.innerHTML = u.ld; // คืนค่าเดิม
     renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE);
+    // Auto-scroll to report after render
+    var reportEl = document.getElementById('r0');
+    if(reportEl) reportEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 3200);
 }
 

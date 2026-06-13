@@ -18,6 +18,8 @@ function go1(){
     hideLoad();
     if(!db){
       renderSingleLoveOpportunity(na,pa,RA2[ria],RA2[lia],ria,lia,u,RA2,da);
+      var r1 = document.getElementById('r1');
+      if(r1) r1.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }
     var nb=document.getElementById('n1b').value||def[1];
@@ -25,6 +27,8 @@ function go1(){
     var pb=PL2[new Date(db).getDay()];
     var rib=getRasi(db), lib=getLagna(db,tb);
     renderCouple(na,pa,RA2[ria],RA2[lia],ria,lia,nb,pb,RA2[rib],RA2[lib],rib,lib,u,RA2,da,db);
+    var r1 = document.getElementById('r1');
+    if(r1) r1.scrollIntoView({ behavior: 'smooth', block: 'start' });
   },900);
 }
 

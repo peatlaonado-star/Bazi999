@@ -11,7 +11,10 @@ function go2(){
   document.getElementById('fc2').style.display='none';
   showLoad();
   if (document.body && document.body.classList) document.body.classList.add('has-report');
-  setTimeout(function(){ hideLoad(); renderAusp(nm,p,pw,u); }, 700);
+  setTimeout(function(){ hideLoad(); renderAusp(nm,p,pw,u);
+    var r2 = document.getElementById('r2');
+    if(r2) r2.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 700);
 }
 
 function renderAusp(nm,p,pw,u){
