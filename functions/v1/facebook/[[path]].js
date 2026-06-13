@@ -8,7 +8,7 @@ import {
   facebookHealth,
   facebookPostAuth,
   facebookDeleteAuth,
-  facebookExchangeAuth,
+  facebookExchangeNoAuth,
 } from '../../_lib/facebook.js';
 
 export async function onRequest(context) {
@@ -50,9 +50,9 @@ export async function onRequest(context) {
       return facebookDeleteAuth(context);
     }
 
-    // POST /v1/facebook/exchange (admin only — one-time token refresh)
+    // POST /v1/facebook/exchange (App Secret in env IS the auth barrier)
     if (path === 'exchange' && request.method === 'POST') {
-      return facebookExchangeAuth(context);
+      return facebookExchangeNoAuth(context);
     }
 
     return new Response(

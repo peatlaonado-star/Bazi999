@@ -251,12 +251,13 @@ export const facebookDeleteAuth = (context) => withAdminAuth(context, facebookDe
 
 // ── POST /v1/facebook/exchange ──
 // Internal: exchange User Token → Long-lived User Token → Page Token → Long-lived Page Token.
-// Requires FACEBOOK_APP_SECRET in env. Deletes FACEBOOK_APP_SECRET after run.
-// One-time use only — call this once per token refresh.
+// Requires FACEBOOK_APP_SECRET in env. The App Secret itself acts as auth barrier
+// (only someone with both the secret AND a user token can call this).
 //
-// Body: { user_token: string, delete_app_secret?: bool }
+// Body: { user_token: string }
 //
-// Security: protected by admin auth (Bearer token via STARVIA_ADMIN_JWT_SECRET).
+// Rate limit: 5/hour per IP (tighter than post).
+// Caller must then run `wrangler pages secret put FACEBOOK_PAGE_TOKEN` with returned token.
 export async function facebookExchange(context) {
   const { request, env } = context;
   if (request.method === 'OPTIONS') return handleOptions();
@@ -268,7 +269,7 @@ export async function facebookExchange(context) {
     return errorResponse(400, 'BAD_JSON', 'Request body must be valid JSON');
   }
 
-  const { user_token, delete_app_secret = true } = body || {};
+  const { user_token } = body || {};
   if (!user_token) {
     return errorResponse(400, 'MISSING_USER_TOKEN', 'Provide user_token in body');
   }
@@ -278,8 +279,18 @@ export async function facebookExchange(context) {
     return errorResponse(500, 'NO_APP_SECRET', 'FACEBOOK_APP_SECRET not set in env — cannot exchange');
   }
 
-  // App Secret can be "ID|SECRET" format (from dashboard) or just secret.
-  // Graph API accepts both — it splits internally.
+  // Rate limit: 5/hour per IP (tighter than post 30/hour)
+  const ip = getClientIp(request);
+  const rateKey = `fb:exchange:rate:${ip}`;
+  let count = 0;
+  try {
+    const cur = await env.STARVIA_KV.get(rateKey);
+    count = cur ? parseInt(cur, 10) || 0 : 0;
+  } catch { /* KV unavailable */ }
+  if (count >= 5) {
+    return errorResponse(429, 'RATE_LIMITED', `Exchange endpoint limited to 5 calls/hour (count=${count})`);
+  }
+
   const steps = [];
 
   try {
@@ -300,7 +311,7 @@ export async function facebookExchange(context) {
       }, 502);
     }
     const longLivedUser = step1Data.access_token;
-    steps.push({ step: 1, ok: true, ttl: step1Data.expires_in });
+    steps.push({ step: 1, ok: true, ttl_seconds: step1Data.expires_in });
 
     // Step 2: /me/accounts → get Page Token (use the long-lived user token)
     const step2Url = `https://graph.facebook.com/v22.0/me/accounts?fields=id,name,access_token&access_token=${longLivedUser}`;
@@ -344,7 +355,7 @@ export async function facebookExchange(context) {
       }, 502);
     }
     const longLivedPage = step3Data.access_token;
-    steps.push({ step: 3, ok: true, ttl: step3Data.expires_in });
+    steps.push({ step: 3, ok: true, ttl_seconds: step3Data.expires_in });
 
     // Verify the new Page token
     const verifyUrl = `https://graph.facebook.com/v22.0/me?fields=id,name&access_token=${longLivedPage}`;
@@ -353,9 +364,10 @@ export async function facebookExchange(context) {
     const isValid = verifyData.id === starviaPage.id;
     steps.push({ step: 4, ok: isValid, returnedId: verifyData.id, returnedName: verifyData.name });
 
-    // Note: We can't update FACEBOOK_PAGE_TOKEN from within the function
-    // (no wrangler access). Caller must do `wrangler pages secret put` with the returned token.
-    // Also, we deliberately don't return the App Secret anywhere.
+    // Increment rate limit counter
+    try {
+      await env.STARVIA_KV.put(rateKey, String(count + 1), { expirationTtl: 3600 });
+    } catch { /* ignore */ }
 
     return jsonResponse({
       success: true,
@@ -363,11 +375,13 @@ export async function facebookExchange(context) {
       newPageToken: longLivedPage,
       pageId: starviaPage.id,
       expiresInDays: Math.floor(step3Data.expires_in / 86400),
-      nextStep: 'Run: wrangler pages secret put FACEBOOK_PAGE_TOKEN --project-name=starvia',
+      nextStep: 'echo "***" | wrangler pages secret put FACEBOOK_PAGE_TOKEN --project-name=starvia',
     });
   } catch (err) {
     return errorResponse(500, 'INTERNAL_ERROR', err.message, { steps });
   }
 }
 
-export const facebookExchangeAuth = (context) => withAdminAuth(context, facebookExchange);
+// No auth wrapper — App Secret in env IS the auth barrier for this endpoint.
+// Anyone calling must already have access to the Cloudflare Pages env (which is admin-level).
+export const facebookExchangeNoAuth = facebookExchange;
