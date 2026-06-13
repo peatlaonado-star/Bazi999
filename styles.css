@@ -1079,6 +1079,16 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   height: 52px;
   display: block;
 }
+/* Gemini glow effect — AI-generated PNG with animated glow */
+.bp-axis-symbol.rasi-symbol .rasi-icon[src*="gemini"] {
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.6))
+          drop-shadow(0 0 20px rgba(212, 175, 55, 0.3));
+  animation: gemini-glow 2s ease-in-out infinite alternate;
+}
+@keyframes gemini-glow {
+  0%   { filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.6)) drop-shadow(0 0 20px rgba(212, 175, 55, 0.3)); }
+  100% { filter: drop-shadow(0 0 14px rgba(212, 175, 55, 0.8)) drop-shadow(0 0 30px rgba(212, 175, 55, 0.5)); }
+}
 
 .bp-axis-grid {
   display: grid;
