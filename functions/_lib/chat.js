@@ -6,8 +6,8 @@
 // API: https://opencode.ai/zen/v1/chat/completions (OpenAI-compatible)
 
 // Primary: deepseek-v4-flash-free (free tier)
-// Fallback: minimax-m3-free, mimo-v2.5-free, qwen3.6-plus-free
-const MODELS = ['deepseek-v4-flash-free', 'minimax-m3-free', 'mimo-v2.5-free', 'qwen3.6-plus-free'];
+// Fallback: minimax-m3-free, mimo-v2.5-free
+const MODELS = ['deepseek-v4-flash-free', 'minimax-m3-free', 'mimo-v2.5-free'];
 const API_BASE = 'https://opencode.ai/zen/v1';
 
 const SYSTEM_PROMPT = `You are "Dara" (ดารา), a Thai astrology consultant for Starvia — a premium Thai astrology service that reveals personality, love, work, and life blueprint from birth date using traditional Thai cosmology (นพเคราะห์, ทักษาปกรณ์, ลัคนา, ราศีจักร).
