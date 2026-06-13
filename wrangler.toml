@@ -3,10 +3,6 @@ compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = "dist"
 
-# Workers AI binding — powers /v1/chat (Dara, Thai astrology assistant)
-[ai]
-binding = "AI"
-
 # KV namespace for STARVIA data (lottery, streak, premium, admin)
 # Created: 2026-06-04 via `wrangler kv namespace create STARVIA_KV`
 [[kv_namespaces]]
@@ -18,9 +14,10 @@ id = "90a41835556b4f68967a1b4cd5df0951"
 STARVIA_PREMIUM_PLAN = "premium_199"
 STARVIA_TOKEN_TTL_SECONDS = "86400"
 STARVIA_ADMIN_TOKEN_TTL = "43200"
-STARVIA_API_VERSION = "2.0.0-cloudflare"
+STARVIA_API_VERSION = "2.1.0-opencode-zen"
 
 # Secrets (set via `wrangler secret put` or dashboard):
+# - OPENCODE_ZEN_API_KEY (LLM for chat — https://opencode.ai/auth)
 # - STARVIA_JWT_SECRET (premium JWT signing)
 # - STARVIA_ADMIN_PASSWORD (admin login)
 # - STARVIA_ADMIN_JWT_SECRET (admin JWT signing)

@@ -1,11 +1,12 @@
 // STARVIA Chat Concierge — "Dara" (ดารา) Thai astrology assistant
-// Uses Cloudflare Workers AI (Llama 3.1 8B) — replaces local Ollama
-// Migration: 2026-06-04 from api/chat-service.mjs
+// Uses OpenCode Zen API (deepseek-v4-flash-free) — replaces Cloudflare Workers AI
+// Migration: 2026-06-13 from Workers AI (Llama 3.1 8B)
 //
-// Free tier: 10,000 neurons/day (≈ 300-500 chats/day with Llama 3.1 8B)
-// Docs: https://developers.cloudflare.com/workers-ai/
+// Free tier: deepseek-v4-flash-free (cost: 0)
+// API: https://opencode.ai/zen/v1/chat/completions (OpenAI-compatible)
 
-const MODEL = '@cf/meta/llama-3.1-8b-instruct';
+const MODEL = 'deepseek-v4-flash-free';
+const API_BASE = 'https://opencode.ai/zen/v1';
 
 const SYSTEM_PROMPT = `You are "Dara" (ดารา), a Thai astrology consultant for Starvia — a premium Thai astrology service that reveals personality, love, work, and life blueprint from birth date using traditional Thai cosmology (นพเคราะห์, ทักษาปกรณ์, ลัคนา, ราศีจักร).
 
@@ -41,15 +42,54 @@ function sanitizeInput(text) {
     .replace(/[\x00-\x08\x0B-\x1F\x7F]/g, '');
 }
 
+// Call OpenCode Zen API (OpenAI-compatible format)
+async function callOpenCodeZen(messages, apiKey) {
+  const response = await fetch(`${API_BASE}/chat/completions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      messages,
+      max_tokens: 200,        // 100 Thai chars ≈ 200 tokens
+      temperature: 0.7,
+      top_p: 0.9,
+    }),
+    signal: AbortSignal.timeout(25000), // 25s timeout
+  });
+
+  if (!response.ok) {
+    const error = await response.text().catch(() => 'Unknown error');
+    throw new Error(`OpenCode API error ${response.status}: ${error}`);
+  }
+
+  const data = await response.json();
+
+  // OpenAI format: data.choices[0].message.content
+  const reply = (data.choices?.[0]?.message?.content || '').trim();
+
+  if (!reply) {
+    // Some models put content in reasoning_content (DeepSeek R1)
+    const reasoning = (data.choices?.[0]?.message?.reasoning_content || '').trim();
+    if (reasoning) return reasoning.slice(0, 800);
+    throw new Error('Empty response from API');
+  }
+
+  return reply.slice(0, 800);
+}
+
 // POST /v1/chat { message: "..." }
 export async function handleChat(context) {
   const { request, env } = context;
 
-  if (!env.AI) {
+  // Check API key is configured
+  if (!env.OPENCODE_ZEN_API_KEY) {
     return json({
       success: false,
-      error: 'AI_NOT_BOUND',
-      message: 'Workers AI binding missing. Add [ai] binding to wrangler.toml.',
+      error: 'API_KEY_NOT_CONFIGURED',
+      message: 'ระบบแชทยังไม่พร้อมใช้งาน',
     }, 503);
   }
 
@@ -74,45 +114,41 @@ export async function handleChat(context) {
     },
   ];
 
-  try {
-    // Call Cloudflare Workers AI with 25s timeout (Workers limit is 30s)
-    const aiResponse = await Promise.race([
-      env.AI.run(MODEL, {
-        messages,
-        max_tokens: 200,        // 100 Thai chars ≈ 200 tokens (1 char ≈ 1.5-2 tokens)
-        temperature: 0.7,
-        top_p: 0.9,
-      }),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('AI_TIMEOUT')), 25000)),
-    ]);
+  // Retry logic — try primary model, then fallback
+  const models = [MODEL, 'minimax-m3-free', 'mimo-v2.5-free'];
 
-    // Workers AI returns { response: "..." } for chat models
-    const reply = (aiResponse?.response || aiResponse?.text || '').trim().slice(0, 800);
+  for (let i = 0; i < models.length; i++) {
+    try {
+      const model = i === 0 ? MODEL : models[i];
+      const messagesToSend = i === 0 ? messages : [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content: userMessage },
+      ];
 
-    if (!reply) {
+      const reply = await callOpenCodeZen(messagesToSend, env.OPENCODE_ZEN_API_KEY);
+
       return json({
-        success: false,
-        error: 'EMPTY_AI_RESPONSE',
-        message: 'ขอโทษค่ะ ดารายังไม่ได้รับพลังงานจากดวงดาว ลองถามใหม่อีกครั้งนะคะ',
-      }, 502);
+        success: true,
+        reply,
+        model: model,
+        provider: 'opencode-zen',
+      });
+    } catch (err) {
+      // If this was the last model, return error
+      if (i === models.length - 1) {
+        const isTimeout = err.message.includes('timeout') || err.name === 'TimeoutError';
+        return json({
+          success: false,
+          error: isTimeout ? 'API_TIMEOUT' : 'API_ERROR',
+          message: isTimeout
+            ? 'ดารากำลังรับพลังงานจากจักรวาล ใช้เวลานานเกินไป ลองใหม่นะคะ'
+            : 'ขอโทษค่ะ ระบบขัดข้องชั่วคราว',
+          detail: err.message?.slice(0, 200),
+        }, isTimeout ? 504 : 502);
+      }
+      // Otherwise, try next model
+      continue;
     }
-
-    return json({
-      success: true,
-      reply,
-      model: MODEL,
-      usage: aiResponse.usage || null,
-    });
-  } catch (err) {
-    const isTimeout = err.message === 'AI_TIMEOUT';
-    return json({
-      success: false,
-      error: isTimeout ? 'AI_TIMEOUT' : 'AI_ERROR',
-      message: isTimeout
-        ? 'ดารากำลังรับพลังงานจากจักรวาล ใช้เวลานานเกินไป ลองใหม่นะคะ'
-        : 'ขอโทษค่ะ ระบบขัดข้องชั่วคราว',
-      detail: err.message,
-    }, isTimeout ? 504 : 502);
   }
 }
 
@@ -122,12 +158,13 @@ export function chatInfo() {
     success: true,
     service: 'starvia-chat-concierge',
     model: MODEL,
-    provider: 'cloudflare-workers-ai',
+    provider: 'opencode-zen',
     status: 'active',
     features: {
       max_input_length: 500,
       max_output_chars: 800,
       response_style: 'thai-only, cosmic, 1-2 sentences',
+      models: [MODEL, 'minimax-m3-free', 'mimo-v2.5-free'],
     },
   });
 }
