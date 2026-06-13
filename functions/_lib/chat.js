@@ -116,6 +116,7 @@ export async function handleChat(context) {
   ];
 
   // Retry logic — try primary (paid) first, then free tier fallbacks
+  // Includes backoff delay for rate limit errors (429)
   const allModels = [MODEL, ...FALLBACK_MODELS];
 
   for (let i = 0; i < allModels.length; i++) {
@@ -137,19 +138,27 @@ export async function handleChat(context) {
         tier: i === 0 ? 'paid' : 'free',
       });
     } catch (err) {
+      const isRateLimit = err.message.includes('429') || err.message.includes('Rate limit');
+      const isTimeout = err.message.includes('timeout') || err.name === 'TimeoutError';
+
       // If this was the last model, return error
       if (i === allModels.length - 1) {
-        const isTimeout = err.message.includes('timeout') || err.name === 'TimeoutError';
         return json({
           success: false,
-          error: isTimeout ? 'API_TIMEOUT' : 'API_ERROR',
-          message: isTimeout
-            ? 'ดารากำลังรับพลังงานจากจักรวาล ใช้เวลานานเกินไป ลองใหม่นะคะ'
-            : 'ขอโทษค่ะ ระบบขัดข้องชั่วคราว',
+          error: isRateLimit ? 'RATE_LIMIT' : (isTimeout ? 'API_TIMEOUT' : 'API_ERROR'),
+          message: isRateLimit
+            ? 'ดาราขอพักรับพลังงานสักครู่ค่ะ ลองใหม่ใน 1-2 นาทีนะคะ'
+            : isTimeout
+              ? 'ดารากำลังรับพลังงานจากจักรวาล ใช้เวลานานเกินไป ลองใหม่นะคะ'
+              : 'ขอโทษค่ะ ระบบขัดข้องชั่วคราว',
           detail: err.message?.slice(0, 200),
-        }, isTimeout ? 504 : 502);
+        }, isRateLimit ? 429 : (isTimeout ? 504 : 502));
       }
-      // Otherwise, try next model
+
+      // For rate limit errors, wait a bit before trying next model
+      if (isRateLimit) {
+        await new Promise((r) => setTimeout(r, 1000 * (i + 1))); // 1s, 2s, 3s
+      }
       continue;
     }
   }
