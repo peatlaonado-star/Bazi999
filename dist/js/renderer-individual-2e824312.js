@@ -1059,12 +1059,16 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + '</div>';
 
   if (typeof initCollapsibleSections === 'function') initCollapsibleSections();
-  // Staggered card animation — cards fade in one by one
+  // ✨ Scroll-triggered reveal — all report cards float up when scrolled into view
   (function(){
     var cards = wrap.querySelectorAll(':scope > .card, :scope > .mc, :scope > .blueprint-card, :scope > .detail-tabs-card, :scope > .collapsible-section, :scope > .life-graph-card');
     for(var ci = 0; ci < cards.length; ci++){
-      cards[ci].classList.add('stagger-card');
-      cards[ci].style.setProperty('--i', ci);
+      cards[ci].classList.add('reveal');
+      cards[ci].style.transitionDelay = (ci * 0.06) + 's';
+    }
+    // Re-observe new elements with IntersectionObserver
+    if(typeof window._revealObserver !== 'undefined') {
+      cards.forEach(function(el){ window._revealObserver.observe(el); });
     }
   })();
   // Load lottery results after report renders

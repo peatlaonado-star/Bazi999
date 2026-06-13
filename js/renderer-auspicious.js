@@ -240,12 +240,16 @@ function renderAusp(nm,p,pw,u){
     + routineHtml
     + mantraHtml
     + '<div class="rbt"><button class="rbtn" data-action="reset-mode" data-mode="2">' + u.r2 + '</button></div>';
-  // Staggered card animation
+  // ✨ Scroll-triggered reveal — all report cards float up when scrolled into view
   (function(){
     var cards = wrap.querySelectorAll(':scope > .card, :scope > .mc, :scope > .collapsible-section');
     for(var ci = 0; ci < cards.length; ci++){
-      cards[ci].classList.add('stagger-card');
-      cards[ci].style.setProperty('--i', ci);
+      cards[ci].classList.add('reveal');
+      cards[ci].style.transitionDelay = (ci * 0.06) + 's';
+    }
+    // Re-observe new elements with IntersectionObserver
+    if(typeof window._revealObserver !== 'undefined') {
+      cards.forEach(function(el){ window._revealObserver.observe(el); });
     }
   })();
 }

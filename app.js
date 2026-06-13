@@ -779,5 +779,7 @@ if(document.readyState === 'loading'){
       }
     }
   }, { threshold: 0.12 });
+  // Expose observer globally so report renderers can add new elements
+  window._revealObserver = obs;
   document.querySelectorAll('.reveal').forEach(function(el){ obs.observe(el); });
 })();

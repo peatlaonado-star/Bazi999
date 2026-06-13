@@ -347,12 +347,16 @@ function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2,dateA,dateB
     +'<div class="mc-t">"'+u.cv2+'"</div></div>'
     +'<div class="rbt"><button class="rbtn" data-action="reset-mode" data-mode="1">'+u.r1+'</button></div>'
   );
-  // Staggered card animation
+  // ✨ Scroll-triggered reveal — all report cards float up when scrolled into view
   (function(){
     var cards = wrap.querySelectorAll(':scope > .card, :scope > .mc, :scope > .love-destiny-card, :scope > .collapsible-section');
     for(var ci = 0; ci < cards.length; ci++){
-      cards[ci].classList.add('stagger-card');
-      cards[ci].style.setProperty('--i', ci);
+      cards[ci].classList.add('reveal');
+      cards[ci].style.transitionDelay = (ci * 0.06) + 's';
+    }
+    // Re-observe new elements with IntersectionObserver
+    if(typeof window._revealObserver !== 'undefined') {
+      cards.forEach(function(el){ window._revealObserver.observe(el); });
     }
   })();
 }
