@@ -1924,14 +1924,15 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   padding: 5px 12px;
   border-radius: 8px;
   margin-top: 10px;
-  opacity: 0;
-  transform: translateY(4px);
+  opacity: .7;
+  transform: translateY(0);
   transition: all .25s ease;
   letter-spacing: .02em;
 }
 .collapsible-section.collapsed .section-toggle:hover .section-toggle-cta {
   opacity: 1;
-  transform: translateY(0);
+  background: rgba(214,173,69,.16);
+  border-color: rgba(214,173,69,.35);
 }
 .collapsible-section.collapsed .section-body {
   max-height: 0 !important;
