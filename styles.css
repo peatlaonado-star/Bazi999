@@ -1077,6 +1077,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .bp-axis-symbol.rasi-symbol .rasi-icon {
   width: 52px;
   height: 52px;
+  display: block;
 }
 
 .bp-axis-grid {
@@ -3455,6 +3456,12 @@ background: linear-gradient(135deg, #1a1a2e, #16213e);
   margin: 4px 0 6px;
   text-shadow: 0 0 15px currentColor;
   animation: bpSymbolPulse 3s ease-in-out infinite;
+}
+/* Override for SVG rasi icons — don't apply text effects to img */
+.bp-axis-symbol.rasi-symbol {
+  font-size: 0 !important;
+  text-shadow: none !important;
+  animation: none !important;
 }
 @keyframes bpSymbolPulse {
   0%, 100% { opacity: 0.8; transform: scale(1); }
