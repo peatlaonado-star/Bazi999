@@ -163,33 +163,35 @@ describe('List PINs', () => {
 });
 
 describe('Expire PIN', () => {
-  it('expires an unused PIN by note', () => {
+  it('expires an unused PIN by pin code', () => {
     const storeFile = tempStorePath();
     const config = makeConfig({ pinStoreFile: storeFile });
-    issuePins({ count: 1, note: 'EXPIRE-ME' }, config);
-    const result = expirePin({ note: 'EXPIRE-ME' }, config);
+    const issued = issuePins({ count: 1, note: 'EXPIRE-ME' }, config);
+    const pinCode = issued.body.issued[0].pin;
+    const result = expirePin({ pin: pinCode }, config);
     expect(result.status).toBe(200);
-    expect(result.body.expired).toBe('EXPIRE-ME');
+    expect(result.body.expired).toBe(pinCode.toUpperCase());
     // Should now show as expired
     const list = listPins({ status: 'expired' }, config);
     expect(list.body.pins).toHaveLength(1);
   });
 
-  it('returns 404 for unknown note', () => {
+  it('returns 404 for unknown pin', () => {
     const config = makeConfig({ pinStoreFile: tempStorePath() });
-    const result = expirePin({ note: 'NONEXISTENT' }, config);
+    const result = expirePin({ pin: 'STAR-NONEXST' }, config);
     expect(result.status).toBe(404);
   });
 });
 
 describe('Delete PIN', () => {
-  it('deletes an unused PIN by note', () => {
+  it('deletes an unused PIN by pin code', () => {
     const storeFile = tempStorePath();
     const config = makeConfig({ pinStoreFile: storeFile });
-    issuePins({ count: 1, note: 'DELETE-ME' }, config);
-    const result = deletePin({ note: 'DELETE-ME' }, config);
+    const issued = issuePins({ count: 1, note: 'DELETE-ME' }, config);
+    const pinCode = issued.body.issued[0].pin;
+    const result = deletePin({ pin: pinCode }, config);
     expect(result.status).toBe(200);
-    expect(result.body.deleted).toBe('DELETE-ME');
+    expect(result.body.deleted).toBe(pinCode.toUpperCase());
     const list = listPins({}, config);
     expect(list.body.pins).toHaveLength(0);
   });
