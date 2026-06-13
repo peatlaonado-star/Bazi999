@@ -15,6 +15,7 @@ const jsFiles = [
   'js/life-graph.js',
   'js/renderer-shared.js',
   'js/streak-tracker.js',
+  'js/cosmic-events.js',
   'js/renderer-individual.js',
   'js/renderer-couple.js',
   'js/renderer-auspicious.js',
