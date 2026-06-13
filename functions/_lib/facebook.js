@@ -36,8 +36,8 @@ export async function facebookHealth(context) {
 
   try {
     const { token, pageId } = getConfig(env);
-    // Use /me endpoint to verify token. Page ID is in env, not the URL.
-    const url = `${GRAPH_BASE}/me?fields=id,name,access_token&access_token=${encodeURIComponent(token)}`;
+    // Use /me endpoint to verify token. Returns id (which is the page ID for page tokens).
+    const url = `${GRAPH_BASE}/me?fields=id,name&access_token=${encodeURIComponent(token)}`;
     const resp = await fetch(url);
     const data = await resp.json();
 
@@ -59,9 +59,6 @@ export async function facebookHealth(context) {
         configuredPageId: pageId,
         idsMatch: data.id === pageId,
       },
-      tokenInfo: data.access_token
-        ? { present: true, snippet: data.access_token.slice(0, 8) + '…' }
-        : { present: false },
     });
   } catch (err) {
     return errorResponse(500, 'CONFIG_ERROR', err.message);
