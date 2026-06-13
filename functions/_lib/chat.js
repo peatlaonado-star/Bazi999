@@ -2,12 +2,12 @@
 // Uses OpenCode Zen API (paid models) — replaces Cloudflare Workers AI
 // Migration: 2026-06-13 from Workers AI (Llama 3.1 8B)
 //
-// Uses PAID models (no rate limit) for production reliability
+// Uses FREE models — no rate limit resets every 24h, but free!
 // API: https://opencode.ai/zen/v1/chat/completions (OpenAI-compatible)
 
-// Primary: deepseek-v4-flash (cheap + fast, ~$0.20/M)
-// Fallback: qwen3.6-plus → minimax-m2.7 → kimi-k2.6
-const MODELS = ['deepseek-v4-flash', 'qwen3.6-plus', 'minimax-m2.7', 'kimi-k2.6'];
+// Primary: deepseek-v4-flash-free (free tier)
+// Fallback: minimax-m3-free, mimo-v2.5-free, qwen3.6-plus-free
+const MODELS = ['deepseek-v4-flash-free', 'minimax-m3-free', 'mimo-v2.5-free', 'qwen3.6-plus-free'];
 const API_BASE = 'https://opencode.ai/zen/v1';
 
 const SYSTEM_PROMPT = `You are "Dara" (ดารา), a Thai astrology consultant for Starvia — a premium Thai astrology service that reveals personality, love, work, and life blueprint from birth date using traditional Thai cosmology (นพเคราะห์, ทักษาปกรณ์, ลัคนา, ราศีจักร).
