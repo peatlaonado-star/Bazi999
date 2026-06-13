@@ -68,29 +68,49 @@ var CosmicEvents = (function() {
       return;
     }
 
-    var banner = createBannerElement(event.emoji, event.title, event.subtitle, event.cta);
+    var banner = createBannerElement(event.emoji, event.title, event.subtitle, event.cta, false, event.zodiac);
     insertBanner(banner);
   }
 
   function renderNextUpcoming() {
     var next = getNextEvent();
     if (!next) return;
-
     var banner = createBannerElement(
       next.emoji,
       'Coming Soon: ' + next.title,
       next.subtitle,
       null,
-      true  // subtle mode
+      true,  // subtle mode
+      next.zodiac
     );
     insertBanner(banner);
   }
 
-  function createBannerElement(emoji, title, subtitle, cta, subtle) {
+  // ─── Zodiac SVG Icon Helper ──────────────────────────────────
+  // Map Thai zodiac names to index (matching RASI_EN_NAMES in reading-helpers.js)
+  var ZODIAC_TH_TO_IDX = {
+    'เมษ': 0, 'พฤษภ': 1, 'มิถุน': 2, 'กรกฎ': 3,
+    'สิงห์': 4, 'กันย์': 5, 'ตุล': 6, 'ตุลย์': 6,
+    'พิจิก': 7, 'ธนู': 8, 'มกร': 9, 'กุมภ์': 10, 'มีน': 11
+  };
+  var ZODIAC_EN = ['aries','taurus','gemini','cancer','leo','virgo','libra','scorpio','sagittarius','capricorn','aquarius','pisces'];
+
+  /** Get SVG icon HTML for a zodiac sign */
+  function zodiacIconHtml(thaiName, size) {
+    var idx = ZODIAC_TH_TO_IDX[thaiName];
+    if (idx === undefined) return '';
+    size = size || 24;
+    var num = String(idx + 1).padStart(2, '0');
+    return '<img class="ceb-zodiac-icon" src="assets/zodiac/' + num + '-' + ZODIAC_EN[idx] + '.svg" width="' + size + '" height="' + size + '" alt="ราศี' + thaiName + '">';
+  }
+
+  function createBannerElement(emoji, title, subtitle, cta, subtle, zodiacName) {
     var div = document.createElement('div');
     div.className = 'cosmic-event-banner' + (subtle ? ' is-upcoming' : '');
 
-    var inner = '<span class="ceb-emoji">' + emoji + '</span>';
+    // Use SVG zodiac icon if zodiac name provided, otherwise use emoji
+    var iconHtml = zodiacName ? zodiacIconHtml(zodiacName, 28) : '<span class="ceb-emoji">' + emoji + '</span>';
+    var inner = iconHtml;
     inner += '<span class="ceb-text">';
     inner += '<span class="ceb-title">' + escapeHTML(title) + '</span>';
     if (subtitle) {

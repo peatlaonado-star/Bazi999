@@ -4600,6 +4600,12 @@ body.has-report .value-section{display:none}
   line-height: 1;
   flex-shrink: 0;
 }
+.cosmic-event-banner .ceb-zodiac-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 4px rgba(214,173,69,.4));
+}
 .cosmic-event-banner .ceb-text {
   display: flex;
   flex-direction: column;
