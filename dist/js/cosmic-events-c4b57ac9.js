@@ -7,7 +7,7 @@
  * Architecture:
  * - Pre-computed notable events for 2026–2027 (new/full moons, solstices, retrogrades)
  * - On DOMContentLoaded: check today's event → render banner if any
- * - Banner updates dynamically at midnight
+ * - Banner auto-refreshes at midnight (only re-renders if event changed)
  */
 
 var CosmicEvents = (function() {
@@ -168,13 +168,58 @@ var CosmicEvents = (function() {
       .replace(/'/g, '&#39;');
   }
 
+  // ─── Midnight Auto-Update ──────────────────────────────────────
+
+  var _currentEventKey = null;  // track displayed event to avoid no-op re-renders
+
+  /** Remove existing banner element from DOM */
+  function removeBanner() {
+    var old = document.querySelector('.cosmic-event-banner');
+    if (old) old.parentNode.removeChild(old);
+  }
+
+  /** ms until next local midnight */
+  function msUntilMidnight() {
+    var now = new Date();
+    var midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
+    return midnight - now;
+  }
+
+  /** Check if event changed since last render; if so, re-render banner */
+  function midnightCheck() {
+    var ev = getCurrentEvent();
+    var key = ev ? ev.start + '|' + ev.end : 'none';
+    if (key !== _currentEventKey) {
+      removeBanner();
+      renderBanner();
+    }
+    scheduleMidnight();  // re-schedule for next midnight
+  }
+
+  /** Schedule next midnight refresh */
+  function scheduleMidnight() {
+    setTimeout(midnightCheck, msUntilMidnight() + 500);  // +500ms buffer
+  }
+
   // ─── Init ──────────────────────────────────────────────────────
 
   function init() {
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', renderBanner);
+      document.addEventListener('DOMContentLoaded', function() {
+        renderBanner();
+        _currentEventKey = (function() {
+          var ev = getCurrentEvent();
+          return ev ? ev.start + '|' + ev.end : 'none';
+        })();
+        scheduleMidnight();
+      });
     } else {
       renderBanner();
+      _currentEventKey = (function() {
+        var ev = getCurrentEvent();
+        return ev ? ev.start + '|' + ev.end : 'none';
+      })();
+      scheduleMidnight();
     }
   }
 
