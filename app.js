@@ -666,10 +666,39 @@ function bindUIEvents(){
   });
 }
 
+// Click handler for above-fold value cards → scroll to form
+function initValueCardsAbove(){
+  var cards = document.querySelectorAll('.value-card-compact[data-scroll-to]');
+  cards.forEach(function(card){
+    function onClick(e){
+      e.preventDefault();
+      var targetId = card.getAttribute('data-scroll-to');
+      var target = document.getElementById(targetId);
+      if(!target) return;
+      // Switch to correct mode if needed (mode 0 = fc0)
+      if(targetId === 'fc0' || targetId === 'fc1' || targetId === 'fc2'){
+        var modeIdx = ['fc0','fc1','fc2'].indexOf(targetId);
+        if(modeIdx >= 0) switchMode(modeIdx);
+      }
+      // Smooth scroll to form
+      target.scrollIntoView({behavior:'smooth',block:'start'});
+      // Focus first input
+      setTimeout(function(){
+        var firstInput = target.querySelector('input:not([type="hidden"]),select');
+        if(firstInput) firstInput.focus();
+      },500);
+    }
+    card.addEventListener('click', onClick);
+    card.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' || e.key === ' ') onClick(e);
+    });
+  });
+}
+
 if(document.readyState === 'loading'){
-  document.addEventListener('DOMContentLoaded', bindUIEvents);
+  document.addEventListener('DOMContentLoaded', function(){ bindUIEvents(); initValueCardsAbove(); });
 } else {
-  bindUIEvents();
+  bindUIEvents(); initValueCardsAbove();
 }
 
 // ===== Form State Persistence (Quick Win #3) =====
