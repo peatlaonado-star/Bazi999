@@ -14,6 +14,7 @@
     "check:js": "node --check app.js && node --check astrology-core.js && node --check data/thai-astrology-content.js && node --check js/reading-helpers.js && node --check js/renderer-shared.js && node --check js/renderer-individual.js && node --check js/renderer-couple.js && node --check js/renderer-auspicious.js && node --check ui-actions.js && node --check api/premium-service.mjs && node --check api/server.mjs && node --check api/admin-service.mjs && node --check scripts/copy-static-assets.mjs && node --check scripts/issue-premium-pin.mjs"
   },
   "devDependencies": {
+    "astronomy-engine": "^2.1.19",
     "jsdom": "^24.1.3",
     "vite": "^5.4.21",
     "vitest": "^2.1.9"
