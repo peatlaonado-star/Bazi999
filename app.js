@@ -763,3 +763,21 @@ if(document.readyState === 'loading'){
     attach(); restore(); restoreMode();
   }
 })();
+
+// ===== Scroll-Triggered Reveal =====
+(function(){
+  if(!('IntersectionObserver' in window)) {
+    // Fallback: just show everything
+    document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('in-view'); });
+    return;
+  }
+  var obs = new IntersectionObserver(function(entries){
+    for(var i=0;i<entries.length;i++){
+      if(entries[i].isIntersecting){
+        entries[i].target.classList.add('in-view');
+        obs.unobserve(entries[i].target);
+      }
+    }
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(function(el){ obs.observe(el); });
+})();

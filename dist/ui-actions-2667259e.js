@@ -510,10 +510,38 @@ function onPremiumVerified(token) {
 
 // ===== COLLAPSIBLE SECTIONS =====
 function initCollapsibleSections() {
-  document.querySelectorAll('.section-toggle').forEach(function(toggle) {
+  document.querySelectorAll('.collapsible-section').forEach(function(section) {
+    var body = section.querySelector('.section-body');
+    var toggle = section.querySelector('.section-toggle');
+    if (!body || !toggle) return;
+
+    // Measure and set the actual content height
+    function measureHeight() {
+      // Temporarily remove max-height to measure real content
+      body.style.setProperty('--section-h', 'none');
+      var h = body.scrollHeight;
+      body.style.setProperty('--section-h', h + 'px');
+    }
+
+    // Initial measurement (for non-collapsed sections)
+    if (!section.classList.contains('collapsed')) {
+      requestAnimationFrame(measureHeight);
+    }
+
     toggle.addEventListener('click', function() {
-      var section = this.closest('.collapsible-section');
-      if (section) section.classList.toggle('collapsed');
+      var willCollapse = !section.classList.contains('collapsed');
+      if (willCollapse) {
+        // About to collapse: set explicit height first, then animate to 0
+        var h = body.scrollHeight;
+        body.style.setProperty('--section-h', h + 'px');
+        // Force reflow so the browser registers the starting height
+        body.offsetHeight;
+        section.classList.add('collapsed');
+      } else {
+        // About to expand: measure target height, set it, remove collapsed
+        section.classList.remove('collapsed');
+        requestAnimationFrame(measureHeight);
+      }
     });
   });
 }
