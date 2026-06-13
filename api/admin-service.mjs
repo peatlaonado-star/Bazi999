@@ -74,20 +74,31 @@ export function getPinStats(config) {
 export function listPins(query, config) {
   const store = readPinStore(config.pinStoreFile);
   const now = config.now();
-  let pins;
+  let records = store.pins;
+
+  // Text search across PIN and note
+  const q = (query.q || query.search || '').trim().toUpperCase();
+  if (q) {
+    records = records.filter((r) =>
+      (r.pin || '').toUpperCase().includes(q) ||
+      (r.note || '').toUpperCase().includes(q)
+    );
+  }
 
   // Filter raw records by status, then map to public format
   const statusFilter = (query.status || '').toLowerCase();
   if (statusFilter === 'unused') {
-    pins = store.pins.filter((r) => !r.usedAt && (!r.expiresAt || new Date(r.expiresAt).getTime() > now * 1000)).map(makePinPublic);
+    records = records.filter((r) => !r.usedAt && (!r.expiresAt || new Date(r.expiresAt).getTime() > now * 1000));
   } else if (statusFilter === 'used') {
-    pins = store.pins.filter((r) => !!r.usedAt).map(makePinPublic);
+    records = records.filter((r) => !!r.usedAt);
   } else if (statusFilter === 'expired') {
-    pins = store.pins.filter((r) => !r.usedAt && r.expiresAt && new Date(r.expiresAt).getTime() <= now * 1000).map(makePinPublic);
-  } else {
-    pins = store.pins.map(makePinPublic);
+    records = records.filter((r) => !r.usedAt && r.expiresAt && new Date(r.expiresAt).getTime() <= now * 1000);
   }
 
+  // Sort by created desc
+  records.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+  const pins = records.map(makePinPublic);
   return { status: 200, body: { success: true, pins } };
 }
 
@@ -152,29 +163,29 @@ function hashPin(pin) {
 // ── Expire PIN ──
 
 export function expirePin(body, config) {
-  const note = (body.note || '').trim();
-  if (!note) return { status: 400, body: { success: false, error: 'MISSING_NOTE', message: 'ระบุ note ของ PIN ที่ต้องการหมดอายุ' } };
+  const pin = (body.pin || '').trim().toUpperCase();
+  if (!pin) return { status: 400, body: { success: false, error: 'MISSING_PIN', message: 'ระบุ PIN ที่ต้องการหมดอายุ' } };
   const store = readPinStore(config.pinStoreFile);
-  const idx = store.pins.findIndex((r) => r.note === note && !r.usedAt);
+  const idx = store.pins.findIndex((r) => r.pin && r.pin.toUpperCase() === pin && !r.usedAt);
   if (idx === -1) return { status: 404, body: { success: false, error: 'NOT_FOUND', message: 'ไม่พบ PIN ที่ยังไม่ถูกใช้' } };
 
   store.pins[idx] = { ...store.pins[idx], expiresAt: new Date(config.now() * 1000 - 1).toISOString() };
   writePinStore(config.pinStoreFile, store);
-  return { status: 200, body: { success: true, expired: note } };
+  return { status: 200, body: { success: true, expired: pin } };
 }
 
 // ── Delete PIN ──
 
 export function deletePin(body, config) {
-  const note = (body.note || '').trim();
-  if (!note) return { status: 400, body: { success: false, error: 'MISSING_NOTE', message: 'ระบุ note ของ PIN ที่ต้องการลบ' } };
+  const pin = (body.pin || '').trim().toUpperCase();
+  if (!pin) return { status: 400, body: { success: false, error: 'MISSING_PIN', message: 'ระบุ PIN ที่ต้องการลบ' } };
   const store = readPinStore(config.pinStoreFile);
-  const idx = store.pins.findIndex((r) => r.note === note && !r.usedAt);
+  const idx = store.pins.findIndex((r) => r.pin && r.pin.toUpperCase() === pin && !r.usedAt);
   if (idx === -1) return { status: 404, body: { success: false, error: 'NOT_FOUND', message: 'ไม่พบ PIN ที่ยังไม่ถูกใช้' } };
 
   store.pins.splice(idx, 1);
   writePinStore(config.pinStoreFile, store);
-  return { status: 200, body: { success: true, deleted: note } };
+  return { status: 200, body: { success: true, deleted: pin } };
 }
 
 // ── Token Helpers ──
