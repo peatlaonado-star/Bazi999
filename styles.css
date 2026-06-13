@@ -1795,49 +1795,73 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   gap: 8px;
   cursor: pointer;
   user-select: none;
-  padding: 10px 14px;
+  padding: 14px 16px;
   margin-bottom: 0;
-  border-radius: 12px 12px 0 0;
-  background: rgba(201,162,39,0.07);
-  border: 1px solid rgba(201,162,39,0.14);
-  transition: background .25s;
+  border-radius: 14px 14px 0 0;
+  background: linear-gradient(135deg, rgba(142,114,216,.08) 0%, rgba(214,173,69,.12) 100%);
+  border: 1px solid rgba(214,173,69,.18);
+  border-bottom: none;
+  transition: all .25s cubic-bezier(.4,0,.2,1);
+  position: relative;
+  overflow: hidden;
+}
+.section-toggle::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(214,173,69,.06), transparent);
+  opacity: 0;
+  transition: opacity .3s;
 }
 .section-toggle:hover {
-  background: rgba(201,162,39,0.12);
+  background: linear-gradient(135deg, rgba(142,114,216,.14) 0%, rgba(214,173,69,.18) 100%);
+  border-color: rgba(214,173,69,.35);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(214,173,69,.12);
+}
+.section-toggle:hover::before {
+  opacity: 1;
+}
+.section-toggle:active {
+  transform: translateY(0) scale(.99);
 }
 .section-toggle-arrow {
   display: inline-block;
   font-size: 10px;
   color: var(--g);
-  transition: transform .3s;
+  transition: transform .3s cubic-bezier(.4,0,.2,1);
   width: 14px;
   text-align: center;
+  filter: drop-shadow(0 0 4px rgba(214,173,69,.4));
 }
 .collapsible-section.collapsed .section-toggle-arrow {
   transform: rotate(-90deg);
 }
 .section-toggle-label {
   flex: 1;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--g);
   letter-spacing: .04em;
+  text-shadow: 0 0 12px rgba(214,173,69,.25);
 }
 .section-toggle-hint {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--tx2);
   font-weight: 400;
   letter-spacing: .03em;
+  opacity: .8;
 }
 .section-body {
   position: relative;
-  border: 1px solid rgba(201,162,39,0.14);
+  border: 1px solid rgba(214,173,69,.18);
   border-top: none;
-  border-radius: 0 0 12px 12px;
+  border-radius: 0 0 14px 14px;
   overflow: hidden;
   opacity: 1;
   max-height: var(--section-h, 3000px);
-  transition: max-height .35s cubic-bezier(.4,0,.2,1), opacity .25s ease, padding .3s ease, margin .3s ease;
+  transition: max-height .4s cubic-bezier(.4,0,.2,1), opacity .3s ease, padding .3s ease, margin .3s ease;
+  background: linear-gradient(180deg, rgba(37,24,68,.3) 0%, rgba(20,12,40,.5) 100%);
 }
 .collapsible-section.collapsed .section-body {
   max-height: 0 !important;
@@ -1848,7 +1872,17 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   border: none;
 }
 .collapsible-section.collapsed .section-toggle {
-  border-radius: 12px;
+  border-radius: 14px;
+  border-bottom: 1px solid rgba(214,173,69,.18);
+}
+/* Glow animation on expand */
+@keyframes sectionGlow {
+  0% { box-shadow: 0 0 0 rgba(214,173,69,0); }
+  50% { box-shadow: 0 0 20px rgba(214,173,69,.15); }
+  100% { box-shadow: 0 0 0 rgba(214,173,69,0); }
+}
+.collapsible-section:not(.collapsed) .section-toggle {
+  animation: sectionGlow .6s ease-out;
 }
 
 /* ── กำลังวันประจำตัว (Weekday Power Card) ── */
