@@ -3555,26 +3555,7 @@ background: linear-gradient(135deg, #1a1a2e, #16213e);
 .rs-actions{display:flex;gap:8px;flex-wrap:wrap}
 .rs-actions a{flex:1;min-width:120px;text-align:center;padding:8px 10px;border-radius:999px;background:rgba(142,114,216,.12);border:1px solid rgba(142,114,216,.22);color:#DDCEFF;text-decoration:none;font-size:12px;font-weight:700}
 @media(max-width:620px){.rs-grid{grid-template-columns:1fr}.rs-actions a{flex-basis:100%}}
-/* Above-fold compact value cards (always visible, clickable) */
-.value-section-above{margin:18px auto 0;max-width:720px;padding:0 18px;animation:none}
-.value-section-above .value-grid-compact{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.value-section-above .value-card-compact{background:linear-gradient(145deg,rgba(37,24,68,.78),rgba(15,9,38,.82));border:1px solid rgba(214,173,69,.22);border-radius:16px;padding:14px 12px;min-height:unset;box-shadow:0 8px 28px rgba(0,0,0,.22);cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;position:relative;overflow:hidden}
-.value-section-above .value-card-compact:hover,.value-section-above .value-card-compact:focus{transform:translateY(-3px);border-color:rgba(214,173,69,.45);box-shadow:0 14px 38px rgba(0,0,0,.35);outline:none}
-.value-section-above .value-card-compact:active{transform:translateY(-1px) scale(.98)}
-.value-section-above .value-card-compact .value-icon{font-size:28px;display:block;margin-bottom:6px}
-.value-section-above .value-card-compact h3{font-size:15px;margin:0 0 4px;color:var(--tx);line-height:1.2}
-.value-section-above .value-card-compact .value-teaser{font-size:12.5px;color:var(--tx2);line-height:1.4;margin:0}
-.value-section-above .value-card-compact .value-arrow{position:absolute;right:10px;bottom:10px;font-size:18px;color:rgba(214,173,69,.55);transition:transform .2s ease,color .2s ease}
-.value-section-above .value-card-compact:hover .value-arrow,.value-section-above .value-card-compact:focus .value-arrow{transform:translateX(3px);color:rgba(214,173,69,.9)}
-@media(max-width:720px){
-.value-section-above .value-grid-compact{grid-template-columns:repeat(2,1fr);gap:10px}
-.value-section-above .value-card-compact{padding:12px 10px}
-.value-section-above .value-card-compact .value-icon{font-size:24px}
-.value-section-above .value-card-compact h3{font-size:14px}
-.value-section-above .value-card-compact .value-teaser{font-size:12px}
-}
-
-body.has-report .value-section-above{display:block}
+body.has-report .value-section{display:none}
 
 /* ═══ Conversion Teaser System (ระบบชิมก่อนซื้อ) ═══ */
 

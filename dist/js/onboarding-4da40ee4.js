@@ -414,12 +414,12 @@ var Onboarding = (function() {
         try { localStorage.removeItem('onboarding_previewed'); } catch(e) {}
         var pv = document.getElementById('onboarding-overlay');
         if (pv) pv.remove();
-        // Smooth-scroll to the form card so the user lands on input,
+        // Smooth-scroll to the value section so the user lands on context,
         // not the top of the page (which would feel like the overlay is
         // still hovering over the content).
-        var formCard = document.getElementById('fc0');
-        if (formCard && typeof formCard.scrollIntoView === 'function') {
-          formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        var valueSection = document.querySelector('.value-section');
+        if (valueSection && typeof valueSection.scrollIntoView === 'function') {
+          valueSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } else {
           window.scrollTo({ top: 600, behavior: 'smooth' });
         }

@@ -56,31 +56,27 @@ describe('Thai astrology content data', () => {
     expect(html).toContain('รู้จักตัวเองจากวันเกิด');
     expect(html).toContain('ไม่ใช่แค่ดูดวง');
     expect(html).toContain('Premium 199 บาท/เดือน');
-    expect(html).toContain('ตัวตน');
-    expect(html).toContain('ความรัก');
-    expect(html).toContain('งาน/เงิน');
-    expect(html).toContain('ฤกษ์ดี');
-    expect(html).toContain('เริ่มดูดวงฟรี');
+    expect(html).toContain('รู้จักตัวเองลึกกว่าที่เคย');
+    expect(html).toContain('4 มิติที่จะเปลี่ยนมุมมอง');
+    expect(html).toContain('เริ่มจากข้อมูลพื้นฐาน');
     expect(html).toContain('ใช้เวลาไม่ถึง 30 วินาที');
     expect(html).not.toContain('Free + Premium');
   });
 
-  it('shows compact value cards above the fold as a teaser before the form', () => {
+  it('puts the free birth form before long landing sections so users can start in the first viewport', () => {
     const html = fs.readFileSync(path.resolve('index.html'), 'utf8');
-    const valueAboveIndex = html.indexOf('value-section-above');
     const formIndex = html.indexOf('id="fc0"');
     const dailyIndex = html.indexOf('daily-fortune-section');
     const socialIndex = html.indexOf('social-proof-section');
+    const valueIndex = html.indexOf('value-section');
 
-    expect(valueAboveIndex).toBeGreaterThan(-1);
     expect(formIndex).toBeGreaterThan(-1);
     expect(dailyIndex).toBeGreaterThan(-1);
     expect(socialIndex).toBeGreaterThan(-1);
-    // Value cards appear BEFORE the form (above fold teaser)
-    expect(valueAboveIndex).toBeLessThan(formIndex);
-    // Form appears before daily fortune and social proof
+    expect(valueIndex).toBeGreaterThan(-1);
     expect(formIndex).toBeLessThan(dailyIndex);
     expect(formIndex).toBeLessThan(socialIndex);
+    expect(formIndex).toBeLessThan(valueIndex);
   });
 
   it('keeps the landing daily fortune as a compact teaser instead of a full report wall', () => {
