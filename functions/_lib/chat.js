@@ -5,7 +5,8 @@
 // Free tier: deepseek-v4-flash-free (cost: 0)
 // API: https://opencode.ai/zen/v1/chat/completions (OpenAI-compatible)
 
-const MODEL = 'deepseek-v4-flash-free';
+const MODEL = 'deepseek-v4-flash'; // OpenCode Go (paid, higher limits, no rate limit)
+const FALLBACK_MODELS = ['deepseek-v4-flash-free', 'minimax-m3-free', 'mimo-v2.5-free']; // Free tier fallbacks
 const API_BASE = 'https://opencode.ai/zen/v1';
 
 const SYSTEM_PROMPT = `You are "Dara" (ดารา), a Thai astrology consultant for Starvia — a premium Thai astrology service that reveals personality, love, work, and life blueprint from birth date using traditional Thai cosmology (นพเคราะห์, ทักษาปกรณ์, ลัคนา, ราศีจักร).
@@ -43,7 +44,7 @@ function sanitizeInput(text) {
 }
 
 // Call OpenCode Zen API (OpenAI-compatible format)
-async function callOpenCodeZen(messages, apiKey) {
+async function callOpenCodeZen(messages, apiKey, model = MODEL) {
   const response = await fetch(`${API_BASE}/chat/completions`, {
     method: 'POST',
     headers: {
@@ -51,7 +52,7 @@ async function callOpenCodeZen(messages, apiKey) {
       'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: MODEL,
+      model,
       messages,
       max_tokens: 200,        // 100 Thai chars ≈ 200 tokens
       temperature: 0.7,
@@ -114,28 +115,30 @@ export async function handleChat(context) {
     },
   ];
 
-  // Retry logic — try primary model, then fallback
-  const models = [MODEL, 'minimax-m3-free', 'mimo-v2.5-free'];
+  // Retry logic — try primary (paid) first, then free tier fallbacks
+  const allModels = [MODEL, ...FALLBACK_MODELS];
 
-  for (let i = 0; i < models.length; i++) {
+  for (let i = 0; i < allModels.length; i++) {
     try {
-      const model = i === 0 ? MODEL : models[i];
+      const model = allModels[i];
+      // Use full reinforcement prompt only for primary, simpler for fallbacks
       const messagesToSend = i === 0 ? messages : [
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: userMessage },
       ];
 
-      const reply = await callOpenCodeZen(messagesToSend, env.OPENCODE_ZEN_API_KEY);
+      const reply = await callOpenCodeZen(messagesToSend, env.OPENCODE_ZEN_API_KEY, model);
 
       return json({
         success: true,
         reply,
         model: model,
         provider: 'opencode-zen',
+        tier: i === 0 ? 'paid' : 'free',
       });
     } catch (err) {
       // If this was the last model, return error
-      if (i === models.length - 1) {
+      if (i === allModels.length - 1) {
         const isTimeout = err.message.includes('timeout') || err.name === 'TimeoutError';
         return json({
           success: false,
@@ -164,7 +167,7 @@ export function chatInfo() {
       max_input_length: 500,
       max_output_chars: 800,
       response_style: 'thai-only, cosmic, 1-2 sentences',
-      models: [MODEL, 'minimax-m3-free', 'mimo-v2.5-free'],
+      models: [MODEL, ...FALLBACK_MODELS],
     },
   });
 }
