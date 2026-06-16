@@ -30,7 +30,7 @@
 
 <!-- Umami Analytics (Privacy-friendly) -->
 <script defer src="https://cloud.umami.is/script.js" data-website-id="21ed818b-d83b-4d45-a007-34f096db715f"></script>
-  <link rel="stylesheet" crossorigin href="/assets/main-DQXRQBKN.css">
+  <link rel="stylesheet" crossorigin href="/assets/main-nhtOhFuv.css">
 </head>
 <noscript><div style="padding:40px;text-align:center;color:#C9A227;background:#09061c;font-family:sans-serif;"><h2>กรุณาเปิด JavaScript</h2><p>STARVIA ต้องใช้ JavaScript ในการทำงาน</p></div></noscript>
 <body>
@@ -119,8 +119,15 @@
         <div class="df-lucky-section" id="df-lucky-section"></div>
         <!-- Fortune Card of the Day -->
         <div class="df-card-section">
-          <div class="df-card-label">🃏 ไพ่ประจำวัน</div>
-          <div class="df-card-container" id="df-fortune-card"></div>
+          <div class="daily-tarot-section" id="daily-tarot-section">
+            <div class="daily-tarot-date"></div>
+            <div class="daily-tarot-card" onclick="flipDailyTarot()">
+              <div class="daily-tarot-front">🃏</div>
+              <div class="daily-tarot-back"></div>
+            </div>
+            <div class="daily-tarot-meaning" style="display:none"></div>
+            <button class="daily-tarot-share" style="display:none" onclick="shareDailyTarot()">📤 แชร์</button>
+          </div>
         </div>
         <!-- Share & Viral Section -->
         <div class="df-share-section" id="df-share-section"></div>
@@ -365,7 +372,29 @@
       </div>
     </div>
 
-    <!-- Step 2: Card Picker -->
+    <!-- Step 1.5: Spread Type Selection -->
+    <div class="tarot-step" id="tarot-step-spread">
+      <h2>เลือกวิธีทำนาย</h2>
+      <p class="tarot-subtitle">เลือกรูปแบบการเปิดไพ่</p>
+      <div class="tarot-spread-options">
+        <button class="tarot-spread-btn" onclick="selectTarotSpread('single')">
+          <div class="spread-emoji">🃏</div>
+          <div class="spread-name">เปิด 1 ใบ</div>
+          <div class="spread-desc">ทำนายสั้น — ฟรีวันละ 1 ครั้ง</div>
+        </button>
+        <button class="tarot-spread-btn premium" onclick="selectTarotSpread('three')">
+          <div class="spread-emoji">🃏🃏🃏</div>
+          <div class="spread-name">เปิด 3 ใบ</div>
+          <div class="spread-desc">Past / Present / Future — Premium</div>
+          <div class="spread-badge">👑 Premium</div>
+        </button>
+      </div>
+      <div style="text-align: center; margin-top: 12px;">
+        <button class="tarot-btn-secondary" onclick="resetTarot()">← เปลี่ยนหัวข้อ</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Card Picker (Single) -->
     <div class="tarot-step" id="tarot-step-pick">
       <h2>ใช้สัญชาตญาณเลือกไพ่ 1 ใบ</h2>
       <p class="tarot-subtitle">หยิบไพ่ที่ "ดึงดูด" คุณที่สุด — ไม่ต้องคิดมาก</p>
@@ -385,6 +414,17 @@
       </div>
     </div>
 
+    <!-- Step 2.5: Card Picker (3-Card Spread) -->
+    <div class="tarot-step" id="tarot-step-pick3">
+      <h2>ใช้สัญชาตญาณเลือกไพ่ 3 ใบ</h2>
+      <p class="tarot-subtitle">เลือกไพ่ที่ "ดึงดูด" คุณ — ใบแรกคือ อดีต, ใบที่สองคือ ปัจจุบัน, ใบที่สามคือ อนาคต</p>
+      <div class="tarot-picker tarot-picker-3" id="tarot-picker3-cards"></div>
+      <div class="tarot-pick3-counter" id="tarot-pick3-counter">เลือกแล้ว 0 / 3 ใบ</div>
+      <div style="text-align: center; margin-top: 8px;">
+        <button class="tarot-btn-secondary" onclick="goToSpreadStep()">← เปลี่ยนวิธีทำนาย</button>
+      </div>
+    </div>
+
     <!-- Step 4: Daily Limit -->
     <div class="tarot-step" id="tarot-step-limit">
       <div id="tarot-limit-content"></div>
@@ -392,8 +432,8 @@
   </div>
 </div>
 
-<script defer src="js/tarot-32c902b2.js"></script>
-<script defer src="js/tarot-ui-ea3b5aad.js"></script>
+<script defer src="js/tarot-dd884d9d.js"></script>
+<script defer src="js/tarot-ui-a5f1f704.js"></script>
 <script>
 // Version-based cache busting
 (function() {

@@ -1,5 +1,14 @@
 {
-  "pins": [],
+  "pins": [
+    {
+      "pinHash": "b2c3ca10e0614f37142487e22361e287fd44fdd7ea313306bc38f58290896344",
+      "plan": "premium_199",
+      "createdAt": "2026-06-16T22:14:29.891Z",
+      "expiresAt": "2026-07-16T22:14:29.891Z",
+      "usedAt": null,
+      "note": "Admin test PIN"
+    }
+  ],
   "generatedAt": "2026-06-03T20:00:00Z",
   "note": "Local dev store. Production uses Railway env vars."
 }

@@ -734,7 +734,26 @@ function getRemainingFree() {
   return Math.max(0, 1 - getDailyCardCount());
 }
 
+// Get daily card (deterministic per day)
+function getDailyCard(dateStr) {
+  // dateStr = 'YYYY-MM-DD'
+  const parts = dateStr.split('-').map(Number);
+  const seed = parts[0] * 10000 + parts[1] * 100 + parts[2];
+  // Simple hash
+  let h = seed;
+  h = ((h >> 16) ^ h) * 0x45d9f3b;
+  h = ((h >> 16) ^ h) * 0x45d9f3b;
+  h = (h >> 16) ^ h;
+  const idx = Math.abs(h) % 22;
+  const oriIdx = Math.abs(h >> 3) % 2;
+  return {
+    card: TAROT_CARDS[idx],
+    orientation: oriIdx === 0 ? 'up' : 'down',
+    date: dateStr
+  };
+}
+
 // Export for use in other files
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { TAROT_CARDS, TAROT_CATEGORIES, buildShareText, getDailyCardCount, incrementDailyCardCount, canDrawFree, getRemainingFree };
+  module.exports = { TAROT_CARDS, TAROT_CATEGORIES, buildShareText, getDailyCardCount, incrementDailyCardCount, canDrawFree, getRemainingFree, getDailyCard };
 }
