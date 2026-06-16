@@ -739,9 +739,9 @@ function buildLifePeriodsHtml(dayOfWeek) {
     html += '<div class="lp-period">'
       + '<div class="lp-age">' + escapeHTML(p.period || p.age) + '</div>'
       + '<div class="lp-planet">🪐 ' + escapeHTML(p.planet || '') + '</div>'
+      + '<div class="lp-meaning"><strong>พลังเด่น:</strong> ' + escapeHTML(p.meaning || '') + '</div>'
       + '<div class="lp-strength"><strong>จุดเด่น:</strong> ' + escapeHTML(p.strength) + '</div>'
-      + '<div class="lp-weakness"><strong>จุดอ่อน:</strong> ' + escapeHTML(p.weakness) + '</div>'
-      + '<div class="lp-advice"><strong>คำแนะนำ:</strong> ' + escapeHTML(p.advice || '') + '</div>'
+      + '<div class="lp-weakness"><strong>จุดอ่อน/ระวัง:</strong> ' + escapeHTML(p.weakness) + '</div>'
       + '</div>';
   });
   
