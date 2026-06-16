@@ -1049,7 +1049,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + wrapCollapsible("🔮 แนวโน้มชีวิตปีนี้", "5 ด้าน · งาน · เงิน · รัก · สุขภาพ · โชค", buildYearlyTransitHtml(dayOfWeek), true)
     + wrapCollapsible("🌑 ราหูเกตุ — จุดพลิกชีวิต", "ราหูย้าย · เกตุ · วิธีรับมือ", buildRahuKetuHtml(dayOfWeek), true)
     + wrapCollapsible("✨ วิธีเสริมดวงปีนี้ — เสริมพลังตามจังหวะดาว", "สีมงคล · ของมงคล · ทิศมงคล · ดาวส่งผล", buildYearlyEnhancementHtml(dayOfWeek), true)
-    + wrapCollapsible("🪐 กำลังวันประจำเดือนเกิด", "ดาวพระเคราะห์ · พลัง · คำแนะนำ", buildPlanetaryStrengthHtml(birthMonth), true)
+    + wrapCollapsible("🪐 กำลังวันประจำเดือนเกิด — ดาวเจ้าปางของคุณ", "จุดแข็ง · จุดอ่อน · ดาวกำกับ · คำแนะนำ", buildPlanetaryStrengthHtml(birthMonth), true)
     + wrapCollapsible("📋 ตัวตน · ความสัมพันธ์ · การงาน · เงิน", "ดูจุดอ่อนที่ซ่อนอยู่ + วิธีแก้", detailTabsShellHtml, true);
 
   // 6. อ้างอิงและเนื้อหาใน Tabs
@@ -1330,13 +1330,103 @@ function buildPlanetaryStrengthHtml(birthMonth) {
   var monthName = MONTH_NAMES[birthMonth - 1];
   var ps = PLANETARY_STRENGTH[monthName];
   if (!ps) return '';
+
+  var planetColors = {
+    'อาทิตย์': '#FF6B35', 'จันทร์': '#C0C0C0', 'อังคาร': '#E63946',
+    'พุธ': '#2EC4B6', 'ราหู': '#7B2D8E', 'เสาร์': '#1D3557', 'พฤหัส': '#F4A261',
+    'ศุกร์': '#E8A0BF'
+  };
+
+  // แยกดาวหลายดวง (เช่น "เสาร์ + ราหู")
+  var strengthPlanets = (ps.strength || '').split('+').map(function(s){ return s.trim(); });
+  var weaknessPlanets = (ps.weakness || '').split('+').map(function(s){ return s.trim(); });
+
   var html = '<div class="ps-card">';
-  html += '<div class="ps-title">✦ กำลังวันประจำเดือน' + monthName + ' ✦</div>';
-  if (ps.planet) html += '<div class="ps-planet"><strong>ดาว:</strong> 🪐 ' + escapeHTML(ps.planet) + '</div>';
-  if (ps.strength) html += '<div class="ps-strength"><strong>จุดแข็ง:</strong> ' + escapeHTML(ps.strength) + '</div>';
-  if (ps.weakness) html += '<div class="ps-weakness"><strong>จุดอ่อน:</strong> ' + escapeHTML(ps.weakness) + '</div>';
-  if (ps.description) html += '<div class="ps-desc">' + escapeHTML(ps.description) + '</div>';
-  if (ps.advice) html += '<div class="ps-advice"><strong>คำแนะนำ:</strong> ' + escapeHTML(ps.advice) + '</div>';
+
+  // === ส่วนที่ 1: Header ===
+  html += '<div class="ps-header">'
+    + '<div class="ps-title">✦ กำลังวันประจำเดือนเกิด ✦</div>'
+    + '<div class="ps-subtitle">' + escapeHTML(monthName) + ' · ' + escapeHTML(ps.dateRange || '') + ' · ราศี' + escapeHTML(ps.zodiac || '') + '</div>'
+    + '</div>';
+
+  // === ส่วนที่ 2: คำอธิบายความหมาย ===
+  html += '<div class="ps-etymology">'
+    + '<div class="ps-etym-label">📚 "กำลังวัน" คืออะไร?</div>'
+    + '<div class="ps-etym-body">'
+    + '"กำลังวัน" ในโหราศาสตร์ไทยโบราณ หมายถึง <strong>พลังของดาวพระเคราะห์ที่กำกับวันเกิด</strong> '
+    + 'ซึ่งส่งผลต่ออุปนิสัย จุดแข็ง จุดอ่อน และวิธีใช้ชีวิต'
+    + '<br><br>'
+    + 'แต่ละเดือนเกิดมี <strong>ดาวเจ้าปาง</strong> (ดาวที่ทรงพลังที่สุด) '
+    + 'และ <strong>ดาวอ่อน</strong> (ดาวที่ต้องระวัง) — '
+    + 'รู้จุดแข็ง → ใช้เป็นอาวุธ · รู้จุดอ่อน → เตรียมรับมือ'
+    + '<br><br>'
+    + 'ดาวเจ้าปางไม่ใช่แค่ "นิสัย" แต่คือ <em>พลังงานหลักที่ขับเคลื่อนชีวิต</em> — '
+    + 'ยิ่งเข้าใจ ยิ่งใช้ชีวิตได้ตรงจุด'
+    + '</div>'
+    + '</div>';
+
+  // === ส่วนที่ 3: ดาวเจ้าปาง + จุดอ่อน ===
+  html += '<div class="ps-planet-cards">';
+
+  // ดาวเจ้าปาง (จุดแข็ง)
+  for (var i = 0; i < strengthPlanets.length; i++) {
+    var sp = strengthPlanets[i];
+    var spColor = planetColors[sp] || '#7B68EE';
+    html += '<div class="ps-planet-card ps-strength-card" style="border-left-color:' + spColor + '">'
+      + '<div class="ps-planet-icon" style="color:' + spColor + '">🪐</div>'
+      + '<div class="ps-planet-info">'
+      + '<div class="ps-planet-label">จุดแข็ง · ดาวเจ้าปาง</div>'
+      + '<div class="ps-planet-name" style="color:' + spColor + '">' + escapeHTML(sp) + '</div>'
+      + '</div>'
+      + '</div>';
+  }
+
+  // ดาวอ่อน (จุดอ่อน)
+  for (var j = 0; j < weaknessPlanets.length; j++) {
+    var wp = weaknessPlanets[j];
+    var wpColor = planetColors[wp] || '#7B68EE';
+    html += '<div class="ps-planet-card ps-weakness-card" style="border-left-color:' + wpColor + '">'
+      + '<div class="ps-planet-icon" style="color:' + wpColor + '">⚠️</div>'
+      + '<div class="ps-planet-info">'
+      + '<div class="ps-planet-label">จุดอ่อน · ดาวที่ต้องระวัง</div>'
+      + '<div class="ps-planet-name" style="color:' + wpColor + '">' + escapeHTML(wp) + '</div>'
+      + '</div>'
+      + '</div>';
+  }
+
+  html += '</div>';
+
+  // === ส่วนที่ 4: คำอธิบาย + คำแนะนำ ===
+  if (ps.description) {
+    html += '<div class="ps-detail-card">'
+      + '<div class="ps-detail-icon">💎</div>'
+      + '<div class="ps-detail-content">'
+      + '<div class="ps-detail-label">ลักษณะเด่นของคุณ</div>'
+      + '<div class="ps-detail-text">' + escapeHTML(ps.description) + '</div>'
+      + '</div>'
+      + '</div>';
+  }
+
+  if (ps.advice) {
+    html += '<div class="ps-detail-card ps-advice-card">'
+      + '<div class="ps-detail-icon">🧭</div>'
+      + '<div class="ps-detail-content">'
+      + '<div class="ps-detail-label">คำแนะนำจากดาวเจ้าปาง</div>'
+      + '<div class="ps-detail-text">' + escapeHTML(ps.advice) + '</div>'
+      + '</div>'
+      + '</div>';
+  }
+
+  // === ส่วนที่ 5: เชื่อมกลับ ===
+  html += '<div class="ps-connect">'
+    + '<div class="ps-connect-icon">🔗</div>'
+    + '<div class="ps-connect-text">'
+    + '<strong>ดูเพิ่มเติม:</strong> '
+    + '<span class="ps-link" onclick="document.querySelector(\'.collapsible-toggle[data-section=\\\'taksa\'\']\')?.click()">ทักษามหาอุติ — ช่วงชีวิตตามดาว</span> · '
+    + '<span class="ps-link" onclick="document.querySelector(\'.collapsible-toggle[data-section=\\\'domain\'\']\')?.click()">คัมภีร์แก้ดวง 6 ด้าน</span>'
+    + '</div>'
+    + '</div>';
+
   html += '</div>';
   return html;
 }

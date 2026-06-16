@@ -5191,20 +5191,142 @@ body.has-report .value-section{display:none}
 .ps-card {
   padding: 16px;
 }
+.ps-header {
+  text-align: center;
+  margin-bottom: 14px;
+}
 .ps-title {
   text-align: center;
-  font-size: 15px;
+  font-size: 16px;
   color: #C9A227;
-  margin-bottom: 12px;
+  margin-bottom: 4px;
+  font-weight: 700;
 }
-.ps-planet,
-.ps-strength,
-.ps-weakness,
-.ps-desc,
-.ps-advice {
+.ps-subtitle {
+  text-align: center;
+  font-size: 12px;
+  color: var(--tx2);
+  opacity: 0.8;
+}
+
+/* Etymology explanation */
+.ps-etymology {
+  background: linear-gradient(135deg, rgba(29,53,87,0.2), rgba(142,114,216,0.1));
+  border: 1px solid rgba(142,114,216,0.2);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+.ps-etym-label {
   font-size: 13px;
-  line-height: 1.6;
+  font-weight: 700;
+  color: var(--pu);
   margin-bottom: 8px;
+}
+.ps-etym-body {
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--tx2);
+}
+.ps-etym-body strong { color: var(--tx); }
+.ps-etym-body em { color: #C9A227; font-style: normal; }
+
+/* Planet cards */
+.ps-planet-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.ps-planet-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  border-left: 3px solid #7B68EE;
+}
+.ps-strength-card {
+  background: rgba(214,173,69,0.04);
+}
+.ps-weakness-card {
+  background: rgba(230,57,70,0.04);
+}
+.ps-planet-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.ps-planet-label {
+  font-size: 11px;
+  color: var(--tx2);
+  opacity: 0.7;
+  margin-bottom: 2px;
+}
+.ps-planet-name {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Detail cards */
+.ps-detail-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  margin-bottom: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  border-left: 3px solid #C9A227;
+}
+.ps-advice-card {
+  border-left-color: var(--pu);
+}
+.ps-detail-icon {
+  font-size: 18px;
+  margin-top: 2px;
+}
+.ps-detail-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #C9A227;
+  margin-bottom: 4px;
+}
+.ps-detail-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--tx2);
+}
+
+/* Connect links */
+.ps-connect {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 10px 12px;
+  background: rgba(142,114,216,0.08);
+  border-radius: 10px;
+  border: 1px solid rgba(142,114,216,0.15);
+}
+.ps-connect-icon {
+  font-size: 14px;
+  margin-top: 1px;
+}
+.ps-connect-text {
+  font-size: 12px;
+  color: var(--tx2);
+  line-height: 1.6;
+}
+.ps-link {
+  color: var(--pu);
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: rgba(142,114,216,0.3);
+  transition: color 0.2s;
+}
+.ps-link:hover {
+  color: #b8a8d8;
 }
 
 /* ---- 8. Couple Compatibility (cc-*) ---- */
