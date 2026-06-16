@@ -1162,33 +1162,75 @@ function buildRahuKetuHtml(dayOfWeek) {
   var dayName = DAY_NAMES[dayOfWeek] || 'อาทิตย์';
   var rk = RAHU_KETU;
   var html = '<div class="rk-card">';
-  // Rahu section
-  if (rk.rahu && rk.rahu[dayName]) {
-    var rh = rk.rahu[dayName];
-    html += '<div class="rk-section"><div class="rk-subtitle">🌑 ราหู — จุดพลิกชีวิต</div>';
-    html += '<div class="rk-impact"><strong>ผลกระทบ:</strong> ' + escapeHTML(rh.impact) + '</div>';
-    html += '<div class="rk-change"><strong>สิ่งที่เปลี่ยน:</strong> ' + escapeHTML(rh.change) + '</div>';
-    if (rh.advice) html += '<div class="rk-advice"><strong>วิธีรับมือ:</strong> ' + escapeHTML(rh.advice) + '</div>';
+
+  // Intro
+  if (rk.intro) html += '<div class="rk-intro">' + escapeHTML(rk.intro) + '</div>';
+
+  // Current transit
+  if (rk.currentTransit) {
+    var ct = rk.currentTransit;
+    html += '<div class="rk-section rk-current">';
+    html += '<div class="rk-subtitle">🌐 ราหูปัจจุบัน ' + (ct.signEmoji||'') + ' ราศี' + escapeHTML(ct.sign||'') + '</div>';
+    html += '<div class="rk-transit-period">⏱️ ' + escapeHTML(ct.period||'') + '</div>';
+    html += '<div class="rk-transit-meaning">' + escapeHTML(ct.meaning||'') + '</div>';
+    if (ct.affectedDays && ct.affectedDays.length) {
+      html += '<div class="rk-transit-affected">⚠️ คนเกิดวัน<strong>' + ct.affectedDays.join('</strong>, <strong>') + '</strong> โดนหนัก</div>';
+    }
+    if (ct.advice) html += '<div class="rk-advice">💡 ' + escapeHTML(ct.advice) + '</div>';
     html += '</div>';
   }
+
+  // Rahu by sign table
+  if (rk.rahuBySign) {
+    html += '<div class="rk-section">';
+    html += '<div class="rk-subtitle">📊 ราหูอยู่ราศีไหน = คนเกิดวันไหนโดน</div>';
+    html += '<table class="rk-table"><thead><tr><th>ราศี</th><th>โดนหนัก</th><th>เปลี่ยนเรื่อง</th></tr></thead><tbody>';
+    var signs = ['เมษ','พฤษภ','เมถุน','กรกฎ','สิงห์','กันย์','ตุลย์','พิจิก','ธนู','มังกร','กุมภ์','มีน'];
+    signs.forEach(function(s) {
+      var data = rk.rahuBySign[s];
+      if (!data) return;
+      var isCurrent = (rk.currentTransit && rk.currentTransit.sign === s);
+      var rowCls = isCurrent ? 'rk-row-current' : '';
+      html += '<tr class="' + rowCls + '"><td>' + (data.emoji||'') + ' ' + s + (isCurrent ? ' 🔵' : '') + '</td><td>' + escapeHTML(data.affected) + '</td><td>' + escapeHTML(data.topic) + '</td></tr>';
+    });
+    html += '</tbody></table></div>';
+  }
+
+  // Per-birth-day effects
+  if (rk.rahu && rk.rahu[dayName]) {
+    var rh = rk.rahu[dayName];
+    html += '<div class="rk-section">';
+    html += '<div class="rk-subtitle">🌑 ราหูกระทบคนเกิดวัน' + dayName + '</div>';
+    html += '<div class="rk-impact"><strong>ผลกระทบ:</strong> ' + escapeHTML(rh.impact) + '</div>';
+    html += '<div class="rk-change"><strong>สิ่งที่เปลี่ยน:</strong> ' + escapeHTML(rh.change) + '</div>';
+    if (rh.advice) html += '<div class="rk-advice"><strong>💡 วิธีรับมือ:</strong> ' + escapeHTML(rh.advice) + '</div>';
+    html += '</div>';
+  }
+
   // Ketu section
   if (rk.ketu && rk.ketu[dayName]) {
     var kt = rk.ketu[dayName];
-    html += '<div class="rk-section"><div class="rk-subtitle">🌗 เกตุ — จุดปล่อยวาง</div>';
-    html += '<div class="rk-impact"><strong>ผลกระทบ:</strong> ' + escapeHTML(kt.impact) + '</div>';
+    html += '<div class="rk-section">';
+    html += '<div class="rk-subtitle">🌗 เกตุ — จุดปล่อยวางสำหรับคนเกิดวัน' + dayName + '</div>';
+    html += '<div class="rk-impact"><strong>ต้องปล่อย:</strong> ' + escapeHTML(kt.impact) + '</div>';
     html += '<div class="rk-change"><strong>สิ่งที่เปลี่ยน:</strong> ' + escapeHTML(kt.change) + '</div>';
-    if (kt.advice) html += '<div class="rk-advice"><strong>วิธีรับมือ:</strong> ' + escapeHTML(kt.advice) + '</div>';
+    if (kt.advice) html += '<div class="rk-advice"><strong>💡 บทเรียน:</strong> ' + escapeHTML(kt.advice) + '</div>';
     html += '</div>';
   }
+
   // Coping strategies
   if (rk.coping && rk.coping.length) {
-    html += '<div class="rk-section"><div class="rk-subtitle">🧭 วิธีรับมือเมื่อดาวย้าย</div>';
+    html += '<div class="rk-section">';
+    html += '<div class="rk-subtitle">🧭 วิธีรับมือเมื่อดาวย้าย</div>';
     rk.coping.forEach(function(c) {
-      html += '<div class="rk-coping-item"><strong>' + escapeHTML(c.title || c.situation) + '</strong>: ' + escapeHTML(c.action || c.advice) + '</div>';
+      html += '<div class="rk-coping-item"><strong>' + escapeHTML(c.situation) + '</strong>: ' + escapeHTML(c.action) + '</div>';
     });
     html += '</div>';
   }
-  if (rk.wisdom) html += '<div class="rk-wisdom"><blockquote>' + escapeHTML(rk.wisdom) + '</blockquote></div>';
+
+  // Wisdom
+  if (rk.wisdom) html += '<div class="rk-wisdom"><blockquote>✨ ' + escapeHTML(rk.wisdom) + '</blockquote></div>';
+
   html += '</div>';
   return html;
 }
