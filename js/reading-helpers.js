@@ -445,24 +445,84 @@ function buildCoupleCompatibilityHtml(myElement) {
   if (typeof COUPLE_COMPATIBILITY === 'undefined') return '';
   var html = '<div class="cc-card">';
   html += '<div class="cc-title">✦ ตารางความเข้ากันได้ของธาตุ ✦</div>';
+  html += '<div class="cc-subtitle" style="text-align:center;color:var(--tx2);font-size:12px;margin-bottom:12px">แตะเซลล์เพื่อดูรายละเอียด · เซลล์สีทอง = ธาตุของคุณ</div>';
   var elements = ['ไฟ','น้ำ','ลม','ดิน'];
+  var elementEmoji = {'ไฟ':'🔥','น้ำ':'🌊','ลม':'💨','ดิน':'🌍'};
   // Header row
   html += '<table class="cc-table"><thead><tr><th></th>';
-  elements.forEach(function(e) { html += '<th>' + e + '</th>'; });
+  elements.forEach(function(e) { html += '<th>' + (elementEmoji[e]||'') + ' ' + e + '</th>'; });
   html += '</tr></thead><tbody>';
   elements.forEach(function(e1) {
-    html += '<tr><th>' + e1 + '</th>';
+    html += '<tr><th>' + (elementEmoji[e1]||'') + ' ' + e1 + '</th>';
     elements.forEach(function(e2) {
       var key = e1 + '-' + e2;
       var pair = COUPLE_COMPATIBILITY[key];
       var score = pair ? pair.score : '-';
       var isMyPair = (e1 === myElement || e2 === myElement);
       var cls = isMyPair ? 'cc-cell cc-highlight' : 'cc-cell';
-      html += '<td class="' + cls + '" title="' + (pair ? escapeHTML(pair.meaning) : '') + '">' + score + '</td>';
+      var title = pair ? (pair.love || '') + ' · ' + (pair.warning || '') + '\n' + (pair.meaning || '') : '';
+      html += '<td class="' + cls + '" title="' + escapeHTML(title) + '" onclick="showCcDetail(this)" data-pair="' + key + '">' + score + '</td>';
     });
     html += '</tr>';
   });
   html += '</tbody></table>';
+
+  // Detail panel (hidden by default, shown on click)
+  html += '<div id="cc-detail-panel" class="cc-detail" style="display:none">';
+  html += '<div class="cc-detail-title"></div>';
+  html += '<div class="cc-detail-body"></div>';
+  html += '<div class="cc-detail-close" onclick="closeCcDetail()">✕ ปิด</div>';
+  html += '</div>';
+
+  // Show user's element pairs detail below
+  if (myElement) {
+    html += '<div class="cc-my-pairs">';
+    html += '<div class="cc-my-title">✨ ธาตุ ' + (elementEmoji[myElement]||'') + ' ' + myElement + ' เข้ากันกับธาตุไหน?</div>';
+    elements.forEach(function(other) {
+      if (other === myElement) return;
+      var key1 = myElement + '-' + other;
+      var key2 = other + '-' + myElement;
+      var pair = COUPLE_COMPATIBILITY[key1] || COUPLE_COMPATIBILITY[key2];
+      if (!pair) return;
+      var scoreColor = pair.score >= 80 ? '#4CAF50' : pair.score >= 65 ? '#C9A227' : '#FF9800';
+      html += '<div class="cc-pair-row">';
+      html += '<div class="cc-pair-label">' + (elementEmoji[myElement]||'') + ' ' + myElement + ' × ' + (elementEmoji[other]||'') + ' ' + other + '</div>';
+      html += '<div class="cc-pair-score" style="color:' + scoreColor + '">' + pair.score + '/100</div>';
+      html += '<div class="cc-pair-love">' + escapeHTML(pair.love || '') + '</div>';
+      html += '<div class="cc-pair-meaning">' + escapeHTML(pair.meaning || '') + '</div>';
+      if (pair.warning) html += '<div class="cc-pair-warning">⚠️ ' + escapeHTML(pair.warning) + '</div>';
+      html += '<div class="cc-pair-advice">💡 ' + escapeHTML(pair.advice || '') + '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
   html += '</div>';
   return html;
+}
+
+// Click handler for detail popup
+function showCcDetail(td) {
+  var key = td.getAttribute('data-pair');
+  if (!key || typeof COUPLE_COMPATIBILITY === 'undefined') return;
+  var pair = COUPLE_COMPATIBILITY[key];
+  if (!pair) return;
+  var panel = document.getElementById('cc-detail-panel');
+  if (!panel) return;
+  var parts = key.split('-');
+  var emoji1 = {'ไฟ':'🔥','น้ำ':'🌊','ลม':'💨','ดิน':'🌍'};
+  panel.querySelector('.cc-detail-title').innerHTML = (emoji1[parts[0]]||'') + ' ' + parts[0] + ' × ' + (emoji1[parts[1]]||'') + ' ' + parts[1] + ' — คะแนน ' + pair.score + '/100';
+  var body = '';
+  body += '<div class="cc-d-row"><strong>💕 ความรัก:</strong> ' + escapeHTML(pair.love || '-') + '</div>';
+  body += '<div class="cc-d-row"><strong>💼 งาน:</strong> ' + escapeHTML(pair.career || '-') + '</div>';
+  body += '<div class="cc-d-row"><strong>🤝 เพื่อน:</strong> ' + escapeHTML(pair.friendship || '-') + '</div>';
+  if (pair.warning) body += '<div class="cc-d-row cc-d-warn"><strong>⚠️ ระวัง:</strong> ' + escapeHTML(pair.warning) + '</div>';
+  body += '<div class="cc-d-row cc-d-meaning">' + escapeHTML(pair.meaning || '') + '</div>';
+  body += '<div class="cc-d-row cc-d-advice">💡 ' + escapeHTML(pair.advice || '') + '</div>';
+  panel.querySelector('.cc-detail-body').innerHTML = body;
+  panel.style.display = 'block';
+}
+function closeCcDetail() {
+  var panel = document.getElementById('cc-detail-panel');
+  if (panel) panel.style.display = 'none';
 }
