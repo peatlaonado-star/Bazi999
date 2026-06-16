@@ -412,9 +412,7 @@ describe('Free reader conversion reading order', () => {
     const detailSection = findByLabel('อ่านรายละเอียดพื้นฐาน');
     const tabsCard = dom.window.document.querySelector('.detail-tabs-card');
 
-    expect(elementSection).toBeTruthy();
-    expect(elementSection.classList.contains('collapsed')).toBe(true);
-    expect(elementSection.querySelector('.section-body').innerHTML).toContain('element-radar-test');
+    expect(elementSection).toBeUndefined(); // removed per user request
     expect(detailSection).toBeUndefined();
     expect(tabsCard).toBeTruthy();
     expect(tabsCard.textContent).not.toContain('อ่านรายละเอียดพื้นฐาน');
