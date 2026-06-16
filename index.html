@@ -35,8 +35,13 @@
 </head>
 <noscript><div style="padding:40px;text-align:center;color:#C9A227;background:#09061c;font-family:sans-serif;"><h2>กรุณาเปิด JavaScript</h2><p>STARVIA ต้องใช้ JavaScript ในการทำงาน</p></div></noscript>
 <body>
+<div id="aria-live-announcer" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+<style>
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+</style>
+<a href="#main-content" class="skip-link">ข้ามไปยังเนื้อหาหลัก</a>
 <canvas id="cv"></canvas>
-<div class="w">
+<div class="w" id="main-content">
   <div class="hd premium-hero">
     <div class="hd-tag" id="hd-tag" aria-hidden="false">✦ ค้นพบตัวเองผ่านดวงดาว ✦</div>
     <h1 id="hd-ttl">STARVIA</h1>
@@ -275,17 +280,17 @@
   </div>
 
   <!-- STARVIA Footer -->
-  <div style="text-align:center;padding:40px 0 20px;border-top:1px solid rgba(201,162,39,.1);margin-top:30px">
-    <div style="font-family:Georgia,'Times New Roman',serif;font-size:20px;font-weight:700;background:linear-gradient(135deg,#8B6914,#C9A227 50%,#f0d96a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.08em;margin-bottom:6px">STARVIA</div>
-    <div style="font-size:10px;letter-spacing:.35em;color:#5B3FA6;text-transform:uppercase;margin-bottom:10px">ค้นพบดวงดาว เข้าใจตัวเอง</div>
-    <div style="width:60px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,162,39,.4),transparent);margin:0 auto 10px"></div>
-    <div style="font-size:10px;color:#5a4a7a;letter-spacing:.1em;margin-bottom:10px">โหราศาสตร์ไทยโบราณ · นพเคราะห์ · ดวงชะตา</div>
-    <div style="font-size:10px;color:#6f5f91;letter-spacing:.04em">
-      <a href="privacy.html" style="color:#8c7bb3;text-decoration:none">นโยบายความเป็นส่วนตัว</a>
-      <span style="opacity:.45;margin:0 8px">·</span>
-      <a href="terms.html" style="color:#8c7bb3;text-decoration:none">ข้อตกลงการใช้งาน</a>
-    </div>
+<footer role="contentinfo" class="site-footer" style="text-align:center;padding:40px 0 20px;border-top:1px solid rgba(201,162,39,.1);margin-top:30px">
+  <div style="font-family:Georgia,'Times New Roman',serif;font-size:20px;font-weight:700;background:linear-gradient(135deg,#8B6914,#C9A227 50%,#f0d96a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.08em;margin-bottom:6px">STARVIA</div>
+  <div style="font-size:10px;letter-spacing:.35em;color:#5B3FA6;text-transform:uppercase;margin-bottom:10px">ค้นพบดวงดาว เข้าใจตัวเอง</div>
+  <div style="width:60px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,162,39,.4),transparent);margin:0 auto 10px"></div>
+  <div style="font-size:10px;color:#5a4a7a;letter-spacing:.1em;margin-bottom:10px">โหราศาสตร์ไทยโบราณ · นพเคราะห์ · ดวงชะตา</div>
+  <div style="font-size:10px;color:#6f5f91;letter-spacing:.04em">
+    <a href="privacy.html" style="color:#8c7bb3;text-decoration:none">นโยบายความเป็นส่วนตัว</a>
+    <span style="opacity:.45;margin:0 8px">·</span>
+    <a href="terms.html" style="color:#8c7bb3;text-decoration:none">ข้อตกลงการใช้งาน</a>
   </div>
+</footer>
 </div>
 
 
@@ -296,6 +301,7 @@
 <script defer src="js/social-proof.js?v=2.0.2"></script>
 <script defer src="astrology-core.js?v=2.0.2"></script>
 <script defer src="data/premium-config.js?v=2.0.2"></script>
+<script defer src="js/toc-navigation.js?v=2.0.2"></script>
 <script defer src="data/thai-astrology-content.js?v=2.0.3"></script>
 <script defer src="data/zodiac-identities.js?v=2.0.3"></script>
 <script defer src="data/element-practices.js?v=2.0.3"></script>

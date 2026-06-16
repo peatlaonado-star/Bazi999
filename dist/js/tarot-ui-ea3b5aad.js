@@ -15,21 +15,82 @@
     const modal = document.getElementById('tarot-modal');
     if (!modal) return;
     modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
     // Reset to category selection
     showTarotStep('category');
+    // Trap focus inside modal (a11y)
+    trapFocus(modal);
   };
 
   window.closeTarot = function() {
     const modal = document.getElementById('tarot-modal');
     if (!modal) return;
     modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
     // Reset state
     drawnCard = null;
     drawnOrientation = null;
     isAnimating = false;
+    // Release focus trap (a11y)
+    releaseFocus(modal);
   };
+
+  // ============== Focus Trap (a11y) ==============
+  // เมื่อ modal เปิด จะกักโฟกัสไว้ภายใน modal เท่านั้น
+  // รองรับ Shift+Tab และ Tab กลับมาที่จุดเริ่มต้น
+  function trapFocus(modal) {
+    if (!modal) return;
+    const focusableEls = modal.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusableEls.length === 0) return;
+
+    const firstFocusable = focusableEls[0];
+    const lastFocusable = focusableEls[focusableEls.length - 1];
+
+    // Store previously focused element เพื่อคืนโฟกัสเมื่อปิด modal
+    modal._previouslyFocused = document.activeElement;
+
+    // Focus ที่ element แรกใน modal
+    try { firstFocusable.focus(); } catch (_) {}
+
+    // จัดการ keydown: กัก Tab ไม่ให้ออกจาก modal
+    modal._keydownHandler = function(e) {
+      if (e.key !== 'Tab') return;
+      if (e.shiftKey) {
+        if (document.activeElement === firstFocusable) {
+          lastFocusable.focus();
+          e.preventDefault();
+        }
+      } else {
+        if (document.activeElement === lastFocusable) {
+          firstFocusable.focus();
+          e.preventDefault();
+        }
+      }
+    };
+
+    modal.addEventListener('keydown', modal._keydownHandler);
+  }
+
+  // ปลดล็อก focus trap และคืนโฟกัสไปยัง element เดิมก่อน modal เปิด
+  function releaseFocus(modal) {
+    if (!modal) return;
+    if (modal._keydownHandler) {
+      modal.removeEventListener('keydown', modal._keydownHandler);
+      modal._keydownHandler = null;
+    }
+    if (modal._previouslyFocused && typeof modal._previouslyFocused.focus === 'function') {
+      try { modal._previouslyFocused.focus(); } catch (_) {}
+    }
+    modal._previouslyFocused = null;
+  }
+
+  // Expose ให้ไฟล์อื่นเรียกใช้ได้
+  window.trapFocus = trapFocus;
+  window.releaseFocus = releaseFocus;
 
   function showTarotStep(step) {
     document.querySelectorAll('.tarot-step').forEach(el => el.classList.remove('active'));
@@ -231,12 +292,22 @@
     }
   });
 
-  // ============== ESC key ==============
+  // ============== ESC key (a11y) ==============
+  // ปิด modal ที่เปิดอยู่เมื่อกด Escape — รองรับทั้ง class-based และ aria-hidden state
   document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-      const modal = document.getElementById('tarot-modal');
-      if (modal && modal.classList.contains('active')) {
-        closeTarot();
+    if (e.key !== 'Escape') return;
+    // หา modal ที่เปิดอยู่ (รองรับหลายรูปแบบ)
+    const openModal = document.querySelector(
+      '.tarot-modal.open, .tarot-modal[aria-hidden="false"], #tarot-modal.active, #tarot-modal[aria-hidden="false"]'
+    );
+    if (openModal) {
+      // หาปุ่มปิดและ trigger click — ให้ระบบปิดผ่าน close handler ที่มีอยู่
+      const closeBtn = openModal.querySelector('.modal-close, [data-action="close"], .tarot-close');
+      if (closeBtn) {
+        closeBtn.click();
+      } else if (typeof window.closeTarot === 'function') {
+        // Fallback: เรียก closeTarot() ตรงๆ
+        window.closeTarot();
       }
     }
   });

@@ -515,6 +515,11 @@ function initCollapsibleSections() {
     var toggle = section.querySelector('.section-toggle');
     if (!body || !toggle) return;
 
+    // Make sure aria-expanded matches the actual collapsed state on init
+    if (toggle.hasAttribute('aria-expanded')) {
+      toggle.setAttribute('aria-expanded', section.classList.contains('collapsed') ? 'false' : 'true');
+    }
+
     // Measure and set the actual content height
     function measureHeight() {
       // Temporarily remove max-height to measure real content
@@ -528,7 +533,7 @@ function initCollapsibleSections() {
       requestAnimationFrame(measureHeight);
     }
 
-    toggle.addEventListener('click', function() {
+    function activate() {
       var willCollapse = !section.classList.contains('collapsed');
       if (willCollapse) {
         // About to collapse: set explicit height first, then animate to 0
@@ -541,6 +546,24 @@ function initCollapsibleSections() {
         // About to expand: measure target height, set it, remove collapsed
         section.classList.remove('collapsed');
         requestAnimationFrame(measureHeight);
+      }
+      // Sync aria-expanded with new state
+      if (toggle.hasAttribute('aria-expanded')) {
+        toggle.setAttribute('aria-expanded', willCollapse ? 'false' : 'true');
+      }
+      // Announce state change for screen readers
+      if (typeof announce === 'function') {
+        announce(willCollapse ? 'ปิดหัวข้อ' : 'ขยายหัวข้อ');
+      }
+    }
+
+    toggle.addEventListener('click', activate);
+
+    // Keyboard activation: Enter or Space toggles the section
+    toggle.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+        e.preventDefault();
+        activate();
       }
     });
   });

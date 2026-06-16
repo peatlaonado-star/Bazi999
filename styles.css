@@ -5432,3 +5432,108 @@ body.has-report .value-section{display:none}
   transition: background 0.2s;
 }
 .cross-section-link:hover { background: rgba(142,114,216,0.12); }
+
+/* ---- Floating Table of Contents ---- */
+.floating-toc {
+  position: fixed;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: var(--z-nav, 1000);
+  background: var(--surface);
+  border: 1px solid var(--br);
+  border-radius: var(--radius-md, 14px);
+  padding: 8px 4px;
+  backdrop-filter: blur(18px);
+  box-shadow: var(--shadow-md, 0 12px 30px rgba(0,0,0,0.24));
+  min-width: 56px;
+}
+.toc-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 3px;
+  background: rgba(255,255,255,0.05);
+  border-radius: var(--radius-md, 14px) var(--radius-md, 14px) 0 0;
+  overflow: hidden;
+}
+.toc-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--g), var(--g2));
+  width: 0%;
+  transition: width 0.15s ease-out;
+}
+.toc-list {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.toc-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--tx2);
+  transition: background 0.2s ease, color 0.2s ease;
+  min-height: 32px;
+}
+.toc-item:hover {
+  background: var(--g-muted);
+  color: var(--tx);
+}
+.toc-item.active {
+  background: var(--g-muted);
+  color: var(--g);
+  font-weight: 600;
+}
+.toc-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.toc-label {
+  font-size: 11px;
+  white-space: nowrap;
+}
+@media(max-width:1024px) {
+  .floating-toc { display: none; }
+}
+
+/* ── Accessibility: Skip Link & Semantic Footer ── */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--g);
+  color: var(--bg);
+  padding: 8px 16px;
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: 0 0 var(--radius-md, 8px) 0;
+  z-index: 10001;
+  transition: top 0.2s ease;
+}
+.skip-link:focus {
+  top: 0;
+}
+
+.site-footer {
+  text-align: center;
+  padding: 20px;
+  margin-top: 40px;
+  font-size: 12px;
+  color: var(--tx2);
+}
+.site-footer a {
+  color: var(--tx2);
+  text-decoration: none;
+  margin: 0 8px;
+  transition: color 0.2s ease;
+}
+.site-footer a:hover { color: var(--g); }

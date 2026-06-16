@@ -730,20 +730,36 @@ function buildLifeTimeline(kind, p, ageY, ageM){
   return html;
 }
 
+var __collapsibleIdCounter = 0;
 function wrapCollapsible(label, hint, content, startCollapsed) {
   var collapsedClass = startCollapsed ? ' collapsed' : '';
-  return '<div class="collapsible-section' + collapsedClass + '">'
-    + '<div class="section-toggle">'
-    + '<span class="section-toggle-arrow">▼</span>'
+  var sectionId = 'colsec-' + (++__collapsibleIdCounter);
+  var bodyId = sectionId + '-body';
+  var ariaExpanded = startCollapsed ? 'false' : 'true';
+  return '<div class="collapsible-section' + collapsedClass + '" id="' + sectionId + '">'
+    + '<div class="section-toggle" role="button" tabindex="0" aria-expanded="' + ariaExpanded + '" aria-controls="' + bodyId + '">'
+    + '<span class="section-toggle-arrow" aria-hidden="true">▼</span>'
     + '<div class="section-toggle-main">'
     + '<span class="section-toggle-label">' + label + '</span>'
     + '<span class="section-toggle-hint">' + hint + '</span>'
     + '</div>'
-    + '<span class="section-toggle-cta">ดูเพิ่มเติม →</span>'
+    + '<span class="section-toggle-cta" aria-hidden="true">ดูเพิ่มเติม →</span>'
     + '</div>'
-    + '<div class="section-body">' + content + '</div>'
+    + '<div class="section-body" id="' + bodyId + '">' + content + '</div>'
     + '</div>';
 }
+
+// ===== ARIA LIVE ANNOUNCER =====
+// Announce a message to screen readers via the polite live region.
+function announce(message) {
+  var announcer = document.getElementById('aria-live-announcer');
+  if (announcer) {
+    // Clear and set to ensure screen readers pick up changes
+    announcer.textContent = '';
+    setTimeout(function() { announcer.textContent = message; }, 50);
+  }
+}
+window.announce = announce;
 
 function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE){
   // Fallback for tests that don't pass birth data
@@ -1044,6 +1060,20 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + wrapCollapsible("🌑 แนวโน้มชีวิตปีนี้ — ราหูเกตุ + จังหวะดาว", "ราหูย้าย · เกตุ · 5 ด้าน · วิธีรับมือ", buildRahuKetuHtml(dayOfWeek) + buildYearlyTransitHtml(dayOfWeek), true)
     + wrapCollapsible("🪐 กำลังวันประจำเดือนเกิด — ดาวเจ้าปางของคุณ", "จุดแข็ง · จุดอ่อน · ดาวกำกับ · คำแนะนำ", buildPlanetaryStrengthHtml(birthMonth), true)
     + wrapCollapsible("📋 ตัวตน · ความสัมพันธ์ · การงาน · เงิน", "ดูจุดอ่อนที่ซ่อนอยู่ + วิธีแก้", detailTabsShellHtml, true);
+
+  // ✨ Focus management: move keyboard focus to the report after it renders
+  // (helps screen reader and keyboard users know the new content is ready)
+  setTimeout(function() {
+    if (!wrap) return;
+    var firstHeading = wrap.querySelector('h1, h2, .blueprint-card');
+    if (firstHeading) {
+      if (!firstHeading.hasAttribute('tabindex')) {
+        firstHeading.setAttribute('tabindex', '-1');
+      }
+      try { firstHeading.focus({ preventScroll: true }); } catch (e) { firstHeading.focus(); }
+      announce('รายงานดวงชะตาของคุณพร้อมแล้ว');
+    }
+  }, 500);
 
   // 6. อ้างอิงและเนื้อหาใน Tabs
   var refDesc = {

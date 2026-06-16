@@ -90,23 +90,52 @@ function buildTabs(tid,sid,pre,TB,p,u){
   var tt=document.getElementById(tid), ts2=document.getElementById(sid);
   // Icon map for each tab position
   var tabIcons = ['👤', '💞', '💼', '💰'];
+
+  // ★ ARIA: กำหนด role="tablist" + aria-label ให้กับ container
+  if (tt) {
+    tt.setAttribute('role', 'tablist');
+    if (!tt.getAttribute('aria-label')) {
+      tt.setAttribute('aria-label', 'หมวดคำทำนาย');
+    }
+  }
   
   TB.forEach(function(tb,i){
     var btn=document.createElement('button');
     btn.className='tab'+(i===0?' on':'');
     var lockSpan = '<span class="tab-lock">🔒</span>';
     btn.innerHTML = '<span class="tab-icon">' + (tabIcons[i] || '✦') + '</span><span class="tab-text">' + tb.lb + '</span>' + lockSpan;
+
+    // ★ ARIA: แต่ละ tab button ต้องมี role="tab", aria-selected, aria-controls
+    var panelId = pre + i;
+    btn.setAttribute('role', 'tab');
+    btn.setAttribute('aria-selected', (i === 0) ? 'true' : 'false');
+    btn.setAttribute('aria-controls', panelId);
+    // tabindex management: roving tabindex pattern — tab ที่ active เท่านั้นที่ tabbable
+    btn.setAttribute('tabindex', (i === 0) ? '0' : '-1');
+    // ผูก id ของ tab เพื่อให้ panel ใช้ aria-labelledby ชี้กลับมา
+    btn.id = (tid || 'tabs') + '-tab-' + i;
+
     btn.addEventListener('click', function(){
       var nextSec = document.getElementById(pre+i);
       // Smooth tab switching: fade-out old, fade-in new via CSS animation
-      document.querySelectorAll('#'+tid+' .tab').forEach(function(t){t.classList.remove('on');});
+      document.querySelectorAll('#'+tid+' .tab').forEach(function(t){
+        t.classList.remove('on');
+        // อัปเดต aria-selected + tabindex พร้อมกัน
+        t.setAttribute('aria-selected', 'false');
+        t.setAttribute('tabindex', '-1');
+      });
+      // ★ ARIA: อัปเดต aria-hidden บน panel — panel ที่ไม่ active ให้ซ่อนจาก screen reader
       var prevSecs = document.querySelectorAll('#'+sid+' .sec.on');
       for(var pi=0; pi<prevSecs.length; pi++){
         prevSecs[pi].classList.add('tab-exit');
         prevSecs[pi].classList.remove('on');
+        prevSecs[pi].setAttribute('aria-hidden', 'true');
       }
       btn.classList.add('on');
+      btn.setAttribute('aria-selected', 'true');
+      btn.setAttribute('tabindex', '0');
       nextSec.classList.add('on');
+      nextSec.setAttribute('aria-hidden', 'false');
       // Clean up exit class after animation completes
       setTimeout(function(){
         var exits = document.querySelectorAll('#'+sid+' .sec.tab-exit');
@@ -118,6 +147,16 @@ function buildTabs(tid,sid,pre,TB,p,u){
     var sec=document.createElement('div');
     sec.className='sec'+(i===0?' on':'');
     sec.id=pre+i;
+
+    // ★ ARIA: แต่ละ panel ต้องมี role="tabpanel" + aria-labelledby ชี้กลับไปที่ tab
+    sec.setAttribute('role', 'tabpanel');
+    sec.setAttribute('aria-labelledby', (tid || 'tabs') + '-tab-' + i);
+    // tabpanel ที่ไม่ได้ active ให้ hidden เพื่อให้ screen reader ข้าม
+    if (i !== 0) {
+      sec.setAttribute('aria-hidden', 'true');
+    } else {
+      sec.setAttribute('aria-hidden', 'false');
+    }
 
     var isPremiumTab = (i > 0); // แท็บแรก (ตัวตน) = ฟรี, แท็บ 2-4 = Premium
     var isLocked = isPremiumTab && !premiumIsUnlocked();
@@ -166,6 +205,39 @@ function buildTabs(tid,sid,pre,TB,p,u){
 
     ts2.appendChild(sec);
   });
+
+  // ★ ARIA: keyboard navigation สำหรับ tab list (Arrow Left/Right, Home, End)
+  // เป็นไปตาม WAI-ARIA Authoring Practices Guide (tablist pattern)
+  if (tt && TB && TB.length > 0) {
+    tt.addEventListener('keydown', function(e) {
+      // ตรวจสอบ key ที่เกี่ยวข้องเท่านั้น
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft' &&
+          e.key !== 'Home' && e.key !== 'End') {
+        return;
+      }
+      var tabs = Array.prototype.slice.call(tt.querySelectorAll('[role="tab"]'));
+      if (tabs.length === 0) return;
+      var currentIdx = tabs.indexOf(document.activeElement);
+      // ถ้า focus ยังไม่อยู่ที่ tab ใดเลย ให้ถือว่าอยู่ที่ tab แรก
+      if (currentIdx < 0) currentIdx = 0;
+      var targetTab = null;
+      if (e.key === 'ArrowRight') {
+        targetTab = tabs[(currentIdx + 1) % tabs.length];
+      } else if (e.key === 'ArrowLeft') {
+        targetTab = tabs[(currentIdx - 1 + tabs.length) % tabs.length];
+      } else if (e.key === 'Home') {
+        targetTab = tabs[0];
+      } else if (e.key === 'End') {
+        targetTab = tabs[tabs.length - 1];
+      }
+      if (targetTab) {
+        e.preventDefault();
+        targetTab.focus();
+        // Activate the tab — ใช้ click() เพื่อ trigger handler ที่มีอยู่ (เปลี่ยน aria-selected, tabindex, panel)
+        try { targetTab.click(); } catch (_) {}
+      }
+    });
+  }
 }
 
 // ===== เหตุเสริมแกร่งธาตุ (Dharma Gift — ฟรีสำหรับทุกคน) =====

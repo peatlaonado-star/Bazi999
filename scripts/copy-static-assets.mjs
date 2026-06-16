@@ -41,6 +41,7 @@ const jsFiles = [
   'js/ab-testing.js',
   'js/tarot.js',
   'js/tarot-ui.js',
+  'js/toc-navigation.js',
 ];
 
 // Other static files (no hash needed)
