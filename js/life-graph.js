@@ -349,6 +349,7 @@ function buildLifeGraphHtmlV2(graph) {
   }
 
   html += '</div>';
+  html += '</div>';
 
   return html;
 }
