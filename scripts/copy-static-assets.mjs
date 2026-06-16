@@ -38,14 +38,12 @@ const jsFiles = [
   'js/social-proof.js',
   'js/analytics.js',
   'js/ab-testing.js',
-  'js/chat-concierge.js',
   'js/tarot.js',
   'js/tarot-ui.js',
 ];
 
 // Other static files (no hash needed)
 const otherFiles = [
-  'css/chat-concierge.css',
   'css/tarot.css',
   'analytics.html',
   'agent-docs.md',

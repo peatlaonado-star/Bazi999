@@ -1,12 +1,13 @@
 // STARVIA Chat Concierge — "Dara" (ดารา) Thai astrology assistant
-// Uses OpenCode Zen API (deepseek-v4-flash-free) — replaces Cloudflare Workers AI
-// Migration: 2026-06-13 from Workers AI (Llama 3.1 8B)
+// Uses OpenCode Zen API (free tier) — 2 keys for failover
+// Migration: 2026-06-13 from Cloudflare Workers AI
 //
-// Free tier: deepseek-v4-flash-free (cost: 0)
+// Uses FREE models (no rate limit on paid keys but free keys = 24h reset)
+// Supports 2 API keys for failover — if key 1 rate-limits, switch to key 2
 // API: https://opencode.ai/zen/v1/chat/completions (OpenAI-compatible)
 
-const MODEL = 'deepseek-v4-flash'; // OpenCode Go (paid, higher limits, no rate limit)
-const FALLBACK_MODELS = ['deepseek-v4-flash-free', 'minimax-m3-free', 'mimo-v2.5-free']; // Free tier fallbacks
+// 2 free models that work
+const MODELS = ['deepseek-v4-flash-free', 'mimo-v2.5-free'];
 const API_BASE = 'https://opencode.ai/zen/v1';
 
 const SYSTEM_PROMPT = `You are "Dara" (ดารา), a Thai astrology consultant for Starvia — a premium Thai astrology service that reveals personality, love, work, and life blueprint from birth date using traditional Thai cosmology (นพเคราะห์, ทักษาปกรณ์, ลัคนา, ราศีจักร).
@@ -43,8 +44,17 @@ function sanitizeInput(text) {
     .replace(/[\x00-\x08\x0B-\x1F\x7F]/g, '');
 }
 
+// Get all available API keys from env (filter out empty)
+function getApiKeys(env) {
+  const keys = [];
+  if (env.OPENCODE_ZEN_API_KEY) keys.push({ name: 'primary', key: env.OPENCODE_ZEN_API_KEY });
+  if (env.OPENCODE_ZEN_API_KEY_2) keys.push({ name: 'backup', key: env.OPENCODE_ZEN_API_KEY_2 });
+  if (env.OPENCODE_GO_API_KEY) keys.push({ name: 'go', key: env.OPENCODE_GO_API_KEY });
+  return keys;
+}
+
 // Call OpenCode Zen API (OpenAI-compatible format)
-async function callOpenCodeZen(messages, apiKey, model = MODEL) {
+async function callOpenCodeZen(model, messages, apiKey) {
   const response = await fetch(`${API_BASE}/chat/completions`, {
     method: 'POST',
     headers: {
@@ -63,7 +73,9 @@ async function callOpenCodeZen(messages, apiKey, model = MODEL) {
 
   if (!response.ok) {
     const error = await response.text().catch(() => 'Unknown error');
-    throw new Error(`OpenCode API error ${response.status}: ${error}`);
+    const err = new Error(`OpenCode API error ${response.status}: ${error}`);
+    err.status = response.status;
+    throw err;
   }
 
   const data = await response.json();
@@ -85,8 +97,18 @@ async function callOpenCodeZen(messages, apiKey, model = MODEL) {
 export async function handleChat(context) {
   const { request, env } = context;
 
-  // Check API key is configured
-  if (!env.OPENCODE_ZEN_API_KEY) {
+  // Get all available API keys
+  const apiKeys = getApiKeys(env);
+
+  // CHAT DISABLED: feature temporarily offline
+  return json({
+    success: false,
+    error: 'CHAT_DISABLED',
+    message: 'ดาราขอพักฟื้นพลังดาวสักครู่ค่ะ โปรดกลับมาใหม่นะคะ',
+  }, 503);
+
+  // Original code preserved below for re-enable
+  /*
     return json({
       success: false,
       error: 'API_KEY_NOT_CONFIGURED',
@@ -115,68 +137,75 @@ export async function handleChat(context) {
     },
   ];
 
-  // Retry logic — try primary (paid) first, then free tier fallbacks
-  // Includes backoff delay for rate limit errors (429)
-  const allModels = [MODEL, ...FALLBACK_MODELS];
+  // 2-level retry logic:
+  //   Outer loop: try different API keys (if rate limit)
+  //   Inner loop: try different models (if model disabled/error)
+  let lastErr = null;
+  let usedKey = null;
+  let usedModel = null;
 
-  for (let i = 0; i < allModels.length; i++) {
-    try {
-      const model = allModels[i];
-      // Use full reinforcement prompt only for primary, simpler for fallbacks
-      const messagesToSend = i === 0 ? messages : [
-        { role: 'system', content: SYSTEM_PROMPT },
-        { role: 'user', content: userMessage },
-      ];
-
-      const reply = await callOpenCodeZen(messagesToSend, env.OPENCODE_ZEN_API_KEY, model);
-
-      return json({
-        success: true,
-        reply,
-        model: model,
-        provider: 'opencode-zen',
-        tier: i === 0 ? 'paid' : 'free',
-      });
-    } catch (err) {
-      const isRateLimit = err.message.includes('429') || err.message.includes('Rate limit');
-      const isTimeout = err.message.includes('timeout') || err.name === 'TimeoutError';
-
-      // If this was the last model, return error
-      if (i === allModels.length - 1) {
+  for (const { name: keyName, key: apiKey } of apiKeys) {
+    for (const model of MODELS) {
+      try {
+        const reply = await callOpenCodeZen(model, messages, apiKey);
         return json({
-          success: false,
-          error: isRateLimit ? 'RATE_LIMIT' : (isTimeout ? 'API_TIMEOUT' : 'API_ERROR'),
-          message: isRateLimit
-            ? 'ดาราขอพักรับพลังงานสักครู่ค่ะ ลองใหม่ใน 1-2 นาทีนะคะ'
-            : isTimeout
-              ? 'ดารากำลังรับพลังงานจากจักรวาล ใช้เวลานานเกินไป ลองใหม่นะคะ'
-              : 'ขอโทษค่ะ ระบบขัดข้องชั่วคราว',
-          detail: err.message?.slice(0, 200),
-        }, isRateLimit ? 429 : (isTimeout ? 504 : 502));
-      }
+          success: true,
+          reply,
+          model,
+          key: keyName,
+          provider: 'opencode-zen',
+        });
+      } catch (err) {
+        lastErr = err;
+        usedKey = keyName;
+        usedModel = model;
 
-      // For rate limit errors, wait a bit before trying next model
-      if (isRateLimit) {
-        await new Promise((r) => setTimeout(r, 1000 * (i + 1))); // 1s, 2s, 3s
+        // If rate limit (429) → try next KEY (different rate limit pool)
+        // If model error (401/403) → try next MODEL
+        const isRateLimit = err.status === 429;
+        console.log(`[chat] key=${keyName} model=${model} failed: ${err.message?.slice(0, 100)}`);
+
+        if (isRateLimit) {
+          // Break inner loop, try next key
+          break;
+        }
+        // Otherwise try next model
       }
-      continue;
     }
   }
+
+  // All combinations failed
+  const isTimeout = lastErr?.message?.includes('timeout') || lastErr?.name === 'TimeoutError';
+  const isRateLimit = lastErr?.status === 429;
+  return json({
+    success: false,
+    error: isTimeout ? 'API_TIMEOUT' : (isRateLimit ? 'RATE_LIMIT' : 'API_ERROR'),
+    message: isTimeout
+      ? 'ดารากำลังรับพลังงานจากจักรวาล ใช้เวลานานเกินไป ลองใหม่นะคะ'
+      : (isRateLimit
+          ? 'ดาราขอพักรับพลังงานสักครู่ค่ะ ลองใหม่ใน 1-2 นาทีนะคะ'
+          : 'ขอโทษค่ะ ระบบขัดข้องชั่วคราว'),
+    detail: lastErr?.message?.slice(0, 200),
+  }, isTimeout ? 504 : (isRateLimit ? 429 : 502));
+  */
 }
 
 // GET /v1/chat — health/info
-export function chatInfo() {
+export function chatInfo(context) {
+  const apiKeys = context?.env ? getApiKeys(context.env) : [];
   return json({
     success: true,
     service: 'starvia-chat-concierge',
-    model: MODEL,
     provider: 'opencode-zen',
-    status: 'active',
+    status: 'disabled', // Temporarily disabled
+    models: MODELS,
+    primary: MODELS[0],
+    api_keys_configured: apiKeys.length,
     features: {
       max_input_length: 500,
       max_output_chars: 800,
       response_style: 'thai-only, cosmic, 1-2 sentences',
-      models: [MODEL, ...FALLBACK_MODELS],
+      retry_strategy: '2-level fallback (keys × models)',
     },
   });
 }
