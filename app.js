@@ -1,9 +1,17 @@
 
 // Stars
 var cv=document.getElementById('cv'),cx=cv.getContext('2d'),ST=[];
+var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 function iS(){cv.width=innerWidth;cv.height=innerHeight;ST=Array.from({length:80},function(){return{x:Math.random()*cv.width,y:Math.random()*cv.height,r:Math.random()*1.3+.3,a:Math.random(),da:(Math.random()-.5)*.008};});}
 function dS(){cx.clearRect(0,0,cv.width,cv.height);ST.forEach(function(s){s.a=Math.max(.05,Math.min(.88,s.a+s.da));if(s.a<=.05||s.a>=.88)s.da*=-1;cx.beginPath();cx.arc(s.x,s.y,s.r,0,Math.PI*2);cx.fillStyle='rgba(255,255,255,'+s.a+')';cx.fill();});requestAnimationFrame(dS);}
-iS();dS();addEventListener('resize',iS);
+iS();
+if(!prefersReducedMotion){dS();}
+else{
+  // Render a static frame for reduced-motion users
+  cx.clearRect(0,0,cv.width,cv.height);
+  ST.forEach(function(s){s.a=0.5;cx.beginPath();cx.arc(s.x,s.y,s.r,0,Math.PI*2);cx.fillStyle='rgba(255,255,255,'+s.a+')';cx.fill();});
+}
+addEventListener('resize',function(){iS();if(prefersReducedMotion){cx.clearRect(0,0,cv.width,cv.height);ST.forEach(function(s){s.a=0.5;cx.beginPath();cx.arc(s.x,s.y,s.r,0,Math.PI*2);cx.fillStyle='rgba(255,255,255,'+s.a+')';cx.fill();});}});
 
 // Floating hearts for couple mode
 var HEART_SYMBOLS = ['♡', '♥', '✧'];
@@ -621,9 +629,9 @@ function bindUIEvents(){
   });
 
   var actionButtons = [
-    ['btn0', function(){ go0(); }],
-    ['btn1', function(){ go1(); }],
-    ['btn2', function(){ go2(); }]
+    ['btn0', function(){ if(typeof window.validateForm === 'function' && !window.validateForm(0)) return; go0(); }],
+    ['btn1', function(){ if(typeof window.validateForm === 'function' && !window.validateForm(1)) return; go1(); }],
+    ['btn2', function(){ if(typeof window.validateForm === 'function' && !window.validateForm(2)) return; go2(); }]
   ];
   actionButtons.forEach(function(pair){
     var el = byId(pair[0]);
@@ -782,4 +790,67 @@ if(document.readyState === 'loading'){
   // Expose observer globally so report renderers can add new elements
   window._revealObserver = obs;
   document.querySelectorAll('.reveal').forEach(function(el){ obs.observe(el); });
+})();
+
+// ===== Form Validation Feedback =====
+// Adds visual error states to required fields when user clicks submit
+(function(){
+  function clearError(el){
+    el.classList.remove('form-error');
+    var msg = el.parentNode.querySelector('.form-error-msg');
+    if(msg) msg.remove();
+  }
+
+  function showError(el, msg){
+    el.classList.add('form-error');
+    if(!el.parentNode.querySelector('.form-error-msg')){
+      var span = document.createElement('span');
+      span.className = 'form-error-msg';
+      span.textContent = msg;
+      el.parentNode.appendChild(span);
+    }
+  }
+
+  // Attach clear-on-input to all required fields
+  var requiredFields = [
+    {id:'d0',  msg:'กรุณาวันเกิด'},
+    {id:'d1a', msg:'กรุณาวันเกิด'},
+    {id:'d2',  msg:'กรุณาวันเกิด'}
+  ];
+
+  function attachClear(){
+    requiredFields.forEach(function(f){
+      var el = document.getElementById(f.id);
+      if(!el) return;
+      el.addEventListener('input', function(){ clearError(el); });
+      el.addEventListener('change', function(){ clearError(el); });
+    });
+  }
+
+  // Wrap the go functions with validation
+  function validateAndRun(mode){
+    var valid = true;
+    if(mode === 0){
+      var d0 = document.getElementById('d0');
+      if(!d0.value){ showError(d0, 'กรุณาวันเกิด'); valid = false; }
+    }
+    if(mode === 1){
+      var d1a = document.getElementById('d1a');
+      if(!d1a.value){ showError(d1a, 'กรุณาวันเกิด'); valid = false; }
+    }
+    if(mode === 2){
+      var d2 = document.getElementById('d2');
+      if(!d2.value){ showError(d2, 'กรุณาวันเกิด'); valid = false; }
+    }
+    return valid;
+  }
+
+  // Expose validate for go0/go1/go2 to call
+  window.validateForm = validateAndRun;
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', attachClear);
+  } else {
+    attachClear();
+  }
 })();

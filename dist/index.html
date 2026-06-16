@@ -32,6 +32,7 @@
 <script defer src="https://cloud.umami.is/script.js" data-website-id="21ed818b-d83b-4d45-a007-34f096db715f"></script>
   <link rel="stylesheet" crossorigin href="/assets/main-D51dh6L7.css">
 </head>
+<noscript><div style="padding:40px;text-align:center;color:#C9A227;background:#09061c;font-family:sans-serif;"><h2>กรุณาเปิด JavaScript</h2><p>STARVIA ต้องใช้ JavaScript ในการทำงาน</p></div></noscript>
 <body>
 <canvas id="cv"></canvas>
 <div class="w">
@@ -68,13 +69,13 @@
         </div>
       </div>
       <div class="row">
-        <div class="f"><label for="n0">ชื่อ</label><input id="n0" type="text" placeholder="ชื่อของคุณ"></div>
+        <div class="f"><label for="n0">ชื่อ</label><input id="n0" type="text" placeholder="ชื่อของคุณ" aria-required="true"></div>
         <div class="f"><label for="g0">เพศ</label>
-          <select id="g0"><option id="g0m">ชาย</option><option id="g0f">หญิง</option><option id="g0o">ไม่ระบุ</option></select>
+          <select id="g0"><option>ชาย</option><option>หญิง</option><option>ไม่ระบุ</option></select>
         </div>
       </div>
       <div class="row">
-        <div class="f"><label for="d0">วันเกิด (ค.ศ.)</label><input id="d0" type="date"></div>
+        <div class="f"><label for="d0">วันเกิด (ค.ศ.)</label><input id="d0" type="date" aria-required="true"></div>
         <div class="f"><label for="t0">เวลาเกิด <span class="opt-label">(ไม่บังคับ)</span></label><input id="t0" type="time" placeholder="06:00"></div>
       </div>
       <button class="btn" id="btn0" disabled>✦ เปิดดวงชะตา ✦</button>
@@ -218,25 +219,25 @@
       <div id="heart-container" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0;"></div>
       <div class="phd" id="phd1a">✦ บุคคลที่หนึ่ง</div>
       <div class="row">
-        <div class="f"><label for="n1a">ชื่อ</label><input id="n1a" type="text" placeholder="ชื่อคนที่หนึ่ง"></div>
+        <div class="f"><label for="n1a">ชื่อ</label><input id="n1a" type="text" placeholder="ชื่อคนที่หนึ่ง" aria-required="true"></div>
         <div class="f"><label for="g1a">เพศ</label>
-          <select id="g1a"><option id="g1am">ชาย</option><option id="g1af">หญิง</option><option id="g1ao">ไม่ระบุ</option></select>
+          <select id="g1a"><option>ชาย</option><option>หญิง</option><option>ไม่ระบุ</option></select>
         </div>
       </div>
       <div class="row">
-        <div class="f"><label for="d1a">วันเดือนปีเกิด (ค.ศ.)</label><input id="d1a" type="date"></div>
+        <div class="f"><label for="d1a">วันเดือนปีเกิด (ค.ศ.)</label><input id="d1a" type="date" aria-required="true"></div>
         <div class="f"><label for="t1a">เวลาเกิด <span class="opt-label">(ไม่บังคับ)</span></label><input id="t1a" type="time" placeholder="06:00"></div>
       </div>
       <div class="cdiv" id="cdiv1">✦ พบกับ ✦</div>
       <div class="phd" id="phd1b">✦ บุคคลที่สอง</div>
       <div class="row">
-        <div class="f"><label for="n1b">ชื่อ</label><input id="n1b" type="text" placeholder="ชื่อคนที่สอง"></div>
+        <div class="f"><label for="n1b">ชื่อ</label><input id="n1b" type="text" placeholder="ชื่อคนที่สอง" aria-required="true"></div>
         <div class="f"><label for="g1b">เพศ</label>
-          <select id="g1b"><option id="g1bm">ชาย</option><option id="g1bf">หญิง</option><option id="g1bo">ไม่ระบุ</option></select>
+          <select id="g1b"><option>ชาย</option><option>หญิง</option><option>ไม่ระบุ</option></select>
         </div>
       </div>
       <div class="row">
-        <div class="f"><label for="d1b">วันเดือนปีเกิด (ค.ศ.)</label><input id="d1b" type="date"></div>
+        <div class="f"><label for="d1b">วันเดือนปีเกิด (ค.ศ.)</label><input id="d1b" type="date" aria-required="true"></div>
         <div class="f"><label for="t1b">เวลาเกิด <span class="opt-label">(ไม่บังคับ)</span></label><input id="t1b" type="time" placeholder="06:00"></div>
       </div>
       <button class="btn" id="btn1" disabled>💖 เปิดดวงความรัก</button>
@@ -249,12 +250,12 @@
   <div class="mode" id="m2">
     <div class="card" id="fc2">
       <div class="row">
-        <div class="f"><label for="n2">ชื่อ</label><input id="n2" type="text" placeholder="ชื่อของคุณ"></div>
+        <div class="f"><label for="n2">ชื่อ</label><input id="n2" type="text" placeholder="ชื่อของคุณ" aria-required="true"></div>
         <div class="f"><label for="g2">เพศ</label>
-          <select id="g2x"><option id="g2m">ชาย</option><option id="g2f">หญิง</option><option id="g2o">ไม่ระบุ</option></select>
+          <select id="g2"><option>ชาย</option><option>หญิง</option><option>ไม่ระบุ</option></select>
         </div>
       </div>
-        <div class="f"><label for="d2">วันเดือนปีเกิด (ค.ศ.)</label><input id="d2" type="date"></div>
+        <div class="f"><label for="d2">วันเดือนปีเกิด (ค.ศ.)</label><input id="d2" type="date" aria-required="true"></div>
       <button class="btn" id="btn2" disabled>◈ ดูฤกษ์งามยามดี ◈</button>
     </div>
     <div id="r2"></div>
@@ -286,13 +287,6 @@
   </div>
 </div>
 
-<!-- STARVIA CONFIG — ตั้งค่า API URL ก่อนโหลด scripts -->
-<!-- Migration: apiBaseUrl = '' ใช้ same-origin (Pages Functions) -->
-<script>
-  window.STARVIA_CONFIG = {
-    apiBaseUrl: ''
-  };
-</script>
 
 <script defer src="js/daily-fortune-dc588dc4.js"></script>
 <script defer src="data/cosmic-events-generated-a5cfc3b7.js"></script>
@@ -324,7 +318,7 @@
 <script defer src="ui-actions-2667259e.js"></script>
 <script defer src="js/analytics-a4c377e7.js"></script>
 <script defer src="js/ab-testing-243de758.js"></script>
-<script defer src="app-7838ed2f.js"></script>
+<script defer src="app-a3d894a5.js"></script>
 
 <!-- 🎴 Tarot Modal -->
 <div id="tarot-modal" role="dialog" aria-modal="true" aria-labelledby="tarot-title">
@@ -396,7 +390,7 @@
 <script>
 // Version-based cache busting
 (function() {
-  var APP_VERSION = "tab-teaser-v1"; // Update this on each deploy
+  var APP_VERSION = "2.0.2"; // Update this on each deploy
   // Test: post-commit hook + reward preview deploy
   var stored = localStorage.getItem('starvia_version');
   

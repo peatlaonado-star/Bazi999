@@ -45,8 +45,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .brow{display:flex;align-items:center;justify-content:center;gap:8px;max-width:min(100%,560px);width:max-content;margin:0 auto 16px;background:rgba(255,255,255,.04);border:1px solid rgba(201,162,39,.2);border-radius:50px;padding:8px 14px;flex-wrap:wrap;line-height:1.45;text-align:center}
 .tabs-w{overflow-x:auto;padding-bottom:3px;margin-bottom:12px}
 .tabs{display:flex;gap:5px;min-width:max-content}
-.tab{padding:7px 14px;border-radius:50px;border:1px solid rgba(212,175,55,.28);background:rgba(255,255,255,.018);color:#b8a8d8;font-family:"Leelawadee UI","Segoe UI",Tahoma,sans-serif;font-size:12.5px;cursor:pointer;transition:all .25s;white-space:nowrap}
-.tab:hover,.tab:focus{border-color:rgba(201,162,39,.42);color:#e8dfc8;background:rgba(201,162,39,.06);outline:none}.tab.on{background:rgba(201,162,39,.16);border-color:rgba(201,162,39,.58);color:var(--g)}
+
 .sec{display:none;opacity:0;transform:translateY(6px);transition:opacity .25s ease,transform .25s ease}.sec.on{display:block;opacity:1;transform:translateY(0)}
 .st {font-size:12px; letter-spacing:0.12em; color:#d3c7ee; text-transform:uppercase; margin-bottom:12px; display:flex; align-items:center; gap:8px; font-weight:700;}
 .st::after {content:""; flex:1; height:1px; background:linear-gradient(90deg, rgba(201,162,39,0.3), transparent);}
@@ -307,7 +306,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 
 /* Love Blueprint UI */
 .love-blueprint {
-  background: linear-gradient(135deg, rgba(232,160,207,0.05), rgba(91,63,166,0.1));
+  background: linear-gradient(135deg, rgba(232,160,207,0.05), rgba(155,138,184,0.08));
   border-left: 2px solid #E8A0CF;
   border-radius: 0 12px 12px 0;
   padding: 20px;
@@ -773,14 +772,6 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   font-weight: 600;
 }
 
-/* Love Blueprint UI */
-.love-blueprint {
-  background: linear-gradient(135deg, rgba(232,160,207,0.05), rgba(155,138,184,0.08));
-  border-left: 2px solid #E8A0CF;
-  border-radius: 0 12px 12px 0;
-  padding: 20px;
-  margin-top: 10px;
-}
 
 /* Freemium Lock System — Zone-Based (ไม่ใช้ is-locked บน parent อีกต่อไป)
  * ใช้ zone containers: .mlm-domains-locked, .domain-locked-zone, .wfl-locked-zone
@@ -1279,21 +1270,28 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 }
 .detail-tabs-card {
   margin: 16px 0 12px;
-  padding: 14px;
-  border: 1px solid rgba(201,162,39,0.18);
+  padding: 16px 18px;
+  border: 1px solid rgba(201,162,39,.16);
   border-radius: 16px;
-  background: rgba(255,255,255,0.028);
+  background: radial-gradient(ellipse at 50% 0%, rgba(201,162,39,.04), transparent 50%),
+              linear-gradient(180deg, rgba(20,12,40,.5), rgba(10,6,22,.3));
 }
 .detail-tabs-head {
-  margin-bottom: 11px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(201,162,39,0.10);
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(201,162,39,.10);
+}
+.detail-tabs-head > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 .detail-tabs-head span {
   display: block;
   color: var(--g);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
+  letter-spacing: .04em;
   margin-bottom: 3px;
 }
 .detail-tabs-head small {
@@ -2123,36 +2121,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   box-shadow: 0 0 12px rgba(201,162,39,.10);
 }
 
-/* Detail Tabs Card — premium wrapper */
-.detail-tabs-card {
-  margin: 16px 0 12px;
-  padding: 16px 18px;
-  border: 1px solid rgba(201,162,39,.16);
-  border-radius: 16px;
-  background: radial-gradient(ellipse at 50% 0%, rgba(201,162,39,.04), transparent 50%),
-              linear-gradient(180deg, rgba(20,12,40,.5), rgba(10,6,22,.3));
-}
-.detail-tabs-head {
-  margin-bottom: 12px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(201,162,39,.10);
-}
-.detail-tabs-head > div {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.detail-tabs-head span {
-  color: var(--g);
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: .04em;
-}
-.detail-tabs-head small {
-  color: var(--tx2);
-  font-size: 11px;
-  line-height: 1.6;
-}
+
 
 /* Tab Section Card — each content block inside a tab */
 .tab-section-card {
@@ -2274,8 +2243,8 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 
 /* ===== P0: DAILY FORTUNE WIDGET ===== */
 .daily-fortune-section{max-width:640px;margin:0 auto 12px}
-.daily-fortune-card{background:linear-gradient(145deg,rgba(20,10,55,.82),rgba(10,5,30,.72));border:1px solid rgba(201,162,39,.2);border-radius:18px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.02);animation:fu .5s ease both}
-.df-header{display:flex;align-items:center;gap:8px;padding:14px 18px 0}
+.daily-fortune-card{background:linear-gradient(135deg,rgba(201,162,39,0.08),rgba(91,63,166,0.08));border:1px solid rgba(201,162,39,.2);border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.02);animation:fu .8s ease both;position:relative;padding:20px;margin:20px 0}
+.df-header{display:flex;align-items:center;gap:8px;padding:14px 18px 0;text-align:center;margin-bottom:16px}
 .df-emoji{font-size:16px}
 .df-label{font-size:12px;font-weight:700;color:var(--g);letter-spacing:.06em;text-transform:uppercase}
 .df-date{font-size:10px;color:#7a6a9a;margin-left:auto;letter-spacing:.04em}
@@ -2539,17 +2508,6 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .lg-next-pivot{font-size:11px;color:#7a6a9a;letter-spacing:.03em}
 .lg-next-pivot strong{color:var(--g)}
 
-/* ===== DAILY FORTUNE CARD ===== */
-.daily-fortune-card {
-  background: linear-gradient(135deg, rgba(201,162,39,0.08), rgba(91,63,166,0.08));
-  border: 1px solid rgba(201,162,39,0.2);
-  border-radius: 16px;
-  padding: 20px;
-  margin: 20px 0;
-  animation: fu 0.8s ease both;
-  position: relative;
-  overflow: hidden;
-}
 
 .daily-fortune-card::before {
   content: '';
@@ -2561,10 +2519,6 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
   background: linear-gradient(90deg, #C9A227, #5B3FA6, #C9A227);
 }
 
-.df-header {
-  text-align: center;
-  margin-bottom: 16px;
-}
 
 .df-badge {
   display: inline-block;
@@ -2780,13 +2734,19 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .lock-preview-text {
   position: relative;
   z-index: 5;
-  pointer-events: auto;
-  background: linear-gradient(135deg, rgba(201,162,39,.12), rgba(139,108,246,.08));
-  border: 1px solid rgba(201,162,39,.35);
+  pointer-events: none;
+  user-select: none;
+  background: linear-gradient(180deg, rgba(13,8,40,.6), transparent);
+  border-bottom: 1px solid rgba(201,162,39,.1);
   border-radius: 14px;
-  padding: 18px;
+  padding: 14px 18px;
   margin-bottom: 16px;
   text-align: center;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--tx2, #b8a9d4);
+  opacity: .75;
+  font-style: italic;
 }
 .lock-preview-text .teaser-icon {
   font-size: 32px;
@@ -4577,21 +4537,6 @@ body.has-report .value-section{display:none}
 }
 
 
-/* Lock Preview Text — visible teaser above blurred content */
-.lock-preview-text {
-  position: relative;
-  z-index: 5;
-  padding: 14px 18px;
-  font-size: 13px;
-  line-height: 1.7;
-  color: var(--tx2, #b8a9d4);
-  border-bottom: 1px solid rgba(201,162,39,.1);
-  background: linear-gradient(180deg, rgba(13,8,40,.6), transparent);
-  pointer-events: none;
-  user-select: none;
-  opacity: .75;
-  font-style: italic;
-}
 .lock-preview-text::before {
   content: '✦ ';
   color: #C9A227;
@@ -5432,3 +5377,7 @@ body.has-report .value-section{display:none}
 .rk-table th { background: rgba(201,162,37,0.15); padding: 6px 8px; text-align: left; font-size: 11px; }
 .rk-table td { padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 .rk-row-current { background: rgba(201,162,37,0.1); font-weight: bold; }
+
+/* ── Form Validation Feedback ── */
+.form-error { border-color: #E63946 !important; background: rgba(230,57,70,.06) !important; }
+.form-error-msg { color: #E63946; font-size: 11px; margin-top: 4px; display: block; }

@@ -1,9 +1,17 @@
 
 // Stars
 var cv=document.getElementById('cv'),cx=cv.getContext('2d'),ST=[];
+var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 function iS(){cv.width=innerWidth;cv.height=innerHeight;ST=Array.from({length:80},function(){return{x:Math.random()*cv.width,y:Math.random()*cv.height,r:Math.random()*1.3+.3,a:Math.random(),da:(Math.random()-.5)*.008};});}
 function dS(){cx.clearRect(0,0,cv.width,cv.height);ST.forEach(function(s){s.a=Math.max(.05,Math.min(.88,s.a+s.da));if(s.a<=.05||s.a>=.88)s.da*=-1;cx.beginPath();cx.arc(s.x,s.y,s.r,0,Math.PI*2);cx.fillStyle='rgba(255,255,255,'+s.a+')';cx.fill();});requestAnimationFrame(dS);}
-iS();dS();addEventListener('resize',iS);
+iS();
+if(!prefersReducedMotion){dS();}
+else{
+  // Render a static frame for reduced-motion users
+  cx.clearRect(0,0,cv.width,cv.height);
+  ST.forEach(function(s){s.a=0.5;cx.beginPath();cx.arc(s.x,s.y,s.r,0,Math.PI*2);cx.fillStyle='rgba(255,255,255,'+s.a+')';cx.fill();});
+}
+addEventListener('resize',function(){iS();if(prefersReducedMotion){cx.clearRect(0,0,cv.width,cv.height);ST.forEach(function(s){s.a=0.5;cx.beginPath();cx.arc(s.x,s.y,s.r,0,Math.PI*2);cx.fillStyle='rgba(255,255,255,'+s.a+')';cx.fill();});}});
 
 // Floating hearts for couple mode
 var HEART_SYMBOLS = ['♡', '♥', '✧'];
