@@ -1045,7 +1045,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + wrapCollapsible("🔮 ช่วงชีวิตตามทักษามหาอุติ", "7 ช่วงชีวิต · จุดเด่น · จุดอ่อน · คำแนะนำ", buildLifePeriodsHtml(dayOfWeek), true)
     + wrapCollapsible("✦ คัมภีร์แก้ดวง 6 ด้าน ✦", "โชค · การเงิน · สุขภาพ · ความรัก · การงาน · บริวาร", domainHtml, true)
     + wrapCollapsible("💘 ตารางความเข้ากันได้ของธาตุ", "4×4 matrix · ดูว่าธาตุไหนเข้ากัน", buildCoupleCompatibilityHtml(p.el), true)
-    + wrapCollapsible("✦ สัดส่วนและสมดุลธาตุ ✦", "กราฟธาตุ + คำแนะนำเสริมใจ (แตะเพื่อดู)", buildElementRadar(p, r, l), true)
+
     + wrapCollapsible("🔮 แนวโน้มชีวิตปีนี้", "5 ด้าน · งาน · เงิน · รัก · สุขภาพ · โชค", buildYearlyTransitHtml(dayOfWeek), true)
     + wrapCollapsible("🌑 ราหูเกตุ — จุดพลิกชีวิต", "ราหูย้าย · เกตุ · วิธีรับมือ", buildRahuKetuHtml(dayOfWeek), true)
     + wrapCollapsible("✨ วิธีเสริมดวงปีนี้", "เสริมดวง · ของมงคล · ทิศมงคล", buildYearlyEnhancementHtml(dayOfWeek), true)
