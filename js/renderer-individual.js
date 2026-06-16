@@ -817,10 +817,34 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + '<div class="ap-quote">"จุดอ่อนที่ถูกเยียวยา จะกลายเป็นจุดแข็งที่แข็งแกร่งที่สุดของคุณ <span style="font-style:normal">🤍</span>"</div>'
     + '</div>';
 
+  // 7-day practice from ELEMENT_PRACTICES
+  var ep = (typeof ELEMENT_PRACTICES !== 'undefined' && ELEMENT_PRACTICES[p.el]) ? ELEMENT_PRACTICES[p.el] : null;
+  if (ep && ep.dailyPractices) {
+    var practiceRows = ep.dailyPractices.map(function(d, i) {
+      return '<div class="ep-day"><span class="ep-num">' + (i+1) + '</span><div><strong>' + escapeHTML(d.practice) + '</strong><br><span style="color:var(--tx2)">' + escapeHTML(d.focus) + '</span></div></div>';
+    }).join('');
+    wkFull += '<div class="ep-section"><div class="ep-title">✦ แบบฝึกหัด 7 วันสำหรับธาตุ' + p.el + ' ✦</div>' + practiceRows + '</div>';
+  }
+
   // 3. พลังแห่งราศี
-  var rasiHtml = '<div class="rasi-header">' + rasiIconHtml(ri, r.n, 36) + ' <strong class="hl-gold">✦ พลังแห่งราศี' + r.n + ' :</strong></div>'
-    + 'จักรราศีมอบ <span class="hl-purple">"' + (r.trait || 'พลังประจำตัว') + '"</span> ให้เป็นอาวุธประจำตัวของคุณ คุณสมบัติเด่นที่คุณควรดึงออกมาใช้ให้เกิดประโยชน์สูงสุดคือ <strong style="color:var(--tx);">' + (r.apply || 'ความเป็นตัวของตัวเอง') + '</strong><br><br>'
-    + '<span style="font-size:12px; color:var(--tx2);">' + (r.add || '') + '</span>';
+  var zi = (typeof ZODIAC_IDENTITIES !== 'undefined' && ZODIAC_IDENTITIES[r.n]) ? ZODIAC_IDENTITIES[r.n] : null;
+  if (zi) {
+    var replaceRows = (zi.replaceTable || []).map(function(t) {
+      return '<tr><td>' + escapeHTML(t.old) + '</td><td>' + escapeHTML(t.new) + '</td></tr>';
+    }).join('');
+    var rasiHtml = '<div class="rasi-header">' + rasiIconHtml(ri, r.n, 36) + ' <strong class="hl-gold">✦ ' + zi.identity + ' — ' + r.n + '</strong></div>'
+      + '<p style="margin:8px 0">' + escapeHTML(zi.description) + '</p>'
+      + '<div class="zi-section"><strong class="hl-gold">จุดแข็ง:</strong> ' + escapeHTML(zi.strengths) + '</div>'
+      + '<div class="zi-section"><strong class="hl-gold">จุดที่ควรปรับ:</strong> ' + escapeHTML(zi.growthEdge) + '</div>'
+      + (replaceRows ? '<table class="zi-table"><thead><tr><th>พฤติกรรมเดิม</th><th>ลองปรับ</th></tr></thead><tbody>' + replaceRows + '</tbody></table>' : '')
+      + '<blockquote class="zi-wisdom">' + escapeHTML(zi.wisdom) + '</blockquote>'
+      + '<div class="zi-action"><strong class="hl-gold">สิ่งที่ควรทำวันนี้:</strong> ' + escapeHTML(zi.dailyAction) + '</div>';
+  } else {
+    // fallback to old brief version
+    var rasiHtml = '<div class="rasi-header">' + rasiIconHtml(ri, r.n, 36) + ' <strong class="hl-gold">✦ พลังแห่งราศี' + r.n + ' :</strong></div>'
+      + 'จักรราศีมอบ <span class="hl-purple">"' + (r.trait || 'พลังประจำตัว') + '"</span> ให้เป็นอาวุธประจำตัวของคุณ...'
+      + '<span style="font-size:12px; color:var(--tx2);">' + (r.add || '') + '</span>';
+  }
 
   // 4. พลังงานเสริมดวง (Standalone Card)
   var POWER_ELEMENTS = [
@@ -1018,8 +1042,14 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + '<div id=\"lottery-results-section\" style=\"margin-bottom:14px;\"></div>'
     + wrapCollapsible("🔮 หมอทักประจำเดือน", "5 ด้านชีวิต · สัญญาณเตือน · วิธีแก้", monthlyLifeMapHtml, true)
     + lifeGraphSectionHtml
+    + wrapCollapsible("🔮 ช่วงชีวิตตามทักษามหาอุติ", "7 ช่วงชีวิต · จุดเด่น · จุดอ่อน · คำแนะนำ", buildLifePeriodsHtml(dayOfWeek), true)
     + wrapCollapsible("✦ คัมภีร์แก้ดวง 6 ด้าน ✦", "โชค · การเงิน · สุขภาพ · ความรัก · การงาน · บริวาร", domainHtml, true)
+    + wrapCollapsible("💘 ตารางความเข้ากันได้ของธาตุ", "4×4 matrix · ดูว่าธาตุไหนเข้ากัน", buildCoupleCompatibilityHtml(p.el), true)
     + wrapCollapsible("✦ สัดส่วนและสมดุลธาตุ ✦", "กราฟธาตุ + คำแนะนำเสริมใจ (แตะเพื่อดู)", buildElementRadar(p, r, l), true)
+    + wrapCollapsible("🔮 แนวโน้มชีวิตปีนี้", "5 ด้าน · งาน · เงิน · รัก · สุขภาพ · โชค", buildYearlyTransitHtml(dayOfWeek), true)
+    + wrapCollapsible("🌑 ราหูเกตุ — จุดพลิกชีวิต", "ราหูย้าย · เกตุ · วิธีรับมือ", buildRahuKetuHtml(dayOfWeek), true)
+    + wrapCollapsible("✨ วิธีเสริมดวงปีนี้", "เสริมดวง · ของมงคล · ทิศมงคล", buildYearlyEnhancementHtml(dayOfWeek), true)
+    + wrapCollapsible("🪐 กำลังวันประจำเดือนเกิด", "ดาวพระเคราะห์ · พลัง · คำแนะนำ", buildPlanetaryStrengthHtml(birthMonth), true)
     + wrapCollapsible("📋 ตัวตน · ความสัมพันธ์ · การงาน · เงิน", "ดูจุดอ่อนที่ซ่อนอยู่ + วิธีแก้", detailTabsShellHtml, true);
 
   // 6. อ้างอิงและเนื้อหาใน Tabs
@@ -1090,4 +1120,109 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
   if (typeof ShareViral !== 'undefined' && ShareViral.renderPersonalizedShare) {
     ShareViral.renderPersonalizedShare('ind-share-section', p.man, nm);
   }
+}
+
+// ===== NEW CONTENT RENDERERS (Phase 2) =====
+
+function buildYearlyTransitHtml(dayOfWeek) {
+  if (typeof YEARLY_TRANSIT === 'undefined') return '<p style="color:var(--tx2)">ข้อมูลอยู่ระหว่างโหลด</p>';
+  var DAY_NAMES = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'];
+  var dayName = DAY_NAMES[dayOfWeek] || 'อาทิตย์';
+  var yt = YEARLY_TRANSIT[dayName];
+  if (!yt) return '';
+  var domains = [
+    {key:'career',icon:'💼',label:'การงาน'},
+    {key:'money',icon:'💰',label:'การเงิน'},
+    {key:'love',icon:'💕',label:'ความรัก'},
+    {key:'health',icon:'🏃',label:'สุขภาพ'},
+    {key:'luck',icon:'🍀',label:'โชคลาภ'}
+  ];
+  var trendIcon = {'ขึ้น':'📈','ลง':'📉','คงที่':'➡️'};
+  var html = '<div class="yt-card">';
+  html += '<div class="yt-title">✦ แนวโน้มชีวิตปีนี้ — คนเกิดวัน' + dayName + ' ✦</div>';
+  if (yt.highlight) html += '<div class="yt-highlight">' + escapeHTML(yt.highlight) + '</div>';
+  domains.forEach(function(d) {
+    var item = yt[d.key];
+    if (!item) return;
+    var trend = trendIcon[item.trend] || '➡️';
+    html += '<div class="yt-domain">';
+    html += '<div class="yt-domain-header"><span>' + d.icon + ' ' + d.label + '</span><span>' + trend + ' ' + escapeHTML(item.trend) + '</span></div>';
+    html += '<div class="yt-detail">' + escapeHTML(item.detail) + '</div>';
+    if (item.action) html += '<div class="yt-action"><strong>สิ่งที่ควรทำ:</strong> ' + escapeHTML(item.action) + '</div>';
+    html += '</div>';
+  });
+  if (yt.advice) html += '<div class="yt-advice">✨ ' + escapeHTML(yt.advice) + '</div>';
+  html += '</div>';
+  return html;
+}
+
+function buildRahuKetuHtml(dayOfWeek) {
+  if (typeof RAHU_KETU === 'undefined') return '';
+  var DAY_NAMES = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'];
+  var dayName = DAY_NAMES[dayOfWeek] || 'อาทิตย์';
+  var rk = RAHU_KETU;
+  var html = '<div class="rk-card">';
+  // Rahu section
+  if (rk.rahu && rk.rahu[dayName]) {
+    var rh = rk.rahu[dayName];
+    html += '<div class="rk-section"><div class="rk-subtitle">🌑 ราหู — จุดพลิกชีวิต</div>';
+    html += '<div class="rk-impact"><strong>ผลกระทบ:</strong> ' + escapeHTML(rh.impact) + '</div>';
+    html += '<div class="rk-change"><strong>สิ่งที่เปลี่ยน:</strong> ' + escapeHTML(rh.change) + '</div>';
+    if (rh.advice) html += '<div class="rk-advice"><strong>วิธีรับมือ:</strong> ' + escapeHTML(rh.advice) + '</div>';
+    html += '</div>';
+  }
+  // Ketu section
+  if (rk.ketu && rk.ketu[dayName]) {
+    var kt = rk.ketu[dayName];
+    html += '<div class="rk-section"><div class="rk-subtitle">🌗 เกตุ — จุดปล่อยวาง</div>';
+    html += '<div class="rk-impact"><strong>ผลกระทบ:</strong> ' + escapeHTML(kt.impact) + '</div>';
+    html += '<div class="rk-change"><strong>สิ่งที่เปลี่ยน:</strong> ' + escapeHTML(kt.change) + '</div>';
+    if (kt.advice) html += '<div class="rk-advice"><strong>วิธีรับมือ:</strong> ' + escapeHTML(kt.advice) + '</div>';
+    html += '</div>';
+  }
+  // Coping strategies
+  if (rk.coping && rk.coping.length) {
+    html += '<div class="rk-section"><div class="rk-subtitle">🧭 วิธีรับมือเมื่อดาวย้าย</div>';
+    rk.coping.forEach(function(c) {
+      html += '<div class="rk-coping-item"><strong>' + escapeHTML(c.title || c.situation) + '</strong>: ' + escapeHTML(c.action || c.advice) + '</div>';
+    });
+    html += '</div>';
+  }
+  if (rk.wisdom) html += '<div class="rk-wisdom"><blockquote>' + escapeHTML(rk.wisdom) + '</blockquote></div>';
+  html += '</div>';
+  return html;
+}
+
+function buildYearlyEnhancementHtml(dayOfWeek) {
+  if (typeof YEARLY_ENHANCEMENT === 'undefined') return '';
+  var DAY_NAMES = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'];
+  var dayName = DAY_NAMES[dayOfWeek] || 'อาทิตย์';
+  var ye = YEARLY_ENHANCEMENT[dayName];
+  if (!ye) return '';
+  var html = '<div class="ye-card">';
+  html += '<div class="ye-title">✦ วิธีเสริมดวงปีนี้ — คนเกิดวัน' + dayName + ' ✦</div>';
+  if (ye.currentTransit) html += '<div class="ye-transit"><strong>จรปีนี้:</strong> ' + escapeHTML(ye.currentTransit) + '</div>';
+  if (ye.enhancement) html += '<div class="ye-enhance"><strong>วิธีเสริม:</strong> ' + escapeHTML(ye.enhancement) + '</div>';
+  if (ye.items) html += '<div class="ye-items"><strong>ของเสริมมงคล:</strong> ' + escapeHTML(ye.items) + '</div>';
+  if (ye.direction) html += '<div class="ye-direction"><strong>ทิศมงคล:</strong> ' + escapeHTML(ye.direction) + '</div>';
+  html += '</div>';
+  return html;
+}
+
+function buildPlanetaryStrengthHtml(birthMonth) {
+  if (typeof PLANETARY_STRENGTH === 'undefined') return '';
+  var MONTH_NAMES = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  if (!birthMonth || birthMonth < 1 || birthMonth > 12) return '';
+  var monthName = MONTH_NAMES[birthMonth - 1];
+  var ps = PLANETARY_STRENGTH[monthName];
+  if (!ps) return '';
+  var html = '<div class="ps-card">';
+  html += '<div class="ps-title">✦ กำลังวันประจำเดือน' + monthName + ' ✦</div>';
+  if (ps.planet) html += '<div class="ps-planet"><strong>ดาว:</strong> 🪐 ' + escapeHTML(ps.planet) + '</div>';
+  if (ps.strength) html += '<div class="ps-strength"><strong>จุดแข็ง:</strong> ' + escapeHTML(ps.strength) + '</div>';
+  if (ps.weakness) html += '<div class="ps-weakness"><strong>จุดอ่อน:</strong> ' + escapeHTML(ps.weakness) + '</div>';
+  if (ps.description) html += '<div class="ps-desc">' + escapeHTML(ps.description) + '</div>';
+  if (ps.advice) html += '<div class="ps-advice"><strong>คำแนะนำ:</strong> ' + escapeHTML(ps.advice) + '</div>';
+  html += '</div>';
+  return html;
 }

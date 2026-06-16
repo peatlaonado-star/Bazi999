@@ -237,6 +237,7 @@ function renderAusp(nm,p,pw,u){
     + weekHtml
     + vinaiHtml
     + colorHtml
+    + buildAuspiciousTimingHtml(pw)
     + routineHtml
     + mantraHtml
     + '<div class="rbt"><button class="rbtn" data-action="reset-mode" data-mode="2">' + u.r2 + '</button></div>';
@@ -259,3 +260,50 @@ function renderAusp(nm,p,pw,u){
   var el=document.getElementById(id);
   if(el) el.max=new Date().toISOString().split('T')[0];
 });
+
+function buildAuspiciousTimingHtml(dayOfWeek) {
+  if (typeof AUSPICIOUS_TIMING === 'undefined') return '';
+  var DAY_NAMES = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'];
+  var dayName = DAY_NAMES[dayOfWeek] || 'อาทิตย์';
+  var at = AUSPICIOUS_TIMING;
+  
+  var html = '<div class="at-card">';
+  
+  // Day table (good/bad days for this day)
+  if (at.dayTable && at.dayTable[dayName]) {
+    var dt = at.dayTable[dayName];
+    html += '<div class="at-section"><div class="at-subtitle">📅 วันดี/วันระวังสำหรับคนเกิดวัน' + dayName + '</div>';
+    html += '<table class="at-table"><thead><tr><th>วัน</th><th>Rating</th><th>เหมาะทำ</th></tr></thead><tbody>';
+    for (var key in dt) {
+      if (dt.hasOwnProperty(key)) {
+        var dayInfo = dt[key];
+        var ratingClass = dayInfo.rating === 'ดีที่สุด' ? 'at-best' : dayInfo.rating === 'ดี' ? 'at-good' : dayInfo.rating === 'ระวัง' ? 'at-bad' : 'at-mid';
+        html += '<tr><td>' + escapeHTML(key) + '</td><td class="' + ratingClass + '">' + escapeHTML(dayInfo.rating) + '</td><td>' + escapeHTML(dayInfo.suitable) + '</td></tr>';
+      }
+    }
+    html += '</tbody></table></div>';
+  }
+  
+  // Rusik (9 ฤกษ์)
+  if (at.rusik && at.rusik.length) {
+    html += '<div class="at-section"><div class="at-subtitle">🕐 ฤกษ์ 9 ฤกษ์</div>';
+    html += '<table class="at-table"><thead><tr><th>ฤกษ์</th><th>เลข</th><th>ความหมาย</th><th>เหมาะทำ</th></tr></thead><tbody>';
+    at.rusik.forEach(function(r) {
+      html += '<tr><td>' + escapeHTML(r.name) + '</td><td>' + escapeHTML(r.numbers) + '</td><td>' + escapeHTML(r.meaning) + '</td><td>' + escapeHTML(r.bestFor) + '</td></tr>';
+    });
+    html += '</tbody></table></div>';
+  }
+  
+  // Yam (8 ยาม)
+  if (at.yam && at.yam.length) {
+    html += '<div class="at-section"><div class="at-subtitle">⏰ ยาม 8 ยาม</div>';
+    html += '<table class="at-table"><thead><tr><th>ยาม</th><th>เวลา</th><th>ดาว</th><th>เหมาะทำ</th></tr></thead><tbody>';
+    at.yam.forEach(function(y) {
+      html += '<tr><td>ยาม ' + y.number + '</td><td>' + escapeHTML(y.time) + '</td><td>' + escapeHTML(y.planet) + '</td><td>' + escapeHTML(y.bestFor) + '</td></tr>';
+    });
+    html += '</tbody></table></div>';
+  }
+  
+  html += '</div>';
+  return html;
+}

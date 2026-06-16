@@ -440,3 +440,29 @@ function buildMonthlyLifeMap(p, r, l, birthDate, today){
     rituals: (cfg.rituals || FALLBACK_MONTHLY_LIFE_MAP.rituals).slice(0, 7)
   };
 }
+
+function buildCoupleCompatibilityHtml(myElement) {
+  if (typeof COUPLE_COMPATIBILITY === 'undefined') return '';
+  var html = '<div class="cc-card">';
+  html += '<div class="cc-title">✦ ตารางความเข้ากันได้ของธาตุ ✦</div>';
+  var elements = ['ไฟ','น้ำ','ลม','ดิน'];
+  // Header row
+  html += '<table class="cc-table"><thead><tr><th></th>';
+  elements.forEach(function(e) { html += '<th>' + e + '</th>'; });
+  html += '</tr></thead><tbody>';
+  elements.forEach(function(e1) {
+    html += '<tr><th>' + e1 + '</th>';
+    elements.forEach(function(e2) {
+      var key = e1 + '-' + e2;
+      var pair = COUPLE_COMPATIBILITY[key];
+      var score = pair ? pair.score : '-';
+      var isMyPair = (e1 === myElement || e2 === myElement);
+      var cls = isMyPair ? 'cc-cell cc-highlight' : 'cc-cell';
+      html += '<td class="' + cls + '" title="' + (pair ? escapeHTML(pair.meaning) : '') + '">' + score + '</td>';
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  html += '</div>';
+  return html;
+}

@@ -725,3 +725,26 @@ function buildLifeDomainForecastV2(birthDay, birthMonth, birthYearBE, ageY, p, l
     domains: domains
   };
 }
+
+function buildLifePeriodsHtml(dayOfWeek) {
+  var DAY_NAMES = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'];
+  var dayName = DAY_NAMES[dayOfWeek] || 'อาทิตย์';
+  var periods = (typeof LIFE_PERIODS !== 'undefined' && LIFE_PERIODS[dayName]) ? LIFE_PERIODS[dayName] : null;
+  if (!periods || !periods.length) return '';
+  
+  var html = '<div class="lp-card">';
+  html += '<div class="lp-title">✦ ช่วงชีวิตตามทักษามหาอุติ — คนเกิดวัน' + dayName + ' ✦</div>';
+  
+  periods.forEach(function(p) {
+    html += '<div class="lp-period">'
+      + '<div class="lp-age">' + escapeHTML(p.period || p.age) + '</div>'
+      + '<div class="lp-planet">🪐 ' + escapeHTML(p.planet || '') + '</div>'
+      + '<div class="lp-strength"><strong>จุดเด่น:</strong> ' + escapeHTML(p.strength) + '</div>'
+      + '<div class="lp-weakness"><strong>จุดอ่อน:</strong> ' + escapeHTML(p.weakness) + '</div>'
+      + '<div class="lp-advice"><strong>คำแนะนำ:</strong> ' + escapeHTML(p.advice || '') + '</div>'
+      + '</div>';
+  });
+  
+  html += '</div>';
+  return html;
+}

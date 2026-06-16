@@ -4683,3 +4683,303 @@ body.has-report .value-section{display:none}
     font-size: 10.5px;
   }
 }
+
+/* ============================================================
+   NEW CONTENT SECTIONS — Appended for Starvia Report Modules
+   ============================================================ */
+
+/* ---- 1. Zodiac Identity (zi-*) ---- */
+.zi-section {
+  margin: 8px 0;
+  line-height: 1.6;
+}
+.zi-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.zi-table th {
+  background: rgba(201, 162, 37, 0.15);
+  padding: 8px;
+  text-align: left;
+}
+.zi-table td {
+  padding: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.zi-wisdom {
+  border-left: 3px solid #C9A227;
+  padding: 12px 16px;
+  margin: 12px 0;
+  font-style: italic;
+  color: var(--tx2);
+}
+.zi-action {
+  background: rgba(201, 162, 37, 0.1);
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 12px;
+}
+
+/* ---- 2. Element Practices (ep-*) ---- */
+.ep-section {
+  margin-top: 16px;
+}
+.ep-title {
+  text-align: center;
+  font-size: 15px;
+  color: #C9A227;
+  margin-bottom: 12px;
+}
+.ep-day {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+}
+.ep-num {
+  width: 28px;
+  height: 28px;
+  background: #C9A227;
+  color: #0a0a1a;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+/* ---- 3. Life Periods (lp-*) ---- */
+.lp-card {
+  padding: 16px;
+}
+.lp-title {
+  text-align: center;
+  font-size: 15px;
+  color: #C9A227;
+  margin-bottom: 16px;
+}
+.lp-period {
+  padding: 12px;
+  margin-bottom: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border-left: 3px solid #7B68EE;
+}
+.lp-age {
+  font-size: 14px;
+  font-weight: bold;
+  color: #C9A227;
+}
+.lp-planet {
+  font-size: 12px;
+  color: var(--tx2);
+  margin: 4px 0;
+}
+.lp-strength,
+.lp-weakness,
+.lp-advice {
+  font-size: 13px;
+  line-height: 1.5;
+  margin-top: 6px;
+}
+
+/* ---- 4. Yearly Transit (yt-*) ---- */
+.yt-card {
+  padding: 16px;
+}
+.yt-title {
+  text-align: center;
+  font-size: 15px;
+  color: #C9A227;
+  margin-bottom: 12px;
+}
+.yt-highlight {
+  text-align: center;
+  font-size: 14px;
+  color: var(--tx);
+  margin-bottom: 16px;
+  padding: 12px;
+  background: rgba(201, 162, 37, 0.1);
+  border-radius: 8px;
+}
+.yt-domain {
+  padding: 12px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+}
+.yt-domain-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+.yt-detail {
+  font-size: 13px;
+  color: var(--tx);
+  line-height: 1.5;
+}
+.yt-action {
+  font-size: 12px;
+  color: var(--tx2);
+  margin-top: 6px;
+}
+.yt-advice {
+  text-align: center;
+  font-size: 13px;
+  color: #C9A227;
+  margin-top: 12px;
+  padding: 12px;
+}
+
+/* ---- 5. Rahu/Ketu (rk-*) ---- */
+.rk-card {
+  padding: 16px;
+}
+.rk-section {
+  margin-bottom: 16px;
+}
+.rk-subtitle {
+  font-size: 15px;
+  color: #C9A227;
+  margin-bottom: 8px;
+}
+.rk-impact,
+.rk-change,
+.rk-advice {
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 6px;
+}
+.rk-coping-item {
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  font-size: 13px;
+}
+.rk-wisdom blockquote {
+  border-left: 3px solid #C9A227;
+  padding: 12px 16px;
+  font-style: italic;
+  color: var(--tx2);
+}
+
+/* ---- 6. Yearly Enhancement (ye-*) ---- */
+.ye-card {
+  padding: 16px;
+}
+.ye-title {
+  text-align: center;
+  font-size: 15px;
+  color: #C9A227;
+  margin-bottom: 12px;
+}
+.ye-transit,
+.ye-enhance,
+.ye-items,
+.ye-direction {
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 8px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+}
+
+/* ---- 7. Planetary Strength (ps-*) ---- */
+.ps-card {
+  padding: 16px;
+}
+.ps-title {
+  text-align: center;
+  font-size: 15px;
+  color: #C9A227;
+  margin-bottom: 12px;
+}
+.ps-planet,
+.ps-strength,
+.ps-weakness,
+.ps-desc,
+.ps-advice {
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+/* ---- 8. Couple Compatibility (cc-*) ---- */
+.cc-card {
+  padding: 16px;
+}
+.cc-title {
+  text-align: center;
+  font-size: 15px;
+  color: #C9A227;
+  margin-bottom: 12px;
+}
+.cc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: center;
+}
+.cc-table th,
+.cc-table td {
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.cc-table th {
+  background: rgba(201, 162, 37, 0.15);
+}
+.cc-cell {
+  background: rgba(255, 255, 255, 0.03);
+}
+.cc-highlight {
+  background: rgba(201, 162, 37, 0.2);
+  font-weight: bold;
+}
+
+/* ---- 9. Auspicious Timing (at-*) ---- */
+.at-card {
+  padding: 16px;
+}
+.at-section {
+  margin-bottom: 16px;
+}
+.at-subtitle {
+  font-size: 15px;
+  color: #C9A227;
+  margin-bottom: 8px;
+}
+.at-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.at-table th {
+  background: rgba(201, 162, 37, 0.15);
+  padding: 8px;
+  text-align: left;
+}
+.at-table td {
+  padding: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.at-good {
+  padding: 8px 12px;
+  background: rgba(76, 175, 80, 0.1);
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+.at-bad {
+  padding: 8px 12px;
+  background: rgba(244, 67, 54, 0.1);
+  border-radius: 6px;
+}
