@@ -324,7 +324,6 @@ describe('Free reader conversion reading order', () => {
       'weekday-power-card',
       'power-card',
       'windfall-luck',
-      'monthly-life-map',
       'life-graph-section',
       'domain-matrix',
       'detail-tabs-card'
@@ -337,48 +336,16 @@ describe('Free reader conversion reading order', () => {
     expect(output).not.toContain('conversion-roadmap');
   });
 
-  it('places a premium price anchor before the first locked teaser', () => {
-    const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>', { url: 'http://localhost' });
-    const context = loadContext(dom);
-
-    context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
-    const output = dom.window.document.getElementById('r0').innerHTML;
-    const anchorIndex = output.indexOf('premium-price-anchor');
-    const windfallIndex = output.indexOf('windfall-luck');
-
-    expect(anchorIndex).toBeGreaterThan(-1);
-    expect(anchorIndex).toBeLessThan(windfallIndex);
-    expect(output).toContain('590 บาท');
-    expect(output).toContain('199 บาท/เดือน');
-    expect(output).toContain('ตกวันละประมาณ 7 บาท');
-  });
-
-
-  it('adds a soft daily CTA and premium preview summary before locked content', () => {
+  it('does not include removed paywall elements as standalone sections', () => {
     const dom = new JSDOM('<!doctype html><div id="r0"></div><div id="ts0"></div>', { url: 'http://localhost' });
     const context = loadContext(dom);
 
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const wrap = dom.window.document.getElementById('r0');
-    const output = wrap.innerHTML;
-    const dailyCta = wrap.querySelector('.daily-fortune-cta');
-    const powerSection = Array.from(wrap.querySelectorAll('.collapsible-section'))
-      .find((node) => node.querySelector('.section-toggle-label')?.textContent.includes('พลังงานเสริมดวง'));
-    const previewSummary = wrap.querySelector('.premium-preview-summary');
-    const windfallSection = Array.from(wrap.querySelectorAll('.collapsible-section'))
-      .find((node) => node.querySelector('.section-toggle-label')?.textContent.includes('สูตรเปิดดวงลาภลอย'));
-    const children = Array.from(wrap.children);
 
-    expect(dailyCta).toBeTruthy();
-    expect(powerSection).toBeTruthy();
-    expect(previewSummary).toBeTruthy();
-    expect(windfallSection).toBeTruthy();
-    expect(children.indexOf(dailyCta)).toBeLessThan(children.indexOf(powerSection));
-    expect(children.indexOf(previewSummary)).toBeGreaterThan(children.indexOf(powerSection));
-    expect(children.indexOf(previewSummary)).toBeLessThan(children.indexOf(windfallSection));
-    expect(output).toContain('วันนี้คือ “สัญญาณแรก”');
-    expect(output).toContain('สิ่งที่ถูกล็อกไว้ไม่ใช่แค่ “คำทำนาย”');
-    expect(output).toContain('ใช้เป็นแผนที่สะท้อนจังหวะชีวิต');
+    // These should no longer be direct children of the report wrap
+    expect(wrap.querySelector('.daily-fortune-cta')).toBeNull();
+    expect(wrap.querySelector('.premium-preview-summary')).toBeNull();
   });
 
   it('shows the life graph as its own visible section before the collapsed six-domain scripture', () => {
@@ -388,7 +355,7 @@ describe('Free reader conversion reading order', () => {
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const output = dom.window.document.getElementById('r0').innerHTML;
     const domainSection = Array.from(dom.window.document.querySelectorAll('.collapsible-section'))
-      .find((node) => node.querySelector('.section-toggle-label')?.textContent.includes('คัมภีร์แก้ดวง 6 ด้าน'));
+      .find((node) => node.querySelector('.section-toggle-label')?.textContent.includes('คัมภีร์แก้ดวง'));
     const graphSection = dom.window.document.querySelector('.life-graph-section');
 
     expect(graphSection).toBeTruthy();
@@ -438,7 +405,7 @@ describe('Free reader conversion reading order', () => {
 
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const domainSection = Array.from(dom.window.document.querySelectorAll('.collapsible-section'))
-      .find((node) => node.querySelector('.section-toggle-label')?.textContent.includes('คัมภีร์แก้ดวง 6 ด้าน'));
+      .find((node) => node.querySelector('.section-toggle-label')?.textContent.includes('คัมภีร์แก้ดวง'));
 
     expect(domainSection).toBeTruthy();
     expect(domainSection.querySelector('.section-toggle-hint').textContent).toContain('โชค');

@@ -960,6 +960,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
   }
   domainHtml += '</div></div>';
   var lifeGraphSectionHtml = '<div class="life-graph-section">' + lifeGraphHtml + '</div>';
+  lifeGraphSectionHtml += '<div class="cross-section-link" onclick="document.querySelector(\'.collapsible-toggle[data-section=\\\'domain\\\'\\]\')?.click(); window.scrollTo({top: document.querySelector(\'.collapsible-toggle[data-section=\\\'domain\\\'\\]\')?.offsetTop - 60, behavior: \"smooth\"})">🎯 ดูวิธีแก้ดวง 6 ด้าน →</div>';
 
   var monthlyLifeMap = buildMonthlyLifeMap(p, r, l, ds);
   var monthlyLifeMapHtml = buildMonthlyLifeMapHtml(monthlyLifeMap, premiumUnlocked);
@@ -1033,22 +1034,14 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + '<div class="streak-discount-anchor"></div>'
     + badgesHtml
     + wrapCollapsible("✦ กำลังวันประจำตัว ✦", "วันเกิด · เทวดา · ธาตุ · สีมงคล", cosmicBriefHtml)
-    + buildDailyFortuneCta()
-    + wrapCollapsible("✨ พลังงานเสริมดวง", "เลขและสีมงคลประจำวัน", powerCardHtml)
-    + buildPremiumPreviewSummary()
-    + buildPremiumPriceAnchor(false)
-    // + wrapCollapsible("🙏 เหตุเสริมแกร่งธาตุ — ธรรมทานฟรี", "ทาน · จิต · เมตตา · ปัญญา · แบบฝึก 7 วัน", buildVinaiSection(p, new Date()))  // hidden per request
+    + wrapCollapsible("✨ เสริมดวงของคุณ — ประจำวัน + ประจำปี", "สีมงคล · เลขมงคล · ของมงคล · ทิศมงคล", powerCardHtml + buildYearlyEnhancementHtml(dayOfWeek))
     + wrapCollapsible("✦ สูตรเปิดดวงลาภลอย ✦", "เลขเด็ด · หวย · ทิศ · คาถา สายมู", windfallLuckHtml, true)
     + '<div id=\"lottery-results-section\" style=\"margin-bottom:14px;\"></div>'
     + wrapCollapsible("🔮 หมอทักประจำเดือน", "5 ด้านชีวิต · สัญญาณเตือน · วิธีแก้", monthlyLifeMapHtml, true)
-    + lifeGraphSectionHtml
-    + wrapCollapsible("🔮 ทักษามหาอุติ — ช่วงชีวิตตามดาว", "ดาวเจ้าปาง · 7 ช่วงชีวิต · จุดเด่น · จุดอ่อน · เชื่อมโยง", buildLifePeriodsHtml(dayOfWeek, ageY), true)
+    + wrapCollapsible("📊 พิมพ์เขียวชีวิต — กราฟ + ช่วงชีวิต", "กราฟชีวิต · 7 ช่วงชีวิต · จุดเด่น · จุดอ่อน", lifeGraphSectionHtml + buildLifePeriodsHtml(dayOfWeek, ageY), true)
     + wrapCollapsible("✦ คัมภีร์แก้ดวง 6 ด้าน ✦", "โชค · การเงิน · สุขภาพ · ความรัก · การงาน · บริวาร", domainHtml, true)
     + wrapCollapsible("💘 ตารางความเข้ากันได้ของธาตุ", "4×4 matrix · ดูว่าธาตุไหนเข้ากัน", buildCoupleCompatibilityHtml(p.el), true)
-
-    + wrapCollapsible("🔮 แนวโน้มชีวิตปีนี้", "5 ด้าน · งาน · เงิน · รัก · สุขภาพ · โชค", buildYearlyTransitHtml(dayOfWeek), true)
-    + wrapCollapsible("🌑 ราหูเกตุ — จุดพลิกชีวิต", "ราหูย้าย · เกตุ · วิธีรับมือ", buildRahuKetuHtml(dayOfWeek), true)
-    + wrapCollapsible("✨ วิธีเสริมดวงปีนี้ — เสริมพลังตามจังหวะดาว", "สีมงคล · ของมงคล · ทิศมงคล · ดาวส่งผล", buildYearlyEnhancementHtml(dayOfWeek), true)
+    + wrapCollapsible("🌑 แนวโน้มชีวิตปีนี้ — ราหูเกตุ + จังหวะดาว", "ราหูย้าย · เกตุ · 5 ด้าน · วิธีรับมือ", buildRahuKetuHtml(dayOfWeek) + buildYearlyTransitHtml(dayOfWeek), true)
     + wrapCollapsible("🪐 กำลังวันประจำเดือนเกิด — ดาวเจ้าปางของคุณ", "จุดแข็ง · จุดอ่อน · ดาวกำกับ · คำแนะนำ", buildPlanetaryStrengthHtml(birthMonth), true)
     + wrapCollapsible("📋 ตัวตน · ความสัมพันธ์ · การงาน · เงิน", "ดูจุดอ่อนที่ซ่อนอยู่ + วิธีแก้", detailTabsShellHtml, true);
 

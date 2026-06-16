@@ -5381,3 +5381,19 @@ body.has-report .value-section{display:none}
 /* ── Form Validation Feedback ── */
 .form-error { border-color: #E63946 !important; background: rgba(230,57,70,.06) !important; }
 .form-error-msg { color: #E63946; font-size: 11px; margin-top: 4px; display: block; }
+
+/* ── Cross-Section Link ── */
+.cross-section-link {
+  text-align: center;
+  padding: 10px;
+  margin-top: 12px;
+  color: var(--pu);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 8px;
+  background: rgba(142,114,216,0.06);
+  border: 1px solid rgba(142,114,216,0.15);
+  transition: background 0.2s;
+}
+.cross-section-link:hover { background: rgba(142,114,216,0.12); }

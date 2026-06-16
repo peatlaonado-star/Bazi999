@@ -22,6 +22,7 @@ const jsFiles = [
   'data/planetary-strength.js',
   'data/element-quiz.js',
   'data/life-graph-data.js',
+  'data/premium-config.js',
   'js/reading-helpers.js',
   'js/life-graph.js',
   'js/renderer-shared.js',
