@@ -279,6 +279,11 @@ export async function facebookExchange(context) {
     return errorResponse(500, 'NO_APP_SECRET', 'FACEBOOK_APP_SECRET not set in env — cannot exchange');
   }
 
+  const appId = env.FACEBOOK_APP_ID;
+  if (!appId) {
+    return errorResponse(500, 'NO_APP_ID', 'FACEBOOK_APP_ID not set in env — cannot exchange');
+  }
+
   // Rate limit: 5/hour per IP (tighter than post 30/hour)
   const ip = getClientIp(request);
   const rateKey = `fb:exchange:rate:${ip}`;
@@ -297,7 +302,7 @@ export async function facebookExchange(context) {
     // Step 1: User Token → Long-lived User Token (60 days)
     const step1Url = `https://graph.facebook.com/v22.0/oauth/access_token`
       + `?grant_type=fb_exchange_token`
-      + `&client_id=***`+ `&client_secret=${encodeURIComponent(appSecret)}`
+      + `&client_id=${encodeURIComponent(appId)}`+ `&client_secret=${encodeURIComponent(appSecret)}`
       + `&fb_exchange_token=${encodeURIComponent(user_token)}`;
 
     const step1Resp = await fetch(step1Url);
@@ -341,7 +346,7 @@ export async function facebookExchange(context) {
     // Step 3: Short Page Token → Long-lived Page Token (60 days)
     const step3Url = `https://graph.facebook.com/v22.0/oauth/access_token`
       + `?grant_type=fb_exchange_token`
-      + `&client_id=***`+ `&client_secret=${encodeURIComponent(appSecret)}`
+      + `&client_id=${encodeURIComponent(appId)}`+ `&client_secret=${encodeURIComponent(appSecret)}`
       + `&fb_exchange_token=${encodeURIComponent(shortPageToken)}`;
     const step3Resp = await fetch(step3Url);
     const step3Data = await step3Resp.json();
