@@ -25,7 +25,18 @@ async function getCachedResults(kv) {
   // Try KV first
   try {
     const cached = await kv.get(RESULTS_KEY, { type: 'json' });
-    if (cached && cached.firstPrize) return { data: cached, source: 'kv' };
+    if (cached && cached.firstPrize) {
+      // If HARDCODED_SEED is newer, upgrade KV automatically
+      if (HARDCODED_SEED.date > (cached.date || '')) {
+        try {
+          await kv.put(RESULTS_KEY, JSON.stringify(HARDCODED_SEED), {
+            expirationTtl: RESULTS_TTL_SECONDS,
+          });
+        } catch (e) { /* KV write failed — return KV data as-is */ }
+        return { data: HARDCODED_SEED, source: 'seed-upgraded' };
+      }
+      return { data: cached, source: 'kv' };
+    }
   } catch (e) {
     // KV read failed — fall through
   }
