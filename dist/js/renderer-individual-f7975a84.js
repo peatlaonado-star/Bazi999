@@ -1048,7 +1048,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
 
     + wrapCollapsible("🔮 แนวโน้มชีวิตปีนี้", "5 ด้าน · งาน · เงิน · รัก · สุขภาพ · โชค", buildYearlyTransitHtml(dayOfWeek), true)
     + wrapCollapsible("🌑 ราหูเกตุ — จุดพลิกชีวิต", "ราหูย้าย · เกตุ · วิธีรับมือ", buildRahuKetuHtml(dayOfWeek), true)
-    + wrapCollapsible("✨ วิธีเสริมดวงปีนี้", "เสริมดวง · ของมงคล · ทิศมงคล", buildYearlyEnhancementHtml(dayOfWeek), true)
+    + wrapCollapsible("✨ วิธีเสริมดวงปีนี้ — เสริมพลังตามจังหวะดาว", "สีมงคล · ของมงคล · ทิศมงคล · ดาวส่งผล", buildYearlyEnhancementHtml(dayOfWeek), true)
     + wrapCollapsible("🪐 กำลังวันประจำเดือนเกิด", "ดาวพระเคราะห์ · พลัง · คำแนะนำ", buildPlanetaryStrengthHtml(birthMonth), true)
     + wrapCollapsible("📋 ตัวตน · ความสัมพันธ์ · การงาน · เงิน", "ดูจุดอ่อนที่ซ่อนอยู่ + วิธีแก้", detailTabsShellHtml, true);
 
@@ -1241,12 +1241,84 @@ function buildYearlyEnhancementHtml(dayOfWeek) {
   var dayName = DAY_NAMES[dayOfWeek] || 'อาทิตย์';
   var ye = YEARLY_ENHANCEMENT[dayName];
   if (!ye) return '';
+
   var html = '<div class="ye-card">';
-  html += '<div class="ye-title">✦ วิธีเสริมดวงปีนี้ — คนเกิดวัน' + dayName + ' ✦</div>';
-  if (ye.currentTransit) html += '<div class="ye-transit"><strong>จรปีนี้:</strong> ' + escapeHTML(ye.currentTransit) + '</div>';
-  if (ye.enhancement) html += '<div class="ye-enhance"><strong>วิธีเสริม:</strong> ' + escapeHTML(ye.enhancement) + '</div>';
-  if (ye.items) html += '<div class="ye-items"><strong>ของเสริมมงคล:</strong> ' + escapeHTML(ye.items) + '</div>';
-  if (ye.direction) html += '<div class="ye-direction"><strong>ทิศมงคล:</strong> ' + escapeHTML(ye.direction) + '</div>';
+
+  // === ส่วนที่ 1: Header ===
+  html += '<div class="ye-header">'
+    + '<div class="ye-title">✦ วิธีเสริมดวงปีนี้ ✦</div>'
+    + '<div class="ye-subtitle">คนเกิดวัน' + dayName + ' · ' + escapeHTML(ye.currentTransit || '') + '</div>'
+    + '</div>';
+
+  // === ส่วนที่ 2: คำอธิบายความหมาย ===
+  html += '<div class="ye-etymology">'
+    + '<div class="ye-etym-label">📚 "เสริมดวง" คืออะไร?</div>'
+    + '<div class="ye-etym-body">'
+    + '"เสริมดวง" ในโหราศาสตร์ไทยโบราณ <strong>ไม่ใช่การ "เปลี่ยนดวง"</strong> แต่คือการ <em>ปรับสมดุลพลังงาน</em> ให้สอดคล้องกับจังหวะดาวที่โคจรอยู่'
+    + '<br><br>'
+    + 'หลักการสำคัญ: <strong>ดวงบอกแนวโน้ม แต่การกระทำคือตัวเปลี่ยนผลลัพธ์</strong>'
+    + ' — ปีนี้ดาวอะไรเด่น → เสริมทางนั้น · ปีนี้ดาวอะไรอ่อน → ระวังทางนั้น'
+    + '<br><br>'
+    + 'การเสริมดวงมี 4 วิธีหลัก: <strong>สีมงคล</strong> (ปรับพลังสี) · <strong>ของมงคล</strong> (เครื่องราง/วัตถุ) · <strong>ทิศมงคล</strong> (ทิศที่ดาวส่งผลดี) · <strong>การกระทำ</strong> (พฤติกรรมที่เสริมพลัง)'
+    + '</div>'
+    + '</div>';
+
+  // === ส่วนที่ 3: รายละเอียด ===
+  if (ye.items) {
+    html += '<div class="ye-detail-card ye-detail-items">'
+      + '<div class="ye-detail-icon">🎁</div>'
+      + '<div class="ye-detail-content">'
+      + '<div class="ye-detail-label">ของเสริมมงคล</div>'
+      + '<div class="ye-detail-text">' + escapeHTML(ye.items) + '</div>'
+      + '</div>'
+      + '</div>';
+  }
+
+  if (ye.direction) {
+    html += '<div class="ye-detail-card ye-detail-direction">'
+      + '<div class="ye-detail-icon">🧭</div>'
+      + '<div class="ye-detail-content">'
+      + '<div class="ye-detail-label">ทิศมงคล</div>'
+      + '<div class="ye-detail-text">' + escapeHTML(ye.direction) + '</div>'
+      + '</div>'
+      + '</div>';
+  }
+
+  // === ส่วนที่ 4: Transit ตามดาวปีนี้ ===
+  if (ye.transit) {
+    html += '<div class="ye-transit-section">'
+      + '<div class="ye-transit-title">🌟 ดาวปีนี้ส่งผลอย่างไร?</div>';
+
+    var planetColors = {
+      'อาทิตย์': '#FF6B35', 'จันทร์': '#C0C0C0', 'อังคาร': '#E63946',
+      'พุธ': '#2EC4B6', 'ราหู': '#7B2D8E', 'เสาร์': '#1D3557', 'พฤหัส': '#F4A261'
+    };
+
+    var transitKeys = Object.keys(ye.transit);
+    for (var i = 0; i < transitKeys.length; i++) {
+      var planet = transitKeys[i];
+      var advice = ye.transit[planet];
+      var pColor = planetColors[planet] || '#7B68EE';
+      html += '<div class="ye-transit-item">'
+        + '<div class="ye-transit-dot" style="background:' + pColor + '"></div>'
+        + '<div class="ye-transit-planet" style="color:' + pColor + '">' + escapeHTML(planet) + '</div>'
+        + '<div class="ye-transit-advice">' + escapeHTML(advice) + '</div>'
+        + '</div>';
+    }
+    html += '</div>';
+  }
+
+  // === ส่วนที่ 5: เชื่อมกลับ ===
+  html += '<div class="ye-connect">'
+    + '<div class="ye-connect-icon">🔗</div>'
+    + '<div class="ye-connect-text">'
+    + '<strong>ดูเพิ่มเติม:</strong> '
+    + '<span class="ye-link" onclick="document.querySelector(\'.collapsible-toggle[data-section=\\\'yearlyTransit\'\']\')?.click()">แนวโน้มชีวิตปีนี้</span> · '
+    + '<span class="ye-link" onclick="document.querySelector(\'.collapsible-toggle[data-section=\\\'domain\'\']\')?.click()">คัมภีร์แก้ดวง 6 ด้าน</span> · '
+    + '<span class="ye-link" onclick="document.querySelector(\'.collapsible-toggle[data-section=\\\'rahuketu\'\']\')?.click()">ราหูเกตุ</span>'
+    + '</div>'
+    + '</div>';
+
   html += '</div>';
   return html;
 }
