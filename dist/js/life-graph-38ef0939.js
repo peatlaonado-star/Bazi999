@@ -726,25 +726,92 @@ function buildLifeDomainForecastV2(birthDay, birthMonth, birthYearBE, ageY, p, l
   };
 }
 
-function buildLifePeriodsHtml(dayOfWeek) {
+function buildLifePeriodsHtml(dayOfWeek, ageY) {
   var DAY_NAMES = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'];
   var dayName = DAY_NAMES[dayOfWeek] || 'อาทิตย์';
   var periods = (typeof LIFE_PERIODS !== 'undefined' && LIFE_PERIODS[dayName]) ? LIFE_PERIODS[dayName] : null;
   if (!periods || !periods.length) return '';
-  
+
+  // หาช่วงปัจจุบัน
+  var currentIdx = 0;
+  if (typeof ageY === 'number') {
+    for (var i = 0; i < periods.length; i++) {
+      var ageRange = (periods[i].period || '').match(/(\d+)/);
+      if (ageRange && parseInt(ageRange[1], 10) <= ageY) currentIdx = i;
+    }
+  }
+
+  // ดาวเคราะห์สี
+  var planetColors = {
+    'อาทิตย์': '#FF6B35', 'จันทร์': '#C0C0C0', 'อังคาร': '#E63946',
+    'พุธ': '#2EC4B6', 'ราหู': '#7B2D8E', 'เสาร์': '#1D3557', 'พฤหัส': '#F4A261'
+  };
+
   var html = '<div class="lp-card">';
-  html += '<div class="lp-title">✦ ช่วงชีวิตตามทักษามหาอุติ — คนเกิดวัน' + dayName + ' ✦</div>';
-  
-  periods.forEach(function(p) {
-    html += '<div class="lp-period">'
-      + '<div class="lp-age">' + escapeHTML(p.period || p.age) + '</div>'
-      + '<div class="lp-planet">🪐 ' + escapeHTML(p.planet || '') + '</div>'
-      + '<div class="lp-meaning"><strong>พลังเด่น:</strong> ' + escapeHTML(p.meaning || '') + '</div>'
-      + '<div class="lp-strength"><strong>จุดเด่น:</strong> ' + escapeHTML(p.strength) + '</div>'
-      + '<div class="lp-weakness"><strong>จุดอ่อน/ระวัง:</strong> ' + escapeHTML(p.weakness) + '</div>'
+
+  // === ส่วนที่ 1: คำอธิบายความหมาย ===
+  html += '<div class="lp-header">'
+    + '<div class="lp-title">✦ ทักษามหาอุติ ✦</div>'
+    + '<div class="lp-subtitle">ช่วงชีวิตตามดาวพระเคราะห์ — คนเกิดวัน' + dayName + '</div>'
+    + '</div>';
+
+  html += '<div class="lp-etymology">'
+    + '<div class="lp-etym-label">📚 ทักษามหาอุติ คืออะไร?</div>'
+    + '<div class="lp-etym-body">'
+    + '<strong>"ทักษา"</strong> มาจากคำว่า <em>ทักขปัญหา</em> หมายถึง วันเกิด ซึ่งเป็นจุดเริ่มต้นของระบบโหราศาสตร์ไทยโบราณ'
+    + ' — แต่ละวันมีดาวพระเคราะห์เป็นเจ้าปาง (เจ้าของ) กำกับ'
+    + '<br><br>'
+    + '<strong>"มหาอุติ"</strong> แปลว่า <em>การยิ่งใหญ่ การโดดเด่น</em> — หมายถึงพลังของดาวพระเคราะห์ที่ส่งผลต่อชีวิตในแต่ละช่วงอายุ'
+    + '<br><br>'
+    + 'หลักนี้เชื่อว่า <strong>ชีวิตคนเราหมุนเป็นวงจร 12 ปี</strong> ตามลำดับดาวพระเคราะห์ 7 ดวง'
+    + ' (จันทร์ → อังคาร → พุธ → พฤหัส → ศุกร์ → เสาร์ → อาทิตย์)'
+    + ' แต่ละช่วงมีพลังต่างกัน — รู้ว่าช่วงไหนดาวส่งผลอย่างไร จะได้เตรียมตัวรับมือและเสริมจังหวะชีวิตได้ถูกต้อง'
+    + '</div>'
+    + '</div>';
+
+  // === ส่วนที่ 2: Timeline ===
+  html += '<div class="lp-timeline">';
+  for (var t = 0; t < periods.length; t++) {
+    var isCurrent = (t === currentIdx);
+    var pColor = planetColors[periods[t].planet] || '#7B68EE';
+    html += '<div class="lp-tl-item' + (isCurrent ? ' lp-tl-current' : '') + '">'
+      + '<div class="lp-tl-dot" style="background:' + pColor + '"></div>'
+      + '<div class="lp-tl-line"></div>'
+      + '<div class="lp-tl-age">' + escapeHTML(periods[t].period || '') + '</div>'
+      + '<div class="lp-tl-planet">' + escapeHTML(periods[t].planet || '') + '</div>'
       + '</div>';
-  });
-  
+  }
+  html += '</div>';
+
+  // === ส่วนที่ 3: รายละเอียดแต่ละช่วง ===
+  for (var j = 0; j < periods.length; j++) {
+    var pp = periods[j];
+    var isCur = (j === currentIdx);
+    var pCol = planetColors[pp.planet] || '#7B68EE';
+    var currentLabel = isCur ? '<span class="lp-now-badge">▸ ช่วงนี้</span>' : '';
+
+    html += '<div class="lp-period' + (isCur ? ' lp-period-active' : '') + '" style="border-left-color:' + pCol + '">'
+      + '<div class="lp-period-head">'
+      + '<div class="lp-age">' + escapeHTML(pp.period || '') + currentLabel + '</div>'
+      + '<div class="lp-planet" style="color:' + pCol + '">🪐 ' + escapeHTML(pp.planet || '') + '</div>'
+      + '</div>'
+      + '<div class="lp-meaning"><strong>พลังเด่น:</strong> ' + escapeHTML(pp.meaning || '') + '</div>'
+      + '<div class="lp-strength"><strong>✦ จุดเด่น:</strong> ' + escapeHTML(pp.strength) + '</div>'
+      + '<div class="lp-weakness"><strong>⚠ จุดอ่อน/ระวัง:</strong> ' + escapeHTML(pp.weakness) + '</div>'
+      + '</div>';
+  }
+
+  // === ส่วนที่ 4: เชื่อมกลับ ===
+  html += '<div class="lp-connect">'
+    + '<div class="lp-connect-icon">🔗</div>'
+    + '<div class="lp-connect-text">'
+    + '<strong>ดูเพิ่มเติม:</strong> '
+    + '<span class="lp-link" onclick="document.querySelector(\'[data-tab=\\\'self\\\']\')?.click()">ตัวตนตามดาวเจ้าชะตา</span> · '
+    + '<span class="lp-link" onclick="document.querySelector(\'.collapsible-toggle[data-section=\\\'domain\'\']\')?.click()">คัมภีร์แก้ดวง 6 ด้าน</span> · '
+    + '<span class="lp-link" onclick="document.querySelector(\'.collapsible-toggle[data-section=\\\'planetary\'\']\')?.click()">กำลังวันเดือนเกิด</span>'
+    + '</div>'
+    + '</div>';
+
   html += '</div>';
   return html;
 }

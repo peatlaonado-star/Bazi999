@@ -1042,7 +1042,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + '<div id=\"lottery-results-section\" style=\"margin-bottom:14px;\"></div>'
     + wrapCollapsible("🔮 หมอทักประจำเดือน", "5 ด้านชีวิต · สัญญาณเตือน · วิธีแก้", monthlyLifeMapHtml, true)
     + lifeGraphSectionHtml
-    + wrapCollapsible("🔮 ช่วงชีวิตตามทักษามหาอุติ", "7 ช่วงชีวิต · จุดเด่น · จุดอ่อน · คำแนะนำ", buildLifePeriodsHtml(dayOfWeek), true)
+    + wrapCollapsible("🔮 ทักษามหาอุติ — ช่วงชีวิตตามดาว", "ดาวเจ้าปาง · 7 ช่วงชีวิต · จุดเด่น · จุดอ่อน · เชื่อมโยง", buildLifePeriodsHtml(dayOfWeek, ageY), true)
     + wrapCollapsible("✦ คัมภีร์แก้ดวง 6 ด้าน ✦", "โชค · การเงิน · สุขภาพ · ความรัก · การงาน · บริวาร", domainHtml, true)
     + wrapCollapsible("💘 ตารางความเข้ากันได้ของธาตุ", "4×4 matrix · ดูว่าธาตุไหนเข้ากัน", buildCoupleCompatibilityHtml(p.el), true)
 

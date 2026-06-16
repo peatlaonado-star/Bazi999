@@ -4758,28 +4758,167 @@ body.has-report .value-section{display:none}
 .lp-card {
   padding: 16px;
 }
+.lp-header {
+  text-align: center;
+  margin-bottom: 14px;
+}
 .lp-title {
   text-align: center;
-  font-size: 15px;
+  font-size: 16px;
   color: #C9A227;
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+.lp-subtitle {
+  text-align: center;
+  font-size: 12px;
+  color: var(--tx2);
+  opacity: 0.8;
+}
+
+/* Etymology explanation */
+.lp-etymology {
+  background: linear-gradient(135deg, rgba(142,114,216,0.12), rgba(214,173,69,0.08));
+  border: 1px solid rgba(142,114,216,0.2);
+  border-radius: 12px;
+  padding: 14px;
   margin-bottom: 16px;
 }
+.lp-etym-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--pu);
+  margin-bottom: 8px;
+}
+.lp-etym-body {
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--tx2);
+}
+.lp-etym-body strong { color: var(--tx); }
+.lp-etym-body em { color: #C9A227; font-style: normal; }
+
+/* Timeline */
+.lp-timeline {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 18px;
+  padding: 12px 4px;
+  position: relative;
+}
+.lp-tl-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+.lp-tl-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-bottom: 4px;
+  position: relative;
+  z-index: 2;
+  opacity: 0.6;
+  transition: all 0.3s;
+}
+.lp-tl-current .lp-tl-dot {
+  width: 14px;
+  height: 14px;
+  opacity: 1;
+  box-shadow: 0 0 8px currentColor;
+  animation: lp-pulse 2s ease-in-out infinite;
+}
+@keyframes lp-pulse {
+  0%, 100% { box-shadow: 0 0 4px currentColor; }
+  50% { box-shadow: 0 0 12px currentColor; }
+}
+.lp-tl-line {
+  width: 100%;
+  height: 2px;
+  background: rgba(255,255,255,0.08);
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  z-index: 1;
+}
+.lp-tl-item:last-child .lp-tl-line { display: none; }
+.lp-tl-age {
+  font-size: 10px;
+  color: var(--tx2);
+  text-align: center;
+  white-space: nowrap;
+}
+.lp-tl-planet {
+  font-size: 10px;
+  color: var(--tx2);
+  text-align: center;
+  opacity: 0.7;
+}
+.lp-tl-current .lp-tl-age {
+  color: #C9A227;
+  font-weight: 700;
+}
+.lp-tl-current .lp-tl-planet {
+  color: #C9A227;
+  opacity: 1;
+}
+
+/* Period cards */
 .lp-period {
   padding: 12px;
   margin-bottom: 10px;
   background: rgba(255, 255, 255, 0.03);
-  border-radius: 8px;
+  border-radius: 10px;
   border-left: 3px solid #7B68EE;
+  transition: all 0.3s;
+}
+.lp-period:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+.lp-period-active {
+  background: rgba(214,173,69,0.06) !important;
+  border-left-width: 4px;
+}
+.lp-period-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
 }
 .lp-age {
   font-size: 14px;
   font-weight: bold;
   color: #C9A227;
 }
+.lp-now-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  color: #09061c;
+  background: linear-gradient(135deg, #C9A227, #F4D987);
+  padding: 1px 8px;
+  border-radius: 10px;
+  margin-left: 8px;
+  vertical-align: middle;
+  animation: lp-glow 2s ease-in-out infinite;
+}
+@keyframes lp-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
 .lp-planet {
   font-size: 12px;
   color: var(--tx2);
   margin: 4px 0;
+  font-weight: 600;
+}
+.lp-meaning {
+  font-size: 12px;
+  color: var(--tx2);
+  margin-bottom: 4px;
 }
 .lp-strength,
 .lp-weakness,
@@ -4787,6 +4926,37 @@ body.has-report .value-section{display:none}
   font-size: 13px;
   line-height: 1.5;
   margin-top: 6px;
+}
+
+/* Connect links */
+.lp-connect {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 10px 12px;
+  background: rgba(142,114,216,0.08);
+  border-radius: 10px;
+  border: 1px solid rgba(142,114,216,0.15);
+}
+.lp-connect-icon {
+  font-size: 14px;
+  margin-top: 1px;
+}
+.lp-connect-text {
+  font-size: 12px;
+  color: var(--tx2);
+  line-height: 1.6;
+}
+.lp-link {
+  color: var(--pu);
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: rgba(142,114,216,0.3);
+  transition: color 0.2s;
+}
+.lp-link:hover {
+  color: #b8a8d8;
 }
 
 /* ---- 4. Yearly Transit (yt-*) ---- */
