@@ -6,19 +6,19 @@
 const RESULTS_KEY = 'lottery:results';
 const RESULTS_TTL_SECONDS = 60 * 60 * 24; // 24h cache
 
-// Last known result (fallback when KV is empty) — updated 2026-06-01
+// Last known result (fallback when KV is empty) — updated 2026-06-16
 const HARDCODED_SEED = {
   available: true,
-  date: '2026-06-01',
-  displayDate: { date: '01', month: '06', year: '2026' },
+  date: '2026-06-16',
+  displayDate: { date: '16', month: '06', year: '2026' },
   period: [],
-  firstPrize: '173770',
-  last3f: ['848', '415'],
-  last3b: ['410', '938'],
-  last2: ['95'],
-  near1: ['173769', '173771'],
-  updatedAt: '2026-06-02T08:30:00.000Z',
-  source: 'thairath.co.th',
+  firstPrize: '287184',
+  last3f: ['758', '434'],
+  last3b: ['007', '721'],
+  last2: ['48'],
+  near1: ['287183', '287185'],
+  updatedAt: '2026-06-16T16:25:00.000Z',
+  source: 'sanook.com',
 };
 
 async function getCachedResults(kv) {
