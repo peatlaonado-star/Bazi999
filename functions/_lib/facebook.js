@@ -385,3 +385,293 @@ export async function facebookExchange(context) {
 // No auth wrapper — App Secret in env IS the auth barrier for this endpoint.
 // Anyone calling must already have access to the Cloudflare Pages env (which is admin-level).
 export const facebookExchangeNoAuth = facebookExchange;
+
+// ═══════════════════════════════════════════════
+// 📩 Messages / Inbox — อ่าน + ส่งข้อความ Facebook Page
+// ═══════════════════════════════════════════════
+
+// ── GET /v1/facebook/inbox ──
+// Reads recent conversations + unread messages
+// Query: ?unread_only=1&limit=10
+export async function facebookInbox(context) {
+  const { request, env } = context;
+  if (request.method === 'OPTIONS') return handleOptions();
+
+  try {
+    const { token, pageId } = getConfig(env);
+    const url = new URL(request.url);
+    const unreadOnly = url.searchParams.get('unread_only') === '1';
+    const limit = Math.min(50, Number(url.searchParams.get('limit')) || 10);
+
+    // Fetch conversations
+    const convFields = 'participants,messages.limit(5){message,from,created_time,attachments{name,image_data,mime_type}},unread_count,updated_time';
+    const convUrl = `${GRAPH_BASE}/${pageId}/conversations?fields=${encodeURIComponent(convFields)}&limit=${limit}&access_token=${encodeURIComponent(token)}`;
+
+    if (unreadOnly) {
+      // Filter only conversations with unread messages
+    }
+
+    const convResp = await fetch(convUrl);
+    const convData = await convResp.json();
+
+    if (!convResp.ok || convData.error) {
+      return jsonResponse({
+        success: false,
+        error: 'FB_API_ERROR',
+        fbError: convData.error,
+      }, 502);
+    }
+
+    const conversations = (convData.data || []).map(conv => ({
+      id: conv.id,
+      updatedTime: conv.updated_time,
+      unreadCount: conv.unread_count || 0,
+      participants: (conv.participants?.data || []).map(p => ({
+        name: p.name,
+        email: p.email,
+      })),
+      recentMessages: (conv.messages?.data || []).map(msg => ({
+        from: msg.from?.name || 'Unknown',
+        message: msg.message || '',
+        createdAt: msg.created_time,
+        hasAttachments: !!(msg.attachments?.data?.length),
+        attachments: (msg.attachments?.data || []).map(att => ({
+          name: att.name || 'attachment',
+          type: att.mime_type || 'unknown',
+          isImage: (att.mime_type || '').startsWith('image/'),
+          imageUrl: att.image_data?.url || null,
+        })),
+      })),
+    }));
+
+    // Filter unread only if requested
+    const filtered = unreadOnly
+      ? conversations.filter(c => c.unreadCount > 0)
+      : conversations;
+
+    return jsonResponse({
+      success: true,
+      conversations: filtered,
+      total: conversations.length,
+      unreadOnly,
+    });
+  } catch (err) {
+    return errorResponse(500, 'INTERNAL_ERROR', err.message);
+  }
+}
+
+// ── POST /v1/facebook/send ──
+// Sends a message to a Facebook user via conversation
+// Body: { conversation_id: string, message: string }
+export async function facebookSendMessage(context) {
+  const { request, env } = context;
+  if (request.method === 'OPTIONS') return handleOptions();
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return errorResponse(400, 'BAD_JSON', 'Request body must be valid JSON');
+  }
+
+  const { conversation_id, message } = body || {};
+  if (!conversation_id) return errorResponse(400, 'MISSING_ID', 'Provide conversation_id');
+  if (!message) return errorResponse(400, 'MISSING_MESSAGE', 'Provide message');
+
+  try {
+    const { token } = getConfig(env);
+
+    const sendUrl = `${GRAPH_BASE}/${conversation_id}/messages`;
+    const formBody = new URLSearchParams();
+    formBody.append('message', String(message));
+    formBody.append('access_token', token);
+
+    const resp = await fetch(sendUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formBody.toString(),
+    });
+    const data = await resp.json();
+
+    if (!resp.ok || data.error) {
+      return jsonResponse({
+        success: false,
+        error: 'FB_SEND_ERROR',
+        fbError: data.error,
+      }, 502);
+    }
+
+    return jsonResponse({
+      success: true,
+      messageId: data.message_id || data.id,
+      conversationId: conversation_id,
+    });
+  } catch (err) {
+    return errorResponse(500, 'INTERNAL_ERROR', err.message);
+  }
+}
+
+// ── POST /v1/facebook/auto-pin ──
+// Cron-friendly endpoint: checks unread conversations for payment slips,
+// issues a PIN, and replies to the customer.
+//
+// Flow:
+//   1. Fetch unread conversations with image attachments
+//   2. For each conversation with an unread image:
+//      a. Issue a new PIN via admin API
+//      b. Send the PIN back to the customer
+//      c. Notify admin via Telegram (optional)
+//   3. Return summary
+//
+// Auth: admin JWT (STARVIA_ADMIN_JWT_SECRET)
+export async function facebookAutoPin(context) {
+  const { request, env } = context;
+  if (request.method === 'OPTIONS') return handleOptions();
+
+  // Import admin functions dynamically to avoid circular deps
+  const { issuePins } = await import('./admin.js');
+
+  try {
+    const { token, pageId } = getConfig(env);
+
+    // Step 1: Fetch conversations with unread messages
+    const convFields = 'participants,messages.limit(3){message,from,created_time,attachments{name,image_data,mime_type}},unread_count,updated_time';
+    const convUrl = `${GRAPH_BASE}/${pageId}/conversations?fields=${encodeURIComponent(convFields)}&limit=20&access_token=${encodeURIComponent(token)}`;
+
+    const convResp = await fetch(convUrl);
+    const convData = await convResp.json();
+
+    if (!convResp.ok || convData.error) {
+      return jsonResponse({
+        success: false,
+        error: 'FB_API_ERROR',
+        fbError: convData.error,
+      }, 502);
+    }
+
+    const conversations = convData.data || [];
+
+    // Step 2: Find conversations with unread image messages
+    const pinCandidates = [];
+    for (const conv of conversations) {
+      const unreadCount = conv.unread_count || 0;
+      if (unreadCount === 0) continue;
+
+      const messages = conv.messages?.data || [];
+      for (const msg of messages) {
+        // Only process messages from customers (not from our page)
+        const isFromCustomer = msg.from?.id !== pageId;
+        if (!isFromCustomer) continue;
+
+        // Check for image attachments
+        const attachments = msg.attachments?.data || [];
+        const hasImage = attachments.some(a => (a.mime_type || '').startsWith('image/'));
+        if (!hasImage) continue;
+
+        // Found a candidate!
+        const customerName = msg.from?.name || 'ลูกค้า';
+        pinCandidates.push({
+          conversationId: conv.id,
+          customerName,
+          customerId: msg.from?.id,
+          messageId: msg.id,
+          messageSnippet: (msg.message || '').substring(0, 100),
+          imageCount: attachments.filter(a => (a.mime_type || '').startsWith('image/')).length,
+          receivedAt: msg.created_time,
+        });
+        break; // One PIN per conversation
+      }
+    }
+
+    if (pinCandidates.length === 0) {
+      return jsonResponse({
+        success: true,
+        result: 'NO_NEW_SLIPS',
+        message: 'ไม่มีข้อความใหม่ที่มีรูปภาพ (สลิป)',
+        checked: conversations.length,
+        checkedAt: new Date().toISOString(),
+      });
+    }
+
+    // Step 3: Issue PINs for each candidate
+    const results = [];
+    for (const candidate of pinCandidates) {
+      try {
+        // Issue a PIN via the admin system
+        const ctx = { env, request: new Request('http://localhost/v1/admin/pins/issue', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            count: 1,
+            days: 30,
+            plan: 'premium_199',
+            note: `Auto-PIN for ${candidate.customerName} via Facebook`,
+          }),
+        }) };
+
+        const pinResult = await issuePins(ctx);
+        const pinBody = await pinResult.json();
+
+        if (!pinBody.success) {
+          results.push({
+            ...candidate,
+            status: 'PIN_ISSUE_FAILED',
+            error: pinBody.error,
+          });
+          continue;
+        }
+
+        const pin = pinBody.issued[0];
+        const pinCode = pin.pin;
+
+        // Step 4: Send PIN back to customer
+        const thankYouMsg = `คุณ ${candidate.customerName} ค่ะ ✨\n\nขอบคุณสำหรับการชำระเงินค่ะ 🎉\n\n🔑 รหัสปลดล็อก Premium ของคุณ:\n${pinCode}\n\nวิธีใช้: ไปที่ https://starvia.website → กด "Premium" → กรอกรหัส\n\n📅 อายุ 30 วัน (ถึง ${pin.expires})\n\nสอบถามเพิ่มเติมทักมาได้เลยนะคะ 🙏`;
+
+        const sendUrl = `${GRAPH_BASE}/${candidate.conversationId}/messages`;
+        const formBody = new URLSearchParams();
+        formBody.append('message', thankYouMsg);
+        formBody.append('access_token', token);
+
+        const sendResp = await fetch(sendUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: formBody.toString(),
+        });
+        const sendData = await sendResp.json();
+
+        results.push({
+          ...candidate,
+          status: 'SUCCESS',
+          pin: pinCode,
+          plan: pin.plan,
+          expiresAt: pin.expires,
+          replySent: !!(sendData.message_id || sendData.id),
+          replyMessageId: sendData.message_id || sendData.id,
+        });
+      } catch (err) {
+        results.push({
+          ...candidate,
+          status: 'ERROR',
+          error: err.message,
+        });
+      }
+    }
+
+    return jsonResponse({
+      success: true,
+      result: results.length > 0 ? 'PINS_ISSUED' : 'NO_NEW_SLIPS',
+      issued: results.filter(r => r.status === 'SUCCESS').length,
+      failed: results.filter(r => r.status !== 'SUCCESS').length,
+      results,
+      checked: conversations.length,
+      checkedAt: new Date().toISOString(),
+    });
+  } catch (err) {
+    return errorResponse(500, 'INTERNAL_ERROR', err.message);
+  }
+}
+
+// ── Auth wrappers ──
+export const facebookInboxAuth = (context) => withAdminAuth(context, facebookInbox);
+export const facebookSendAuth = (context) => withAdminAuth(context, facebookSendMessage);
+export const facebookAutoPinAuth = (context) => withAdminAuth(context, facebookAutoPin);

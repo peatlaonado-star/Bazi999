@@ -9,6 +9,9 @@ import {
   facebookPostAuth,
   facebookDeleteAuth,
   facebookExchangeNoAuth,
+  facebookInboxAuth,
+  facebookSendAuth,
+  facebookAutoPinAuth,
 } from '../../_lib/facebook.js';
 
 export async function onRequest(context) {
@@ -53,6 +56,21 @@ export async function onRequest(context) {
     // POST /v1/facebook/exchange (App Secret in env IS the auth barrier)
     if (path === 'exchange' && request.method === 'POST') {
       return facebookExchangeNoAuth(context);
+    }
+
+    // GET /v1/facebook/inbox (reads conversations)
+    if (path === 'inbox' && request.method === 'GET') {
+      return facebookInboxAuth(context);
+    }
+
+    // POST /v1/facebook/send (sends message)
+    if (path === 'send' && request.method === 'POST') {
+      return facebookSendAuth(context);
+    }
+
+    // POST /v1/facebook/auto-pin (auto-PIN from inbox slips)
+    if (path === 'auto-pin' && request.method === 'POST') {
+      return facebookAutoPinAuth(context);
     }
 
     return new Response(
