@@ -279,10 +279,7 @@ export async function facebookExchange(context) {
     return errorResponse(500, 'NO_APP_SECRET', 'FACEBOOK_APP_SECRET not set in env — cannot exchange');
   }
 
-  const appId = env.FACEBOOK_APP_ID;
-  if (!appId) {
-    return errorResponse(500, 'NO_APP_ID', 'FACEBOOK_APP_ID not set in env — cannot exchange');
-  }
+  const appId = env.FACEBOOK_APP_ID || '61573341702581';
 
   // Rate limit: 5/hour per IP (tighter than post 30/hour)
   const ip = getClientIp(request);
