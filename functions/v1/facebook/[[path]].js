@@ -13,6 +13,14 @@ import {
   facebookSendAuth,
   facebookAutoPinAuth,
 } from '../../_lib/facebook.js';
+import {
+  facebookAutoPostAuth,
+  facebookAutoPostPreviewAuth,
+} from '../../_lib/auto-post.js';
+import {
+  facebookAutoReplyAuth,
+  facebookAutoReplyTestAuth,
+} from '../../_lib/auto-reply.js';
 
 export async function onRequest(context) {
   const { request } = context;
@@ -71,6 +79,26 @@ export async function onRequest(context) {
     // POST /v1/facebook/auto-pin (auto-PIN from inbox slips)
     if (path === 'auto-pin' && request.method === 'POST') {
       return facebookAutoPinAuth(context);
+    }
+
+    // POST /v1/facebook/auto-post (daily horoscope auto-post)
+    if (path === 'auto-post' && request.method === 'POST') {
+      return facebookAutoPostAuth(context);
+    }
+
+    // GET /v1/facebook/auto-post (preview today's post without posting)
+    if (path === 'auto-post' && request.method === 'GET') {
+      return facebookAutoPostPreviewAuth(context);
+    }
+
+    // POST /v1/facebook/auto-reply (scan comments + auto-reply)
+    if (path === 'auto-reply' && request.method === 'POST') {
+      return facebookAutoReplyAuth(context);
+    }
+
+    // POST /v1/facebook/auto-reply/test (test keyword matching)
+    if (path === 'auto-reply/test' && request.method === 'POST') {
+      return facebookAutoReplyTestAuth(context);
     }
 
     return new Response(
