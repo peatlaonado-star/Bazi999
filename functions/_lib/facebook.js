@@ -646,7 +646,27 @@ export async function facebookAutoPin(context) {
         const pinCode = pin.pin;
 
         // Step 4: Send PIN back to customer via Messenger Platform API
-        const thankYouMsg = `คุณ ${candidate.customerName} ค่ะ ✨\\n\\nขอบคุณสำหรับการชำระเงินค่ะ 🎉\\n\\n🔑 รหัสปลดล็อก Premium ของคุณ:\\n${pinCode}\\n\\nวิธีใช้: ไปที่ https://starvia.website → กด "Premium" → กรอกรหัส\\n\\n📅 อายุ 30 วัน (ถึง ${pin.expires})\\n\\nสอบถามเพิ่มเติมทักมาได้เลยนะคะ 🙏`;
+        const thankYouMsg = [
+          `✨ คุณ ${candidate.customerName} ค่ะ`,
+          ``,
+          `ขอบคุณสำหรับการชำระเงินค่ะ 🎉`,
+          ``,
+          `━━━━━━━━━━━━━━━━`,
+          `🔑 รหัสปลดล็อก Premium`,
+          ``,
+          `     ${pinCode}`,
+          ``,
+          `📅 อายุ 30 วัน`,
+          `⏰ ถึง ${new Date(pin.expires).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}`,
+          `━━━━━━━━━━━━━━━━`,
+          ``,
+          `📖 วิธีใช้`,
+          `1. ไปที่ https://starvia.website`,
+          `2. กดปุ่ม "Premium"`,
+          `3. กรอกรหัสด้านบน`,
+          ``,
+          `สอบถามเพิ่มเติมทักมาได้เลยนะคะ 🙏`,
+        ].join('\n');
 
         const sendUrl = `${GRAPH_BASE}/${pageId}/messages?access_token=${encodeURIComponent(token)}`;
         const msgBody = JSON.stringify({
