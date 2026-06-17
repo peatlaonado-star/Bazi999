@@ -51,15 +51,12 @@ export async function facebookHealth(context) {
       }, 200);
     }
 
-    // Check if this is actually a Page token by listing accounts
-    // User tokens return all pages, Page tokens return [] (or error)
-    const accountsResp = await fetch(
-      `${GRAPH_BASE}/me/accounts?fields=id,name&access_token=${encodeURIComponent(token)}`
+    // Check if token can actually read page inbox (the permission auto-pin needs)
+    const inboxResp = await fetch(
+      `${GRAPH_BASE}/${pageId}/conversations?limit=1&access_token=${encodeURIComponent(token)}`
     );
-    const accountsData = await accountsResp.json();
-    const isPageToken = Array.isArray(accountsData.data) && accountsData.data.length === 0
-      && accountsData.data?.length !== undefined;
-    // Page tokens return empty data[]; User tokens return list of pages
+    const inboxData = await inboxResp.json();
+    const canReadInbox = inboxResp.ok && Array.isArray(inboxData.data);
 
     return jsonResponse({
       ok: true,
@@ -70,12 +67,12 @@ export async function facebookHealth(context) {
         idsMatch: data.id === pageId,
       },
       tokenType: {
-        isPageToken,
-        hint: isPageToken
-          ? 'Looks like Page token (empty accounts list)'
-          : 'Looks like User token (has pages). Use "Get Page Access Token" in Explorer to get a real Page token.',
-        pagesAvailable: accountsData.data?.length || 0,
-        pageNames: accountsData.data?.map(p => p.name) || [],
+        isPageToken: canReadInbox,
+        canReadInbox,
+        hint: canReadInbox
+          ? 'Token can read page inbox - ready for auto-pin'
+          : 'Token valid but cannot read inbox. Ensure Page token has pages_messaging permission.',
+        error: canReadInbox ? undefined : inboxData.error?.message,
       },
     });
   } catch (err) {
