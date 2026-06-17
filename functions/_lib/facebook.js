@@ -744,7 +744,7 @@ async function ocrSlipImage(imageUrl, env) {
     if (!imgResp.ok) return 'ดาวน์โหลดรูปไม่สำเร็จ';
     const imgBuffer = await imgResp.arrayBuffer();
     const contentType = imgResp.headers.get('content-type') || 'image/jpeg';
-    const base64 = btoa(String.fromCharCode(...new Uint8Array(imgBuffer)));
+    const base64 = btoa(Array.from(new Uint8Array(imgBuffer), b => String.fromCharCode(b)).join(''));
     const dataUrl = `data:${contentType};base64,${base64}`;
 
     // Try OpenAI first (better Thai OCR)
