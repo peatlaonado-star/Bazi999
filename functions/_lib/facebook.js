@@ -613,11 +613,71 @@ export async function facebookAutoPin(context) {
       });
     }
 
-    // Step 3: Issue PINs for each candidate
+    // Step 3: Process each candidate (OCR → check amount ≥ 199 → issue PIN)
     const results = [];
+    const MIN_AMOUNT = 199;
+
     for (const candidate of pinCandidates) {
       try {
-        // Issue a PIN via the admin system
+        // Step 3.1: OCR the slip image FIRST (before issuing PIN)
+        const ocrResult = await ocrSlipImage(candidate.slipImageUrl, env);
+        const parsedAmount = parseAmountFromOCR(ocrResult);
+
+        // Step 3.2: Check minimum amount (199 THB)
+        if (parsedAmount !== null && parsedAmount < MIN_AMOUNT) {
+          // Amount too low — reject, don't issue PIN
+          const rejectMsg = [
+            `😔 คุณ ${candidate.customerName} ค่ะ`,
+            ``,
+            `ขอบคุณที่ส่งสลิปมาให้นะคะ แต่ยอดโอนขั้นต่ำสำหรับปลดล็อก Premium คือ **${MIN_AMOUNT} บาท** ค่ะ`,
+            ``,
+            `📋 ระบบอ่านสลิปได้: **${parsedAmount.toLocaleString('th-TH')} บาท**`,
+            ``,
+            `หากต้องการปลดล็อก กรุณาโอนเพิ่มอีก **${(MIN_AMOUNT - parsedAmount).toLocaleString('th-TH')} บาท** นะคะ 🙏`,
+          ].join('\n');
+
+          const sendUrl = `${GRAPH_BASE}/${pageId}/messages?access_token=${encodeURIComponent(token)}`;
+          const msgBody = JSON.stringify({
+            recipient: { id: candidate.customerId },
+            message: { text: rejectMsg },
+            messaging_type: 'RESPONSE',
+          });
+          const sendResp = await fetch(sendUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: msgBody,
+          });
+          const sendData = await sendResp.json();
+          const sendOk = !!(sendData.message_id || sendData.id);
+
+          // Notify Telegram about rejection
+          await notifyTelegram(env, {
+            customerName: candidate.customerName,
+            pinCode: null,
+            ocrResult,
+            slipImageUrl: candidate.slipImageUrl,
+            expires: null,
+            rejected: true,
+            rejectReason: `ยอดไม่ถึง ${MIN_AMOUNT} บาท (OCR: ${parsedAmount} THB)`,
+          });
+
+          // Update KV dedup to 'rejected' so it can be reprocessed if customer sends again
+          const dedupKey = `fb:pin:msg:${candidate.messageId}`;
+          try {
+            await env.STARVIA_KV.put(dedupKey, 'rejected_amount_too_low', { expirationTtl: 3600 });
+          } catch {}
+
+          results.push({
+            ...candidate,
+            status: 'AMOUNT_TOO_LOW',
+            ocrResult,
+            parsedAmount,
+            replySent: sendOk,
+          });
+          continue;
+        }
+
+        // Step 3.3: Amount OK (or unreadable — err on side of issuing) → Issue PIN
         const ctx = { env, request: new Request('http://localhost/v1/admin/pins/issue', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -625,7 +685,7 @@ export async function facebookAutoPin(context) {
             count: 1,
             days: 30,
             plan: 'premium_199',
-            note: `Auto-PIN for ${candidate.customerName} via Facebook`,
+            note: `Auto-PIN for ${candidate.customerName} via Facebook (OCR: ${parsedAmount || 'unreadable'} THB)`,
           }),
         }) };
 
@@ -637,6 +697,8 @@ export async function facebookAutoPin(context) {
             ...candidate,
             status: 'PIN_ISSUE_FAILED',
             error: pinBody.error,
+            ocrResult,
+            parsedAmount,
           });
           continue;
         }
@@ -644,10 +706,7 @@ export async function facebookAutoPin(context) {
         const pin = pinBody.issued[0];
         const pinCode = pin.pin;
 
-        // Step 3.5: OCR the slip image (non-blocking — fire and collect later)
-        const ocrPromise = ocrSlipImage(candidate.slipImageUrl, env);
-
-        // Step 4: Send PIN back to customer via Messenger Platform API
+        // Step 3.4: Send PIN to customer
         const thankYouMsg = [
           `✨ คุณ ${candidate.customerName} ค่ะ`,
           ``,
@@ -685,8 +744,7 @@ export async function facebookAutoPin(context) {
         const sendData = await sendResp.json();
         const sendOk = !!(sendData.message_id || sendData.id);
 
-        // Step 4.5: Wait for OCR result + send Telegram notification
-        const ocrResult = await ocrPromise;
+        // Step 3.5: Notify Telegram
         const telegramSent = await notifyTelegram(env, {
           customerName: candidate.customerName,
           pinCode,
@@ -704,11 +762,8 @@ export async function facebookAutoPin(context) {
           replySent: sendOk,
           replyMessageId: sendData.message_id || sendData.id || null,
           ocrResult,
+          parsedAmount,
           telegramNotified: telegramSent,
-          _debugSend: {
-            httpStatus: sendResp.status,
-            fbResponse: sendData,
-          },
         });
       } catch (err) {
         results.push({
@@ -834,28 +889,62 @@ async function ocrWithZen(dataUrl, apiKey) {
   }
 }
 
+// ── Parse amount from OCR text (Thai: "ยอดเงิน: 355.00 บาท" → 355.00) ──
+function parseAmountFromOCR(ocrText) {
+  if (!ocrText) return null;
+  // Match patterns: "ยอดเงิน: 355.00 บาท", "จำนวนเงิน 199", "355.00", "฿199", "199.00 บาท"
+  const patterns = [
+    /(?:ยอดเงิน|จำนวนเงิน|ยอด|amount)[:\s]*([\d,]+\.?\d*)/i,
+    /฿\s*([\d,]+\.?\d*)/,
+    /([\d,]+\.?\d*)\s*(?:บาท|baht|thb)/i,
+    /([\d,]+\.\d{2})/,       // explicit decimal like 355.00
+  ];
+  for (const pat of patterns) {
+    const match = ocrText.match(pat);
+    if (match) {
+      const amount = parseFloat(match[1].replace(/,/g, ''));
+      if (!isNaN(amount) && amount > 0) return amount;
+    }
+  }
+  return null;
+}
+
 // ── Telegram Notification: Send slip + PIN info to admin ──
-async function notifyTelegram(env, { customerName, pinCode, ocrResult, slipImageUrl, expires }) {
+async function notifyTelegram(env, { customerName, pinCode, ocrResult, slipImageUrl, expires, rejected, rejectReason }) {
   const botToken = env.TELEGRAM_BOT_TOKEN;
   const chatId = env.TELEGRAM_CHAT_ID;
   if (!botToken || !chatId) return false;
 
-  const expiresThai = new Date(expires).toLocaleDateString('th-TH', {
-    year: 'numeric', month: 'long', day: 'numeric',
-  });
+  let caption;
 
-  const caption = [
-    `💳 แจ้งเตือน Auto-PIN`,
-    ``,
-    `👤 ลูกค้า: ${customerName}`,
-    `🔑 PIN: ${pinCode}`,
-    `📅 หมดอายุ: ${expiresThai}`,
-    ``,
-    `📋 OCR สลิป:`,
-    `${ocrResult || 'อ่านไม่ออก'}`,
-    ``,
-    `❌ หากไม่ถูกต้อง: /revoke ${pinCode}`,
-  ].join('\n');
+  if (rejected) {
+    caption = [
+      `⚠️ แจ้งเตือน Auto-PIN — **ปฏิเสธ**`,
+      ``,
+      `👤 ลูกค้า: ${customerName}`,
+      `🚫 สาเหตุ: ${rejectReason || 'ไม่ระบุ'}`,
+      ``,
+      `📋 OCR สลิป:`,
+      `${ocrResult || 'อ่านไม่ออก'}`,
+    ].join('\n');
+  } else {
+    const expiresThai = new Date(expires).toLocaleDateString('th-TH', {
+      year: 'numeric', month: 'long', day: 'numeric',
+    });
+
+    caption = [
+      `💳 แจ้งเตือน Auto-PIN`,
+      ``,
+      `👤 ลูกค้า: ${customerName}`,
+      `🔑 PIN: ${pinCode}`,
+      `📅 หมดอายุ: ${expiresThai}`,
+      ``,
+      `📋 OCR สลิป:`,
+      `${ocrResult || 'อ่านไม่ออก'}`,
+      ``,
+      `❌ หากไม่ถูกต้อง: /revoke ${pinCode}`,
+    ].join('\n');
+  }
 
   try {
     if (slipImageUrl) {
