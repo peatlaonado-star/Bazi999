@@ -82,25 +82,25 @@ export async function verifyPremiumPin(context) {
 
   const record = store.pins[idx];
 
-  if (record.usedAt) {
-    return json({ success: false, error: 'PIN_USED', message: 'รหัสนี้ถูกใช้งานไปแล้ว' }, 409);
-  }
   if (record.expiresAt && Date.parse(record.expiresAt) <= Date.now()) {
     return json({ success: false, error: 'PIN_EXPIRED', message: 'รหัสนี้หมดอายุแล้ว' }, 410);
   }
 
-  // Mark as used
+  // If PIN already used, re-issue token (allows re-entry on new devices/browsers)
   const issuedAt = Math.floor(Date.now() / 1000);
   const expiresIn = Number(env.STARVIA_TOKEN_TTL_SECONDS || DEFAULT_TTL);
   const expiresAt = issuedAt + expiresIn;
   const plan = record.plan || env.STARVIA_PREMIUM_PLAN || DEFAULT_PLAN;
 
-  store.pins[idx] = {
-    ...record,
-    plan,
-    usedAt: new Date(issuedAt * 1000).toISOString(),
-  };
-  await writePinStore(env.STARVIA_KV, store);
+  // Mark as used (update usedAt if first use, keep existing if re-issue)
+  if (!record.usedAt) {
+    store.pins[idx] = {
+      ...record,
+      plan,
+      usedAt: new Date(issuedAt * 1000).toISOString(),
+    };
+    await writePinStore(env.STARVIA_KV, store);
+  }
 
   const token = await signHS256(
     {
