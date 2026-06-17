@@ -134,9 +134,13 @@
   // ============== Premium Check ==============
   function isPremium() {
     if (window.starviaIsPremium) return true;
+    // Check multiple storage keys (streak-tracker uses 'starvia_premium', premium verify uses 'starvia_premium_token')
+    const premiumFlag = localStorage.getItem('starvia_premium');
+    if (premiumFlag === 'true') return true;
     const token = localStorage.getItem('starvia_premium_token');
     if (!token) return false;
-    return token.startsWith('STAR-');
+    // Accept both JWT tokens (eyJ...) and legacy STAR- tokens
+    return token.startsWith('STAR-') || token.startsWith('eyJ');
   }
   window.isTarotPremium = isPremium;
 
@@ -151,11 +155,66 @@
         <div class="tarot-limit-tip">
           💎 <strong>Premium</strong> — เปิดไพ่ได้ไม่จำกัด + ทำนาย 3 ใบ + AI ตีความเจาะลึก
         </div>
-        <button class="tarot-btn-primary" onclick="showTarotStep('spread')">← กลับเลือกวิธีทำนาย</button>
+        <div class="tarot-pin-section">
+          <div class="tarot-pin-label">มีรหัส Premium? กรอกรหัสที่นี่</div>
+          <div class="tarot-pin-row">
+            <input type="text" id="tarot-pin-input" class="tarot-pin-input" 
+                   placeholder="STAR-XXXX-XXXX" maxlength="18" autocomplete="off"
+                   onkeydown="if(event.key==='Enter')activatePremiumFromPin()">
+            <button class="tarot-btn-primary tarot-pin-btn" onclick="activatePremiumFromPin()">เปิดใช้</button>
+          </div>
+          <div id="tarot-pin-status" class="tarot-pin-status"></div>
+        </div>
+        <button class="tarot-btn-secondary" onclick="showTarotStep('spread')" style="margin-top:12px">← กลับเลือกวิธีทำนาย</button>
       `;
     }
     showTarotStep('limit');
   }
+
+  // ============== Activate Premium from PIN ==============
+  window.activatePremiumFromPin = async function() {
+    const input = document.getElementById('tarot-pin-input');
+    const status = document.getElementById('tarot-pin-status');
+    if (!input || !status) return;
+
+    const pin = input.value.trim().toUpperCase();
+    if (!pin) {
+      status.innerHTML = '<span style="color:#e8534A">กรุณากรอกรหัส</span>';
+      return;
+    }
+
+    status.innerHTML = '<span style="color:#C9A227">⏳ กำลังตรวจสอบ...</span>';
+    input.disabled = true;
+
+    try {
+      const resp = await fetch('/v1/premium/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin })
+      });
+      const data = await resp.json();
+
+      if (data.success && data.token) {
+        // Store token in both keys for compatibility
+        localStorage.setItem('starvia_premium_token', data.token);
+        localStorage.setItem('starvia_premium', 'true');
+        window.starviaIsPremium = true;
+        
+        status.innerHTML = '<span style="color:#32CD32">✅ Premium เปิดใช้แล้ว!</span>';
+        input.disabled = true;
+
+        // Reload after short delay to apply premium everywhere
+        setTimeout(() => { window.location.reload(); }, 1200);
+      } else {
+        status.innerHTML = '<span style="color:#e8534A">❌ ' + (data.message || 'รหัสไม่ถูกต้อง') + '</span>';
+        input.disabled = false;
+        input.focus();
+      }
+    } catch (err) {
+      status.innerHTML = '<span style="color:#e8534A">❌ เกิดข้อผิดพลาด — ลองใหม่</span>';
+      input.disabled = false;
+    }
+  };
 
   // ============== Go to Spread Step (back button for pick3) ==============
   window.goToSpreadStep = function() {
@@ -495,11 +554,62 @@
         <h3>ใบเดียวต่อวัน — เปิดใหม่พรุ่งนี้</h3>
         <p>ดวงบอกว่าการเปิดซ้ำในวันเดียวกันจะ "เบลอ" พลังงานของไพ่</p>
         <p class="tarot-limit-tip">💎 <strong>Premium</strong> เปิดไพ่ได้ไม่จำกัด + AI ตีความเจาะลึก</p>
-        <button class="tarot-btn-primary" onclick="closeTarot()">กลับหน้าหลัก</button>
+        <div class="tarot-pin-section">
+          <div class="tarot-pin-label">มีรหัส Premium? กรอกรหัสที่นี่</div>
+          <div class="tarot-pin-row">
+            <input type="text" id="tarot-pin-input-limit" class="tarot-pin-input" 
+                   placeholder="STAR-XXXX-XXXX" maxlength="18" autocomplete="off"
+                   onkeydown="if(event.key==='Enter')activatePremiumFromPinLimit()">
+            <button class="tarot-btn-primary tarot-pin-btn" onclick="activatePremiumFromPinLimit()">เปิดใช้</button>
+          </div>
+          <div id="tarot-pin-status-limit" class="tarot-pin-status"></div>
+        </div>
+        <button class="tarot-btn-secondary" onclick="closeTarot()" style="margin-top:12px">กลับหน้าหลัก</button>
       `;
     }
     showTarotStep('limit');
   }
+
+  // ============== Activate Premium from PIN (Daily Limit) ==============
+  window.activatePremiumFromPinLimit = async function() {
+    const input = document.getElementById('tarot-pin-input-limit');
+    const status = document.getElementById('tarot-pin-status-limit');
+    if (!input || !status) return;
+
+    const pin = input.value.trim().toUpperCase();
+    if (!pin) {
+      status.innerHTML = '<span style="color:#e8534A">กรุณากรอกรหัส</span>';
+      return;
+    }
+
+    status.innerHTML = '<span style="color:#C9A227">⏳ กำลังตรวจสอบ...</span>';
+    input.disabled = true;
+
+    try {
+      const resp = await fetch('/v1/premium/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin })
+      });
+      const data = await resp.json();
+
+      if (data.success && data.token) {
+        localStorage.setItem('starvia_premium_token', data.token);
+        localStorage.setItem('starvia_premium', 'true');
+        window.starviaIsPremium = true;
+        
+        status.innerHTML = '<span style="color:#32CD32">✅ Premium เปิดใช้แล้ว!</span>';
+        setTimeout(() => { window.location.reload(); }, 1200);
+      } else {
+        status.innerHTML = '<span style="color:#e8534A">❌ ' + (data.message || 'รหัสไม่ถูกต้อง') + '</span>';
+        input.disabled = false;
+        input.focus();
+      }
+    } catch (err) {
+      status.innerHTML = '<span style="color:#e8534A">❌ เกิดข้อผิดพลาด — ลองใหม่</span>';
+      input.disabled = false;
+    }
+  };
 
   // ============== Share ==============
   window.shareTarotResult = function() {
