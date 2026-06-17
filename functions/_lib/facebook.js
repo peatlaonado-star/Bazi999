@@ -466,8 +466,8 @@ export async function facebookInbox(context) {
 }
 
 // ── POST /v1/facebook/send ──
-// Sends a message to a Facebook user via conversation
-// Body: { conversation_id: string, message: string }
+// Sends a message to a Facebook user via Messenger Platform API
+// Body: { recipient_id: string, message: string }
 export async function facebookSendMessage(context) {
   const { request, env } = context;
   if (request.method === 'OPTIONS') return handleOptions();
@@ -479,22 +479,24 @@ export async function facebookSendMessage(context) {
     return errorResponse(400, 'BAD_JSON', 'Request body must be valid JSON');
   }
 
-  const { conversation_id, message } = body || {};
-  if (!conversation_id) return errorResponse(400, 'MISSING_ID', 'Provide conversation_id');
+  const { recipient_id, message } = body || {};
+  if (!recipient_id) return errorResponse(400, 'MISSING_ID', 'Provide recipient_id');
   if (!message) return errorResponse(400, 'MISSING_MESSAGE', 'Provide message');
 
   try {
-    const { token } = getConfig(env);
+    const { token, pageId } = getConfig(env);
 
-    const sendUrl = `${GRAPH_BASE}/${conversation_id}/messages`;
-    const formBody = new URLSearchParams();
-    formBody.append('message', String(message));
-    formBody.append('access_token', token);
+    const sendUrl = `${GRAPH_BASE}/${pageId}/messages?access_token=${encodeURIComponent(token)}`;
+    const msgBody = JSON.stringify({
+      recipient: { id: String(recipient_id) },
+      message: { text: String(message) },
+      messaging_type: 'RESPONSE',
+    });
 
     const resp = await fetch(sendUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: formBody.toString(),
+      headers: { 'Content-Type': 'application/json' },
+      body: msgBody,
     });
     const data = await resp.json();
 
@@ -509,7 +511,7 @@ export async function facebookSendMessage(context) {
     return jsonResponse({
       success: true,
       messageId: data.message_id || data.id,
-      conversationId: conversation_id,
+      recipientId: recipient_id,
     });
   } catch (err) {
     return errorResponse(500, 'INTERNAL_ERROR', err.message);
@@ -573,6 +575,20 @@ export async function facebookAutoPin(context) {
         const hasImage = attachments.some(a => (a.mime_type || '').startsWith('image/'));
         if (!hasImage) continue;
 
+        // Dedup: skip if this message was already processed
+        const dedupKey = `fb:pin:msg:${msg.id}`;
+        let alreadyProcessed = false;
+        try {
+          const existing = await env.STARVIA_KV.get(dedupKey);
+          if (existing) alreadyProcessed = true;
+        } catch { /* KV may not be available */ }
+        if (alreadyProcessed) continue;
+
+        // Mark as processing (set before sending to prevent races)
+        try {
+          await env.STARVIA_KV.put(dedupKey, 'processing', { expirationTtl: 86400 });
+        } catch { /* non-critical */ }
+
         // Found a candidate!
         const customerName = msg.from?.name || 'ลูกค้า';
         pinCandidates.push({
@@ -629,29 +645,36 @@ export async function facebookAutoPin(context) {
         const pin = pinBody.issued[0];
         const pinCode = pin.pin;
 
-        // Step 4: Send PIN back to customer
-        const thankYouMsg = `คุณ ${candidate.customerName} ค่ะ ✨\n\nขอบคุณสำหรับการชำระเงินค่ะ 🎉\n\n🔑 รหัสปลดล็อก Premium ของคุณ:\n${pinCode}\n\nวิธีใช้: ไปที่ https://starvia.website → กด "Premium" → กรอกรหัส\n\n📅 อายุ 30 วัน (ถึง ${pin.expires})\n\nสอบถามเพิ่มเติมทักมาได้เลยนะคะ 🙏`;
+        // Step 4: Send PIN back to customer via Messenger Platform API
+        const thankYouMsg = `คุณ ${candidate.customerName} ค่ะ ✨\\n\\nขอบคุณสำหรับการชำระเงินค่ะ 🎉\\n\\n🔑 รหัสปลดล็อก Premium ของคุณ:\\n${pinCode}\\n\\nวิธีใช้: ไปที่ https://starvia.website → กด "Premium" → กรอกรหัส\\n\\n📅 อายุ 30 วัน (ถึง ${pin.expires})\\n\\nสอบถามเพิ่มเติมทักมาได้เลยนะคะ 🙏`;
 
-        const sendUrl = `${GRAPH_BASE}/${candidate.conversationId}/messages`;
-        const formBody = new URLSearchParams();
-        formBody.append('message', thankYouMsg);
-        formBody.append('access_token', token);
+        const sendUrl = `${GRAPH_BASE}/${pageId}/messages?access_token=${encodeURIComponent(token)}`;
+        const msgBody = JSON.stringify({
+          recipient: { id: candidate.customerId },
+          message: { text: thankYouMsg },
+          messaging_type: 'RESPONSE',
+        });
 
         const sendResp = await fetch(sendUrl, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: formBody.toString(),
+          headers: { 'Content-Type': 'application/json' },
+          body: msgBody,
         });
         const sendData = await sendResp.json();
+        const sendOk = !!(sendData.message_id || sendData.id);
 
         results.push({
           ...candidate,
-          status: 'SUCCESS',
+          status: sendOk ? 'SUCCESS' : 'SEND_FAILED',
           pin: pinCode,
           plan: pin.plan,
           expiresAt: pin.expires,
-          replySent: !!(sendData.message_id || sendData.id),
-          replyMessageId: sendData.message_id || sendData.id,
+          replySent: sendOk,
+          replyMessageId: sendData.message_id || sendData.id || null,
+          _debugSend: {
+            httpStatus: sendResp.status,
+            fbResponse: sendData,
+          },
         });
       } catch (err) {
         results.push({
