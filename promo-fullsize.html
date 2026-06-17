@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700;800;900&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  width: 1088px;
+  height: 1344px;
+  background: linear-gradient(135deg, #09061c 0%, #1a0a3e 30%, #2d1b69 60%, #09061c 100%);
+  font-family: 'Noto Sans Thai', sans-serif;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Stars background */
+body::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    radial-gradient(1px 1px at 50px 80px, #fff 0.5px, transparent 1px),
+    radial-gradient(1px 1px at 200px 150px, #fff 0.5px, transparent 1px),
+    radial-gradient(1.5px 1.5px at 400px 50px, #ffd700 1px, transparent 1px),
+    radial-gradient(1px 1px at 600px 200px, #fff 0.5px, transparent 1px),
+    radial-gradient(1px 1px at 800px 100px, #fff 0.5px, transparent 1px),
+    radial-gradient(1.5px 1.5px at 950px 300px, #ffd700 1px, transparent 1px),
+    radial-gradient(1px 1px at 100px 400px, #fff 0.5px, transparent 1px),
+    radial-gradient(1px 1px at 700px 500px, #fff 0.5px, transparent 1px),
+    radial-gradient(1px 1px at 300px 600px, #fff 0.5px, transparent 1px),
+    radial-gradient(1.5px 1.5px at 500px 700px, #ffd700 1px, transparent 1px),
+    radial-gradient(1px 1px at 150px 900px, #fff 0.5px, transparent 1px),
+    radial-gradient(1px 1px at 900px 800px, #fff 0.5px, transparent 1px),
+    radial-gradient(1px 1px at 450px 1100px, #fff 0.5px, transparent 1px),
+    radial-gradient(1px 1px at 750px 1200px, #fff 0.5px, transparent 1px),
+    radial-gradient(1px 1px at 1000px 600px, #fff 0.5px, transparent 1px),
+    radial-gradient(1px 1px at 50px 1100px, #fff 0.5px, transparent 1px),
+    radial-gradient(1.5px 1.5px at 350px 350px, #ffd700 1px, transparent 1px),
+    radial-gradient(1px 1px at 650px 950px, #fff 0.5px, transparent 1px),
+    radial-gradient(1px 1px at 850px 450px, #fff 0.5px, transparent 1px);
+  z-index: 0;
+}
+
+.header {
+  text-align: center;
+  padding: 36px 40px 20px;
+  z-index: 1;
+}
+
+.header .title {
+  font-size: 52px;
+  font-weight: 900;
+  color: #ffd700;
+  text-shadow: 0 0 20px rgba(255,215,0,0.5), 0 2px 4px rgba(0,0,0,0.5);
+  letter-spacing: 2px;
+  line-height: 1.3;
+}
+
+.header .subtitle {
+  font-size: 26px;
+  color: #b8a9d4;
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 50px;
+  padding: 10px 50px 20px;
+  z-index: 1;
+}
+
+/* Phone mockup - left side */
+.phone-container {
+  flex: 0 0 auto;
+  position: relative;
+}
+
+.phone {
+  width: 420px;
+  height: 760px;
+  background: #1a1a2e;
+  border-radius: 40px;
+  border: 4px solid #444;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 30px rgba(255,215,0,0.1);
+  position: relative;
+}
+
+.phone-notch {
+  width: 120px;
+  height: 24px;
+  background: #000;
+  border-radius: 0 0 16px 16px;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+.phone-screen {
+  width: 100%;
+  height: 100%;
+  padding: 40px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.phone-screen .zodiac-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.zodiac-item {
+  background: rgba(255,215,0,0.1);
+  border: 1px solid rgba(255,215,0,0.2);
+  border-radius: 10px;
+  padding: 8px 4px;
+  text-align: center;
+  color: #ffd700;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.zodiac-item .icon {
+  font-size: 18px;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.phone-screen .daily-section {
+  background: rgba(255,255,255,0.06);
+  border-radius: 14px;
+  padding: 14px;
+  border: 1px solid rgba(255,215,0,0.15);
+}
+
+.daily-section .section-title {
+  color: #ffd700;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.daily-section .fortune-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  color: #e0d5f0;
+  font-size: 12px;
+}
+
+.fortune-item .label {
+  color: #b8a9d4;
+  font-weight: 600;
+}
+
+.fortune-item .value {
+  font-weight: 700;
+  color: #ffd700;
+}
+
+.lucky-numbers {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.lucky-num {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #ffd700, #b8860b);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 900;
+  color: #1a0a3e;
+  box-shadow: 0 4px 12px rgba(255,215,0,0.3);
+}
+
+.phone-screen .tarot-section {
+  background: linear-gradient(135deg, rgba(147,51,234,0.3), rgba(79,70,229,0.2));
+  border-radius: 14px;
+  padding: 12px 14px;
+  border: 1px solid rgba(147,51,234,0.3);
+  text-align: center;
+}
+
+.tarot-section .tarot-title {
+  color: #c084fc;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.tarot-section .tarot-sub {
+  color: #a78bfa;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+/* Right side features */
+.features-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 10px 0;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.feature-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  flex-shrink: 0;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+
+.feature-icon.gold {
+  background: linear-gradient(135deg, #ffd700, #b8860b);
+}
+.feature-icon.pink {
+  background: linear-gradient(135deg, #ec4899, #be185d);
+}
+.feature-icon.purple {
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+}
+.feature-icon.blue {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+.feature-text .ft-title {
+  font-size: 30px;
+  font-weight: 800;
+  color: #ffd700;
+  text-shadow: 0 2px 8px rgba(255,215,0,0.3);
+  line-height: 1.3;
+}
+
+.feature-text .ft-desc {
+  font-size: 18px;
+  color: #b8a9d4;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+/* Premium banner */
+.premium-banner {
+  background: linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,215,0,0.05));
+  border: 2px solid rgba(255,215,0,0.3);
+  border-radius: 18px;
+  padding: 20px 28px;
+  text-align: center;
+}
+
+.premium-banner .pb-title {
+  font-size: 28px;
+  font-weight: 900;
+  color: #ffd700;
+}
+
+.premium-banner .pb-sub {
+  font-size: 18px;
+  color: #b8a9d4;
+  margin-top: 4px;
+}
+
+.premium-banner .pb-price {
+  font-size: 34px;
+  font-weight: 900;
+  color: #10b981;
+  margin-top: 6px;
+}
+
+.premium-banner .pb-unit {
+  font-size: 16px;
+  color: #6ee7b7;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 16px 40px 36px;
+  z-index: 1;
+}
+
+.footer .url {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffd700;
+  letter-spacing: 1px;
+}
+
+.footer .hashtags {
+  font-size: 16px;
+  color: #7c6ba3;
+  margin-top: 6px;
+}
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="title">✦ เช็คดวงทุกวัน ฟรี ✦</div>
+    <div class="subtitle">STARVIA — โหราศาสตร์ไทยโบราณ</div>
+  </div>
+
+  <div class="main-content">
+    <!-- Phone mockup - LEFT -->
+    <div class="phone-container">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="zodiac-grid">
+            <div class="zodiac-item"><span class="icon">♈</span>เมษ</div>
+            <div class="zodiac-item"><span class="icon">♉</span>พฤษภ</div>
+            <div class="zodiac-item"><span class="icon">♊</span>เมถุน</div>
+            <div class="zodiac-item"><span class="icon">♋</span>กรกฎ</div>
+            <div class="zodiac-item"><span class="icon">♌</span>สิงห์</div>
+            <div class="zodiac-item"><span class="icon">♍</span>กันย์</div>
+            <div class="zodiac-item"><span class="icon">♎</span>ตุลย์</div>
+            <div class="zodiac-item"><span class="icon">♏</span>พิจิก</div>
+            <div class="zodiac-item"><span class="icon">♐</span>ธนู</div>
+            <div class="zodiac-item"><span class="icon">♑</span>มกร</div>
+            <div class="zodiac-item"><span class="icon">♒</span>กุมภ์</div>
+            <div class="zodiac-item"><span class="icon">♓</span>มีน</div>
+          </div>
+
+          <div class="daily-section">
+            <div class="section-title">🌟 ดวงวันนี้ — 17 มิถุนายน 🌟</div>
+            <div class="fortune-item">
+              <span class="label">🔮 ธาตุ</span>
+              <span class="value">ไฟ — ความรักเด่น</span>
+            </div>
+            <div class="fortune-item">
+              <span class="label">🎨 สีมงคล</span>
+              <span class="value">ชมพู · ม่วง</span>
+            </div>
+            <div class="fortune-item">
+              <span class="label">🕐 เวลาเฮง</span>
+              <span class="value">09:00 — 11:00</span>
+            </div>
+            <div class="fortune-item" style="border-bottom:none;">
+              <span class="label">⭐ ทิศมงคล</span>
+              <span class="value">ทิศตะวันออก</span>
+            </div>
+            <div class="lucky-numbers">
+              <div class="lucky-num">67</div>
+              <div class="lucky-num">66</div>
+              <div class="lucky-num">65</div>
+            </div>
+          </div>
+
+          <div class="tarot-section">
+            <div class="tarot-title">🃏 ไพ่ทาโร่ทำนาย — จักรพรรดิ์</div>
+            <div class="tarot-sub">อำนาจ · ความมั่นคง · ความสำเร็จ</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Features - RIGHT -->
+    <div class="features-panel">
+      <div class="feature-item">
+        <div class="feature-icon gold">🌟</div>
+        <div class="feature-text">
+          <div class="ft-title">ดูดวงตัวเอง</div>
+          <div class="ft-desc">เช็คดวงรายวันฟรี ทุกวัน</div>
+        </div>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-icon pink">💕</div>
+        <div class="feature-text">
+          <div class="ft-title">ดูดวงคู่</div>
+          <div class="ft-desc">เช็คความเข้ากัน ราศีคู่รัก</div>
+        </div>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-icon purple">🕐</div>
+        <div class="feature-text">
+          <div class="ft-title">ฤกษ์งามยามดี</div>
+          <div class="ft-desc">เลือกวันที่เหมาะสำหรับคุณ</div>
+        </div>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-icon blue">🃏</div>
+        <div class="feature-text">
+          <div class="ft-title">ไพ่ทาโร่ทำนาย</div>
+          <div class="ft-desc">เปิดไพ่ 3 ใบ ทำนายลึกซึ้ง</div>
+        </div>
+      </div>
+
+      <div class="premium-banner">
+        <div class="pb-title">⭐ Premium อ่านหมด ⭐</div>
+        <div class="pb-sub">ปลดล็อคทุกฟีเจอร์ ไม่มีโฆษณา</div>
+        <div class="pb-price">199 <span class="pb-unit">฿/เดือน</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="url">⭐ starvia.website ⭐</div>
+    <div class="hashtags">#Starvia #ดวงวันนี้ #ดูดวงฟรี #ไพ่ทาโร่ #โหราศาสตร์ไทย</div>
+  </div>
+</body>
+</html>

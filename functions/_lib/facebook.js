@@ -619,6 +619,7 @@ export async function facebookAutoPin(context) {
         // Step 3.1: OCR the slip image FIRST (before issuing PIN)
         const ocrResult = await ocrSlipImage(candidate.slipImageUrl, env);
         const parsedAmount = parseAmountFromOCR(ocrResult);
+        const transferTime = parseTimeFromOCR(ocrResult);
 
         // Step 3.2: Check minimum amount (199 THB)
         if (parsedAmount !== null && parsedAmount < MIN_AMOUNT) {
@@ -673,6 +674,22 @@ export async function facebookAutoPin(context) {
           });
           continue;
         }
+
+        // Step 3.2.5: Check for duplicate slips from same customer
+        const dupCheck = await checkDuplicateSlip(env, candidate.customerId, parsedAmount, transferTime);
+        if (dupCheck.isDuplicate && !dupCheck.isNewer) {
+          // Same amount, same or older time → skip (already processed)
+          results.push({
+            ...candidate,
+            status: 'DUPLICATE_SLIP',
+            message: 'สลิปซ้ำ: ยอด ' + (parsedAmount || '?') + ' THB, เวลา ' + (transferTime || '?') + ' (PIN เดิม: ' + dupCheck.oldPin + ')',
+            ocrResult,
+            parsedAmount,
+            transferTime,
+          });
+          continue;
+        }
+        // If dupCheck.isDuplicate && isNewer → continue to issue new PIN (old one stays, admin revokes later)
 
         // Step 3.3: Amount OK (or unreadable — err on side of issuing) → Issue PIN
         const ctx = { env, request: new Request('http://localhost/v1/admin/pins/issue', {
@@ -748,6 +765,18 @@ export async function facebookAutoPin(context) {
           ocrResult,
           slipImageUrl: candidate.slipImageUrl,
           expires: pin.expires,
+          duplicateOf: dupCheck.isDuplicate ? dupCheck.oldPin : null,
+          timeUncertain: dupCheck.timeUncertain || false,
+        });
+
+        // Step 3.6: Save slip record for future duplicate detection
+        await saveSlipRecord(env, candidate.customerId, {
+          amount: parsedAmount,
+          transferTime,
+          pinCode,
+          messageId: candidate.messageId,
+          createdAt: new Date().toISOString(),
+          revoked: false,
         });
 
         results.push({
@@ -760,7 +789,9 @@ export async function facebookAutoPin(context) {
           replyMessageId: sendData.message_id || sendData.id || null,
           ocrResult,
           parsedAmount,
+          transferTime,
           telegramNotified: telegramSent,
+          duplicateOf: dupCheck.isDuplicate ? dupCheck.oldPin : null,
         });
       } catch (err) {
         results.push({
@@ -906,8 +937,84 @@ function parseAmountFromOCR(ocrText) {
   return null;
 }
 
+// ── Parse transfer time from OCR text ──
+// Matches: "14:30", "14:30:00", "เวลา 14:30 น.", "เมื่อ 14:30"
+function parseTimeFromOCR(ocrText) {
+  if (!ocrText) return null;
+  const m = ocrText.match(/(\d{1,2}:\d{2}(?::\d{2})?)/);
+  return m ? m[1] : null;
+}
+
+// ── Slip record tracking: save / check duplicates ──
+// KV key: fb:slip:{customerId} → JSON array of records
+// TTL: 30 days (long enough for admin to verify)
+
+async function saveSlipRecord(env, customerId, record) {
+  const key = 'fb:slip:' + customerId;
+  try {
+    const existing = await env.STARVIA_KV.get(key, { type: 'json' });
+    const records = existing || [];
+    records.push(record);
+    // Keep last 10 records per customer
+    await env.STARVIA_KV.put(key, JSON.stringify(records.slice(-10)), {
+      expirationTtl: 86400 * 30,
+    });
+  } catch (e) {
+    console.error('saveSlipRecord error:', e.message);
+  }
+}
+
+// Returns: { isDuplicate, isNewer, oldPin, oldTime, oldAmount }
+async function checkDuplicateSlip(env, customerId, amount, transferTime) {
+  const key = 'fb:slip:' + customerId;
+  try {
+    const existing = await env.STARVIA_KV.get(key, { type: 'json' });
+    if (!existing || existing.length === 0) return { isDuplicate: false };
+
+    // Find active (non-revoked) slips with same amount
+    const sameAmount = existing.filter(r => r.amount === amount && !r.revoked);
+    if (sameAmount.length === 0) return { isDuplicate: false };
+
+    // If we have transfer time, compare with the most recent same-amount slip
+    const latest = sameAmount[sameAmount.length - 1];
+    if (transferTime && latest.transferTime) {
+      if (transferTime > latest.transferTime) {
+        // Newer transfer → allow (issue new PIN, admin revokes old if needed)
+        return {
+          isDuplicate: true,
+          isNewer: true,
+          oldPin: latest.pinCode,
+          oldTime: latest.transferTime,
+          oldAmount: latest.amount,
+        };
+      }
+      // Same or older → skip
+      return {
+        isDuplicate: true,
+        isNewer: false,
+        oldPin: latest.pinCode,
+        oldTime: latest.transferTime,
+        oldAmount: latest.amount,
+      };
+    }
+
+    // Can't determine time (OCR missed it) → err on side of customer, allow PIN
+    return {
+      isDuplicate: true,
+      isNewer: true,
+      oldPin: latest.pinCode,
+      oldTime: latest.transferTime || null,
+      oldAmount: latest.amount,
+      timeUncertain: true,
+    };
+  } catch (e) {
+    console.error('checkDuplicateSlip error:', e.message);
+    return { isDuplicate: false };
+  }
+}
+
 // ── Telegram Notification: Send slip + PIN info to admin ──
-async function notifyTelegram(env, { customerName, pinCode, ocrResult, slipImageUrl, expires, rejected, rejectReason }) {
+async function notifyTelegram(env, { customerName, pinCode, ocrResult, slipImageUrl, expires, rejected, rejectReason, duplicateOf, timeUncertain }) {
   const botToken = env.TELEGRAM_BOT_TOKEN;
   const chatId = env.TELEGRAM_CHAT_ID;
   if (!botToken || !chatId) return false;
@@ -939,7 +1046,9 @@ async function notifyTelegram(env, { customerName, pinCode, ocrResult, slipImage
       `📋 OCR สลิป:`,
       `${ocrResult || 'อ่านไม่ออก'}`,
       ``,
-      `❌ หากไม่ถูกต้อง: /revoke ${pinCode}`,
+      duplicateOf
+        ? `⚠️ สลิปซ้ำ — PIN เดิม: ${duplicateOf}${timeUncertain ? '\n   (ระบบอ่านเวลาไม่ได้ ออก PIN ไว้ก่อน)' : ''}\n   (ตรวจสอบเงินเข้าแล้ว /revoke ${duplicateOf} ถ้ายกเลิก)`
+        : `❌ หากไม่ถูกต้อง: /revoke ${pinCode}`,
     ].join('\n');
   }
 
