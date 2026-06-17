@@ -739,6 +739,15 @@ async function ocrSlipImage(imageUrl, env) {
   if (!apiKey || !imageUrl) return null;
 
   try {
+    // Step 1: Download image from Facebook CDN (URL may have auth tokens)
+    const imgResp = await fetch(imageUrl);
+    if (!imgResp.ok) return 'ดาวน์โหลดรูปไม่สำเร็จ';
+    const imgBuffer = await imgResp.arrayBuffer();
+    const contentType = imgResp.headers.get('content-type') || 'image/jpeg';
+    const base64 = btoa(String.fromCharCode(...new Uint8Array(imgBuffer)));
+    const dataUrl = `data:${contentType};base64,${base64}`;
+
+    // Step 2: Send to OpenCode Zen Vision (using minimax-m3 which supports Thai + vision)
     const resp = await fetch('https://opencode.ai/zen/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -746,12 +755,12 @@ async function ocrSlipImage(imageUrl, env) {
         'Authorization': 'Bearer ' + apiKey,
       },
       body: JSON.stringify({
-        model: 'qwen3.6-plus-free',
+        model: 'minimax-m3-free',
         messages: [{
           role: 'user',
           content: [
             { type: 'text', text: 'อ่านข้อความภาษาไทยจากสลิปโอนเงินนี้ ตอบสั้นๆ เป็นภาษาไทย บอกเฉพาะ: ยอดเงิน, วันที่โอน, เวลา (ถ้ามี), ธนาคารต้นทาง (ถ้ามี) ถ้าอ่านไม่ออกให้ตอบว่า "อ่านไม่ออก"' },
-            { type: 'image_url', image_url: { url: imageUrl } },
+            { type: 'image_url', image_url: { url: dataUrl } },
           ],
         }],
         max_tokens: 150,
@@ -759,8 +768,14 @@ async function ocrSlipImage(imageUrl, env) {
       }),
     });
     const data = await resp.json();
-    return data.choices?.[0]?.message?.content?.trim() || 'อ่านไม่ออก';
+    const content = data.choices?.[0]?.message?.content?.trim();
+    if (!content || content === 'อ่านไม่ออก') {
+      // Log raw response for debugging
+      console.log('OCR raw response:', JSON.stringify(data).substring(0, 500));
+    }
+    return content || 'อ่านไม่ออก';
   } catch (e) {
+    console.error('OCR error:', e.message);
     return `OCR error: ${e.message}`;
   }
 }
