@@ -893,3 +893,58 @@
   color: #ef4444;
   font-size: 14px;
 }
+/* Tarot Card Images */
+.tarot-card-image,
+.tarot-result-image {
+  width: 100%;
+  max-width: 200px;
+  margin: 0 auto 1rem;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(201, 162, 39, 0.3);
+}
+
+.tarot-card-image img,
+.tarot-result-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* 3-card spread images */
+.tarot-result-3card .tarot-result-image {
+  max-width: 120px;
+  margin-bottom: 0.5rem;
+}
+
+/* Reversed card effect */
+.tarot-result-card.reversed .tarot-result-image img,
+.tarot-result-3card.reversed .tarot-result-image img {
+  transform: rotate(180deg);
+}
+
+/* Card back pattern */
+.tarot-card-back {
+  background: linear-gradient(135deg, #1a0a2e 0%, #0d0521 100%);
+  border: 2px solid #c9a227;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.tarot-card-back::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(201, 162, 39, 0.1) 10px,
+    rgba(201, 162, 39, 0.1) 20px
+  );
+  pointer-events: none;
+}

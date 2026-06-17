@@ -258,11 +258,17 @@
       const oriEmoji = orientation === 'up' ? '⬆️' : '⬇️';
       const posClass = ['tarot-past', 'tarot-present', 'tarot-future'][i];
 
+      // Use card image if available, otherwise emoji
+      const cardImage = card.image || null;
+      const imageHtml = cardImage 
+        ? `<div class="tarot-result-image"><img src="${cardImage}" alt="${card.thai}" loading="lazy"></div>`
+        : `<div class="tarot-result-emoji">${card.emoji}</div>`;
+
       return `
         <div class="tarot-result-3card ${posClass} ${orientation === 'down' ? 'reversed' : ''}">
           <div class="tarot-result-3card-label">${labels[i]}</div>
           <div class="tarot-result-card-inner">
-            <div class="tarot-result-emoji">${card.emoji}</div>
+            ${imageHtml}
             <div class="tarot-result-name-thai">${card.thai}</div>
             <div class="tarot-result-name-en">${card.name}</div>
             <div class="tarot-result-orientation">${oriEmoji} ${oriText}</div>
@@ -367,9 +373,15 @@
       setTimeout(() => {
         // Replace with flipped card
         back.classList.add('flipped');
+        // Use card image if available, otherwise emoji
+        const cardImage = card.image || null;
+        const imageHtml = cardImage 
+          ? `<div class="tarot-card-image"><img src="${cardImage}" alt="${card.thai}" loading="lazy"></div>`
+          : `<div class="tarot-card-emoji">${card.emoji}</div>`;
+        
         back.innerHTML = `
           <div class="tarot-card-front">
-            <div class="tarot-card-emoji">${card.emoji}</div>
+            ${imageHtml}
             <div class="tarot-card-name-thai">${card.thai}</div>
             <div class="tarot-card-name-en">${card.name}</div>
             <div class="tarot-card-symbol">${card.symbol}</div>
@@ -396,9 +408,15 @@
 
     const resultEl = document.getElementById('tarot-result-content');
     if (resultEl) {
+      // Use card image if available, otherwise emoji
+      const cardImage = drawnCard.image || null;
+      const imageHtml = cardImage 
+        ? `<div class="tarot-result-image"><img src="${cardImage}" alt="${drawnCard.thai}" loading="lazy"></div>`
+        : `<div class="tarot-result-emoji">${drawnCard.emoji}</div>`;
+      
       resultEl.innerHTML = `
         <div class="tarot-result-card ${drawnOrientation === 'down' ? 'reversed' : ''}">
-          <div class="tarot-result-emoji">${drawnCard.emoji}</div>
+          ${imageHtml}
           <div class="tarot-result-name-thai">${drawnCard.thai}</div>
           <div class="tarot-result-name-en">${drawnCard.name}</div>
           <div class="tarot-result-orientation">${oriEmoji} ${oriText}</div>
