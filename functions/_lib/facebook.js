@@ -733,10 +733,10 @@ export async function facebookAutoPin(context) {
   }
 }
 
-// ── OCR: Read Thai text from slip image using OpenCode Zen Vision ──
+// ── OCR: Read Thai text from slip image ──
+// Priority: OpenAI (gpt-4o-mini) > OpenCode Zen (minimax-m3-free)
 async function ocrSlipImage(imageUrl, env) {
-  const apiKey = env.OPENCODE_ZEN_API_KEY || env.OPENCODE_ZEN_API_KEY_2;
-  if (!apiKey || !imageUrl) return null;
+  if (!imageUrl) return null;
 
   try {
     // Step 1: Download image from Facebook CDN (URL may have auth tokens)
@@ -747,7 +747,62 @@ async function ocrSlipImage(imageUrl, env) {
     const base64 = btoa(String.fromCharCode(...new Uint8Array(imgBuffer)));
     const dataUrl = `data:${contentType};base64,${base64}`;
 
-    // Step 2: Send to OpenCode Zen Vision (using minimax-m3 which supports Thai + vision)
+    // Try OpenAI first (better Thai OCR)
+    const openaiKey = env.OPENAI_API_KEY;
+    if (openaiKey) {
+      const result = await ocrWithOpenAI(dataUrl, openaiKey);
+      if (result) return result;
+    }
+
+    // Fallback to OpenCode Zen
+    const zenKey = env.OPENCODE_ZEN_API_KEY || env.OPENCODE_ZEN_API_KEY_2;
+    if (zenKey) {
+      const result = await ocrWithZen(dataUrl, zenKey);
+      if (result) return result;
+    }
+
+    return 'ไม่มี API key สำหรับ OCR';
+  } catch (e) {
+    console.error('OCR error:', e.message);
+    return `OCR error: ${e.message}`;
+  }
+}
+
+async function ocrWithOpenAI(dataUrl, apiKey) {
+  try {
+    const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + apiKey,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'text', text: 'อ่านข้อความภาษาไทยจากสลิปโอนเงินนี้ ตอบสั้นๆ เป็นภาษาไทย บอกเฉพาะ: ยอดเงิน, วันที่โอน, เวลา (ถ้ามี), ธนาคารต้นทาง (ถ้ามี) ถ้าอ่านไม่ออกให้ตอบว่า "อ่านไม่ออก"' },
+            { type: 'image_url', image_url: { url: dataUrl } },
+          ],
+        }],
+        max_tokens: 150,
+        temperature: 0,
+      }),
+    });
+    const data = await resp.json();
+    if (data.error) {
+      console.log('OpenAI OCR error:', JSON.stringify(data.error));
+      return null; // fallback
+    }
+    return data.choices?.[0]?.message?.content?.trim() || null;
+  } catch (e) {
+    console.error('OpenAI OCR exception:', e.message);
+    return null;
+  }
+}
+
+async function ocrWithZen(dataUrl, apiKey) {
+  try {
     const resp = await fetch('https://opencode.ai/zen/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -770,13 +825,12 @@ async function ocrSlipImage(imageUrl, env) {
     const data = await resp.json();
     const content = data.choices?.[0]?.message?.content?.trim();
     if (!content || content === 'อ่านไม่ออก') {
-      // Log raw response for debugging
-      console.log('OCR raw response:', JSON.stringify(data).substring(0, 500));
+      console.log('Zen OCR raw:', JSON.stringify(data).substring(0, 300));
     }
-    return content || 'อ่านไม่ออก';
+    return content || null;
   } catch (e) {
-    console.error('OCR error:', e.message);
-    return `OCR error: ${e.message}`;
+    console.error('Zen OCR exception:', e.message);
+    return null;
   }
 }
 
