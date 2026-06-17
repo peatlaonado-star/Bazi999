@@ -1006,3 +1006,19 @@
   margin-top: 8px;
   min-height: 20px;
 }
+
+/* Premium Unlocked State */
+.tarot-spread-btn.unlocked {
+  border-color: rgba(50, 205, 50, 0.4);
+  background: rgba(50, 205, 50, 0.05);
+}
+
+.tarot-spread-btn.unlocked .spread-badge {
+  background: linear-gradient(135deg, #32CD32, #228B22);
+  color: white;
+}
+
+.tarot-spread-btn.unlocked:hover {
+  border-color: rgba(50, 205, 50, 0.6);
+  background: rgba(50, 205, 50, 0.1);
+}

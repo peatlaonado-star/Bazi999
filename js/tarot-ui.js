@@ -24,6 +24,8 @@
     document.body.style.overflow = 'hidden';
     // Reset to category selection
     showTarotStep('category');
+    // Update premium status on UI
+    updatePremiumUI();
     // Trap focus inside modal (a11y)
     trapFocus(modal);
   };
@@ -131,6 +133,14 @@
     }
   };
 
+  // ============== Go to Spread Step (back button for pick3) ==============
+  window.goToSpreadStep = function() {
+    pickedCards3 = [];
+    available3 = [];
+    showTarotStep('spread');
+    updatePremiumUI();
+  };
+
   // ============== Premium Check ==============
   function isPremium() {
     if (window.starviaIsPremium) return true;
@@ -143,6 +153,31 @@
     return token.startsWith('STAR-') || token.startsWith('eyJ');
   }
   window.isTarotPremium = isPremium;
+
+  // ============== Update Premium UI ==============
+  function updatePremiumUI() {
+    const btn = document.getElementById('tarot-spread-three');
+    const desc = document.getElementById('tarot-spread-three-desc');
+    const badge = document.getElementById('tarot-spread-three-badge');
+    if (!btn || !desc || !badge) return;
+
+    if (isPremium()) {
+      // User is premium — unlock the button visually
+      btn.classList.remove('premium');
+      btn.classList.add('unlocked');
+      desc.textContent = 'Past / Present / Future — เปิดใช้แล้ว ✦';
+      badge.textContent = '✅ พรีเมี่ยม';
+      badge.style.background = 'linear-gradient(135deg, #32CD32, #228B22)';
+    } else {
+      // Not premium — show locked state
+      btn.classList.add('premium');
+      btn.classList.remove('unlocked');
+      desc.textContent = 'Past / Present / Future — Premium';
+      badge.textContent = '👑 Premium';
+      badge.style.background = '';
+    }
+  }
+  window.updateTarotPremiumUI = updatePremiumUI;
 
   // ============== Premium Upsell ==============
   function showTarotPremiumUpsell() {
@@ -214,13 +249,6 @@
       status.innerHTML = '<span style="color:#e8534A">❌ เกิดข้อผิดพลาด — ลองใหม่</span>';
       input.disabled = false;
     }
-  };
-
-  // ============== Go to Spread Step (back button for pick3) ==============
-  window.goToSpreadStep = function() {
-    pickedCards3 = [];
-    available3 = [];
-    showTarotStep('spread');
   };
 
   // ============== 3-Card Picker ==============
@@ -353,6 +381,12 @@
           ${getCombinedKeywords().map(k => `<span class="tarot-keyword">${k}</span>`).join('')}
         </div>
       </div>
+      <div class="tarot-ai-section">
+        <button class="tarot-ai-btn" onclick="requestAIInterpretation3()">
+          🤖 ให้ AI ตีความเจาะลึก
+        </button>
+        <div id="tarot-ai-result" style="display:none"></div>
+      </div>
     `;
 
     // Track event
@@ -365,7 +399,25 @@
     }
 
     showTarotStep('result');
+
+    // Update action buttons for 3-card spread
+    const actionsEl = document.getElementById('tarot-result-actions');
+    if (actionsEl) {
+      actionsEl.innerHTML = `
+        <button class="tarot-btn-secondary" onclick="drawTarot3Again()">🔄 เปิดใหม่</button>
+        <button class="tarot-btn-secondary" onclick="goToSpreadStep()">← เปลี่ยนวิธีทำนาย</button>
+        <button class="tarot-btn-primary" onclick="shareTarotResult()">📤 แชร์</button>
+      `;
+    }
   }
+
+  // ============== Draw 3-Card Again ==============
+  window.drawTarot3Again = function() {
+    pickedCards3 = [];
+    available3 = [];
+    showTarotStep('pick3');
+    renderTarotPicker3();
+  };
 
   // ============== Combined Interpretation ==============
   function buildCombinedInterpretation() {
@@ -501,6 +553,15 @@
     }
 
     showTarotStep('result');
+
+    // Reset action buttons for 1-card draw
+    const actionsEl = document.getElementById('tarot-result-actions');
+    if (actionsEl) {
+      actionsEl.innerHTML = `
+        <button class="tarot-btn-secondary" onclick="resetTarot()">เปลี่ยนหัวข้อ</button>
+        <button class="tarot-btn-primary" onclick="shareTarotResult()">📤 แชร์</button>
+      `;
+    }
   }
 
   // ============== AI Interpretation ==============
@@ -528,6 +589,50 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: 'tarot-ai-' + Date.now(),
+          params: {
+            skillId: 'chat_consultation',
+            input: { question: question, birthDate: birthDate }
+          }
+        })
+      });
+      const data = await resp.json();
+      if (data.success && data.result && data.result.reply) {
+        resultEl.innerHTML = '<div class="tarot-ai-content">' + data.result.reply + '</div>';
+      } else {
+        resultEl.innerHTML = '<div class="tarot-ai-error">ขออภัย AI ไม่สามารถตีความได้ในตอนนี้</div>';
+      }
+    } catch (err) {
+      resultEl.innerHTML = '<div class="tarot-ai-error">เกิดข้อผิดพลาด — ลองใหม่อีกครั้ง</div>';
+    }
+  };
+
+  // ============== AI Interpretation (3-Card Spread) ==============
+  window.requestAIInterpretation3 = async function() {
+    if (pickedCards3.length < 3) return;
+    const resultEl = document.getElementById('tarot-ai-result');
+    const btn = document.querySelector('.tarot-ai-btn');
+    if (!resultEl || !btn) return;
+
+    btn.style.display = 'none';
+    resultEl.style.display = 'block';
+    resultEl.innerHTML = '<div class="tarot-ai-loading">🔮 กำลังตีความ 3 ใบ...</div>';
+
+    const category = TAROT_CATEGORIES.find(c => c.id === currentCategory);
+    const cardsDesc = pickedCards3.map((item, i) => {
+      const pos = ['อดีต', 'ปัจจุบัน', 'อนาคต'][i];
+      const ori = item.orientation === 'up' ? 'ตั้ง' : 'กลับหัว';
+      return `${pos}: ${item.card.thai} (${item.card.name}) ${ori}`;
+    }).join(', ');
+    const question = 'ทำนายไพ่ทาโร่ 3 ใบ หมวด' + category.name + '. ' + cardsDesc + '. โปรดตีความความสัมพันธ์ของ 3 ใบ อดีต-ปัจจุบัน-อนาคต พร้อมคำแนะนำเชิงลึก';
+
+    const birthDate = localStorage.getItem('starvia_birthdate') || '';
+
+    try {
+      const resp = await fetch('/v1/agent/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: 'tarot-ai-3-' + Date.now(),
           params: {
             skillId: 'chat_consultation',
             input: { question: question, birthDate: birthDate }
