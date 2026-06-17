@@ -30,7 +30,7 @@
 
 <!-- Umami Analytics (Privacy-friendly) -->
 <script defer src="https://cloud.umami.is/script.js" data-website-id="21ed818b-d83b-4d45-a007-34f096db715f"></script>
-  <link rel="stylesheet" crossorigin href="/assets/main-nhtOhFuv.css">
+  <link rel="stylesheet" crossorigin href="/assets/main-CgicHZV6.css">
 </head>
 <noscript><div style="padding:40px;text-align:center;color:#C9A227;background:#09061c;font-family:sans-serif;"><h2>กรุณาเปิด JavaScript</h2><p>STARVIA ต้องใช้ JavaScript ในการทำงาน</p></div></noscript>
 <body>
@@ -382,11 +382,11 @@
           <div class="spread-name">เปิด 1 ใบ</div>
           <div class="spread-desc">ทำนายสั้น — ฟรีวันละ 1 ครั้ง</div>
         </button>
-        <button class="tarot-spread-btn premium" onclick="selectTarotSpread('three')">
+        <button class="tarot-spread-btn premium" id="tarot-spread-three" onclick="selectTarotSpread('three')">
           <div class="spread-emoji">🃏🃏🃏</div>
           <div class="spread-name">เปิด 3 ใบ</div>
-          <div class="spread-desc">Past / Present / Future — Premium</div>
-          <div class="spread-badge">👑 Premium</div>
+          <div class="spread-desc" id="tarot-spread-three-desc">Past / Present / Future — Premium</div>
+          <div class="spread-badge" id="tarot-spread-three-badge">👑 Premium</div>
         </button>
       </div>
       <div style="text-align: center; margin-top: 12px;">
@@ -408,7 +408,7 @@
     <div class="tarot-step" id="tarot-step-result">
       <h2>✨ ไพ่ของคุณ</h2>
       <div id="tarot-result-content"></div>
-      <div class="tarot-actions">
+      <div class="tarot-actions" id="tarot-result-actions">
         <button class="tarot-btn-secondary" onclick="resetTarot()">เปลี่ยนหัวข้อ</button>
         <button class="tarot-btn-primary" onclick="shareTarotResult()">📤 แชร์</button>
       </div>
@@ -433,11 +433,11 @@
 </div>
 
 <script defer src="js/tarot-dd884d9d.js"></script>
-<script defer src="js/tarot-ui-a5f1f704.js"></script>
+<script defer src="js/tarot-ui-f08699fb.js"></script>
 <script>
 // Version-based cache busting
 (function() {
-  var APP_VERSION = "2.0.2"; // Update this on each deploy
+  var APP_VERSION = "2.0.4"; // Update this on each deploy
   // Test: post-commit hook + reward preview deploy
   var stored = localStorage.getItem('starvia_version');
   

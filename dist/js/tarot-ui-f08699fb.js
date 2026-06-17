@@ -24,6 +24,8 @@
     document.body.style.overflow = 'hidden';
     // Reset to category selection
     showTarotStep('category');
+    // Update premium status on UI
+    updatePremiumUI();
     // Trap focus inside modal (a11y)
     trapFocus(modal);
   };
@@ -131,14 +133,51 @@
     }
   };
 
+  // ============== Go to Spread Step (back button for pick3) ==============
+  window.goToSpreadStep = function() {
+    pickedCards3 = [];
+    available3 = [];
+    showTarotStep('spread');
+    updatePremiumUI();
+  };
+
   // ============== Premium Check ==============
   function isPremium() {
     if (window.starviaIsPremium) return true;
+    // Check multiple storage keys (streak-tracker uses 'starvia_premium', premium verify uses 'starvia_premium_token')
+    const premiumFlag = localStorage.getItem('starvia_premium');
+    if (premiumFlag === 'true') return true;
     const token = localStorage.getItem('starvia_premium_token');
     if (!token) return false;
-    return token.startsWith('STAR-');
+    // Accept both JWT tokens (eyJ...) and legacy STAR- tokens
+    return token.startsWith('STAR-') || token.startsWith('eyJ');
   }
   window.isTarotPremium = isPremium;
+
+  // ============== Update Premium UI ==============
+  function updatePremiumUI() {
+    const btn = document.getElementById('tarot-spread-three');
+    const desc = document.getElementById('tarot-spread-three-desc');
+    const badge = document.getElementById('tarot-spread-three-badge');
+    if (!btn || !desc || !badge) return;
+
+    if (isPremium()) {
+      // User is premium — unlock the button visually
+      btn.classList.remove('premium');
+      btn.classList.add('unlocked');
+      desc.textContent = 'Past / Present / Future — เปิดใช้แล้ว ✦';
+      badge.textContent = '✅ พรีเมี่ยม';
+      badge.style.background = 'linear-gradient(135deg, #32CD32, #228B22)';
+    } else {
+      // Not premium — show locked state
+      btn.classList.add('premium');
+      btn.classList.remove('unlocked');
+      desc.textContent = 'Past / Present / Future — Premium';
+      badge.textContent = '👑 Premium';
+      badge.style.background = '';
+    }
+  }
+  window.updateTarotPremiumUI = updatePremiumUI;
 
   // ============== Premium Upsell ==============
   function showTarotPremiumUpsell() {
@@ -151,17 +190,65 @@
         <div class="tarot-limit-tip">
           💎 <strong>Premium</strong> — เปิดไพ่ได้ไม่จำกัด + ทำนาย 3 ใบ + AI ตีความเจาะลึก
         </div>
-        <button class="tarot-btn-primary" onclick="showTarotStep('spread')">← กลับเลือกวิธีทำนาย</button>
+        <div class="tarot-pin-section">
+          <div class="tarot-pin-label">มีรหัส Premium? กรอกรหัสที่นี่</div>
+          <div class="tarot-pin-row">
+            <input type="text" id="tarot-pin-input" class="tarot-pin-input" 
+                   placeholder="STAR-XXXX-XXXX" maxlength="18" autocomplete="off"
+                   onkeydown="if(event.key==='Enter')activatePremiumFromPin()">
+            <button class="tarot-btn-primary tarot-pin-btn" onclick="activatePremiumFromPin()">เปิดใช้</button>
+          </div>
+          <div id="tarot-pin-status" class="tarot-pin-status"></div>
+        </div>
+        <button class="tarot-btn-secondary" onclick="showTarotStep('spread')" style="margin-top:12px">← กลับเลือกวิธีทำนาย</button>
       `;
     }
     showTarotStep('limit');
   }
 
-  // ============== Go to Spread Step (back button for pick3) ==============
-  window.goToSpreadStep = function() {
-    pickedCards3 = [];
-    available3 = [];
-    showTarotStep('spread');
+  // ============== Activate Premium from PIN ==============
+  window.activatePremiumFromPin = async function() {
+    const input = document.getElementById('tarot-pin-input');
+    const status = document.getElementById('tarot-pin-status');
+    if (!input || !status) return;
+
+    const pin = input.value.trim().toUpperCase();
+    if (!pin) {
+      status.innerHTML = '<span style="color:#e8534A">กรุณากรอกรหัส</span>';
+      return;
+    }
+
+    status.innerHTML = '<span style="color:#C9A227">⏳ กำลังตรวจสอบ...</span>';
+    input.disabled = true;
+
+    try {
+      const resp = await fetch('/v1/premium/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin })
+      });
+      const data = await resp.json();
+
+      if (data.success && data.token) {
+        // Store token in both keys for compatibility
+        localStorage.setItem('starvia_premium_token', data.token);
+        localStorage.setItem('starvia_premium', 'true');
+        window.starviaIsPremium = true;
+        
+        status.innerHTML = '<span style="color:#32CD32">✅ Premium เปิดใช้แล้ว!</span>';
+        input.disabled = true;
+
+        // Reload after short delay to apply premium everywhere
+        setTimeout(() => { window.location.reload(); }, 1200);
+      } else {
+        status.innerHTML = '<span style="color:#e8534A">❌ ' + (data.message || 'รหัสไม่ถูกต้อง') + '</span>';
+        input.disabled = false;
+        input.focus();
+      }
+    } catch (err) {
+      status.innerHTML = '<span style="color:#e8534A">❌ เกิดข้อผิดพลาด — ลองใหม่</span>';
+      input.disabled = false;
+    }
   };
 
   // ============== 3-Card Picker ==============
@@ -258,11 +345,17 @@
       const oriEmoji = orientation === 'up' ? '⬆️' : '⬇️';
       const posClass = ['tarot-past', 'tarot-present', 'tarot-future'][i];
 
+      // Use card image if available, otherwise emoji
+      const cardImage = card.image || null;
+      const imageHtml = cardImage 
+        ? `<div class="tarot-result-image"><img src="${cardImage}" alt="${card.thai}" loading="lazy"></div>`
+        : `<div class="tarot-result-emoji">${card.emoji}</div>`;
+
       return `
         <div class="tarot-result-3card ${posClass} ${orientation === 'down' ? 'reversed' : ''}">
           <div class="tarot-result-3card-label">${labels[i]}</div>
           <div class="tarot-result-card-inner">
-            <div class="tarot-result-emoji">${card.emoji}</div>
+            ${imageHtml}
             <div class="tarot-result-name-thai">${card.thai}</div>
             <div class="tarot-result-name-en">${card.name}</div>
             <div class="tarot-result-orientation">${oriEmoji} ${oriText}</div>
@@ -288,6 +381,12 @@
           ${getCombinedKeywords().map(k => `<span class="tarot-keyword">${k}</span>`).join('')}
         </div>
       </div>
+      <div class="tarot-ai-section">
+        <button class="tarot-ai-btn" onclick="requestAIInterpretation3()">
+          🤖 ให้ AI ตีความเจาะลึก
+        </button>
+        <div id="tarot-ai-result" style="display:none"></div>
+      </div>
     `;
 
     // Track event
@@ -300,7 +399,25 @@
     }
 
     showTarotStep('result');
+
+    // Update action buttons for 3-card spread
+    const actionsEl = document.getElementById('tarot-result-actions');
+    if (actionsEl) {
+      actionsEl.innerHTML = `
+        <button class="tarot-btn-secondary" onclick="drawTarot3Again()">🔄 เปิดใหม่</button>
+        <button class="tarot-btn-secondary" onclick="goToSpreadStep()">← เปลี่ยนวิธีทำนาย</button>
+        <button class="tarot-btn-primary" onclick="shareTarotResult()">📤 แชร์</button>
+      `;
+    }
   }
+
+  // ============== Draw 3-Card Again ==============
+  window.drawTarot3Again = function() {
+    pickedCards3 = [];
+    available3 = [];
+    showTarotStep('pick3');
+    renderTarotPicker3();
+  };
 
   // ============== Combined Interpretation ==============
   function buildCombinedInterpretation() {
@@ -367,9 +484,15 @@
       setTimeout(() => {
         // Replace with flipped card
         back.classList.add('flipped');
+        // Use card image if available, otherwise emoji
+        const cardImage = card.image || null;
+        const imageHtml = cardImage 
+          ? `<div class="tarot-card-image"><img src="${cardImage}" alt="${card.thai}" loading="lazy"></div>`
+          : `<div class="tarot-card-emoji">${card.emoji}</div>`;
+        
         back.innerHTML = `
           <div class="tarot-card-front">
-            <div class="tarot-card-emoji">${card.emoji}</div>
+            ${imageHtml}
             <div class="tarot-card-name-thai">${card.thai}</div>
             <div class="tarot-card-name-en">${card.name}</div>
             <div class="tarot-card-symbol">${card.symbol}</div>
@@ -396,9 +519,15 @@
 
     const resultEl = document.getElementById('tarot-result-content');
     if (resultEl) {
+      // Use card image if available, otherwise emoji
+      const cardImage = drawnCard.image || null;
+      const imageHtml = cardImage 
+        ? `<div class="tarot-result-image"><img src="${cardImage}" alt="${drawnCard.thai}" loading="lazy"></div>`
+        : `<div class="tarot-result-emoji">${drawnCard.emoji}</div>`;
+      
       resultEl.innerHTML = `
         <div class="tarot-result-card ${drawnOrientation === 'down' ? 'reversed' : ''}">
-          <div class="tarot-result-emoji">${drawnCard.emoji}</div>
+          ${imageHtml}
           <div class="tarot-result-name-thai">${drawnCard.thai}</div>
           <div class="tarot-result-name-en">${drawnCard.name}</div>
           <div class="tarot-result-orientation">${oriEmoji} ${oriText}</div>
@@ -424,6 +553,15 @@
     }
 
     showTarotStep('result');
+
+    // Reset action buttons for 1-card draw
+    const actionsEl = document.getElementById('tarot-result-actions');
+    if (actionsEl) {
+      actionsEl.innerHTML = `
+        <button class="tarot-btn-secondary" onclick="resetTarot()">เปลี่ยนหัวข้อ</button>
+        <button class="tarot-btn-primary" onclick="shareTarotResult()">📤 แชร์</button>
+      `;
+    }
   }
 
   // ============== AI Interpretation ==============
@@ -468,6 +606,50 @@
     }
   };
 
+  // ============== AI Interpretation (3-Card Spread) ==============
+  window.requestAIInterpretation3 = async function() {
+    if (pickedCards3.length < 3) return;
+    const resultEl = document.getElementById('tarot-ai-result');
+    const btn = document.querySelector('.tarot-ai-btn');
+    if (!resultEl || !btn) return;
+
+    btn.style.display = 'none';
+    resultEl.style.display = 'block';
+    resultEl.innerHTML = '<div class="tarot-ai-loading">🔮 กำลังตีความ 3 ใบ...</div>';
+
+    const category = TAROT_CATEGORIES.find(c => c.id === currentCategory);
+    const cardsDesc = pickedCards3.map((item, i) => {
+      const pos = ['อดีต', 'ปัจจุบัน', 'อนาคต'][i];
+      const ori = item.orientation === 'up' ? 'ตั้ง' : 'กลับหัว';
+      return `${pos}: ${item.card.thai} (${item.card.name}) ${ori}`;
+    }).join(', ');
+    const question = 'ทำนายไพ่ทาโร่ 3 ใบ หมวด' + category.name + '. ' + cardsDesc + '. โปรดตีความความสัมพันธ์ของ 3 ใบ อดีต-ปัจจุบัน-อนาคต พร้อมคำแนะนำเชิงลึก';
+
+    const birthDate = localStorage.getItem('starvia_birthdate') || '';
+
+    try {
+      const resp = await fetch('/v1/agent/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: 'tarot-ai-3-' + Date.now(),
+          params: {
+            skillId: 'chat_consultation',
+            input: { question: question, birthDate: birthDate }
+          }
+        })
+      });
+      const data = await resp.json();
+      if (data.success && data.result && data.result.reply) {
+        resultEl.innerHTML = '<div class="tarot-ai-content">' + data.result.reply + '</div>';
+      } else {
+        resultEl.innerHTML = '<div class="tarot-ai-error">ขออภัย AI ไม่สามารถตีความได้ในตอนนี้</div>';
+      }
+    } catch (err) {
+      resultEl.innerHTML = '<div class="tarot-ai-error">เกิดข้อผิดพลาด — ลองใหม่อีกครั้ง</div>';
+    }
+  };
+
   // ============== Daily Limit ==============
   function showTarotLimit() {
     const limitEl = document.getElementById('tarot-limit-content');
@@ -477,11 +659,62 @@
         <h3>ใบเดียวต่อวัน — เปิดใหม่พรุ่งนี้</h3>
         <p>ดวงบอกว่าการเปิดซ้ำในวันเดียวกันจะ "เบลอ" พลังงานของไพ่</p>
         <p class="tarot-limit-tip">💎 <strong>Premium</strong> เปิดไพ่ได้ไม่จำกัด + AI ตีความเจาะลึก</p>
-        <button class="tarot-btn-primary" onclick="closeTarot()">กลับหน้าหลัก</button>
+        <div class="tarot-pin-section">
+          <div class="tarot-pin-label">มีรหัส Premium? กรอกรหัสที่นี่</div>
+          <div class="tarot-pin-row">
+            <input type="text" id="tarot-pin-input-limit" class="tarot-pin-input" 
+                   placeholder="STAR-XXXX-XXXX" maxlength="18" autocomplete="off"
+                   onkeydown="if(event.key==='Enter')activatePremiumFromPinLimit()">
+            <button class="tarot-btn-primary tarot-pin-btn" onclick="activatePremiumFromPinLimit()">เปิดใช้</button>
+          </div>
+          <div id="tarot-pin-status-limit" class="tarot-pin-status"></div>
+        </div>
+        <button class="tarot-btn-secondary" onclick="closeTarot()" style="margin-top:12px">กลับหน้าหลัก</button>
       `;
     }
     showTarotStep('limit');
   }
+
+  // ============== Activate Premium from PIN (Daily Limit) ==============
+  window.activatePremiumFromPinLimit = async function() {
+    const input = document.getElementById('tarot-pin-input-limit');
+    const status = document.getElementById('tarot-pin-status-limit');
+    if (!input || !status) return;
+
+    const pin = input.value.trim().toUpperCase();
+    if (!pin) {
+      status.innerHTML = '<span style="color:#e8534A">กรุณากรอกรหัส</span>';
+      return;
+    }
+
+    status.innerHTML = '<span style="color:#C9A227">⏳ กำลังตรวจสอบ...</span>';
+    input.disabled = true;
+
+    try {
+      const resp = await fetch('/v1/premium/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin })
+      });
+      const data = await resp.json();
+
+      if (data.success && data.token) {
+        localStorage.setItem('starvia_premium_token', data.token);
+        localStorage.setItem('starvia_premium', 'true');
+        window.starviaIsPremium = true;
+        
+        status.innerHTML = '<span style="color:#32CD32">✅ Premium เปิดใช้แล้ว!</span>';
+        setTimeout(() => { window.location.reload(); }, 1200);
+      } else {
+        status.innerHTML = '<span style="color:#e8534A">❌ ' + (data.message || 'รหัสไม่ถูกต้อง') + '</span>';
+        input.disabled = false;
+        input.focus();
+      }
+    } catch (err) {
+      status.innerHTML = '<span style="color:#e8534A">❌ เกิดข้อผิดพลาด — ลองใหม่</span>';
+      input.disabled = false;
+    }
+  };
 
   // ============== Share ==============
   window.shareTarotResult = function() {
