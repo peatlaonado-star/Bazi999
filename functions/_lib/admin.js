@@ -34,6 +34,11 @@ async function hashPin(pin) {
     .join('');
 }
 
+async function findPinByHash(store, pin) {
+  const pinHash = await hashPin(pin);
+  return store.pins.findIndex(r => r.pinHash === pinHash);
+}
+
 async function generatePin() {
   const bytes = new Uint8Array(8);
   crypto.getRandomValues(bytes);
@@ -205,7 +210,8 @@ export async function revokePin(context) {
   return json({ success: true, revoked: pin });
 }
 
-// POST /v1/admin/pins/expire { note: "..." }
+// POST /v1/admin/pins/expire { pin: "STAR-XXXXXXXX" }
+// Expire a PIN by its code immediately
 export async function expirePin(context) {
   const { request, env } = context;
   if (!env.STARVIA_KV) return json({ success: false, error: 'KV_NOT_BOUND' }, 500);
@@ -215,17 +221,32 @@ export async function expirePin(context) {
   } catch {
     return json({ success: false, error: 'INVALID_JSON' }, 400);
   }
-  const note = (body.note || '').trim();
-  if (!note) return json({ success: false, error: 'MISSING_NOTE', message: 'ระบุ note ของ PIN ที่ต้องการหมดอายุ' }, 400);
+  const pin = normalizePin(body.pin);
+  if (!pin) return json({ success: false, error: 'MISSING_PIN', message: 'ระบุรหัส PIN' }, 400);
+
   const store = await readPinStore(env.STARVIA_KV);
-  const idx = store.pins.findIndex(r => r.note === note && !r.usedAt);
-  if (idx === -1) return json({ success: false, error: 'NOT_FOUND', message: 'ไม่พบ PIN ที่ยังไม่ถูกใช้' }, 404);
-  store.pins[idx] = { ...store.pins[idx], expiresAt: new Date(Date.now() - 1).toISOString() };
+  const idx = await findPinByHash(store, pin);
+  if (idx === -1) return json({ success: false, error: 'NOT_FOUND', message: 'ไม่พบ PIN นี้' }, 404);
+
+  const record = store.pins[idx];
+  if (record.usedAt) {
+    return json({ success: false, error: 'ALREADY_USED', message: 'PIN นี้ถูกใช้ไปแล้ว' }, 409);
+  }
+  if (record.expiresAt && Date.parse(record.expiresAt) <= Date.now()) {
+    return json({ success: false, error: 'ALREADY_EXPIRED', message: 'PIN นี้หมดอายุแล้ว' }, 409);
+  }
+
+  store.pins[idx] = {
+    ...record,
+    expiresAt: new Date(Date.now() - 1).toISOString(),
+    note: (record.note || '') + ' [EXPIRED]',
+  };
   await writePinStore(env.STARVIA_KV, store);
-  return json({ success: true, expired: note });
+  return json({ success: true, expired: pin });
 }
 
-// POST /v1/admin/pins/delete { note: "..." }
+// POST /v1/admin/pins/delete { pin: "STAR-XXXXXXXX" }
+// Delete a PIN by its code (only if not used)
 export async function deletePin(context) {
   const { request, env } = context;
   if (!env.STARVIA_KV) return json({ success: false, error: 'KV_NOT_BOUND' }, 500);
@@ -235,14 +256,21 @@ export async function deletePin(context) {
   } catch {
     return json({ success: false, error: 'INVALID_JSON' }, 400);
   }
-  const note = (body.note || '').trim();
-  if (!note) return json({ success: false, error: 'MISSING_NOTE', message: 'ระบุ note ของ PIN ที่ต้องการลบ' }, 400);
+  const pin = normalizePin(body.pin);
+  if (!pin) return json({ success: false, error: 'MISSING_PIN', message: 'ระบุรหัส PIN' }, 400);
+
   const store = await readPinStore(env.STARVIA_KV);
-  const idx = store.pins.findIndex(r => r.note === note && !r.usedAt);
-  if (idx === -1) return json({ success: false, error: 'NOT_FOUND', message: 'ไม่พบ PIN ที่ยังไม่ถูกใช้' }, 404);
+  const idx = await findPinByHash(store, pin);
+  if (idx === -1) return json({ success: false, error: 'NOT_FOUND', message: 'ไม่พบ PIN นี้' }, 404);
+
+  const record = store.pins[idx];
+  if (record.usedAt) {
+    return json({ success: false, error: 'ALREADY_USED', message: 'PIN นี้ถูกใช้ไปแล้ว ไม่สามารถลบได้' }, 409);
+  }
+
   store.pins.splice(idx, 1);
   await writePinStore(env.STARVIA_KV, store);
-  return json({ success: true, deleted: note });
+  return json({ success: true, deleted: pin });
 }
 
 // Auth wrapper for admin routes

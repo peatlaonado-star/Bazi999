@@ -502,7 +502,7 @@ function renderPinTable() {
                 '<span class="badge badge-expired">หมดอายุ</span>';
     var canModify = p.status === 'active';
     var actions = '<div class="actions">' +
-      '<button class="btn btn-outline btn-icon" onclick="copyPin(\'' + esc(p.pin) + '\')" title="คัดลอก">โบรณ</button>' +
+      '<button class="btn btn-outline btn-icon" onclick="copyPin(\'' + esc(p.pin) + '\')" title="คัดลอก">คัดลอก</button>' +
       (canModify ? '<button class="btn btn-danger btn-sm" onclick="expirePin(\'' + esc(p.pin) + '\')" title="หมดอายุ">หมดอายุ</button>' : '') +
       (canModify ? '<button class="btn btn-danger btn-sm" onclick="deletePin(\'' + esc(p.pin) + '\')" title="ลบ">ลบ</button>' : '') +
       '</div>';
