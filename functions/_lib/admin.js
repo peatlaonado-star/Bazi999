@@ -171,6 +171,40 @@ export async function issuePins(context) {
   return json({ success: true, issued, count });
 }
 
+// POST /v1/admin/pins/revoke { pin: "STAR-XXXXXXXX" }
+// Revoke a PIN by its code — marks it as used+expired immediately
+export async function revokePin(context) {
+  const { request, env } = context;
+  if (!env.STARVIA_KV) return json({ success: false, error: 'KV_NOT_BOUND' }, 500);
+  let body = {};
+  try {
+    body = await request.json();
+  } catch {
+    return json({ success: false, error: 'INVALID_JSON' }, 400);
+  }
+  const pin = normalizePin(body.pin);
+  if (!pin) return json({ success: false, error: 'MISSING_PIN', message: 'ระบุรหัส PIN' }, 400);
+
+  const store = await readPinStore(env.STARVIA_KV);
+  const idx = await findPinByHash(store, pin);
+  if (idx === -1) return json({ success: false, error: 'NOT_FOUND', message: 'ไม่พบ PIN นี้' }, 404);
+
+  const record = store.pins[idx];
+  if (record.usedAt) {
+    return json({ success: false, error: 'ALREADY_USED', message: 'PIN นี้ถูกใช้ไปแล้ว' }, 409);
+  }
+
+  // Mark as used + expired
+  store.pins[idx] = {
+    ...record,
+    usedAt: new Date().toISOString(),
+    expiresAt: new Date(Date.now() - 1).toISOString(),
+    note: (record.note || '') + ' [REVOKED]',
+  };
+  await writePinStore(env.STARVIA_KV, store);
+  return json({ success: true, revoked: pin });
+}
+
 // POST /v1/admin/pins/expire { note: "..." }
 export async function expirePin(context) {
   const { request, env } = context;

@@ -591,6 +591,7 @@ export async function facebookAutoPin(context) {
 
         // Found a candidate!
         const customerName = msg.from?.name || 'ลูกค้า';
+        const slipImageUrl = attachments.find(a => (a.mime_type || '').startsWith('image/'))?.image_data?.url || null;
         pinCandidates.push({
           conversationId: conv.id,
           customerName,
@@ -598,6 +599,7 @@ export async function facebookAutoPin(context) {
           messageId: msg.id,
           messageSnippet: (msg.message || '').substring(0, 100),
           imageCount: attachments.filter(a => (a.mime_type || '').startsWith('image/')).length,
+          slipImageUrl,
           receivedAt: msg.created_time,
         });
         break; // One PIN per conversation
@@ -645,6 +647,9 @@ export async function facebookAutoPin(context) {
         const pin = pinBody.issued[0];
         const pinCode = pin.pin;
 
+        // Step 3.5: OCR the slip image (non-blocking — fire and collect later)
+        const ocrPromise = ocrSlipImage(candidate.slipImageUrl, env);
+
         // Step 4: Send PIN back to customer via Messenger Platform API
         const thankYouMsg = [
           `✨ คุณ ${candidate.customerName} ค่ะ`,
@@ -683,6 +688,16 @@ export async function facebookAutoPin(context) {
         const sendData = await sendResp.json();
         const sendOk = !!(sendData.message_id || sendData.id);
 
+        // Step 4.5: Wait for OCR result + send Telegram notification
+        const ocrResult = await ocrPromise;
+        const telegramSent = await notifyTelegram(env, {
+          customerName: candidate.customerName,
+          pinCode,
+          ocrResult,
+          slipImageUrl: candidate.slipImageUrl,
+          expires: pin.expires,
+        });
+
         results.push({
           ...candidate,
           status: sendOk ? 'SUCCESS' : 'SEND_FAILED',
@@ -691,6 +706,8 @@ export async function facebookAutoPin(context) {
           expiresAt: pin.expires,
           replySent: sendOk,
           replyMessageId: sendData.message_id || sendData.id || null,
+          ocrResult,
+          telegramNotified: telegramSent,
           _debugSend: {
             httpStatus: sendResp.status,
             fbResponse: sendData,
@@ -716,6 +733,90 @@ export async function facebookAutoPin(context) {
     });
   } catch (err) {
     return errorResponse(500, 'INTERNAL_ERROR', err.message);
+  }
+}
+
+// ── OCR: Read Thai text from slip image using OpenCode Zen Vision ──
+async function ocrSlipImage(imageUrl, env) {
+  const apiKey = env.OPENCODE_ZEN_API_KEY || env.OPENCODE_ZEN_API_KEY_2;
+  if (!apiKey || !imageUrl) return null;
+
+  try {
+    const resp = await fetch('https://opencode.ai/zen/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + apiKey,
+      },
+      body: JSON.stringify({
+        model: 'qwen3.6-plus-free',
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'text', text: 'อ่านข้อความภาษาไทยจากสลิปโอนเงินนี้ ตอบสั้นๆ เป็นภาษาไทย บอกเฉพาะ: ยอดเงิน, วันที่โอน, เวลา (ถ้ามี), ธนาคารต้นทาง (ถ้ามี) ถ้าอ่านไม่ออกให้ตอบว่า "อ่านไม่ออก"' },
+            { type: 'image_url', image_url: { url: imageUrl } },
+          ],
+        }],
+        max_tokens: 150,
+        temperature: 0,
+      }),
+    });
+    const data = await resp.json();
+    return data.choices?.[0]?.message?.content?.trim() || 'อ่านไม่ออก';
+  } catch (e) {
+    return `OCR error: ${e.message}`;
+  }
+}
+
+// ── Telegram Notification: Send slip + PIN info to admin ──
+async function notifyTelegram(env, { customerName, pinCode, ocrResult, slipImageUrl, expires }) {
+  const botToken = env.TELEGRAM_BOT_TOKEN;
+  const chatId = env.TELEGRAM_CHAT_ID;
+  if (!botToken || !chatId) return false;
+
+  const expiresThai = new Date(expires).toLocaleDateString('th-TH', {
+    year: 'numeric', month: 'long', day: 'numeric',
+  });
+
+  const caption = [
+    `💳 แจ้งเตือน Auto-PIN`,
+    ``,
+    `👤 ลูกค้า: ${customerName}`,
+    `🔑 PIN: ${pinCode}`,
+    `📅 หมดอายุ: ${expiresThai}`,
+    ``,
+    `📋 OCR สลิป:`,
+    `${ocrResult || 'อ่านไม่ออก'}`,
+    ``,
+    `❌ หากไม่ถูกต้อง: /revoke ${pinCode}`,
+  ].join('\n');
+
+  try {
+    if (slipImageUrl) {
+      // Send photo with caption
+      await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          photo: slipImageUrl,
+          caption,
+        }),
+      });
+    } else {
+      await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: caption,
+        }),
+      });
+    }
+    return true;
+  } catch (e) {
+    console.error('Telegram notify error:', e.message);
+    return false;
   }
 }
 

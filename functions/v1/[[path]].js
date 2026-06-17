@@ -11,6 +11,7 @@ import {
   issuePins,
   expirePin,
   deletePin,
+  revokePin,
   withAdminAuth,
 } from '../_lib/admin.js';
 import { createPayment, paymentWebhook, verifyPayment, paymentStatus } from '../_lib/payment.js';
@@ -106,6 +107,9 @@ export async function onRequest(context) {
         }
         if (segments[2] === 'delete' && request.method === 'POST') {
           return withAdminAuth(context, deletePin);
+        }
+        if (segments[2] === 'revoke' && request.method === 'POST') {
+          return withAdminAuth(context, revokePin);
         }
       }
     }
