@@ -156,8 +156,8 @@ def generate_daily_fortune(zodiac=None):
 
 ⭐ ดวงวันนี้แม่นมาก ลองเช็คดูสิ!
 
-ดูดวงฟรีทุกวัน
-starvia.website
+🌐 ดูดวงฟรีทุกวัน 👇
+https://starvia.website
 
 #Starvia #ดวงวันนี้ #ราศี{zodiac['name']}"""
     
@@ -179,9 +179,9 @@ def generate_couple_post():
 
 ━━━━━━━━━━━━━━━━━━
 
-✨ เช็คความเข้ากันกับคนรักได้ที่
+✨ เช็คความเข้ากันกับคนรักได้ที่ 👇
 
-starvia.website
+https://starvia.website
 
 #Starvia #ดวงคู่ #ความเข้ากันได้"""
     
@@ -203,9 +203,9 @@ def generate_auspicious_post():
 
 ━━━━━━━━━━━━━━━━━━
 
-✨ ดูฤกษ์ยามส่วนตัวได้ที่
+✨ ดูฤกษ์ยามส่วนตัวได้ที่ 👇
 
-starvia.website
+https://starvia.website
 
 #Starvia #ฤกษ์ยาม #ดวงวันนี้"""
     
