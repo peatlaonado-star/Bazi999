@@ -50,6 +50,18 @@ ZODIAC_NUMBERS = {
 }
 
 
+def get_openai_api_key():
+    """Read OpenAI API key from .env"""
+    env_path = os.path.expanduser("~/.hermes/.env")
+    if os.path.exists(env_path):
+        with open(env_path) as f:
+            for line in f:
+                line = line.strip().strip("'").strip('"')
+                if line.startswith("OPENAI_API_KEY=") and "OPENAI_API_KEY=" in line:
+                    return line.split("=", 1)[1].strip().strip("'").strip('"')
+    return os.environ.get("OPENAI_API_KEY")
+
+
 def get_together_api_key():
     """Read Together AI API key from .env"""
     env_path = os.path.expanduser("~/.hermes/.env")
@@ -60,6 +72,62 @@ def get_together_api_key():
                 if line.startswith("TOGETHER_API_KEY="):
                     return line.split("=", 1)[1].strip().strip("'").strip('"')
     return os.environ.get("TOGETHER_API_KEY")
+
+
+def generate_gpt_image(zodiac_name, today_str, force=False, post_type="daily"):
+    """Generate pure cosmic art with gpt-image-1 (no text overlay)"""
+    image_path = os.path.join(IMAGES_DIR, f"post-{today_str}.jpg")
+    
+    if os.path.exists(image_path) and not force:
+        return image_path
+    
+    zodiac_num = ZODIAC_NUMBERS.get(zodiac_name, 0)
+    base_prompt = COSMIC_PROMPTS.get(zodiac_num, DEFAULT_PROMPT)
+    
+    # เพิ่ม theme ตามประเภทโพสต์
+    if post_type == "couple":
+        theme = "two souls connected by golden cosmic threads, twin flame energy, intertwined zodiac constellations forming a heart shape, romantic mystical atmosphere"
+    elif post_type == "auspicious":
+        theme = "sacred golden aura radiating from a celestial calendar wheel, divine timing symbols, auspicious light rays piercing through cosmic clouds"
+    else:
+        theme = "ornate golden wheel of fortune floating in cosmic nebula, goddess figure in flowing robes, dramatic moon and stars, ancient temple silhouettes"
+    
+    full_prompt = f"{base_prompt}, {theme}, no text, no words, no letters, pure visual art only, masterpiece quality, highly detailed"
+    
+    api_key = get_openai_api_key()
+    if not api_key:
+        print("ERROR: No OPENAI_API_KEY found", file=sys.stderr)
+        return None
+    
+    try:
+        import httpx, base64
+        client = httpx.Client(timeout=120)
+        resp = client.post(
+            "https://api.openai.com/v1/images/generations",
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            json={
+                "model": "gpt-image-1",
+                "prompt": full_prompt,
+                "size": "1024x1536",
+                "n": 1,
+                "quality": "high"
+            }
+        )
+        
+        if resp.status_code != 200:
+            print(f"ERROR: gpt-image-1 returned {resp.status_code}: {resp.text[:300]}", file=sys.stderr)
+            return None
+        
+        data = resp.json()
+        b64 = data["data"][0]["b64_json"]
+        with open(image_path, "wb") as f:
+            f.write(base64.b64decode(b64))
+        
+        print(f"  gpt-image-1 saved: {image_path}", file=sys.stderr)
+        return image_path
+    except Exception as e:
+        print(f"ERROR: gpt-image-1 failed: {e}", file=sys.stderr)
+        return None
 
 
 def generate_background(zodiac_name, today_str, force=False):
@@ -439,39 +507,48 @@ html, body {{
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate Starvia post image as HTML")
+    parser = argparse.ArgumentParser(description="Generate Starvia post image")
     parser.add_argument("--input-json", required=True, help="JSON string with post data")
-    parser.add_argument("--output", help="Output HTML path (default: auto)")
-    parser.add_argument("--no-flux", action="store_true", help="Skip FLUX generation, use CSS background only")
-    parser.add_argument("--force-flux", action="store_true", help="Regenerate FLUX even if cached")
+    parser.add_argument("--output", help="Output path (default: auto)")
+    parser.add_argument("--mode", choices=["gpt", "html"], default="gpt",
+                       help="gpt = pure gpt-image-1 art (no text), html = FLUX + HTML overlay")
+    parser.add_argument("--no-flux", action="store_true", help="(html mode) Skip FLUX, use CSS background")
+    parser.add_argument("--force", action="store_true", help="Regenerate image even if cached")
+    parser.add_argument("--force-flux", action="store_true", help="(html mode) Regenerate FLUX")
     args = parser.parse_args()
     
-    # Parse JSON
     data = json.loads(args.input_json)
     zodiac_name = data.get("zodiac", "")
+    post_type = data.get("type", "daily")
     today_str = datetime.date.today().strftime("%Y%m%d")
     
-    # Generate FLUX background
-    bg_path = None
-    if not args.no_flux:
-        bg_path = generate_background(zodiac_name, today_str, force=args.force_flux)
-    
-    # Convert to base64 for inline use
-    bg_b64 = image_to_base64(bg_path) if bg_path else None
-    
-    # Build HTML
-    html = build_html(data, bg_b64=bg_b64)
-    
-    # Write output
-    if args.output:
-        out_path = args.output
+    if args.mode == "gpt":
+        # ── Pure gpt-image-1 mode (no text overlay) ──
+        img_path = generate_gpt_image(zodiac_name, today_str, force=args.force, post_type=post_type)
+        if img_path:
+            print(img_path)
+        else:
+            print("ERROR: Image generation failed", file=sys.stderr)
+            sys.exit(1)
     else:
-        out_path = os.path.join(IMAGES_DIR, f"post-{today_str}.html")
-    
-    with open(out_path, "w", encoding="utf-8") as f:
-        f.write(html)
-    
-    print(out_path)
+        # ── HTML mode (FLUX + text overlay) ──
+        bg_path = None
+        if not args.no_flux:
+            bg_path = generate_background(zodiac_name, today_str, force=args.force_flux)
+        
+        bg_b64 = image_to_base64(bg_path) if bg_path else None
+        
+        html = build_html(data, bg_b64=bg_b64)
+        
+        if args.output:
+            out_path = args.output
+        else:
+            out_path = os.path.join(IMAGES_DIR, f"post-{today_str}.html")
+        
+        with open(out_path, "w", encoding="utf-8") as f:
+            f.write(html)
+        
+        print(out_path)
 
 
 if __name__ == "__main__":
