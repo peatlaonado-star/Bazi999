@@ -19,18 +19,18 @@ from datetime import datetime, timedelta
 
 # ===== ZODIAC DATA =====
 ZODIAC_SIGNS = [
-    {'name': 'เมษ', 'symbol': '♈', 'element': 'ไฟ', 'ruler': 'อาทิตย์'},
-    {'name': 'พฤษภ', 'symbol': '♉', 'element': 'ดิน', 'ruler': 'ศุกร์'},
-    {'name': 'เมถุน', 'symbol': '♊', 'element': 'ลม', 'ruler': 'พุธ'},
-    {'name': 'กรกฎ', 'symbol': '♋', 'element': 'น้ำ', 'ruler': 'จันทร์'},
-    {'name': 'สิงห์', 'symbol': '♌', 'element': 'ไฟ', 'ruler': 'อาทิตย์'},
-    {'name': 'กันย์', 'symbol': '♍', 'element': 'ดิน', 'ruler': 'พุธ'},
-    {'name': 'ตุลย์', 'symbol': '♎', 'element': 'ลม', 'ruler': 'ศุกร์'},
-    {'name': 'พิจิก', 'symbol': '♏', 'element': 'น้ำ', 'ruler': 'อังคาร'},
-    {'name': 'ธนู', 'symbol': '♐', 'element': 'ไฟ', 'ruler': 'พฤหัสบดี'},
-    {'name': 'มกร', 'symbol': '♑', 'element': 'ดิน', 'ruler': 'เสาร์'},
-    {'name': 'กุมภ์', 'symbol': '♒', 'element': 'ลม', 'ruler': 'เสาร์'},
-    {'name': 'มีน', 'symbol': '♓', 'element': 'น้ำ', 'ruler': 'พฤหัสบดี'},
+    {'name': 'เมษ', 'symbol': '♈', 'element': 'ไฟ', 'ruler': 'อาทิตย์', 'date_range': '21 มี.ค. – 19 เม.ย.'},
+    {'name': 'พฤษภ', 'symbol': '♉', 'element': 'ดิน', 'ruler': 'ศุกร์', 'date_range': '20 เม.ย. – 20 พ.ค.'},
+    {'name': 'เมถุน', 'symbol': '♊', 'element': 'ลม', 'ruler': 'พุธ', 'date_range': '21 พ.ค. – 20 มิ.ย.'},
+    {'name': 'กรกฎ', 'symbol': '♋', 'element': 'น้ำ', 'ruler': 'จันทร์', 'date_range': '21 มิ.ย. – 22 ก.ค.'},
+    {'name': 'สิงห์', 'symbol': '♌', 'element': 'ไฟ', 'ruler': 'อาทิตย์', 'date_range': '23 ก.ค. – 22 ส.ค.'},
+    {'name': 'กันย์', 'symbol': '♍', 'element': 'ดิน', 'ruler': 'พุธ', 'date_range': '23 ส.ค. – 22 ก.ย.'},
+    {'name': 'ตุลย์', 'symbol': '♎', 'element': 'ลม', 'ruler': 'ศุกร์', 'date_range': '23 ก.ย. – 22 ต.ค.'},
+    {'name': 'พิจิก', 'symbol': '♏', 'element': 'น้ำ', 'ruler': 'อังคาร', 'date_range': '23 ต.ค. – 21 พ.ย.'},
+    {'name': 'ธนู', 'symbol': '♐', 'element': 'ไฟ', 'ruler': 'พฤหัสบดี', 'date_range': '22 พ.ย. – 21 ธ.ค.'},
+    {'name': 'มกร', 'symbol': '♑', 'element': 'ดิน', 'ruler': 'เสาร์', 'date_range': '22 ธ.ค. – 19 ม.ค.'},
+    {'name': 'กุมภ์', 'symbol': '♒', 'element': 'ลม', 'ruler': 'เสาร์', 'date_range': '20 ม.ค. – 18 ก.พ.'},
+    {'name': 'มีน', 'symbol': '♓', 'element': 'น้ำ', 'ruler': 'พฤหัสบดี', 'date_range': '19 ก.พ. – 20 มี.ค.'},
 ]
 
 # ===== DAILY FORTUNE TEMPLATES =====
@@ -145,7 +145,8 @@ def generate_daily_fortune(zodiac=None):
     
     post = f"""เช็คดวงกันเถอะ ✨
 
-{zodiac['symbol']} ราศี{zodiac['name']} วันนี้
+{zodiac['symbol']} ราศี{zodiac['name']}
+คนเกิด {zodiac['date_range']}
 
 💕 ความรัก: {fortune['love']}
 💼 การงาน: {fortune['career']}
