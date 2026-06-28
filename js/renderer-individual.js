@@ -1395,7 +1395,40 @@ function buildPlanetaryStrengthHtml(birthMonth) {
     + '</div>'
     + '</div>';
 
-  // === ส่วนที่ 3: ดาวเจ้าปาง + จุดอ่อน ===
+  // === ส่วนที่ 3: ดาวเจ้าปาง + ความเชี่ยวชาญ (แสดงเสมอ — UI แบบ C) ===
+  // แสดงแค่สิ่งที่อ่านง่าย ส่วนตัวเลข (power) ซ่อนไว้ใน toggle ด้านล่าง
+  var mainPlanet = strengthPlanets[0] || ps.planet || '';
+  var mainPlanetColor = planetColors[mainPlanet] || '#7B68EE';
+  html += '<div class="ps-expertise">'
+    + '<div class="ps-expertise-row">'
+    + '<span class="ps-expertise-label">🪐 ดาวเจ้าปาง</span>'
+    + '<span class="ps-expertise-value" style="color:' + mainPlanetColor + '">' + escapeHTML(mainPlanet) + '</span>'
+    + '</div>'
+    + '<div class="ps-expertise-row">'
+    + '<span class="ps-expertise-label">📖 ความเชี่ยวชาญ</span>'
+    + '<span class="ps-expertise-value">' + escapeHTML(ps.expertise || ps.description || '—') + '</span>'
+    + '</div>'
+    + '</div>';
+
+  // === ส่วนที่ 4: Toggle — ดูค่าพละ (ซ่อนไว้ก่อน คลิกดู) ===
+  if (ps.power) {
+    html += '<details class="ps-power-detail">'
+      + '<summary class="ps-power-toggle">🔍 ดูค่าพละ ' + ps.power + '/21 ตามคัมภีร์ →</summary>'
+      + '<div class="ps-power-bar">'
+      + '<div class="ps-power-label">กำลังวัน (พละ)</div>'
+      + '<div class="ps-power-value-wrap">'
+      + '<div class="ps-power-number">' + ps.power + '</div>'
+      + '<div class="ps-power-bar-track"><div class="ps-power-bar-fill" style="width:' + Math.round(ps.power/21*100) + '%"></div></div>'
+      + '<div class="ps-power-max">/ 21</div>'
+      + '</div>'
+      + '<div class="ps-power-desc">ค่าพละของดาว' + escapeHTML(ps.planet) + ' ตามคัมภีร์โหราศาสตร์ไทยมาตรฐาน — '
+      + 'ค่านี้ไม่ได้บอกว่า "ดวงดี/ไม่ดี" แต่บอกว่า<strong>ดาวนี้เด่นเรื่องอะไร</strong> '
+      + '(คะแนนเยอะ = เด่นเฉพาะทาง, คะแนนน้อย = เรื่องอื่นมากกว่า)</div>'
+      + '</div>'
+      + '</details>';
+  }
+
+  // === ส่วนที่ 4: ดาวเจ้าปาง + จุดอ่อน ===
   html += '<div class="ps-planet-cards">';
 
   // ดาวเจ้าปาง (จุดแข็ง)

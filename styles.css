@@ -5203,6 +5203,129 @@ body.has-report .value-section{display:none}
 .ps-etym-body strong { color: var(--tx); }
 .ps-etym-body em { color: var(--g); font-style: normal; }
 
+/* Expertise — ดาวเจ้าปาง + ความเชี่ยวชาญ (UI แบบ C: แสดงเสมอ) */
+.ps-expertise {
+  background: linear-gradient(135deg, rgba(214,173,69,0.06), rgba(142,114,216,0.06));
+  border: 1px solid rgba(214,173,69,0.18);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.ps-expertise-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 4px 0;
+}
+.ps-expertise-label {
+  font-size: 12px;
+  color: var(--tx2);
+  opacity: 0.7;
+  flex-shrink: 0;
+  min-width: 110px;
+}
+.ps-expertise-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--tx);
+  letter-spacing: 0.01em;
+}
+
+/* Power detail — toggle ซ่อนตัวเลข (UI แบบ C: progressive disclosure) */
+.ps-power-detail {
+  margin-bottom: 14px;
+}
+.ps-power-detail[open] {
+  margin-bottom: 14px;
+}
+.ps-power-toggle {
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--tx2);
+  opacity: 0.75;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.03);
+  border: 1px dashed rgba(255,255,255,0.12);
+  text-align: center;
+  list-style: none;
+  user-select: none;
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+.ps-power-toggle::-webkit-details-marker { display: none; }
+.ps-power-toggle::marker { display: none; content: ''; }
+.ps-power-toggle:hover {
+  background: rgba(214,173,69,0.08);
+  opacity: 1;
+  border-color: rgba(214,173,69,0.3);
+}
+.ps-power-toggle:active {
+  transform: scale(0.99);
+}
+details[open] > .ps-power-toggle {
+  background: rgba(214,173,69,0.06);
+  border-style: solid;
+  border-color: rgba(214,173,69,0.2);
+  opacity: 1;
+  margin-bottom: 8px;
+}
+
+/* Power bar — กำลังวัน (พละ) */
+.ps-power-bar {
+  background: linear-gradient(135deg, rgba(201,162,39,0.08), rgba(142,114,216,0.08));
+  border: 1px solid rgba(201,162,39,0.15);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 14px;
+  text-align: center;
+}
+.ps-power-label {
+  font-size: 11px;
+  color: var(--tx2);
+  opacity: 0.7;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+.ps-power-value-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.ps-power-number {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--g);
+  line-height: 1;
+  min-width: 36px;
+}
+.ps-power-bar-track {
+  width: 100px;
+  height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.ps-power-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--g), #f0d96a);
+  transition: width 0.6s ease;
+}
+.ps-power-max {
+  font-size: 11px;
+  color: var(--tx2);
+  opacity: 0.5;
+}
+.ps-power-desc {
+  font-size: 11px;
+  color: var(--tx2);
+  opacity: 0.7;
+  line-height: 1.4;
+}
+
 /* Planet cards */
 .ps-planet-cards {
   display: flex;

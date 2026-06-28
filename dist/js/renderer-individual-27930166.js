@@ -976,7 +976,7 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
   }
   domainHtml += '</div></div>';
   var lifeGraphSectionHtml = '<div class="life-graph-section">' + lifeGraphHtml + '</div>';
-  lifeGraphSectionHtml += '<div class="cross-section-link" onclick="document.querySelector(\'.collapsible-toggle[data-section=\\\'domain\\\'\\]\')?.click(); window.scrollTo({top: document.querySelector(\'.collapsible-toggle[data-section=\\\'domain\\\'\\]\')?.offsetTop - 60, behavior: \"smooth\"})">🎯 ดูวิธีแก้ดวง 6 ด้าน →</div>';
+  lifeGraphSectionHtml += '<div class="cross-section-link" onclick="document.querySelector(\'.collapsible-toggle[data-section=\\\'domain\\\'\\]\')?.click(); window.scrollTo({top: document.querySelector(\'.collapsible-toggle[data-section=\\\'domain\\\'\\]\')?.offsetTop - 60, behavior: "smooth"})">🎯 ดูวิธีแก้ดวง 6 ด้าน →</div>';
 
   var monthlyLifeMap = buildMonthlyLifeMap(p, r, l, ds);
   var monthlyLifeMapHtml = buildMonthlyLifeMapHtml(monthlyLifeMap, premiumUnlocked);
@@ -1049,16 +1049,23 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
     + '<div class="streak-progress-anchor"></div>'
     + '<div class="streak-discount-anchor"></div>'
     + badgesHtml
+    // ── LAYER 1: Identity + Quick Win (เปิดไว้ให้เห็นเลย) ──
     + wrapCollapsible("✦ กำลังวันประจำตัว ✦", "วันเกิด · เทวดา · ธาตุ · สีมงคล", cosmicBriefHtml)
-    + wrapCollapsible("✨ เสริมดวงของคุณ — ประจำวัน + ประจำปี", "สีมงคล · เลขมงคล · ของมงคล · ทิศมงคล", powerCardHtml + buildYearlyEnhancementHtml(dayOfWeek))
-    + wrapCollapsible("✦ สูตรเปิดดวงลาภลอย ✦", "เลขเด็ด · หวย · ทิศ · คาถา สายมู", windfallLuckHtml, true)
-    + '<div id=\"lottery-results-section\" style=\"margin-bottom:14px;\"></div>'
-    + wrapCollapsible("🔮 หมอทักประจำเดือน", "5 ด้านชีวิต · สัญญาณเตือน · วิธีแก้", monthlyLifeMapHtml, true)
-    + wrapCollapsible("📊 พิมพ์เขียวชีวิต — กราฟ + ช่วงชีวิต", "กราฟชีวิต · 7 ช่วงชีวิต · จุดเด่น · จุดอ่อน", lifeGraphSectionHtml + buildLifePeriodsHtml(dayOfWeek, ageY), true)
-    + wrapCollapsible("✦ คัมภีร์แก้ดวง 6 ด้าน ✦", "โชค · การเงิน · สุขภาพ · ความรัก · การงาน · บริวาร", domainHtml, true)
-    + wrapCollapsible("💘 ตารางความเข้ากันได้ของธาตุ", "4×4 matrix · ดูว่าธาตุไหนเข้ากัน", buildCoupleCompatibilityHtml(p.el), true)
+    + wrapCollapsible("✨ เสริมดวงของคุณ", "สีมงคล · เลขมงคล · ของมงคล · ทิศมงคล", powerCardHtml + buildYearlyEnhancementHtml(dayOfWeek))
+    // ── LAYER 2: Core Reading — 6 ด้านชีวิต (หัวใจของรายงาน) ──
+    + wrapCollapsible("✦ คัมภีร์แก้ดวง 6 ด้าน ✦", "โชค · การเงิน · สุขภาพ · ความรัก · การงาน · บริวาร · วิเคราะห์เฉพาะบุคคล", domainHtml, true)
+    // ── LAYER 3: Yearly Forecast — จังหวะดาวทั้งปี ──
     + wrapCollapsible("🌑 แนวโน้มชีวิตปีนี้ — ราหูเกตุ + จังหวะดาว", "ราหูย้าย · เกตุ · 5 ด้าน · วิธีรับมือ", buildRahuKetuHtml(dayOfWeek) + buildYearlyTransitHtml(dayOfWeek), true)
-    + wrapCollapsible("🪐 กำลังวันประจำเดือนเกิด — ดาวเจ้าปางของคุณ", "จุดแข็ง · จุดอ่อน · ดาวกำกับ · คำแนะนำ", buildPlanetaryStrengthHtml(birthMonth), true)
+    // ── LAYER 4: Curiosity — ลาภลอย + หมอทัก ──
+    + wrapCollapsible("✦ สูตรเปิดดวงลาภลอย ✦", "เลขเด็ด · หวย · ทิศ · คาถา สายมู", windfallLuckHtml, true)
+    + '<div id="lottery-results-section" style="margin-bottom:14px;"></div>'
+    + wrapCollapsible("🔮 หมอทักประจำเดือน", "5 ด้านชีวิต · สัญญาณเตือน · วิธีแก้", monthlyLifeMapHtml, true)
+    // ── LAYER 5: Deep Dive — กราฟชีวิต ──
+    + wrapCollapsible("📊 พิมพ์เขียวชีวิต — กราฟ + ช่วงชีวิต", "กราฟชีวิต · 7 ช่วงชีวิต · จุดเด่น · จุดอ่อน", lifeGraphSectionHtml + buildLifePeriodsHtml(dayOfWeek, ageY), true)
+    // ── LAYER 6: Bonus Tools ──
+    + wrapCollapsible("💘 ตารางความเข้ากันได้ของธาตุ", "4×4 matrix · ดูว่าธาตุไหนเข้ากัน", buildCoupleCompatibilityHtml(p.el), true)
+    + wrapCollapsible("🪐 กำลังวันประจำเดือนเกิด", "จุดแข็ง · จุดอ่อน · ดาวกำกับ · คำแนะนำ", buildPlanetaryStrengthHtml(birthMonth), true)
+    // ── LAYER 7: Detail / CTA ──
     + wrapCollapsible("📋 ตัวตน · ความสัมพันธ์ · การงาน · เงิน", "ดูจุดอ่อนที่ซ่อนอยู่ + วิธีแก้", detailTabsShellHtml, true);
 
   // ✨ Focus management: move keyboard focus to the report after it renders
@@ -1388,7 +1395,40 @@ function buildPlanetaryStrengthHtml(birthMonth) {
     + '</div>'
     + '</div>';
 
-  // === ส่วนที่ 3: ดาวเจ้าปาง + จุดอ่อน ===
+  // === ส่วนที่ 3: ดาวเจ้าปาง + ความเชี่ยวชาญ (แสดงเสมอ — UI แบบ C) ===
+  // แสดงแค่สิ่งที่อ่านง่าย ส่วนตัวเลข (power) ซ่อนไว้ใน toggle ด้านล่าง
+  var mainPlanet = strengthPlanets[0] || ps.planet || '';
+  var mainPlanetColor = planetColors[mainPlanet] || '#7B68EE';
+  html += '<div class="ps-expertise">'
+    + '<div class="ps-expertise-row">'
+    + '<span class="ps-expertise-label">🪐 ดาวเจ้าปาง</span>'
+    + '<span class="ps-expertise-value" style="color:' + mainPlanetColor + '">' + escapeHTML(mainPlanet) + '</span>'
+    + '</div>'
+    + '<div class="ps-expertise-row">'
+    + '<span class="ps-expertise-label">📖 ความเชี่ยวชาญ</span>'
+    + '<span class="ps-expertise-value">' + escapeHTML(ps.expertise || ps.description || '—') + '</span>'
+    + '</div>'
+    + '</div>';
+
+  // === ส่วนที่ 4: Toggle — ดูค่าพละ (ซ่อนไว้ก่อน คลิกดู) ===
+  if (ps.power) {
+    html += '<details class="ps-power-detail">'
+      + '<summary class="ps-power-toggle">🔍 ดูค่าพละ ' + ps.power + '/21 ตามคัมภีร์ →</summary>'
+      + '<div class="ps-power-bar">'
+      + '<div class="ps-power-label">กำลังวัน (พละ)</div>'
+      + '<div class="ps-power-value-wrap">'
+      + '<div class="ps-power-number">' + ps.power + '</div>'
+      + '<div class="ps-power-bar-track"><div class="ps-power-bar-fill" style="width:' + Math.round(ps.power/21*100) + '%"></div></div>'
+      + '<div class="ps-power-max">/ 21</div>'
+      + '</div>'
+      + '<div class="ps-power-desc">ค่าพละของดาว' + escapeHTML(ps.planet) + ' ตามคัมภีร์โหราศาสตร์ไทยมาตรฐาน — '
+      + 'ค่านี้ไม่ได้บอกว่า "ดวงดี/ไม่ดี" แต่บอกว่า<strong>ดาวนี้เด่นเรื่องอะไร</strong> '
+      + '(คะแนนเยอะ = เด่นเฉพาะทาง, คะแนนน้อย = เรื่องอื่นมากกว่า)</div>'
+      + '</div>'
+      + '</details>';
+  }
+
+  // === ส่วนที่ 4: ดาวเจ้าปาง + จุดอ่อน ===
   html += '<div class="ps-planet-cards">';
 
   // ดาวเจ้าปาง (จุดแข็ง)

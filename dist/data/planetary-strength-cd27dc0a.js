@@ -2,6 +2,11 @@
 // STARVIA — กำลังพระเคราะห์ตามเดือนเกิด
 // Cosmic planetary strength by birth month
 // ============================================
+// อัปเดต 29 มิ.ย. 69 — แก้ตามทฤษฎีโหราศาสตร์ไทย
+// เมษ = อังคาร (8) · กุมภ์ = เสาร์ (10)
+// เพิ่มค่ากำลังวัน (พละ) ตามคัมภีร์โหราศาสตร์ไทยมาตรฐาน
+// เพิ่ม `expertise` = ความเชี่ยวชาญเด่น 1-2 คำ ใช้แสดงก่อนตัวเลข
+//   (UI แบบ C: progressive disclosure — คนทั่วไปเห็นแค่ "ความเชี่ยวชาญ", คนสนใจลึกคลิกดูค่าพละ)
 
 var PLANETARY_STRENGTH = {
   'มกราคม': {
@@ -11,6 +16,8 @@ var PLANETARY_STRENGTH = {
     planet: 'เสาร์',
     strength: 'เสาร์',
     weakness: 'ศุกร์',
+    power: 10,
+    expertise: 'วินัย อดทน',
     description: 'มีวินัย อดทน มุ่งเป้าหมาย',
     advice: 'ใช้ความอดทนเป็นพลัง สร้างระบบและวางรากฐานชีวิตให้มั่นคง'
   },
@@ -18,9 +25,11 @@ var PLANETARY_STRENGTH = {
     month: 'กุมภาพันธ์',
     dateRange: '13 ก.พ. - 13 มี.ค.',
     zodiac: 'กุมภ์',
-    planet: 'เสาร์ + ราหู',
-    strength: 'เสาร์ + ราหู',
+    planet: 'เสาร์',
+    strength: 'เสาร์',
     weakness: 'พุธ',
+    power: 10,
+    expertise: 'คิดนอกกรอบ',
     description: 'แตกต่าง คิดนอกกรอบ มีอุดมการณ์',
     advice: 'ใช้ความแตกต่างเป็นจุดแข็ง คิดนอกกรอบแต่รู้จักสร้างสมดุล'
   },
@@ -31,6 +40,8 @@ var PLANETARY_STRENGTH = {
     planet: 'พฤหัส',
     strength: 'พฤหัส',
     weakness: 'อาทิตย์',
+    power: 19,
+    expertise: 'ปัญญา จินตนาการ',
     description: 'ฝัน จินตนาการ เข้าถึงจิตใจคน',
     advice: 'ใช้จินตนาการสร้างสรรค์สิ่งใหม่ เข้าถึงจิตใจคนรอบข้าง'
   },
@@ -38,11 +49,13 @@ var PLANETARY_STRENGTH = {
     month: 'เมษายน',
     dateRange: '13 เม.ย. - 14 พ.ค.',
     zodiac: 'เมษ',
-    planet: 'อาทิตย์ + อังคาร',
-    strength: 'อาทิตย์ + อังคาร',
+    planet: 'อังคาร',
+    strength: 'อังคาร',
     weakness: 'เสาร์',
-    description: 'เกิดมาพร้อมพลังนักรบ มีแรงเริ่ม',
-    advice: 'ใช้พลังนักรบเริ่มต้นสิ่งใหม่ แต่ระวังอย่าเผาเครื่องตัวเอง'
+    power: 8,
+    expertise: 'พลังนักรบ',
+    description: 'กล้าลุย มีพลังนักรบ ไม่ย่อท้อ',
+    advice: 'ใช้พลังนักรบเริ่มต้นสิ่งใหม่ แต่รู้จักหยุดคิดก่อนลงมือ'
   },
   'พฤษภาคม': {
     month: 'พฤษภาคม',
@@ -51,6 +64,8 @@ var PLANETARY_STRENGTH = {
     planet: 'ศุกร์',
     strength: 'ศุกร์',
     weakness: 'จันทร์',
+    power: 21,
+    expertise: 'เสน่ห์ ศิลปะ',
     description: 'มีเสน่ห์ มั่นคง รักสบาย',
     advice: 'ใช้เสน่ห์สร้างความสัมพันธ์ แต่รักษาความมั่นคงในชีวิต'
   },
@@ -61,6 +76,8 @@ var PLANETARY_STRENGTH = {
     planet: 'พุธ',
     strength: 'พุธ',
     weakness: 'จันทร์',
+    power: 17,
+    expertise: 'ฉลาด สื่อสาร',
     description: 'ฉลาด พูดเก่ง เปลี่ยนไว',
     advice: 'ใช้ทักษะการสื่อสารให้เป็นประโยชน์ แต่รู้จักมั่นคงในทิศทาง'
   },
@@ -71,6 +88,8 @@ var PLANETARY_STRENGTH = {
     planet: 'จันทร์',
     strength: 'จันทร์',
     weakness: 'อังคาร',
+    power: 15,
+    expertise: 'อ่อนโยน ผูกพัน',
     description: 'อ่อนไหว รักบ้าน ผูกพัน',
     advice: 'ใช้ความอ่อนไหวเป็นพลังสร้างความผูกพัน แต่ไม่ลืมเข้มแข็งเมื่อจำเป็น'
   },
@@ -81,6 +100,8 @@ var PLANETARY_STRENGTH = {
     planet: 'อาทิตย์',
     strength: 'อาทิตย์',
     weakness: 'พฤหัส',
+    power: 6,
+    expertise: 'บารมี ผู้นำ',
     description: 'เกิดมาเพื่อนำ มีบารมี',
     advice: 'ใช้บารมีนำพาคนรอบข้าง แต่เปิดรับความรู้ใหม่เสมอ'
   },
@@ -91,6 +112,8 @@ var PLANETARY_STRENGTH = {
     planet: 'พุธ',
     strength: 'พุธ',
     weakness: 'ราหู',
+    power: 17,
+    expertise: 'ละเอียด เป็นระบบ',
     description: 'ละเอียด เป็นระบบ ขี้กังวล',
     advice: 'ใช้ความละเอียดสร้างระบบ แต่ไม่กังวลจนเกินไป'
   },
@@ -101,6 +124,8 @@ var PLANETARY_STRENGTH = {
     planet: 'ศุกร์',
     strength: 'ศุกร์',
     weakness: 'เสาร์',
+    power: 21,
+    expertise: 'ศิลปะ การทูต',
     description: 'มีศิลปะ รักสวยรักงาม การทูตดี',
     advice: 'ใช้ศิลปะและการทูตสร้างความสัมพันธ์ที่ดี'
   },
@@ -111,6 +136,8 @@ var PLANETARY_STRENGTH = {
     planet: 'อังคาร',
     strength: 'อังคาร',
     weakness: 'จันทร์',
+    power: 8,
+    expertise: 'เข้มข้น ลึกซึ้ง',
     description: 'เข้มข้น ลึกซึ้ง มุ่งมั่น',
     advice: 'ใช้พลังเข้มข้นมุ่งสู่เป้าหมาย แต่รู้จักผ่อนคลายจิตใจ'
   },
@@ -121,6 +148,8 @@ var PLANETARY_STRENGTH = {
     planet: 'พฤหัส',
     strength: 'พฤหัส',
     weakness: 'เสาร์',
+    power: 19,
+    expertise: 'อิสระ แง่ดี',
     description: 'รักอิสระ มองโลกแง่ดี',
     advice: 'ใช้อิสระและแง่ดีสร้างแรงบันดาลใจ แต่วางแผนชีวิตให้รัดกุม'
   }

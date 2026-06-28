@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>STARVIA · ตัวอย่าง UI กำลังวันประจำเดือนเกิด</title>
+<style>
+  body { background:#0d1b2a; color:#e8edf3; font-family:system-ui,sans-serif; padding:24px; margin:0; }
+  h1 { text-align:center; color:#c9a227; margin-bottom:8px; font-size:20px; }
+  h2 { color:#c9a227; font-size:15px; margin:0 0 10px; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; max-width:900px; margin:0 auto; }
+  .card { background:rgba(255,255,255,0.04); border:1px solid rgba(201,162,39,0.2); border-radius:12px; padding:16px; }
+  .card.before { border-left:3px solid #e63946; }
+  .card.after { border-left:3px solid #2ec4b6; }
+  .badge { display:inline-block; padding:3px 10px; border-radius:6px; font-size:11px; font-weight:700; margin-bottom:12px; }
+  .badge.before { background:rgba(230,57,70,0.15); color:#e63946; }
+  .badge.after { background:rgba(46,196,182,0.15); color:#2ec4b6; }
+
+  /* ===== A. ก่อนปรับ (เก่า) ===== */
+  .label-old { font-size:11px; color:#9ca3af; opacity:0.7; letter-spacing:0.08em; margin-bottom:8px; text-transform:uppercase; }
+  .power-row-old { display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:6px; }
+  .power-num-old { font-size:28px; font-weight:700; color:#c9a227; line-height:1; min-width:36px; }
+  .power-bar-old { width:100px; height:6px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden; }
+  .power-fill-old { height:100%; border-radius:3px; background:linear-gradient(90deg,#c9a227,#f0d96a); }
+  .power-max-old { font-size:11px; color:#9ca3af; opacity:0.5; }
+  .desc-old { font-size:11px; color:#9ca3af; opacity:0.7; line-height:1.4; text-align:center; }
+
+  /* ===== C. หลังปรับ — progressive disclosure ===== */
+  .expertise {
+    background: linear-gradient(135deg, rgba(214,173,69,0.06), rgba(142,114,216,0.06));
+    border: 1px solid rgba(214,173,69,0.18);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+  .expertise-row { display:flex; align-items:baseline; gap:10px; padding:4px 0; }
+  .expertise-label { font-size:12px; color:#9ca3af; opacity:0.7; flex-shrink:0; min-width:110px; }
+  .expertise-value { font-size:15px; font-weight:600; color:#e8edf3; }
+  .expertise-value.sun { color:#FF6B35; }
+  .expertise-value.venus { color:#E8A0BF; }
+
+  .power-detail { margin-bottom:14px; }
+  .power-toggle {
+    cursor:pointer; font-size:12px; color:#9ca3af; opacity:0.75;
+    padding:8px 12px; border-radius:8px;
+    background:rgba(255,255,255,0.03); border:1px dashed rgba(255,255,255,0.12);
+    text-align:center; list-style:none; user-select:none;
+    transition: background 0.2s ease, opacity 0.2s ease;
+  }
+  .power-toggle::-webkit-details-marker { display:none; }
+  .power-toggle::marker { display:none; content:''; }
+  .power-toggle:hover { background:rgba(214,173,69,0.08); opacity:1; border-color:rgba(214,173,69,0.3); }
+  details[open] > .power-toggle {
+    background:rgba(214,173,69,0.06); border-style:solid;
+    border-color:rgba(214,173,69,0.2); opacity:1; margin-bottom:8px;
+  }
+  .power-bar-inner {
+    background:linear-gradient(135deg, rgba(201,162,39,0.08), rgba(142,114,216,0.08));
+    border:1px solid rgba(201,162,39,0.15); border-radius:12px;
+    padding:14px; margin-bottom:6px; text-align:center;
+  }
+  .power-bar-inner-label { font-size:11px; color:#9ca3af; opacity:0.7; letter-spacing:0.08em; margin-bottom:8px; text-transform:uppercase; }
+  .power-bar-inner-row { display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:6px; }
+  .power-bar-inner-num { font-size:28px; font-weight:700; color:#c9a227; line-height:1; min-width:36px; }
+  .power-bar-inner-track { width:100px; height:6px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden; }
+  .power-bar-inner-fill { height:100%; border-radius:3px; background:linear-gradient(90deg,#c9a227,#f0d96a); }
+  .power-bar-inner-max { font-size:11px; color:#9ca3af; opacity:0.5; }
+  .power-bar-inner-desc { font-size:11px; color:#9ca3af; opacity:0.7; line-height:1.4; }
+  .power-bar-inner-desc strong { color:#e8edf3; }
+
+  .diff { font-size:12px; color:#e63946; margin-top:10px; }
+  .diff ul { font-size:12px; line-height:1.6; margin:6px 0; padding-left:20px; }
+  .diff-good { font-size:12px; color:#5eead4; margin-top:10px; }
+  .diff-good ul { font-size:12px; line-height:1.6; margin:6px 0; padding-left:20px; }
+</style>
+</head>
+<body>
+<h1>✦ STARVIA · ตัวอย่าง UI กำลังวันประจำเดือนเกิด ✦</h1>
+<p style="text-align:center;color:#9ca3af;font-size:13px;margin:0 0 20px;">เทียบ "ก่อนปรับ" กับ "หลังปรับ" (ทางเลือก C: progressive disclosure)</p>
+
+<!-- ════════ ตัวอย่างที่ 1: คนเกิดสิงห์ (อาทิตย์ = 6) — ค่าต่ำสุด ════════ -->
+<div style="max-width:900px;margin:0 auto 24px;text-align:center;font-size:13px;color:#c9a227;">
+  📌 ตัวอย่างที่ 1: คนเกิดเดือนสิงหาคม (ราศีสิงห์) — ดาวอาทิตย์ · ค่าพละ = 6 (ต่ำสุด)
+</div>
+
+<div class="grid">
+  <!-- A. BEFORE -->
+  <div class="card before">
+    <div class="badge before">❌ ก่อนปรับ (A)</div>
+    <div class="label-old">กำลังวัน (พละ)</div>
+    <div class="power-row-old">
+      <div class="power-num-old">6</div>
+      <div class="power-bar-old"><div class="power-fill-old" style="width:28%"></div></div>
+      <div class="power-max-old">/ 21</div>
+    </div>
+    <div class="desc-old">ค่าพละของดาวอาทิตย์ ตามคัมภีร์โหราศาสตร์ไทยมาตรฐาน</div>
+    <div class="diff">⚠️ ปัญหา:</div>
+    <ul style="color:#e63946;">
+      <li>คนเกิดสิงห์ (ผู้นำ) เห็นเลข 6 → <b>ตกใจ คิดว่าดวงต่ำ</b></li>
+      <li>ไม่รู้ว่า 6 สูงหรือต่ำ หน่วยอะไร</li>
+      <li>"กำลังวัน" กับ "พละ" คืออันเดียวกันมั้ย?</li>
+      <li>"คัมภีร์โหราศาสตร์ไทย" คืออะไร?</li>
+    </ul>
+  </div>
+
+  <!-- C. AFTER -->
+  <div class="card after">
+    <div class="badge after">✅ หลังปรับ (C)</div>
+    <div class="expertise">
+      <div class="expertise-row">
+        <span class="expertise-label">🪐 ดาวเจ้าปาง</span>
+        <span class="expertise-value sun">อาทิตย์</span>
+      </div>
+      <div class="expertise-row">
+        <span class="expertise-label">📖 ความเชี่ยวชาญ</span>
+        <span class="expertise-value">บารมี ผู้นำ</span>
+      </div>
+    </div>
+    <details class="power-detail">
+      <summary class="power-toggle">🔍 ดูค่าพละ 6/21 ตามคัมภีร์ →</summary>
+      <div class="power-bar-inner">
+        <div class="power-bar-inner-label">กำลังวัน (พละ)</div>
+        <div class="power-bar-inner-row">
+          <div class="power-bar-inner-num">6</div>
+          <div class="power-bar-inner-track"><div class="power-bar-inner-fill" style="width:28%"></div></div>
+          <div class="power-bar-inner-max">/ 21</div>
+        </div>
+        <div class="power-bar-inner-desc">
+          ค่าพละของดาวอาทิตย์ ตามคัมภีร์โหราศาสตร์ไทยมาตรฐาน —
+          ค่านี้ไม่ได้บอกว่า "ดวงดี/ไม่ดี" แต่บอกว่า<strong>ดาวนี้เด่นเรื่องอะไร</strong>
+          (คะแนนเยอะ = เด่นเฉพาะทาง, คะแนนน้อย = เรื่องอื่นมากกว่า)
+        </div>
+      </div>
+    </details>
+    <div class="diff-good">✓ ดีขึ้น:</div>
+    <ul>
+      <li>เห็น "<b>บารมี ผู้นำ</b>" ก่อน → <b>เข้าใจชัด</b> ไม่กลัวตัวเลข</li>
+      <li>ใครอยากรู้ลึก → กด "🔍 ดูค่าพละ" → เห็นค่าพร้อม<b>คำอธิบาย</b></li>
+      <li>ตัวเลขอยู่ในบริบท → ลดการตีความผิด</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ════════ ตัวอย่างที่ 2: คนเกิดพฤษภ (ศุกร์ = 21) — ค่าสูงสุด ════════ -->
+<div style="max-width:900px;margin:30px auto 24px;text-align:center;font-size:13px;color:#c9a227;">
+  📌 ตัวอย่างที่ 2: คนเกิดเดือนพฤษภาคม (ราศีพฤษภ) — ดาวศุกร์ · ค่าพละ = 21 (สูงสุด)
+</div>
+
+<div class="grid">
+  <!-- A. BEFORE -->
+  <div class="card before">
+    <div class="badge before">❌ ก่อนปรับ (A)</div>
+    <div class="label-old">กำลังวัน (พละ)</div>
+    <div class="power-row-old">
+      <div class="power-num-old">21</div>
+      <div class="power-bar-old"><div class="power-fill-old" style="width:100%"></div></div>
+      <div class="power-max-old">/ 21</div>
+    </div>
+    <div class="desc-old">ค่าพละของดาวศุกร์ ตามคัมภีร์โหราศาสตร์ไทยมาตรฐาน</div>
+    <div class="diff">⚠️ ปัญหา:</div>
+    <ul style="color:#e63946;">
+      <li>เห็น 21 → <b>เข้าใจผิดว่าดวงสุดยอด ดีทุกเรื่อง</b></li>
+      <li>จริงๆ ศุกร์เด่นเรื่อง "ความรัก ศิลปะ ความสวยงาม" ไม่ใช่พลังรบ</li>
+      <li>ไม่รู้ว่าค่าสูงสุด = พลังเฉพาะทาง ไม่ได้แปลว่า "ดีสุด"</li>
+    </ul>
+  </div>
+
+  <!-- C. AFTER -->
+  <div class="card after">
+    <div class="badge after">✅ หลังปรับ (C)</div>
+    <div class="expertise">
+      <div class="expertise-row">
+        <span class="expertise-label">🪐 ดาวเจ้าปาง</span>
+        <span class="expertise-value venus">ศุกร์</span>
+      </div>
+      <div class="expertise-row">
+        <span class="expertise-label">📖 ความเชี่ยวชาญ</span>
+        <span class="expertise-value">เสน่ห์ ศิลปะ</span>
+      </div>
+    </div>
+    <details class="power-detail">
+      <summary class="power-toggle">🔍 ดูค่าพละ 21/21 ตามคัมภีร์ →</summary>
+      <div class="power-bar-inner">
+        <div class="power-bar-inner-label">กำลังวัน (พละ)</div>
+        <div class="power-bar-inner-row">
+          <div class="power-bar-inner-num">21</div>
+          <div class="power-bar-inner-track"><div class="power-bar-inner-fill" style="width:100%"></div></div>
+          <div class="power-bar-inner-max">/ 21</div>
+        </div>
+        <div class="power-bar-inner-desc">
+          ค่าพละของดาวศุกร์ ตามคัมภีร์โหราศาสตร์ไทยมาตรฐาน —
+          ค่านี้ไม่ได้บอกว่า "ดวงดี/ไม่ดี" แต่บอกว่า<strong>ดาวนี้เด่นเรื่องอะไร</strong>
+          (คะแนนเยอะ = เด่นเฉพาะทาง, คะแนนน้อย = เรื่องอื่นมากกว่า)
+        </div>
+      </div>
+    </details>
+    <div class="diff-good">✓ ดีขึ้น:</div>
+    <ul>
+      <li>เห็น "<b>เสน่ห์ ศิลปะ</b>" ก่อน → รู้ทันทีว่า<b>เก่งเรื่องอะไร</b></li>
+      <li>ไม่ตีความ 21 ผิดว่า "ดีทุกเรื่อง"</li>
+      <li>คลิกดูค่าพละ ก็ยังมี<b>คำอธิบาย</b>กำกับ ไม่ใช่ตัวเลขเดี่ยวๆ</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ════════ สรุป ════════ -->
+<div style="max-width:900px;margin:30px auto 0;padding:16px;background:rgba(46,196,182,0.05);border-radius:10px;">
+  <h3 style="margin:0 0 8px;font-size:14px;">📋 สรุปการเปลี่ยนแปลง (A → C)</h3>
+  <table style="width:100%;font-size:13px;border-collapse:collapse;">
+    <tr><td style="padding:6px 12px;color:#9ca3af;">มิติ</td><td style="padding:6px 12px;color:#9ca3af;">❌ ก่อน (A)</td><td style="padding:6px 12px;color:#5eead4;">✅ หลัง (C)</td></tr>
+    <tr><td style="padding:6px 12px;">ข้อมูลแรกที่เห็น</td><td style="padding:6px 12px;">ตัวเลข 6 หรือ 21 + bar</td><td style="padding:6px 12px;"><b>ชื่อดาว + ความเชี่ยวชาญ</b> (อ่านง่าย)</td></tr>
+    <tr><td style="padding:6px 12px;">ตัวเลขค่าพละ</td><td style="padding:6px 12px;">แสดงทันที</td><td style="padding:6px 12px;"><b>ซ่อน</b>หลังปุ่ม "🔍 ดูค่าพละ ... →"</td></tr>
+    <tr><td style="padding:6px 12px;">คำอธิบายตัวเลข</td><td style="padding:6px 12px;">"ค่าพละของดาว[X] ตามคัมภีร์..." (แห้ง)</td><td style="padding:6px 12px;"><b>เตือนก่อน</b>ตีความ: "คะแนนเยอะ ≠ ดีสุด"</td></tr>
+    <tr><td style="padding:6px 12px;">คนกลัวตัวเลข</td><td style="padding:6px 12px;">เห็นแล้วตกใจ (สิงห์=6)</td><td style="padding:6px 12px;"><b>เห็น "บารมี ผู้นำ" ก่อน → ไม่กลัว</b></td></tr>
+    <tr><td style="padding:6px 12px;">คนอยากรู้ลึก</td><td style="padding:6px 12px;">เห็นอยู่แล้ว</td><td style="padding:6px 12px;">กด 1 ครั้ง → เห็น + คำอธิบาย</td></tr>
+    <tr><td style="padding:6px 12px;">สอดคล้อง brand</td><td style="padding:6px 12px;">"ดาวเป็นคำสั่ง" (ตัวเลขคือคำตอบ)</td><td style="padding:6px 12px;"><b>"ดาวเป็นแผนที่"</b> (ความเชี่ยวชาญคือทาง)</td></tr>
+  </table>
+  <p style="margin-top:14px;font-size:13px;color:#5eead4;">
+    <b>หลักคิด:</b> คนทั่วไปเห็น "ความเชี่ยวชาญ" → อ่านง่าย ไม่กลัว · คนสนใจลึก คลิกเพิ่มได้ ไม่บังคับ
+  </p>
+</div>
+
+</body>
+</html>
