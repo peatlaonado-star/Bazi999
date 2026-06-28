@@ -319,12 +319,11 @@ describe('Free reader conversion reading order', () => {
 
     context.renderInd('Test', 'หญิง', '2000-06-15', '08:30', samplePlanet('ไฟ'), sampleSign(), sampleSign(), 0, 0, sampleUi());
     const output = dom.window.document.getElementById('r0').innerHTML;
+    // New psychological flow order: identity → daily power → enhancement → core reading → detail/CTA
     const order = [
       'blueprint-card',
       'weekday-power-card',
       'power-card',
-      'windfall-luck',
-      'life-graph-section',
       'domain-matrix',
       'detail-tabs-card'
     ].map((needle) => output.indexOf(needle));
@@ -363,7 +362,8 @@ describe('Free reader conversion reading order', () => {
     expect(domainSection).toBeTruthy();
     expect(domainSection.classList.contains('collapsed')).toBe(true);
     expect(domainSection.querySelector('.section-body .life-graph-card')).toBeNull();
-    expect(output.indexOf('life-graph-section')).toBeLessThan(output.indexOf('คัมภีร์แก้ดวง 6 ด้าน'));
+    // Now the six-domain scripture appears before life graph (core reading first)
+    expect(output.indexOf('คัมภีร์แก้ดวง 6 ด้าน')).toBeLessThan(output.indexOf('life-graph-section'));
   });
 
   it('keeps lower supporting sections collapsed but leaves the free detail tabs visible', () => {
