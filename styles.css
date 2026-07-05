@@ -2208,10 +2208,11 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 
 /* World-class typography/layout calibration: Apple/Linear/Stripe-inspired scale */
 .w{max-width:840px;padding:0 22px 88px}
-/* V17 Hero: video bg + overlay + vignette (smooth gradient ล่าง ไม่ทึบ) */
+/* V18 Hero: video bg + overlay + vignette (เน้นเห็นตัวละคร ไม่ทับข้อความ) */
 .premium-hero{position:relative;max-width:720px;padding:48px 0 30px;overflow:hidden;isolation:isolate;border-radius:24px}
 .hero-video-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 35%;z-index:-3;pointer-events:none;image-rendering:-webkit-optimize-contrast;image-rendering:crisp-edges}
-.hero-overlay{position:absolute;inset:0;z-index:-2;pointer-events:none;background:linear-gradient(180deg,rgba(9,6,28,0.45) 0%,rgba(9,6,28,0.20) 22%,rgba(9,6,28,0.08) 38%,rgba(9,6,28,0.05) 50%,rgba(9,6,28,0.10) 62%,rgba(9,6,28,0.20) 74%,rgba(9,6,28,0.25) 88%,rgba(9,6,28,0.30) 100%)}
+/* V18: overlay หนาที่บน-กลาง (กลบข้อความ) + เบาลงล่าง (เปิดให้เห็นตัวละคร) */
+.hero-overlay{position:absolute;inset:0;z-index:-2;pointer-events:none;background:linear-gradient(180deg,rgba(9,6,28,0.85) 0%,rgba(9,6,28,0.65) 18%,rgba(9,6,28,0.50) 32%,rgba(9,6,28,0.30) 50%,rgba(9,6,28,0.15) 68%,rgba(9,6,28,0.05) 82%,rgba(9,6,28,0.20) 100%)}
 .hero-vignette{position:absolute;inset:0;z-index:-1;pointer-events:none;box-shadow:inset 0 -120px 140px -20px rgba(9,6,28,0.55),inset 0 -40px 60px -10px rgba(9,6,28,0.30);background:radial-gradient(ellipse 150% 50% at 50% 100%,rgba(9,6,28,0.10) 0%,rgba(9,6,28,0.00) 60%)}
 .premium-hero .hd-tag,.premium-hero h1,.premium-hero .hero-kicker,.premium-hero .hero-price,.premium-hero .hero-title,.premium-hero .hero-desc,.premium-hero .hero-actions,.premium-hero .brand-promise{position:relative;z-index:1}
 .hd h1{font-size:clamp(42px,6vw,64px);line-height:1.04;letter-spacing:.025em;margin-bottom:8px}
@@ -2250,9 +2251,9 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .btn{font-size:16px;min-height:48px;border-radius:14px;letter-spacing:.04em}
 .trust-strip{font-size:13px;line-height:1.55;margin-top:15px}
 @media(max-width:768px){.w{max-width:100%;padding:0 18px 72px}.premium-hero{padding:34px 0 24px;border-radius:18px}.hd h1{font-size:42px}.hero-title{font-size:31px;line-height:1.12}.hero-desc{font-size:15.5px}.daily-mantra{margin-bottom:18px}.modenav{margin-bottom:24px}.value-section,.premium-preview{margin:24px auto 20px}.value-grid,.preview-grid{grid-template-columns:1fr}.form-card{padding:22px}
-/* V17 mobile: overlay+vignette แรงกว่า เพราะ vdo 16:9 เต็มจอ seam ชัด */
-.hero-overlay{background:linear-gradient(180deg,rgba(9,6,28,0.55) 0%,rgba(9,6,28,0.30) 22%,rgba(9,6,28,0.15) 38%,rgba(9,6,28,0.20) 55%,rgba(9,6,28,0.45) 72%,rgba(9,6,28,0.80) 90%,rgba(9,6,28,0.85) 100%)!important}
-.hero-vignette{box-shadow:inset 0 -100px 120px -10px rgba(9,6,28,0.85),inset 0 -30px 50px -5px rgba(9,6,28,0.50)!important;background:radial-gradient(ellipse 130% 50% at 50% 100%,rgba(9,6,28,0.30) 0%,rgba(9,6,28,0.00) 60%)!important}}
+/* V18 mobile: overlay หนาขึ้นเพื่อข้อความชัด แต่ล่างเบาลงเพื่อเห็นตัวละคร */
+.hero-overlay{background:linear-gradient(180deg,rgba(9,6,28,0.92) 0%,rgba(9,6,28,0.75) 18%,rgba(9,6,28,0.55) 32%,rgba(9,6,28,0.35) 50%,rgba(9,6,28,0.15) 68%,rgba(9,6,28,0.05) 85%,rgba(9,6,28,0.10) 100%)!important}
+.hero-vignette{box-shadow:inset 0 -80px 100px -10px rgba(9,6,28,0.55),inset 0 -20px 40px -5px rgba(9,6,28,0.30)!important;background:radial-gradient(ellipse 130% 50% at 50% 100%,rgba(9,6,28,0.15) 0%,rgba(9,6,28,0.00) 60%)!important}}
 .nowrap{white-space:nowrap}
 @media(max-width:480px){.nowrap{white-space:normal}.hero-title{font-size:29px}}
 
