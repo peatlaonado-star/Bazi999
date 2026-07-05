@@ -100,8 +100,8 @@ for (const file of otherFiles) {
   fs.copyFileSync(source, target);
 }
 
-// Recursively copy subdirectories (assets/zodiac/)
-const extraDirs = ['assets/zodiac'];
+// Recursively copy subdirectories (assets/zodiac/, assets/hero/)
+const extraDirs = ['assets/zodiac', 'assets/hero'];
 for (const dir of extraDirs) {
   const sourceDir = path.join(root, dir);
   if (!fs.existsSync(sourceDir)) continue;
