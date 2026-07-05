@@ -120,20 +120,34 @@ const indexHtml = path.join(dist, 'index.html');
 if (fs.existsSync(indexHtml)) {
   let html = fs.readFileSync(indexHtml, 'utf-8');
   let replacements = 0;
-  
+
   for (const [original, hashed] of Object.entries(hashMap)) {
     // Escape for regex (dots in paths)
     const escaped = original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     // Match src="original" or src='/original' — with or without leading slash
     // Also strip ?v=... cache-buster from the src before matching
     const regex = new RegExp(`(src=["'])(/?)${escaped}(\\?[^"']*)?(["'])`, 'g');
-    
+
     html = html.replace(regex, (match, prefix, slash, _query, suffix) => {
       replacements++;
       return `${prefix}${slash}${hashed}${suffix}`;
     });
   }
-  
+
+  // Rewrite hero asset hashed paths back to stable /assets/hero/* paths
+  // (CF Pages CDN caches hashed files but served as 404 HTML on first deploy —
+  // stable paths from copy-static-assets work reliably)
+  const heroReplacements = [
+    { from: /\/assets\/mama-kara-loop-[A-Za-z0-9_-]+\.webm/g, to: '/assets/hero/mama-kara-loop.webm' },
+    { from: /\/assets\/mama-kara-loop-[A-Za-z0-9_-]+\.mp4/g, to: '/assets/hero/mama-kara-loop.mp4' },
+    { from: /\/assets\/mama-kara-loop-poster-[A-Za-z0-9_-]+\.jpg/g, to: '/assets/hero/mama-kara-loop-poster.jpg' }
+  ];
+  let heroFixed = 0;
+  for (const r of heroReplacements) {
+    html = html.replace(r.from, (match) => { heroFixed++; return r.to; });
+  }
+  console.log(`🎬 Hero asset paths normalized: ${heroFixed} hashed → /assets/hero/*`);
+
   fs.writeFileSync(indexHtml, html);
   console.log(`✅ Rewrote index.html: ${replacements} JS references → hashed`);
 } else {
