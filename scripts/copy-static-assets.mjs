@@ -100,16 +100,21 @@ for (const file of otherFiles) {
   fs.copyFileSync(source, target);
 }
 
-// Recursively copy subdirectories (assets/zodiac/, assets/hero/)
-const extraDirs = ['assets/zodiac', 'assets/hero'];
-for (const dir of extraDirs) {
-  const sourceDir = path.join(root, dir);
+// Recursively copy subdirectories
+// Mapping: source dir → target dir (lets us pull from public/ but emit as dist/assets/)
+const extraDirs = [
+  { src: 'assets/zodiac', dst: 'assets/zodiac' },
+  { src: 'public/hero',   dst: 'assets/hero' },  // public/hero/* → dist/assets/hero/*
+  { src: 'assets/hero',   dst: 'assets/hero' },
+];
+for (const { src, dst } of extraDirs) {
+  const sourceDir = path.join(root, src);
   if (!fs.existsSync(sourceDir)) continue;
   const entries = fs.readdirSync(sourceDir, { withFileTypes: true });
   for (const entry of entries) {
     if (!entry.isFile()) continue;
     const source = path.join(sourceDir, entry.name);
-    const target = path.join(dist, dir, entry.name);
+    const target = path.join(dist, dst, entry.name);
     fs.mkdirSync(path.dirname(target), { recursive: true });
     fs.copyFileSync(source, target);
   }
