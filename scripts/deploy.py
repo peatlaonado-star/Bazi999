@@ -168,9 +168,20 @@ def verify_production(deploy_id, expected_token=None, timeout=60):
     try:
         req = Request(css_url, headers=HEADERS)
         with urlopen(req, timeout=15) as r:
+            # Read content-type BEFORE body — CF sometimes returns HTML 404 when
+            # new hash hasn't propagated to edge yet. Detect this BEFORE counting bytes.
+            css_ctype = r.headers.get("Content-Type", "")
             css = r.read().decode("utf-8", errors="replace")
     except Exception as e:
         return {"ok": False, "error": f"CSS unreachable: {e}"}
+
+    # Reject HTML 404 (CF Pages edge serves fallback before new hash propagates)
+    if "text/html" in css_ctype or css.lstrip().startswith("<!DOCTYPE"):
+        return {
+            "ok": False,
+            "error": f"{current_css} not yet deployed to edge (got {css_ctype})",
+            "css_bundle": current_css,
+        }
 
     if expected_token:
         if expected_token in css:

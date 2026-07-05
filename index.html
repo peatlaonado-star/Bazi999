@@ -43,7 +43,7 @@
 <canvas id="cv"></canvas>
 <div id="main-content">
 
-  <!-- V19: Hero Splash 100vh แยกจาก content (เหมือน mockup) -->
+  <!-- V20: Hero — text ลอยบน+ล่าง ไม่บังหน้าแม่หมอ (เหมือน hero-mockup.html V17) -->
   <section class="hero-splash" aria-label="STARVIA hero">
     <div class="hero-frame">
       <video class="hero-video-bg" autoplay muted loop playsinline preload="metadata"
@@ -53,9 +53,15 @@
       </video>
       <div class="hero-overlay" aria-hidden="true"></div>
       <div class="hero-vignette" aria-hidden="true"></div>
-      <div class="hero-inner">
+
+      <!-- TOP: tag + STARVIA logo -->
+      <div class="hero-top">
         <div class="hd-tag" id="hd-tag" aria-hidden="false">✦ ค้นพบตัวเองผ่านดวงดาว ✦</div>
         <h1 id="hd-ttl">STARVIA</h1>
+      </div>
+
+      <!-- BOTTOM (Desktop only via CSS — Mobile ย้ายออกไป .hero-cta-panel ใต้ hero): kicker + price + title + desc + actions + promise -->
+      <div class="hero-text">
         <div class="hero-kicker" id="hd-sub">นพเคราะห์ · ราศีจักร · ลัคนา · ดวงชะตา</div>
         <div class="hero-price">✦ Premium 199 บาท/เดือน · รู้จักตัวเองลึกกว่านี้ ✦</div>
         <h2 class="hero-title">รู้จักตัวเองจากวันเกิด <span class="nowrap">ไม่ใช่แค่ดูดวง</span></h2>
@@ -68,6 +74,21 @@
         </div>
         <div id="brand-promise" class="brand-promise">ดาวไม่ได้ตัดสินชีวิตคุณ - ดาวช่วยให้คุณมองเห็นตัวเองชัดขึ้น</div>
       </div>
+    </div>
+
+    <!-- V26: Mobile CTA panel ใต้ hero (แสดงเฉพาะ mobile) — เอาปุ่มออกจาก vdo ไม่ทับแมว -->
+    <div class="hero-cta-panel" aria-label="เริ่มใช้งาน STARVIA">
+      <div class="hero-kicker">นพเคราะห์ · ราศีจักร · ลัคนา · ดวงชะตา</div>
+      <div class="hero-price">✦ Premium 199 บาท/เดือน · รู้จักตัวเองลึกกว่านี้ ✦</div>
+      <h2 class="hero-title">รู้จักตัวเองจากวันเกิด <span class="nowrap">ไม่ใช่แค่ดูดวง</span></h2>
+      <p class="hero-desc">STARVIA ช่วยถอดรหัสจุดแข็ง ความรัก งาน เงิน และจังหวะชีวิต ผ่านโหราศาสตร์ไทยโบราณแบบอ่านง่าย</p>
+      <div class="hero-actions" aria-label="ทางลัดเริ่มใช้งาน">
+        <a class="hero-primary" href="#fc0">เริ่มดูดวงฟรี</a>
+        <button class="tarot-trigger" onclick="openTarot()" aria-label="เปิดไพ่ทำนาย">
+          <span class="tarot-trigger-emoji" aria-hidden="true">🎴</span> หยิบไพ่ทำนาย
+        </button>
+      </div>
+      <div class="brand-promise">ดาวไม่ได้ตัดสินชีวิตคุณ - ดาวช่วยให้คุณมองเห็นตัวเองชัดขึ้น</div>
     </div>
   </section>
 

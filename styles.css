@@ -2208,26 +2208,41 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 
 /* World-class typography/layout calibration: Apple/Linear/Stripe-inspired scale */
 .w{max-width:840px;padding:0 22px 88px}
-/* V19 Hero Splash: 100vh แยกจาก content (เหมือน mockup hero-mockup.html)
-   hero-splash เต็มจอ → hero-frame เป็น aspect 9:16 กลางจอ → hero-inner ใส่ content */
+/* V20 Hero Splash: เหมือน mockup V17 — text ลอยบน+ล่าง ไม่บังหน้าแม่หมอ
+   hero-splash เต็มจอ → hero-frame เป็น aspect 9:16 กลางจอ → hero-top (บน) + hero-text (absolute ล่าง) */
 .hero-splash{position:relative;width:100%;min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:18px 18px 28px;background:var(--bg);overflow:hidden;isolation:isolate}
-/* mockup V17: max-width 720 + aspect 9:16 + overflow hidden + isolation isolate */
-.hero-frame{position:relative;width:100%;max-width:720px;aspect-ratio:9/16;max-height:min(86vh,860px);overflow:hidden;isolation:isolate;border-radius:24px;box-shadow:0 24px 70px rgba(0,0,0,.42)}
-.hero-video-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 35%;z-index:-3;pointer-events:none;image-rendering:-webkit-optimize-contrast;image-rendering:crisp-edges}
-/* V18: overlay หนาบน-กลาง (กลบข้อความ) + เบาล่าง (เปิดให้เห็นตัวละคร) — inverted gradient
-   V19: เพิ่ม opacity ช่วง 32-50% ขึ้นเพื่อให้ข้อความ STARVIA + headline อ่านชัด */
-.hero-overlay{position:absolute;inset:0;z-index:-2;pointer-events:none;background:linear-gradient(180deg,rgba(9,6,28,0.92) 0%,rgba(9,6,28,0.78) 18%,rgba(9,6,28,0.65) 32%,rgba(9,6,28,0.45) 50%,rgba(9,6,28,0.20) 68%,rgba(9,6,28,0.08) 82%,rgba(9,6,28,0.25) 100%)}
-.hero-vignette{position:absolute;inset:0;z-index:-1;pointer-events:none;box-shadow:inset 0 -120px 140px -20px rgba(9,6,28,0.55),inset 0 -40px 60px -10px rgba(9,6,28,0.30);background:radial-gradient(ellipse 150% 50% at 50% 100%,rgba(9,6,28,0.10) 0%,rgba(9,6,28,0.00) 60%)}
-.hero-inner{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;height:100%;padding:28px 20px 24px}
-.hero-splash .hd-tag,.hero-splash h1,.hero-splash .hero-kicker,.hero-splash .hero-price,.hero-splash .hero-title,.hero-splash .hero-desc,.hero-splash .hero-actions,.hero-splash .brand-promise{position:relative;z-index:1}
-.hd h1{font-size:clamp(42px,6vw,64px);line-height:1.04;letter-spacing:.025em;margin-bottom:8px}
-.hero-kicker{font-size: 11px;letter-spacing:.22em;color:#b4a1ea;font-family:var(--font-display)}
-.hero-price{margin-top:18px;font-size:12px;padding:6px 13px;font-family:var(--font-display)}
-.hero-title{max-width:620px;margin-top:18px;font-size:clamp(31px,4.4vw,46px);line-height:1.11;font-weight:700;letter-spacing:-.035em;font-family:var(--font-display)}
-.hero-desc{max-width:560px;margin-top:14px;font-size:16.5px;line-height:1.68;letter-spacing:-.01em}
-.hero-actions{margin-top:22px;gap:10px}
-.hero-primary,.hero-secondary{min-height:44px;padding:0 18px;font-size:15px;font-weight:700}
-.brand-promise{max-width:520px;margin:16px auto 0;font-size:13px;line-height:1.6;font-family:var(--font-body);text-shadow:0 1px 4px rgba(0,0,0,0.6),0 0 8px rgba(9,6,28,0.5)}
+/* V20: max-width 720 + aspect 9:16 + contain (เห็น vdo เต็ม ไม่ crop หน้า) + object-position top (ใบหน้าอยู่บน) */
+.hero-frame{position:relative;width:100%;max-width:720px;aspect-ratio:9/16;max-height:min(86vh,860px);overflow:hidden;isolation:isolate;border-radius:24px;box-shadow:0 24px 70px rgba(0,0,0,.42);background:#09061c}
+.hero-video-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center top;opacity:1;z-index:1;pointer-events:none;image-rendering:-webkit-optimize-contrast;image-rendering:crisp-edges}
+/* V20: overlay บางทั่ว hero — ไม่กลบตัวละครตรงกลาง แค่ช่วยให้ text อ่านออก */
+.hero-overlay{position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(180deg,rgba(9,6,28,0.45) 0%,rgba(9,6,28,0.20) 22%,rgba(9,6,28,0.08) 38%,rgba(9,6,28,0.05) 50%,rgba(9,6,28,0.10) 62%,rgba(9,6,28,0.20) 74%,rgba(9,6,28,0.25) 88%,rgba(9,6,28,0.30) 100%)}
+/* V20: vignette เป็น inset glow — ขอบสีอ่อนลากเข้ามา แทนที่จะบังตัวละครกลาง */
+.hero-vignette{position:absolute;inset:0;z-index:3;pointer-events:none;box-shadow:inset 0 -120px 140px -20px rgba(9,6,28,0.55),inset 0 -40px 60px -10px rgba(9,6,28,0.30);background:radial-gradient(ellipse 150% 50% at 50% 100%,rgba(9,6,28,0.10) 0%,rgba(9,6,28,0.00) 60%)}
+
+/* TOP: tag + STARVIA (อยู่ด้านบนของ hero) */
+.hero-top{position:relative;z-index:5;padding:28px 20px 0;text-align:center}
+
+/* BOTTOM: text ลอย absolute ล่างสุด + gradient บางเรียบ ไม่มี hard seam */
+.hero-text{position:absolute;bottom:0;left:50%;transform:translateX(-50%);z-index:10;width:100%;padding:22px 20px 32px;text-align:center;background:linear-gradient(180deg,rgba(9,6,28,0.00) 0%,rgba(9,6,28,0.45) 35%,rgba(9,6,28,0.70) 65%,rgba(9,6,28,0.55) 90%,rgba(9,6,28,0.20) 100%)}
+
+/* ทุก text ใน hero-top + hero-text ใช้ text-shadow แข็ง กัน overlay ไม่พอ */
+.hero-top .hd-tag,.hero-top h1,.hero-text .hero-kicker,.hero-text .hero-price,.hero-text .hero-title,.hero-text .hero-desc,.hero-text .hero-actions,.hero-text .brand-promise{position:relative;z-index:1}
+.hd h1{font-size:clamp(42px,6vw,64px);line-height:1.04;letter-spacing:.025em;margin-bottom:8px;text-shadow:0 4px 24px rgba(0,0,0,0.5)}
+.hero-kicker{font-size: 11px;letter-spacing:.28em;color:#C5B0FF;text-transform:uppercase;font-family:var(--font-display);margin-bottom:4px;text-shadow:0 2px 12px rgba(9,6,28,0.95),0 0 28px rgba(9,6,28,0.85),0 0 3px rgba(9,6,28,0.95)}
+.hero-price{display:inline-flex;align-items:center;justify-content:center;margin:0 auto 8px;padding:5px 12px;border:1px solid rgba(214,173,69,.34);border-radius:999px;background:rgba(9,6,28,0.50);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--g2);font-size:12px;font-weight:600;letter-spacing:.04em;font-family:var(--font-display)}
+.hero-title{max-width:620px;margin:4px auto 8px;font-size:clamp(18px,3.4vw,28px);line-height:1.18;color:var(--tx);font-weight:700;letter-spacing:-.01em;font-family:var(--font-display);text-shadow:0 2px 12px rgba(9,6,28,0.95),0 0 28px rgba(9,6,28,0.85),0 0 3px rgba(9,6,28,0.95)}
+.hero-desc{max-width:540px;margin:0 auto 12px;color:var(--tx2);font-size:13.5px;line-height:1.55;text-shadow:0 2px 12px rgba(9,6,28,0.95),0 0 28px rgba(9,6,28,0.85),0 0 3px rgba(9,6,28,0.95)}
+.hero-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:10px}
+.hero-primary,.hero-secondary{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 22px;border-radius:999px;text-decoration:none;font-size:13.5px;font-weight:800;transition:transform .25s,box-shadow .25s,border-color .25s}
+.hero-primary{background:linear-gradient(135deg,var(--g2),var(--g));color:#080415;box-shadow:0 10px 24px rgba(214,173,69,.32),0 2px 8px rgba(0,0,0,0.4)}
+.hero-secondary{border:1px solid rgba(214,173,69,.42);color:var(--tx);background:rgba(9,6,28,0.50);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);text-shadow:0 2px 6px rgba(9,6,28,0.8)}
+.hero-primary:hover,.hero-secondary:hover{transform:translateY(-2px)}
+.brand-promise{font-size:11px;color:var(--tx2);line-height:1.5;opacity:.92;max-width:480px;margin:0 auto;text-shadow:0 2px 12px rgba(9,6,28,0.95),0 0 28px rgba(9,6,28,0.85),0 0 3px rgba(9,6,28,0.95)}
+/* hd-tag (บนสุด) — pill สีทอง + blur */
+.hd-tag{display:inline-flex;padding:7px 14px;border:1px solid rgba(214,173,69,.34);border-radius:999px;background:rgba(9,6,28,0.40);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--g2);font-size:12px;font-weight:600;letter-spacing:.06em;font-family:var(--font-display)}
+
+/* V26: Mobile CTA Panel — แสดงเฉพาะ mobile, ซ่อนใน desktop */
+.hero-cta-panel{display:none}
 .daily-mantra{max-width:620px;width:auto;margin:0 auto 22px;padding:10px 16px;border-style:solid;background:rgba(255,255,255,.035);border-color:rgba(214,173,69,.16);border-radius:16px}
 .dm-lbl{font-size: 11px;letter-spacing:.16em;margin-bottom:4px;color:#b4a1ea}
 .dm-txt{font-size:13px;line-height:1.55;letter-spacing:0;color:var(--tx2)}
@@ -2256,11 +2271,52 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.4) sepia(1) h
 .btn{font-size:16px;min-height:48px;border-radius:14px;letter-spacing:.04em}
 .trust-strip{font-size:13px;line-height:1.55;margin-top:15px}
 @media(max-width:768px){.w{max-width:100%;padding:0 18px 72px}.hero-splash{padding:0}.hero-frame{border-radius:0;max-height:100dvh}.hd h1{font-size:42px}.hero-title{font-size:31px;line-height:1.12}.hero-desc{font-size:15.5px}.daily-mantra{margin-bottom:18px}.modenav{margin-bottom:24px}.value-section,.premium-preview{margin:24px auto 20px}.value-grid,.preview-grid{grid-template-columns:1fr}.form-card{padding:22px}
-/* V18 mobile: overlay หนาขึ้นเพื่อข้อความชัด แต่ล่างเบาลงเพื่อเห็นตัวละคร */
-.hero-overlay{background:linear-gradient(180deg,rgba(9,6,28,0.92) 0%,rgba(9,6,28,0.75) 18%,rgba(9,6,28,0.55) 32%,rgba(9,6,28,0.35) 50%,rgba(9,6,28,0.15) 68%,rgba(9,6,28,0.05) 85%,rgba(9,6,28,0.10) 100%)!important}
-.hero-vignette{box-shadow:inset 0 -80px 100px -10px rgba(9,6,28,0.55),inset 0 -20px 40px -5px rgba(9,6,28,0.30)!important;background:radial-gradient(ellipse 130% 50% at 50% 100%,rgba(9,6,28,0.15) 0%,rgba(9,6,28,0.00) 60%)!important}}
+@media(max-width:768px){
+  .w{max-width:100%;padding:0 18px 72px}
+  /* V27 mobile: hero-splash ไม่ flex center — เป็น block ปกติ, frame เต็มจอ */
+  .hero-splash{display:block;min-height:auto;padding:0}
+  /* V27 mobile: frame เต็มจอ — ไม่มี border-radius + ไม่มี max-height (ใช้ aspect 9:16 เดิม) */
+  .hero-frame{border-radius:0;max-height:none;box-shadow:none}
+  .hd h1{font-size:42px}
+  /* V27 mobile: ซ่อน .hero-text — แสดง .hero-cta-panel ใต้ hero แทน */
+  .hero-text{display:none}
+  .hero-top{padding:32px 16px 0}
+  .daily-mantra{margin-bottom:18px}
+  .modenav{margin-bottom:24px}
+  .value-section,.premium-preview{margin:24px auto 20px}
+  .value-grid,.preview-grid{grid-template-columns:1fr}
+  .form-card{padding:22px}
+  /* V27 mobile: overlay เบาลง — ไม่มี text ใน hero ตัวละครเห็นเต็ม */
+  .hero-overlay{background:linear-gradient(180deg,rgba(9,6,28,0.35) 0%,rgba(9,6,28,0.12) 25%,rgba(9,6,28,0.05) 50%,rgba(9,6,28,0.10) 75%,rgba(9,6,28,0.25) 100%)!important}
+  .hero-vignette{box-shadow:inset 0 -60px 80px -10px rgba(9,6,28,0.45),inset 0 -20px 30px -5px rgba(9,6,28,0.30)!important;background:radial-gradient(ellipse 130% 50% at 50% 100%,rgba(9,6,28,0.20) 0%,rgba(9,6,28,0.00) 60%)!important}
+  /* V27 mobile: CTA panel ใต้ hero — พื้นที่ทึบ ปุ่มไม่ทับ vdo */
+  .hero-cta-panel{
+    display:block;
+    background:linear-gradient(180deg,#0d0826 0%,#09061c 100%);
+    padding:32px 20px 28px;
+    text-align:center;
+    border-top:1px solid rgba(214,173,69,0.18);
+  }
+  .hero-cta-panel .hero-kicker{font-size:11px;letter-spacing:.28em;color:#C5B0FF;text-transform:uppercase;font-family:var(--font-display);margin-bottom:10px;display:block}
+  .hero-cta-panel .hero-price{display:inline-flex;margin:0 auto 18px;padding:6px 14px;border:1px solid rgba(214,173,69,.34);border-radius:999px;background:rgba(214,173,69,.08);color:var(--g2);font-size:12px;font-weight:600;letter-spacing:.04em;font-family:var(--font-display)}
+  .hero-cta-panel .hero-title{max-width:620px;margin:0 auto 12px;font-size:clamp(22px,5.5vw,28px);line-height:1.22;color:var(--tx);font-weight:700;letter-spacing:-.015em;font-family:var(--font-display)}
+  .hero-cta-panel .hero-desc{max-width:520px;margin:0 auto 18px;color:var(--tx2);font-size:14.5px;line-height:1.65}
+  .hero-cta-panel .hero-actions{display:flex;flex-direction:row;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
+  .hero-cta-panel .hero-actions .hero-primary,
+  .hero-cta-panel .hero-actions .tarot-trigger{
+    width:auto;
+    flex:0 1 auto;
+    max-width:none;
+    min-height:46px;
+    padding:0 24px;
+    font-size:14px;
+  }
+  .hero-cta-panel .hero-primary{background:linear-gradient(135deg,var(--g2),var(--g));color:#080415;box-shadow:0 8px 22px rgba(214,173,69,.32)}
+  .hero-cta-panel .tarot-trigger{border:1px solid rgba(214,173,69,.42);color:var(--tx);background:rgba(255,255,255,.06)}
+  .hero-cta-panel .brand-promise{font-size:12px;color:var(--tx2);line-height:1.55;opacity:.85;max-width:420px;margin:0 auto;padding-bottom:env(safe-area-inset-bottom,0)}
+}
 .nowrap{white-space:nowrap}
-@media(max-width:480px){.nowrap{white-space:normal}.hero-title{font-size:29px}}
+@media(max-width:480px){.nowrap{white-space:normal}}
 
 /* ===== P0: DAILY FORTUNE WIDGET ===== */
 .daily-fortune-section{max-width:640px;margin:0 auto 12px}

@@ -30,7 +30,7 @@
 
 <!-- Umami Analytics (Privacy-friendly) -->
 <script defer src="https://cloud.umami.is/script.js" data-website-id="21ed818b-d83b-4d45-a007-34f096db715f"></script>
-  <link rel="stylesheet" crossorigin href="/assets/main-Czee4T-U.css">
+  <link rel="stylesheet" crossorigin href="/assets/main-zO2SJlY6.css">
 </head>
 <noscript><div style="padding:40px;text-align:center;color:#C9A227;background:#09061c;font-family:sans-serif;"><h2>กรุณาเปิด JavaScript</h2><p>STARVIA ต้องใช้ JavaScript ในการทำงาน</p></div></noscript>
 <body>
@@ -42,19 +42,25 @@
 <canvas id="cv"></canvas>
 <div id="main-content">
 
-  <!-- V19: Hero Splash 100vh แยกจาก content (เหมือน mockup) -->
+  <!-- V20: Hero — text ลอยบน+ล่าง ไม่บังหน้าแม่หมอ (เหมือน hero-mockup.html V17) -->
   <section class="hero-splash" aria-label="STARVIA hero">
     <div class="hero-frame">
       <video class="hero-video-bg" autoplay muted loop playsinline preload="metadata"
-             poster="assets/hero/mama-kara-loop-poster.jpg" aria-hidden="true">
-        <source src="assets/hero/mama-kara-loop.webm" type="video/webm">
-        <source src="assets/hero/mama-kara-loop.mp4" type="video/mp4">
+             poster="/assets/hero/mama-kara-loop-poster.jpg" aria-hidden="true">
+        <source src="/assets/hero/mama-kara-loop.webm" type="video/webm">
+        <source src="/assets/hero/mama-kara-loop.mp4" type="video/mp4">
       </video>
       <div class="hero-overlay" aria-hidden="true"></div>
       <div class="hero-vignette" aria-hidden="true"></div>
-      <div class="hero-inner">
+
+      <!-- TOP: tag + STARVIA logo -->
+      <div class="hero-top">
         <div class="hd-tag" id="hd-tag" aria-hidden="false">✦ ค้นพบตัวเองผ่านดวงดาว ✦</div>
         <h1 id="hd-ttl">STARVIA</h1>
+      </div>
+
+      <!-- BOTTOM (Desktop only via CSS — Mobile ย้ายออกไป .hero-cta-panel ใต้ hero): kicker + price + title + desc + actions + promise -->
+      <div class="hero-text">
         <div class="hero-kicker" id="hd-sub">นพเคราะห์ · ราศีจักร · ลัคนา · ดวงชะตา</div>
         <div class="hero-price">✦ Premium 199 บาท/เดือน · รู้จักตัวเองลึกกว่านี้ ✦</div>
         <h2 class="hero-title">รู้จักตัวเองจากวันเกิด <span class="nowrap">ไม่ใช่แค่ดูดวง</span></h2>
@@ -67,6 +73,21 @@
         </div>
         <div id="brand-promise" class="brand-promise">ดาวไม่ได้ตัดสินชีวิตคุณ - ดาวช่วยให้คุณมองเห็นตัวเองชัดขึ้น</div>
       </div>
+    </div>
+
+    <!-- V26: Mobile CTA panel ใต้ hero (แสดงเฉพาะ mobile) — เอาปุ่มออกจาก vdo ไม่ทับแมว -->
+    <div class="hero-cta-panel" aria-label="เริ่มใช้งาน STARVIA">
+      <div class="hero-kicker">นพเคราะห์ · ราศีจักร · ลัคนา · ดวงชะตา</div>
+      <div class="hero-price">✦ Premium 199 บาท/เดือน · รู้จักตัวเองลึกกว่านี้ ✦</div>
+      <h2 class="hero-title">รู้จักตัวเองจากวันเกิด <span class="nowrap">ไม่ใช่แค่ดูดวง</span></h2>
+      <p class="hero-desc">STARVIA ช่วยถอดรหัสจุดแข็ง ความรัก งาน เงิน และจังหวะชีวิต ผ่านโหราศาสตร์ไทยโบราณแบบอ่านง่าย</p>
+      <div class="hero-actions" aria-label="ทางลัดเริ่มใช้งาน">
+        <a class="hero-primary" href="#fc0">เริ่มดูดวงฟรี</a>
+        <button class="tarot-trigger" onclick="openTarot()" aria-label="เปิดไพ่ทำนาย">
+          <span class="tarot-trigger-emoji" aria-hidden="true">🎴</span> หยิบไพ่ทำนาย
+        </button>
+      </div>
+      <div class="brand-promise">ดาวไม่ได้ตัดสินชีวิตคุณ - ดาวช่วยให้คุณมองเห็นตัวเองชัดขึ้น</div>
     </div>
   </section>
 
