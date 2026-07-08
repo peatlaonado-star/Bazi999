@@ -610,13 +610,93 @@ export async function facebookAutoPin(context) {
       });
     }
 
-    // Step 3: Process each candidate (OCR → check amount ≥ 199 → issue PIN)
+    // Step 3: Process each candidate
+    // NEW FLOW: Classify intent FIRST → OCR only if BUYING_SLIP
     const results = [];
     const MIN_AMOUNT = 199;
+    const { token, pageId: cfgPageId } = getConfig(env);
 
     for (const candidate of pinCandidates) {
       try {
-        // Step 3.1: OCR the slip image FIRST (before issuing PIN)
+        // Step 3.0: Classify intent (NEW — prevents issuing PIN for chitchat/empty slips)
+        const intent = await classifyIntent(
+          candidate.messageSnippet || '',
+          !!candidate.slipImageUrl,
+          env
+        );
+        candidate.intent = intent;
+
+        // Step 3.0a: Non-buying intents → Reply via LLM (แม่หมอคาร่า) + skip OCR/PIN
+        if (intent === 'CHITCHAT' || intent === 'OTHER') {
+          const replyText = await generateChatReply(
+            candidate.messageSnippet || '',
+            candidate.customerName,
+            intent,
+            env
+          );
+          const sent = await sendFBMessage(candidate.customerId, replyText, token, cfgPageId);
+
+          // Notify admin via Telegram (chitchat, no payment)
+          await notifyTelegram(env, {
+            customerName: candidate.customerName,
+            pinCode: null,
+            ocrResult: null,
+            slipImageUrl: candidate.slipImageUrl,
+            expires: null,
+            rejected: false,
+            intent,
+            replySent: sent,
+          }).catch(() => {});
+
+          // Mark dedup so we don't re-process
+          const dedupKey = `fb:pin:msg:${candidate.messageId}`;
+          try { await env.STARVIA_KV.put(dedupKey, `chitchat_${intent}`, { expirationTtl: 86400 }); } catch {}
+
+          results.push({
+            ...candidate,
+            status: intent === 'CHITCHAT' ? 'CHITCHAT_REPLIED' : 'OTHER_REPLIED',
+            replyText,
+            replySent: sent,
+          });
+          continue;
+        }
+
+        // Step 3.0b: BUYING_NO_SLIP → Ask customer to send slip
+        if (intent === 'BUYING_NO_SLIP') {
+          const replyText = await generateChatReply(
+            candidate.messageSnippet || '',
+            candidate.customerName,
+            intent,
+            env
+          );
+          const sent = await sendFBMessage(candidate.customerId, replyText, token, cfgPageId);
+
+          await notifyTelegram(env, {
+            customerName: candidate.customerName,
+            pinCode: null,
+            ocrResult: null,
+            slipImageUrl: candidate.slipImageUrl,
+            expires: null,
+            rejected: false,
+            intent,
+            replySent: sent,
+          }).catch(() => {});
+
+          // Mark dedup (expiry 1h — customer may send slip soon)
+          const dedupKey = `fb:pin:msg:${candidate.messageId}`;
+          try { await env.STARVIA_KV.put(dedupKey, 'awaiting_slip', { expirationTtl: 3600 }); } catch {}
+
+          results.push({
+            ...candidate,
+            status: 'AWAITING_SLIP',
+            replyText,
+            replySent: sent,
+          });
+          continue;
+        }
+
+        // Step 3.0c: BUYING_SLIP (or ambiguous) → Continue to OCR
+        // Step 3.1: OCR the slip image
         const ocrResult = await ocrSlipImage(candidate.slipImageUrl, env);
         const parsedAmount = parseAmountFromOCR(ocrResult);
         const transferTime = parseTimeFromOCR(ocrResult);
@@ -691,7 +771,41 @@ export async function facebookAutoPin(context) {
         }
         // If dupCheck.isDuplicate && isNewer → continue to issue new PIN (old one stays, admin revokes later)
 
-        // Step 3.3: Amount OK (or unreadable — err on side of issuing) → Issue PIN
+        // Step 3.3: REJECT if OCR unreadable (err on side of rejecting)
+        // Only issue PIN if we can CONFIRM the amount ≥ MIN_AMOUNT
+        if (parsedAmount === null) {
+          const rejectMsg = `😔 คุณ ${candidate.customerName} ค่ะ\n\nขอบคุณที่ส่งรูปมานะคะ แต่ระบบอ่านสลิปไม่ออกค่ะ\n\n📸 กรุณาส่งสลิปโอนเงินใหม่อีกครั้ง โดย:\n• ถ่ายให้เห็นยอดเงินชัดเจน\n• ตัวเลขไม่เบลอ\n• เห็นชื่อบัญชีต้นทาง\n\n💰 ยอดขั้นต่ำ 199 บาท หากส่งสลิปมาใหม่ ระบบจะตรวจสอบและออกรหัสให้อัตโนมัติค่ะ 🙏`;
+
+          const sent = await sendFBMessage(candidate.customerId, rejectMsg, token, cfgPageId);
+
+          await notifyTelegram(env, {
+            customerName: candidate.customerName,
+            pinCode: null,
+            ocrResult,
+            slipImageUrl: candidate.slipImageUrl,
+            expires: null,
+            rejected: true,
+            rejectReason: 'OCR อ่านสลิปไม่ออก — ขอให้ลูกค้าส่งใหม่',
+            intent,
+            replySent: sent,
+          }).catch(() => {});
+
+          // Mark dedup (1h expiry — customer may re-send slip)
+          const dedupKey = `fb:pin:msg:${candidate.messageId}`;
+          try { await env.STARVIA_KV.put(dedupKey, 'ocr_unreadable_awaiting_resend', { expirationTtl: 3600 }); } catch {}
+
+          results.push({
+            ...candidate,
+            status: 'OCR_UNREADABLE',
+            ocrResult,
+            parsedAmount: null,
+            replyText: rejectMsg,
+            replySent: sent,
+          });
+          continue;
+        }
+
+        // Step 3.4: Amount confirmed ≥ MIN_AMOUNT → Issue PIN
         const ctx = { env, request: new Request('http://localhost/v1/admin/pins/issue', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -813,6 +927,160 @@ export async function facebookAutoPin(context) {
     });
   } catch (err) {
     return errorResponse(500, 'INTERNAL_ERROR', err.message);
+  }
+}
+
+// ── LLM Intent Classifier + Chat Reply ──
+// Priority: OpenAI (gpt-4o-mini) > OpenCode Zen (minimax-m3-free)
+async function callLLM(messages, env, maxTokens = 300) {
+  const openaiKey = env.OPENAI_API_KEY;
+  if (openaiKey) {
+    try {
+      const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + openaiKey,
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages,
+          max_tokens: maxTokens,
+          temperature: 0.3,
+        }),
+      });
+      const data = await resp.json();
+      const content = data.choices?.[0]?.message?.content?.trim();
+      if (content) return content;
+    } catch (e) {
+      console.error('OpenAI LLM error:', e.message);
+    }
+  }
+  const zenKey = env.OPENCODE_ZEN_API_KEY || env.OPENCODE_ZEN_API_KEY_2;
+  if (zenKey) {
+    try {
+      const resp = await fetch('https://opencode.ai/zen/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + zenKey,
+        },
+        body: JSON.stringify({
+          model: 'minimax-m3-free',
+          messages,
+          max_tokens: maxTokens,
+          temperature: 0.3,
+        }),
+      });
+      const data = await resp.json();
+      const content = data.choices?.[0]?.message?.content?.trim();
+      if (content) return content;
+    } catch (e) {
+      console.error('Zen LLM error:', e.message);
+    }
+  }
+  return null;
+}
+
+// Classify customer message intent — return one of: BUYING_SLIP, BUYING_NO_SLIP, CHITCHAT, OTHER
+async function classifyIntent(customerMessage, hasAttachment, env) {
+  const systemPrompt = `คุณคือ "แม่หมอคาร่า" น้องสาวคนสนิทของ STARVIA หน้าที่ของคุณคือ "จำแนกประเภทข้อความ" ของลูกค้าที่ทักเข้ามาทาง Facebook Messenger
+
+ตอบเป็น JSON เท่านั้น ห้ามมีคำอธิบายอื่น รูปแบบ:
+{"intent": "BUYING_SLIP"} | {"intent": "BUYING_NO_SLIP"} | {"intent": "CHITCHAT"} | {"intent": "OTHER"}
+
+ความหมาย:
+- BUYING_SLIP: ลูกค้าต้องการซื้อสมาชิกพรีเมี่ยม + แนบสลิปโอนเงินมา (มีรูปภาพแนบ และข้อความบ่งบอกว่าซื้อ/โอน)
+- BUYING_NO_SLIP: ลูกค้าต้องการซื้อสมาชิกพรีเมี่ยม แต่ยังไม่ได้แนบสลิป (อาจถามราคา วิธีจ่าย หรือบอกว่าจะโอน)
+- CHITCHAT: ทักทายธรรมดา ถามดวง ขอบคุณ หรือพูดคุยทั่วไป (ไม่เกี่ยวกับการซื้อ)
+- OTHER: สแปม ข้อความไม่ชัดเจน หรือเรื่องอื่นที่ไม่เข้าข้อใด`;
+
+  const userPrompt = `ข้อความลูกค้า: "${(customerMessage || '').substring(0, 500)}"
+มีรูปภาพแนบ: ${hasAttachment ? 'ใช่' : 'ไม่'}
+
+จำแนก intent แล้วตอบเป็น JSON เท่านั้น`;
+
+  const content = await callLLM([
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: userPrompt },
+  ], env, 50);
+
+  if (!content) return 'OTHER';
+  // Parse JSON safely
+  try {
+    const cleaned = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const parsed = JSON.parse(cleaned);
+    const intent = parsed.intent;
+    if (['BUYING_SLIP', 'BUYING_NO_SLIP', 'CHITCHAT', 'OTHER'].includes(intent)) return intent;
+  } catch (e) {
+    console.error('Intent parse error:', content.substring(0, 200));
+  }
+  return 'OTHER';
+}
+
+// Generate chat reply as แม่หมอคาร่า — based on intent
+async function generateChatReply(customerMessage, customerName, intent, env) {
+  const systemPrompt = `คุณคือ "แม่หมอคาร่า" น้องสาวคนสนิทของ STARVIA ที่มีความรู้เรื่องดวงดาว ราศี โหราศาสตร์
+
+## ตัวตน:
+- น้ำเสียงน้องสาว เป็นกันเองสุดๆ
+- ตอบสั้นกระชับ ไม่เกิน 200 ตัวอักษร (Facebook Messenger limit)
+- ใส่อีโมจิ ✨🔮💫🥰💕🌟⭐🙏
+- ห้ามพูดถึง AI ห้ามใช้ภาษาทางการ
+
+## สิ่งที่ต้องทำตอนนี้:
+- intent ของลูกค้า = "${intent}"
+- ถ้าเป็น CHITCHAT/OTHER → อธิบายว่า "ช่องทางข้อความนี้สำหรับการขอสนับสนุนแม่หมอคาร่า หรือซื้อสมาชิกพรีเมี่ยมเพื่อเข้าดูดวงแบบพิเศษค่ะ" (พูดสั้นๆ ไม่ยัดเยียด)
+- ถ้าเป็น BUYING_NO_SLIP → บอกให้ส่งสลิปโอนเงินมาเพื่อออกรหัส Premium
+- ถ้าเป็น BUYING_SLIP → บอกว่ากำลังตรวจสอบสลิปอยู่ ขอบคุณที่รอค่ะ
+
+## ตัวอย่าง:
+- CHITCHAT: "สวัสดีค่ะ 💕 ช่องทางนี้สำหรับขอสนับสนุนแม่หมอคาร่า หรือซื้อสมาชิกพรีเมี่ยมเพื่อเข้าดูดวงแบบพิเศษค่ะ ส่งสลิปมาได้เลยนะคะ 🔮✨"
+- BUYING_NO_SLIP: "ยอดเยี่ยมเลยค่ะ! 🎉 ส่งสลิปโอนเงิน 199 บาท มาทางแชทนี้ได้เลยนะคะ ระบบจะออกรหัสให้อัตโนมัติค่ะ 🙏"
+- BUYING_SLIP: "ได้รับสลิปแล้วค่ะ ✅ กำลังตรวจสอบอยู่นะคะ ขอบคุณที่รอค่ะ 💕"`;
+
+  const userPrompt = `ลูกค้าชื่อ: ${customerName}
+ข้อความ: "${(customerMessage || '').substring(0, 300)}"
+
+ตอบเป็น "แม่หมอคาร่า" สั้นๆ 1-2 ประโยค`;
+
+  const content = await callLLM([
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: userPrompt },
+  ], env, 150);
+
+  // Fallback if LLM fails
+  if (!content) {
+    if (intent === 'BUYING_NO_SLIP') {
+      return 'ขอบคุณค่ะ! 🎉 ส่งสลิปโอนเงิน 199 บาท มาทางแชทนี้ได้เลยนะคะ ระบบจะออกรหัสให้อัตโนมัติค่ะ 🙏';
+    } else if (intent === 'BUYING_SLIP') {
+      return 'ได้รับสลิปแล้วค่ะ ✅ กำลังตรวจสอบอยู่นะคะ ขอบคุณที่รอค่ะ 💕';
+    } else {
+      return 'สวัสดีค่ะ 💕 ช่องทางนี้สำหรับขอสนับสนุนแม่หมอคาร่า หรือซื้อสมาชิกพรีเมี่ยมเพื่อเข้าดูดวงแบบพิเศษค่ะ 🔮✨';
+    }
+  }
+  return content;
+}
+
+// Send text message to a Facebook user via page
+async function sendFBMessage(customerId, text, token, pageId) {
+  try {
+    const sendUrl = `${GRAPH_BASE}/${pageId}/messages?access_token=${encodeURIComponent(token)}`;
+    const msgBody = JSON.stringify({
+      recipient: { id: customerId },
+      message: { text },
+      messaging_type: 'RESPONSE',
+    });
+    const sendResp = await fetch(sendUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: msgBody,
+    });
+    const sendData = await sendResp.json();
+    return !!(sendData.message_id || sendData.id);
+  } catch (e) {
+    console.error('sendFBMessage error:', e.message);
+    return false;
   }
 }
 
