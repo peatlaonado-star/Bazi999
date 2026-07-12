@@ -2,12 +2,51 @@ node_modules/
 .vitest/
 coverage/
 .DS_Store
-#dist/
 .vite/
 .env
 .env.local
 .env.*.local
-# Backup files (Starvia 2026-06-07)
-*.bak
 # Legacy Netlify config (Starvia moved to Cloudflare Pages 2026-06-04)
 .netlify/
+
+# Backup files (Starvia 2026-06-07)
+*.bak
+*.backup
+
+# Generated content artifacts — not source code
+images/
+videos/
+reels/
+cache/
+prompts/
+data/clips/
+data/transcripts/
+data/*.json
+
+# Temp standalone HTML for testing — not part of site
+*.html
+!index.html
+!public/index.html
+!public/**/*.html
+
+# Python cache
+**/__pycache__/
+*.pyc
+
+# Virtual environments
+.venv*/
+venv*/
+.env*/
+__pypackages__/
+
+# Output/scripts artifacts
+scripts/*.py
+!scripts/copy-static-assets.mjs
+!scripts/*.mjs
+scripts/__pycache__/
+
+# Editor temp files
+*.swp
+*.swo
+*~
+.DS_Store?

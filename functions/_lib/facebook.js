@@ -614,7 +614,6 @@ export async function facebookAutoPin(context) {
     // NEW FLOW: Classify intent FIRST → OCR only if BUYING_SLIP
     const results = [];
     const MIN_AMOUNT = 199;
-    const { token, pageId: cfgPageId } = getConfig(env);
 
     for (const candidate of pinCandidates) {
       try {
@@ -634,7 +633,7 @@ export async function facebookAutoPin(context) {
             intent,
             env
           );
-          const sent = await sendFBMessage(candidate.customerId, replyText, token, cfgPageId);
+          const sent = await sendFBMessage(candidate.customerId, replyText, token, pageId);
 
           // Notify admin via Telegram (chitchat, no payment)
           await notifyTelegram(env, {
@@ -669,7 +668,7 @@ export async function facebookAutoPin(context) {
             intent,
             env
           );
-          const sent = await sendFBMessage(candidate.customerId, replyText, token, cfgPageId);
+          const sent = await sendFBMessage(candidate.customerId, replyText, token, pageId);
 
           await notifyTelegram(env, {
             customerName: candidate.customerName,
@@ -776,7 +775,7 @@ export async function facebookAutoPin(context) {
         if (parsedAmount === null) {
           const rejectMsg = `😔 คุณ ${candidate.customerName} ค่ะ\n\nขอบคุณที่ส่งรูปมานะคะ แต่ระบบอ่านสลิปไม่ออกค่ะ\n\n📸 กรุณาส่งสลิปโอนเงินใหม่อีกครั้ง โดย:\n• ถ่ายให้เห็นยอดเงินชัดเจน\n• ตัวเลขไม่เบลอ\n• เห็นชื่อบัญชีต้นทาง\n\n💰 ยอดขั้นต่ำ 199 บาท หากส่งสลิปมาใหม่ ระบบจะตรวจสอบและออกรหัสให้อัตโนมัติค่ะ 🙏`;
 
-          const sent = await sendFBMessage(candidate.customerId, rejectMsg, token, cfgPageId);
+          const sent = await sendFBMessage(candidate.customerId, rejectMsg, token, pageId);
 
           await notifyTelegram(env, {
             customerName: candidate.customerName,
