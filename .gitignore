@@ -23,11 +23,15 @@ data/clips/
 data/transcripts/
 data/*.json
 
+# Hermes session context files
+.hermes-*
+
 # Temp standalone HTML for testing — not part of site
 *.html
 !index.html
 !public/index.html
-!public/**/*.html
+!public/404.html
+!public/offline.html
 
 # Python cache
 **/__pycache__/
@@ -41,8 +45,8 @@ __pypackages__/
 
 # Output/scripts artifacts
 scripts/*.py
+scripts/shoot-*.mjs
 !scripts/copy-static-assets.mjs
-!scripts/*.mjs
 scripts/__pycache__/
 
 # Editor temp files
