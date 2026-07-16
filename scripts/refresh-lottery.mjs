@@ -28,6 +28,99 @@ function resolveResultsFile() {
 }
 const RESULTS_FILE = resolveResultsFile();
 
+// Load admin password for pushing to Cloudflare KV
+function loadAdminPassword() {
+  // 1. Env var (best for cron — set in job env)
+  if (process.env.STARVIA_ADMIN_PASSWORD) return process.env.STARVIA_ADMIN_PASSWORD;
+  // 2. ~/.hermes/.env
+  const hermesEnv = path.resolve(process.env.HOME || '/root', '.hermes', '.env');
+  if (fs.existsSync(hermesEnv)) {
+    try {
+      const content = fs.readFileSync(hermesEnv, 'utf8');
+      const m = content.match(/^STARVIA_ADMIN_PASSWORD\s*=\s*["']?([^"'\n]+)["']?/m);
+      if (m) return m[1].trim();
+    } catch {}
+  }
+  // 3. ~/Starvia/.env
+  const starviaEnv = path.resolve(process.env.HOME || '/root', 'Starvia', '.env');
+  if (fs.existsSync(starviaEnv)) {
+    try {
+      const content = fs.readFileSync(starviaEnv, 'utf8');
+      const m = content.match(/^STARVIA_ADMIN_PASSWORD\s*=\s*["']?([^"'\n]+)["']?/m);
+      if (m) return m[1].trim();
+    } catch {}
+  }
+  return null;
+}
+
+// Push to Cloudflare KV via admin login → /v1/lottery/manual
+// This makes the new lottery data visible on starvia.website (frontend reads from KV)
+async function pushToCloudflare(results, apiBase, password) {
+  if (!password) {
+    console.log('[lottery] ⚠ No STARVIA_ADMIN_PASSWORD — skipping CF push (KV will only update on next API hit)');
+    return false;
+  }
+  try {
+    // Step 1: login → get JWT
+    const loginBody = JSON.stringify({ password });
+    const loginRes = await postJson(`${apiBase}/admin/login`, loginBody);
+    if (!loginRes.token) {
+      console.log(`[lottery] ⚠ Login failed: ${JSON.stringify(loginRes)}`);
+      return false;
+    }
+    // Step 2: POST lottery/manual with JWT
+    const manualBody = JSON.stringify({
+      date: results.date,
+      displayDate: results.displayDate,
+      firstPrize: results.firstPrize,
+      last3f: results.last3f,
+      last3b: results.last3b,
+      last2: results.last2,
+      near1: results.near1,
+    });
+    const manualRes = await postJson(`${apiBase}/lottery/manual`, manualBody, loginRes.token);
+    if (manualRes.success) {
+      console.log(`[lottery] ✅ Pushed to Cloudflare KV: ${results.firstPrize}`);
+      return true;
+    }
+    console.log(`[lottery] ⚠ Manual push failed: ${JSON.stringify(manualRes)}`);
+    return false;
+  } catch (e) {
+    console.log(`[lottery] ⚠ CF push error: ${e.message}`);
+    return false;
+  }
+}
+
+function postJson(url, body, bearerToken = null) {
+  return new Promise((resolve, reject) => {
+    const u = new URL(url);
+    const data = Buffer.from(body, 'utf8');
+    const headers = {
+      'Content-Type': 'application/json',
+      'Content-Length': data.length,
+    };
+    if (bearerToken) headers['Authorization'] = `Bearer ${bearerToken}`;
+    const req = https.request({
+      hostname: u.hostname,
+      path: u.pathname + (u.search || ''),
+      method: 'POST',
+      headers,
+      timeout: 15000,
+    }, (res) => {
+      let respData = '';
+      res.on('data', c => respData += c);
+      res.on('end', () => {
+        try { resolve(JSON.parse(respData)); }
+        catch { resolve({ success: false, raw: respData }); }
+      });
+    });
+    req.on('error', reject);
+    req.on('timeout', () => { req.destroy(); reject(new Error('Timeout')); });
+    req.write(data);
+    req.end();
+  });
+}
+
 function fetch(url) {
   return new Promise((resolve, reject) => {
     const mod = url.startsWith('https') ? https : http;
@@ -124,13 +217,31 @@ async function main() {
       process.exit(0);
     }
 
-    // Check if newer than existing
-    let existing = {};
-    try { existing = JSON.parse(fs.readFileSync(RESULTS_FILE, 'utf8')); } catch (e) {}
-    
-    if (existing.date === results.date && existing.firstPrize === results.firstPrize) {
-      console.log(`[lottery] Already up to date: ${results.date} — ${results.firstPrize}`);
+    // Check if newer than existing — check BOTH project data AND hermes data
+    // (cron runs from ~/.hermes/scripts/ so checks ~/.hermes/data/; manual runs check project data)
+    function readExisting(path) {
+      try { return JSON.parse(fs.readFileSync(path, 'utf8')); } catch { return {}; }
+    }
+    const projectExisting = fs.existsSync(RESULTS_FILE) ? readExisting(RESULTS_FILE) : {};
+    const hermesData = path.resolve(process.env.HOME || '/root', '.hermes', 'data', 'lottery-results.json');
+    const hermesExisting = fs.existsSync(hermesData) ? readExisting(hermesData) : {};
+
+    // Use whichever has a fresher date as the reference
+    const refDate = [projectExisting.date, hermesExisting.date].filter(Boolean).sort().pop() || '';
+    const refPrize = (refDate === projectExisting.date ? projectExisting.firstPrize : hermesExisting.firstPrize) || '';
+    const refUpdatedAt = (refDate === projectExisting.date ? projectExisting.updatedAt : hermesExisting.updatedAt) || '';
+
+    // Skip ONLY if both same date AND same prize AND very fresh (<30 min old) — otherwise push to CF
+    const ageMs = refUpdatedAt ? (Date.now() - new Date(refUpdatedAt).getTime()) : Infinity;
+    const isFresh = ageMs < 30 * 60 * 1000;
+
+    if (refDate === results.date && refPrize === results.firstPrize && isFresh) {
+      console.log(`[lottery] Already up to date: ${results.date} — ${results.firstPrize} (age: ${Math.round(ageMs/60000)}min)`);
       process.exit(0);
+    }
+
+    if (refDate === results.date && refPrize === results.firstPrize) {
+      console.log(`[lottery] Same data but ${Math.round(ageMs/60000)}min old — will re-push to CF KV`);
     }
 
     fs.writeFileSync(RESULTS_FILE, JSON.stringify(results, null, 2), 'utf8');
@@ -138,6 +249,11 @@ async function main() {
     console.log(`[lottery] Last 3 front: ${results.last3f.join(', ')}`);
     console.log(`[lottery] Last 3 back: ${results.last3b.join(', ')}`);
     console.log(`[lottery] Last 2: ${results.last2.join(', ')}`);
+
+    // Push to Cloudflare KV so frontend (starvia.website) shows the new data
+    const apiBase = process.env.STARVIA_API_BASE || 'https://starvia.website/v1';
+    const password = loadAdminPassword();
+    await pushToCloudflare(results, apiBase, password);
     
   } catch (err) {
     console.error('[lottery] ❌ Error:', err.message);
