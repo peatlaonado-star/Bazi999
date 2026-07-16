@@ -6,18 +6,18 @@
 const RESULTS_KEY = 'lottery:results';
 const RESULTS_TTL_SECONDS = 60 * 60 * 24; // 24h cache
 
-// Last known result (fallback when KV is empty) — updated 2026-06-16
+// Last known result (fallback when KV is empty) — updated 2026-07-16
 const HARDCODED_SEED = {
   available: true,
-  date: '2026-06-16',
-  displayDate: { date: '16', month: '06', year: '2026' },
+  date: '2026-07-16',
+  displayDate: { date: '16', month: '07', year: '2026' },
   period: [],
-  firstPrize: '287184',
-  last3f: ['758', '434'],
-  last3b: ['007', '721'],
-  last2: ['48'],
-  near1: ['287183', '287185'],
-  updatedAt: '2026-06-16T16:25:00.000Z',
+  firstPrize: '639214',
+  last3f: ['683', '709'],
+  last3b: ['746', '427'],
+  last2: ['71'],
+  near1: ['639213', '639215'],
+  updatedAt: '2026-07-16T12:44:35.780Z',
   source: 'sanook.com',
 };
 
@@ -92,7 +92,8 @@ export async function handleLotteryResults(context) {
   // Best-effort: try GLO for fresher data (don't block on it)
   const gloResult = await tryFetchFromGLO();
   let result = data;
-  if (gloResult && gloResult.date !== data.date) {
+  // String compare on ISO date 'YYYY-MM-DD' works because both are zero-padded
+  if (gloResult && gloResult.date && gloResult.date > (result.date || '')) {
     result = gloResult;
     await setResults(kv, gloResult);
   }
