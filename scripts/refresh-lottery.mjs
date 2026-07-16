@@ -11,7 +11,22 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const RESULTS_FILE = path.resolve(__dirname, '..', 'data', 'lottery-results.json');
+// Resolve results file: when running from ~/Starvia/scripts/, use project data dir;
+// otherwise (e.g. cron from ~/.hermes/scripts/) use ~/.hermes/data/ with auto-mkdir
+function resolveResultsFile() {
+  const projectData = path.resolve(__dirname, '..', 'data', 'lottery-results.json');
+  const hermesDataDir = path.resolve(process.env.HOME || '/root', '.hermes', 'data');
+  const hermesData = path.join(hermesDataDir, 'lottery-results.json');
+  // If script is inside the STARVIA project, prefer the project's data/ (next to scripts/)
+  const isInStarviaProject = __dirname === '/home/kara/Starvia/scripts' || __dirname.endsWith('/Starvia/scripts');
+  if (isInStarviaProject && fs.existsSync(path.dirname(projectData))) {
+    return projectData;
+  }
+  // Otherwise use ~/.hermes/data/ (auto-create)
+  try { fs.mkdirSync(hermesDataDir, { recursive: true }); } catch (e) {}
+  return hermesData;
+}
+const RESULTS_FILE = resolveResultsFile();
 
 function fetch(url) {
   return new Promise((resolve, reject) => {
