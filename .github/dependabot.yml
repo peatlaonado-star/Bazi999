@@ -1,0 +1,26 @@
+# Dependabot config for Starvia
+# Free for public repos. Auto-creates PRs when deps need updates.
+
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Bangkok"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "auto-merge-candidate"
+    commit-message:
+      prefix: "deps"
+      prefix-development: "deps(dev)"
+      include: "scope"
+    # Auto-merge security patches only (low risk for Starvia)
+    # Major version bumps still need Peat review
+    groups:
+      security:
+        applies-to: security-updates
+        patterns: ["*"]
