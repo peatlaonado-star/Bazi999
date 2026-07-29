@@ -17,10 +17,9 @@ import {
   facebookAutoPostAuth,
   facebookAutoPostPreviewAuth,
 } from '../../_lib/auto-post.js';
-import {
-  facebookAutoReplyAuth,
-  facebookAutoReplyTestAuth,
-} from '../../_lib/auto-reply.js';
+// DISABLED 20 ก.ค.69 (Option A): keyword auto-reply เลิกใช้
+// ระบบหลัก = ~/.hermes/scripts/starvia-autoreply-llm.py (cron 2f1b6bfd4c21)
+// ไฟล์เก่าอยู่ที่ functions/_lib/_disabled/auto-reply.js — ยังไม่ deploy ปิด production
 
 export async function onRequest(context) {
   const { request } = context;
@@ -91,14 +90,17 @@ export async function onRequest(context) {
       return facebookAutoPostPreviewAuth(context);
     }
 
-    // POST /v1/facebook/auto-reply (scan comments + auto-reply)
-    if (path === 'auto-reply' && request.method === 'POST') {
-      return facebookAutoReplyAuth(context);
-    }
-
-    // POST /v1/facebook/auto-reply/test (test keyword matching)
-    if (path === 'auto-reply/test' && request.method === 'POST') {
-      return facebookAutoReplyTestAuth(context);
+    // POST /v1/facebook/auto-reply — DISABLED 20 ก.ค.69
+    // ระบบหลัก = starvia-autoreply-llm.py เท่านั้น (ห้ามเปิด keyword endpoint ซ้ำ)
+    if (path === 'auto-reply' || path === 'auto-reply/test') {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'DISABLED',
+          message: 'Keyword auto-reply เลิกใช้แล้ว — ใช้ Python LLM (cron) แทน',
+        }),
+        { status: 410, headers: { 'Content-Type': 'application/json' } }
+      );
     }
 
     return new Response(

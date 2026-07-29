@@ -1,7 +1,17 @@
-// Facebook Auto-Reply — ตอบคอมเม้นต์อัตโนมัติ
+// ═══════════════════════════════════════════════════════════════
+// ⛔ DISABLED 20 ก.ค.69 — Option A local cleanup (ยังไม่ deploy)
+// ═══════════════════════════════════════════════════════════════
+// เหตุผล: ระบบตอบคอมเมนต์หลัก = starvia-autoreply-llm.py (cron 2f1b6bfd4c21)
+// ไฟล์นี้เป็น keyword matching เก่า — ไม่มี cron เรียกแล้ว
+// ถ้าจะเปิดใหม่ ห้ามเปิดทับ Python — ต้องออกแบบ hybrid ใหม่ให้ถูกทาง
+// Production endpoint ยังมีอยู่จนกว่าจะ deploy (Option B)
+// Archive callers: ~/archive/starvia-autoreply-legacy-2026-07-20/
+// ═══════════════════════════════════════════════════════════════
+//
+// Facebook Auto-Reply — ตอบคอมเม้นต์อัตโนมัติ (LEGACY)
 // Reads recent comments on page posts, matches keywords, and sends Thai replies.
 //
-// Endpoints exposed via functions/v1/facebook/[[path]].js:
+// Endpoints (เลิกใช้):
 //   POST /v1/facebook/auto-reply → scan comments + auto-reply (admin auth)
 //   POST /v1/facebook/auto-reply/test → dry-run mode (no actual replies sent)
 //
@@ -10,8 +20,11 @@
 // Keyword matching is Thai-focused for Starvia astrology services.
 // Reference: https://developers.facebook.com/docs/pages-api/comments/
 
-import { jsonResponse, errorResponse, getClientIp, handleOptions } from './cors.js';
-import { withAdminAuth } from './admin.js';
+// NOTE: imports broken by design after move to _disabled/ (relative paths)
+// import { jsonResponse, errorResponse, getClientIp, handleOptions } from '../cors.js';
+// import { withAdminAuth } from '../admin.js';
+import { jsonResponse, errorResponse, getClientIp, handleOptions } from '../cors.js';
+import { withAdminAuth } from '../admin.js';
 
 const GRAPH_API_VERSION = 'v22.0';
 const GRAPH_BASE = `https://graph.facebook.com/${GRAPH_API_VERSION}`;

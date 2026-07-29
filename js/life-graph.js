@@ -785,20 +785,37 @@ function buildLifePeriodsHtml(dayOfWeek, ageY) {
   html += '</div>';
 
   // === ส่วนที่ 3: รายละเอียดแต่ละช่วง ===
+  // Option A: ช่วงปัจจุบัน = Premium, ช่วงถัดไป = Premium, อื่นๆ = ฟรี (เปิดพลังเด่น+จุดเด่น ล็อคจุดอ่อน)
+  var premiumUnlocked = (typeof premiumIsUnlocked === 'function') && premiumIsUnlocked();
+  var nextPeriodIdx = (currentIdx < periods.length - 1) ? currentIdx + 1 : null;
   for (var j = 0; j < periods.length; j++) {
     var pp = periods[j];
     var isCur = (j === currentIdx);
+    var isNext = (j === nextPeriodIdx);
+    var isLockedPeriod = (isCur || isNext) && !premiumUnlocked;
+    var hideWeakness = isLockedPeriod; // ช่วงปัจจุบัน+ถัดไป: ล็อคทั้งช่วง (รวมจุดอ่อน)
     var pCol = planetColors[pp.planet] || '#7B68EE';
     var currentLabel = isCur ? '<span class="lp-now-badge">▸ ช่วงนี้</span>' : '';
+    var nextLabel = isNext ? '<span class="lp-next-badge">▸ ถัดไป</span>' : '';
+
+    var meaningHtml = '<div class="lp-meaning"><strong>พลังเด่น:</strong> ' + escapeHTML(pp.meaning || '') + '</div>';
+    var strengthHtml = '<div class="lp-strength"><strong>✦ จุดเด่น:</strong> ' + escapeHTML(pp.strength) + '</div>';
+    var weaknessHtml = hideWeakness
+      ? '<div class="lp-weakness lp-locked-block" style="text-align:center;padding:14px 10px;background:rgba(201,162,39,0.08);border-radius:8px;margin-top:8px;">'
+        + '<div style="font-size:14px;color:#C9A227;margin-bottom:6px;">🔒 จุดอ่อน/ระวัง ของช่วง' + escapeHTML(pp.period || '') + '</div>'
+        + '<div style="font-size:12px;color:#b8a8d8;line-height:1.6;">ปลดล็อก <strong style="color:#C9A227;">Premium</strong> เพื่อดูจุดอ่อนและสิ่งที่ต้องระวังในช่วงนี้</div>'
+        + '<button class="cta-btn" data-action="unlock-premium" style="margin-top:10px;font-size:12px;padding:8px 20px;">ปลดล็อก 199 บาท/เดือน</button>'
+        + '</div>'
+      : '<div class="lp-weakness"><strong>⚠ จุดอ่อน/ระวัง:</strong> ' + escapeHTML(pp.weakness) + '</div>';
 
     html += '<div class="lp-period' + (isCur ? ' lp-period-active' : '') + '" style="border-left-color:' + pCol + '">'
       + '<div class="lp-period-head">'
-      + '<div class="lp-age">' + escapeHTML(pp.period || '') + currentLabel + '</div>'
+      + '<div class="lp-age">' + escapeHTML(pp.period || '') + currentLabel + nextLabel + '</div>'
       + '<div class="lp-planet" style="color:' + pCol + '">🪐 ' + escapeHTML(pp.planet || '') + '</div>'
       + '</div>'
-      + '<div class="lp-meaning"><strong>พลังเด่น:</strong> ' + escapeHTML(pp.meaning || '') + '</div>'
-      + '<div class="lp-strength"><strong>✦ จุดเด่น:</strong> ' + escapeHTML(pp.strength) + '</div>'
-      + '<div class="lp-weakness"><strong>⚠ จุดอ่อน/ระวัง:</strong> ' + escapeHTML(pp.weakness) + '</div>'
+      + meaningHtml
+      + strengthHtml
+      + weaknessHtml
       + '</div>';
   }
 

@@ -223,7 +223,12 @@ function renderSingleLoveOpportunity(na,pa,ra,la,ria,lia,u,RA2,dateA){
     + '<div><b>ราศี/พลังที่มีแนวโน้มเข้ามา</b><br>' + rasiIconHtml(model.partnerSignIndex, model.partnerSignName, 28) + ' <strong>' + escapeHTML(model.partnerSignName) + '</strong> · ธาตุ' + escapeHTML(model.partnerElement) + '</div>'
     + '<div><b>นิสัยคนที่มีแนวโน้มเข้ากัน</b><br>' + escapeHTML(model.traits) + '</div>'
     + '</div>'
-    + loveTimingHtml
+    + (premiumIsUnlocked() ? loveTimingHtml : buildConversionCta(
+        '💕 ดูแผนเปิดทางความรัก 3 ขั้น',
+        'วิธีคัดคน · สัญญาณคนที่ใช่ · จังหวะเปิดใจ',
+        '',
+        '✦ ปลดล็อกแผนความรัก ✦'
+      ))
     + '<div class="ld-ref">' + escapeHTML(model.reference) + '</div>'
     + '</div>'
     + '<div class="rbt"><button class="rbtn" data-action="reset-mode" data-mode="1">' + (u.r1 || 'เริ่มใหม่') + '</button></div>';
@@ -258,8 +263,8 @@ function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2,dateA,dateB
   var wrap=document.getElementById('r1');
   na = escapeHTML(na);
   nb = escapeHTML(nb);
-  // Couple mode is fully unlocked — no premium gating. All sections
-  // (Dharma, score breakdown, action plan) render for everyone.
+  // Option A: ฟรีดูแค่ % Compatibility, รายละเอียดล็อค Premium
+  var premiumUnlocked = premiumIsUnlocked();
   var elS=ELC[pa.ei][pb.ei];
   var piA=getPL().indexOf(pa), piB=getPL().indexOf(pb);
   var plS=PLC[piA>=0?piA:0][piB>=0?piB:0];
@@ -336,10 +341,15 @@ function renderCouple(na,pa,ra,la,ria,lia,nb,pb,rb,lb2,rib,lib,u,RA2,dateA,dateB
     + '</div>';
 
   wrap.innerHTML = matrixHtml
-    + loveDestinyHtml
-    + dharmaHtml
-    + scoreBreakdownHtml
-    + actionPlanFullHtml;
+    + (premiumUnlocked ? loveDestinyHtml : buildConversionCta(
+        '💕 ดูแผนเปิดทางความรัก + ดวงคู่สมพงศ์',
+        'จังหวะรัก · วิธีดูแล · หลุมพราง',
+        '94% บอกว่าตรงกับความสัมพันธ์จริง',
+        '✦ ปลดล็อกดวงคู่เต็ม ✦'
+      ))
+    + (premiumUnlocked ? dharmaHtml : '')
+    + (premiumUnlocked ? scoreBreakdownHtml : '')
+    + (premiumUnlocked ? actionPlanFullHtml : '');
 
   // ปิดท้ายด้วย closing card + reset button
   wrap.insertAdjacentHTML('beforeend',

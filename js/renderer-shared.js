@@ -158,7 +158,7 @@ function buildTabs(tid,sid,pre,TB,p,u){
       sec.setAttribute('aria-hidden', 'false');
     }
 
-    var isPremiumTab = (i > 0); // แท็บแรก (ตัวตน) = ฟรี, แท็บ 2-4 = Premium
+    var isPremiumTab = true; // Option A: ทุกแท็บ = Premium, เฉพาะส่วนสรุปด้านบนที่ฟรี
     var isLocked = isPremiumTab && !premiumIsUnlocked();
     if (isLocked) {
        sec.classList.add('is-locked');

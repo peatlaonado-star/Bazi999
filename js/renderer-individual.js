@@ -879,11 +879,13 @@ function renderInd(nm,gd,ds,ts,p,r,l,ri,li,u, birthDay, birthMonth, birthYearBE)
   var powerCardHtml = '<div class="power-card">'
     + '<div class="pc-header"><span style="font-size:16px;">✨</span> พลังงานเสริมดวง</div>'
     + '<div class="pc-grid">'
-    + '<div class="pc-item"><div class="pc-title">🔢 เลขขับเคลื่อนชีวิต</div><div class="pc-value">' + pe.num + '</div></div>'
+    + '<div class="pc-item"><div class="pc-title">🔢 เลขขับเคลื่อนชีวิต</div><div class="pc-value">' + (premiumUnlocked ? pe.num : '●-●-●') + '</div></div>'
     + '<div class="pc-item"><div class="pc-title">🎨 สีเสริมออร่า</div>'
     + '<div class="pc-colors">'
-    + '<div class="pc-color-wrap"><div class="pc-color-dot" style="background:' + pe.c1 + ';"></div><div class="pc-color-name">' + pe.c1n + '</div></div>'
-    + '<div class="pc-color-wrap"><div class="pc-color-dot" style="background:' + pe.c2 + ';"></div><div class="pc-color-name">' + pe.c2n + '</div></div>'
+    + (premiumUnlocked
+      ? '<div class="pc-color-wrap"><div class="pc-color-dot" style="background:' + pe.c1 + ';"></div><div class="pc-color-name">' + pe.c1n + '</div></div>'
+        + '<div class="pc-color-wrap"><div class="pc-color-dot" style="background:' + pe.c2 + ';"></div><div class="pc-color-name">' + pe.c2n + '</div></div>'
+      : '<div style="text-align:center;font-size:12px;color:#7a6a9a;padding:4px 0;">🔒 ปลดล็อกเพื่อดูสีและเลขเสริมดวง</div>')
     + '</div></div>'
     + '</div>'
     + powerTip

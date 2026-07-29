@@ -472,6 +472,18 @@
     var container = document.getElementById('df-lucky-section');
     if (!container) return;
 
+    var premiumUnlocked = (typeof premiumIsUnlocked === 'function') && premiumIsUnlocked();
+
+    if (!premiumUnlocked) {
+      // FREE: แสดงเฉพาะ teaser ชวนปลดล็อก
+      container.innerHTML = '<div class="df-lucky-teaser" style="text-align:center;padding:16px;margin-top:8px;border-top:1px solid rgba(201,162,39,0.2);">'
+        + '<div style="font-size:13px;color:#7a6a9a;margin-bottom:6px;">🔒 สีมงคล · เลขนำโชค · เวลาเฮง</div>'
+        + '<div style="font-size:12px;color:#b8a8d8;line-height:1.6;">ปลดล็อก <strong style="color:#C9A227;">Premium</strong> เพื่อดูสีมงคล เลขนำโชค และจังหวะเวลาเฮงประจำวันนี้</div>'
+        + '<button class="cta-btn" data-action="unlock-premium" style="margin-top:10px;font-size:12px;padding:8px 20px;">ปลดล็อก 199 บาท/เดือน</button>'
+        + '</div>';
+      return;
+    }
+
     var html = '<div class="df-lucky-grid">';
 
     // Lucky Color

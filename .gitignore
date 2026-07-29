@@ -54,3 +54,13 @@ scripts/__pycache__/
 *.swo
 *~
 .DS_Store?
+
+# Cloudflare Pages build output
+dist/
+
+# Wrangler temp
+.wrangler/
+.wranglerignore
+
+# Content drafts
+content/

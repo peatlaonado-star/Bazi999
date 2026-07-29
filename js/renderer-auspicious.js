@@ -173,15 +173,18 @@ function renderAusp(nm,p,pw,u){
     { d: 'เสาร์', luck: '#2196F3', luckN: 'ฟ้า/น้ำเงิน (รับทรัพย์)', work: '#F44336', workN: 'แดง (ผู้ใหญ่เอ็นดู)', bad: '#4CAF50', badN: 'เขียว (เลี่ยง)' }
   ];
   var tc = TODAY_COLORS[todayIdx];
-  var colorHtml = '<div class="wellness-card">'
-    + '<div class="wc-title"><span style="font-size:16px;">✨</span> พลังงานสีประจำวันนี้ (วัน' + tc.d + ')</div>'
-    + '<div class="color-day">'
-    + '<div class="cd-row">'
-    + '<div class="cd-item"><div class="cd-dot" style="background:' + tc.luck + ';"></div><div class="cd-lbl" style="color:var(--g);">' + tc.luckN + '</div></div>'
-    + '<div class="cd-item"><div class="cd-dot" style="background:' + tc.work + ';"></div><div class="cd-lbl" style="color:var(--g);">' + tc.workN + '</div></div>'
-    + '<div class="cd-item"><div class="cd-dot" style="background:' + tc.bad + '; border-color:rgba(255,0,0,0.4);"></div><div class="cd-lbl" style="color:#c06080">' + tc.badN + '</div></div>'
-    + '</div>'
-    + '</div></div>';
+  var colorHtml = '';
+  if (premiumUnlocked) {
+    colorHtml = '<div class="wellness-card">'
+      + '<div class="wc-title"><span style="font-size:16px;">✨</span> พลังงานสีประจำวันนี้ (วัน' + tc.d + ')</div>'
+      + '<div class="color-day">'
+      + '<div class="cd-row">'
+      + '<div class="cd-item"><div class="cd-dot" style="background:' + tc.luck + ';"></div><div class="cd-lbl" style="color:var(--g);">' + tc.luckN + '</div></div>'
+      + '<div class="cd-item"><div class="cd-dot" style="background:' + tc.work + ';"></div><div class="cd-lbl" style="color:var(--g);">' + tc.workN + '</div></div>'
+      + '<div class="cd-item"><div class="cd-dot" style="background:' + tc.bad + '; border-color:rgba(255,0,0,0.4);"></div><div class="cd-lbl" style="color:#c06080">' + tc.badN + '</div></div>'
+      + '</div>'
+      + '</div></div>';
+  }
 
   // ===== 6. Cosmic Routine (keep existing) =====
   var routines = {
@@ -266,6 +269,8 @@ function buildAuspiciousTimingHtml(dayOfWeek) {
   var DAY_NAMES = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'];
   var dayName = DAY_NAMES[dayOfWeek] || 'อาทิตย์';
   var at = AUSPICIOUS_TIMING;
+  // Option A: ฟรีดูแค่ชื่อฤกษ์, คำแนะนำล็อค Premium
+  var premiumUnlocked = (typeof premiumIsUnlocked === 'function') && premiumIsUnlocked();
   
   var html = '<div class="at-card">';
   
@@ -278,7 +283,7 @@ function buildAuspiciousTimingHtml(dayOfWeek) {
       if (dt.hasOwnProperty(key)) {
         var dayInfo = dt[key];
         var ratingClass = dayInfo.rating === 'ดีที่สุด' ? 'at-best' : dayInfo.rating === 'ดี' ? 'at-good' : dayInfo.rating === 'ระวัง' ? 'at-bad' : 'at-mid';
-        html += '<tr><td>' + escapeHTML(key) + '</td><td class="' + ratingClass + '">' + escapeHTML(dayInfo.rating) + '</td><td>' + escapeHTML(dayInfo.suitable) + '</td></tr>';
+        html += '<tr><td>' + escapeHTML(key) + '</td><td class="' + ratingClass + '">' + escapeHTML(dayInfo.rating) + '</td><td>' + (premiumUnlocked ? escapeHTML(dayInfo.suitable) : '<span style="color:#7a6a9a;">🔒 Premium</span>') + '</td></tr>';
       }
     }
     html += '</tbody></table></div>';
@@ -287,21 +292,37 @@ function buildAuspiciousTimingHtml(dayOfWeek) {
   // Rusik (9 ฤกษ์)
   if (at.rusik && at.rusik.length) {
     html += '<div class="at-section"><div class="at-subtitle">🕐 ฤกษ์ 9 ฤกษ์</div>';
-    html += '<table class="at-table"><thead><tr><th>ฤกษ์</th><th>เลข</th><th>ความหมาย</th><th>เหมาะทำ</th></tr></thead><tbody>';
-    at.rusik.forEach(function(r) {
-      html += '<tr><td>' + escapeHTML(r.name) + '</td><td>' + escapeHTML(r.numbers) + '</td><td>' + escapeHTML(r.meaning) + '</td><td>' + escapeHTML(r.bestFor) + '</td></tr>';
-    });
-    html += '</tbody></table></div>';
+    if (premiumUnlocked) {
+      html += '<table class="at-table"><thead><tr><th>ฤกษ์</th><th>เลข</th><th>ความหมาย</th><th>เหมาะทำ</th></tr></thead><tbody>';
+      at.rusik.forEach(function(r) {
+        html += '<tr><td>' + escapeHTML(r.name) + '</td><td>' + escapeHTML(r.numbers) + '</td><td>' + escapeHTML(r.meaning) + '</td><td>' + escapeHTML(r.bestFor) + '</td></tr>';
+      });
+      html += '</tbody></table>';
+    } else {
+      // ฟรีดูแค่ชื่อฤกษ์
+      html += '<div class="at-rusik-free">';
+      at.rusik.forEach(function(r) {
+        html += '<span class="at-rusik-chip">' + escapeHTML(r.name) + '</span> ';
+      });
+      html += '</div>';
+      html += '<div style="text-align:center;margin-top:10px;font-size:12px;color:#7a6a9a;">🔒 ปลดล็อก Premium เพื่อดูเลข ความหมาย และสิ่งที่ฤกษ์นี้เหมาะทำ</div>';
+    }
+    html += '</div>';
   }
   
   // Yam (8 ยาม)
   if (at.yam && at.yam.length) {
     html += '<div class="at-section"><div class="at-subtitle">⏰ ยาม 8 ยาม</div>';
-    html += '<table class="at-table"><thead><tr><th>ยาม</th><th>เวลา</th><th>ดาว</th><th>เหมาะทำ</th></tr></thead><tbody>';
-    at.yam.forEach(function(y) {
-      html += '<tr><td>ยาม ' + y.number + '</td><td>' + escapeHTML(y.time) + '</td><td>' + escapeHTML(y.planet) + '</td><td>' + escapeHTML(y.bestFor) + '</td></tr>';
-    });
-    html += '</tbody></table></div>';
+    if (premiumUnlocked) {
+      html += '<table class="at-table"><thead><tr><th>ยาม</th><th>เวลา</th><th>ดาว</th><th>เหมาะทำ</th></tr></thead><tbody>';
+      at.yam.forEach(function(y) {
+        html += '<tr><td>ยาม ' + y.number + '</td><td>' + escapeHTML(y.time) + '</td><td>' + escapeHTML(y.planet) + '</td><td>' + escapeHTML(y.bestFor) + '</td></tr>';
+      });
+      html += '</tbody></table>';
+    } else {
+      html += '<div style="text-align:center;padding:12px;font-size:12px;color:#7a6a9a;">🔒 ปลดล็อก Premium เพื่อดูตารางยามทั้ง 8 ช่วงเวลา</div>';
+    }
+    html += '</div>';
   }
   
   html += '</div>';
