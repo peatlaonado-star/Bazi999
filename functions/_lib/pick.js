@@ -133,6 +133,8 @@ export async function drawPick(context) {
     name: body.name || body.slug,
     emoji: body.emoji || '🃏',
     topic: body.topic || 'general',
+    reading: body.reading || '',
+    pos: body.pos != null ? Number(body.pos) : null,
   };
   const next = applyDraw(refreshed, today, entry);
   await env.STARVIA_KV.put(stateKey(fingerprint), JSON.stringify(next));

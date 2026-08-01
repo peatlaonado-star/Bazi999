@@ -142,6 +142,8 @@ async function pickCard(el, idx) {
         slug: card.slug,
         name: card.name,
         emoji: card.emoji,
+        reading: card.reading || "",
+        pos: card.pos != null ? Number(card.pos) : null,
       }),
     });
     const d = await r.json();
@@ -159,6 +161,7 @@ async function pickCard(el, idx) {
     state.history.unshift({
       date: new Date().toISOString(), card: card.name, emoji: card.emoji,
       topic: TOPIC_LABEL[state.topic], slug: card.slug,
+      reading: card.reading || "", pos: card.pos != null ? Number(card.pos) : null,
     });
   }
 
@@ -250,17 +253,47 @@ function renderHistory() {
   state.history.forEach((h) => {
     const it = document.createElement("div");
     it.className = "hs-item";
-    const slug = h.slug || h.card.toLowerCase().replace(/ /g, "_").replace("of_", "").replace("__", "_");
+    it.setAttribute("role", "button");
+    it.setAttribute("tabindex", "0");
+    const name = h.name || h.card || "ไพ่ปริศนา";
+    const slug = h.slug || name.toLowerCase().replace(/ /g, "_").replace("of_", "").replace("__", "_");
+    const topicLabel = TOPIC_LABEL[h.topic] || h.topic || "ทั่วไป";
     it.innerHTML = `
-      <img src="${CARD_IMG(slug)}" class="hs-card-img" alt="${h.card}" loading="lazy">
+      <img src="${CARD_IMG(slug)}" class="hs-card-img" alt="${name}" loading="lazy">
       <div class="hs-info">
-        <div class="hs-card-n">${h.card}</div>
+        <div class="hs-card-n">${name}</div>
         <div class="hs-meta">${fmtDate(h.date)}</div>
       </div>
-      <div class="hs-topic">${h.topic}</div>`;
+      <div class="hs-topic">${topicLabel}</div>
+      <div class="hs-arrow">›</div>`;
+    it.addEventListener("click", () => viewHistoryCard(h));
+    it.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); viewHistoryCard(h); }
+    });
     list.appendChild(it);
   });
   $("hsStreakN").textContent = `${state.streak} วันติดต่อกัน`;
+}
+
+/* ── ดูรายละเอียดไพ่จากประวัติ (เหมือนเปิดไพ่รอบแรก) ── */
+function viewHistoryCard(h) {
+  const topicKeys = ["career", "money", "love", "health"];
+  state.topic = topicKeys.includes(h.topic) ? h.topic
+    : Object.keys(TOPIC_LABEL).find((k) => TOPIC_LABEL[k] === h.topic) || "career";
+  const card = {
+    slug: h.slug,
+    name: h.name || h.card || "ไพ่ปริศนา",
+    sub: h.sub || "",
+    emoji: h.emoji || "🃏",
+    reading: h.reading || "ใบนี้คือใบที่เคยหยิบไว้ — ฟังเสียงหัวใจตัวเองนะคะ ✨",
+    num: h.num || "",
+    color: h.color || "",
+    do: h.do || "",
+    dont: h.dont || "",
+    pos: h.pos != null ? Number(h.pos) : 65,
+  };
+  fillReveal(card);
+  show("scrReveal");
 }
 
 /* ── Quota modal ────────────────────────── */
