@@ -119,6 +119,43 @@ def trigger_deploy(creds, commit_sha):
 
 
 PROD_URL = "https://starvia.website"
+ZONE_NAME = "starvia.website"
+
+
+def purge_cdn_cache(creds, urls=None):
+    """Purge Cloudflare CDN cache after deploy.
+
+    Without this, static files whose filenames haven't changed (e.g.
+    pick-a-card/pick-a-card.css) keep serving the stale cached version
+    even after a new deployment goes live.
+
+    If *urls* is given, purges only those specific URLs; otherwise
+    purges the entire zone (every file on starvia.website).
+    """
+    # 1. Find the zone ID for our domain
+    zones_path = "/zones?name={}&per_page=1".format(ZONE_NAME)
+    resp = cf_request("GET", zones_path, creds)
+    zones = resp.get("result", [])
+    if not zones:
+        print(f"⚠️  Zone '{ZONE_NAME}' not found — skipping cache purge")
+        return False
+    zone_id = zones[0]["id"]
+
+    # 2. Purge
+    purge_path = f"/zones/{zone_id}/purge_cache"
+    if urls:
+        body = {"files": urls}
+    else:
+        body = {"purge_everything": True}
+
+    resp = cf_request("DELETE", purge_path, creds, body=body)
+    if resp.get("success"):
+        scope = f"{len(urls)} URLs" if urls else "everything"
+        print(f"🧹 CDN cache purged ({scope})")
+        return True
+    else:
+        print(f"⚠️  Cache purge failed: {resp.get('errors')}")
+        return False
 
 
 def verify_production(deploy_id, expected_token=None, timeout=60):
@@ -257,6 +294,11 @@ def main():
             print(f"🌐 Production: https://{PROJECT_NAME}.website")
             if args.url or preview_url:
                 print(f"🔍 Preview:   {preview_url}")
+
+            # Purge CDN cache so static files (CSS, JS without hashes)
+            # reflect the new build immediately instead of serving stale cache.
+            print()
+            purge_cdn_cache(creds)
 
             # Production verification — actually fetch the live URL and
             # confirm the new code is being served (catches CDN lag, wrong
