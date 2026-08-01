@@ -104,7 +104,6 @@ function buildFan() {
     const backImg = document.createElement("img");
     backImg.src = CARD_IMG("_back");
     backImg.alt = "";
-    backImg.loading = "lazy";
     back.appendChild(backImg);
 
     const front = document.createElement("div");
@@ -112,7 +111,6 @@ function buildFan() {
     const frontImg = document.createElement("img");
     frontImg.src = CARD_IMG(card.slug);
     frontImg.alt = card.name;
-    frontImg.loading = "lazy";
     front.appendChild(frontImg);
 
     inner.appendChild(back);
@@ -259,7 +257,7 @@ function renderHistory() {
     const slug = h.slug || name.toLowerCase().replace(/ /g, "_").replace("of_", "").replace("__", "_");
     const topicLabel = TOPIC_LABEL[h.topic] || h.topic || "ทั่วไป";
     it.innerHTML = `
-      <img src="${CARD_IMG(slug)}" class="hs-card-img" alt="${name}" loading="lazy">
+      <img src="${CARD_IMG(slug)}" class="hs-card-img" alt="${name}">
       <div class="hs-info">
         <div class="hs-card-n">${name}</div>
         <div class="hs-meta">${fmtDate(h.date)}</div>
