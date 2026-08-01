@@ -1436,7 +1436,7 @@ export async function facebookSubscriberCheck(context) {
         'Facebook ยังไม่เปิดช่องทางตรวจสมาชิกให้ (ดู checks) — ต้องขอ permission ผ่าน app review หรือรอ Meta เปิด API',
       checks,
     },
-    502
+    200
   );
 }
 
