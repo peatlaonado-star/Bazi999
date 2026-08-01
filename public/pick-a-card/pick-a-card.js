@@ -299,9 +299,7 @@ function viewHistoryCard(h) {
   };
   fillReveal(card);
   show("scrReveal");
-  requestAnimationFrame(() =>
-    setTimeout(() => $("rvFlip").classList.add("flip"), 250)
-  );
+  setTimeout(() => $("rvFlip").classList.add("flip"), 300);
 }
 
 /* ── Quota modal ────────────────────────── */
