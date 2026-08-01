@@ -12,6 +12,7 @@ import {
   facebookInboxAuth,
   facebookSendAuth,
   facebookAutoPinAuth,
+  facebookSubscriberCheck,
 } from '../../_lib/facebook.js';
 import {
   facebookAutoPostAuth,
@@ -78,6 +79,11 @@ export async function onRequest(context) {
     // POST /v1/facebook/auto-pin (auto-PIN from inbox slips)
     if (path === 'auto-pin' && request.method === 'POST') {
       return facebookAutoPinAuth(context);
+    }
+
+    // POST /v1/facebook/subscriber-check (FB Login — ตรวจว่าเป็นสมาชิกเพจหรือไม่)
+    if (path === 'subscriber-check' && request.method === 'POST') {
+      return facebookSubscriberCheck(context);
     }
 
     // POST /v1/facebook/auto-post (daily horoscope auto-post)

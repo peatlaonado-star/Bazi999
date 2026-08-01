@@ -6,7 +6,7 @@
 <title>Pick a Card · STARVIA — ไพ่ประจำวันของคุณ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="pick-a-card.css?v=3">
+<link rel="stylesheet" href="pick-a-card.css?v=4">
 </head>
 <body>
 
@@ -166,6 +166,7 @@
         <span class="gp-u">บาท / เดือน</span>
       </div>
       <button class="btn btn-g gate-cta" id="btnSubscribe">💜 สมัครสมาชิกผ่าน Facebook</button>
+      <button class="btn btn-o gate-login" id="btnFbLogin">🔑 เป็นสมาชิกแล้ว? เข้าด้วย Facebook</button>
       <div class="gate-note">ชำระผ่านระบบ Subscriptions ของ Facebook<br>ยกเลิกได้ทุกเมื่อ ไม่มีผูกมัด</div>
     </div>
   </section>
@@ -183,6 +184,18 @@
     </div>
   </div>
 
+  <!-- ═══════════ MODAL · ข้อความกลางจอ (login/แจ้งเตือน) ═══════════ -->
+  <div class="pac-modal" id="msgModal" hidden>
+    <div class="pm-card">
+      <div class="pm-ic" id="msgIc">✨</div>
+      <h3 class="pm-t" id="msgTitle"></h3>
+      <p class="pm-d" id="msgBody"></p>
+      <div class="pm-actions">
+        <button class="btn btn-g" id="btnMsgOk">รับทราบค่ะ</button>
+      </div>
+    </div>
+  </div>
+
 </main>
 
 <!-- ═══════════ FOOTER ═══════════ -->
@@ -191,7 +204,7 @@
   <a href="/" class="pac-ft-a">← กลับเว็บหลัก</a>
 </footer>
 
-<script src="data/tarot-card-data.js?v=3"></script>
-<script src="pick-a-card.js?v=3"></script>
+<script src="data/tarot-card-data.js?v=4"></script>
+<script src="pick-a-card.js?v=4"></script>
 </body>
 </html>

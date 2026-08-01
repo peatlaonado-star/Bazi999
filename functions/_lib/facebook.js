@@ -14,6 +14,7 @@
 
 import { jsonResponse, errorResponse, getClientIp, handleOptions } from './cors.js';
 import { withAdminAuth } from './admin.js';
+import { signHS256 } from './jwt.js';
 
 const GRAPH_API_VERSION = 'v22.0';
 const GRAPH_BASE = `https://graph.facebook.com/${GRAPH_API_VERSION}`;
@@ -1351,4 +1352,105 @@ async function notifyTelegram(env, { customerName, pinCode, ocrResult, slipImage
 // ── Auth wrappers ──
 export const facebookInboxAuth = (context) => withAdminAuth(context, facebookInbox);
 export const facebookSendAuth = (context) => withAdminAuth(context, facebookSendMessage);
+
+// ── POST /v1/facebook/subscriber-check ──
+// FB Login flow: ตรวจว่า user (ที่ login ผ่าน Facebook บนเว็บ) เป็น subscriber ของเพจหรือไม่
+// รับ { accessToken } = user token จาก Facebook Login (JS SDK)
+// ลองตรวจหลายวิธีเรียงกัน:
+//   1. GET /{page-id}?fields=is_subscribed_by_viewer (user token — Facebook บอกตรงๆ ว่า viewer เป็นสมาชิกไหม)
+//   2. GET /{page-id}/subscribers (page token — list สมาชิก ต้อง advanced access ผ่าน app review)
+// ถ้าเป็นสมาชิก → ออก JWT premium (เหมือน PIN) → หน้าเว็บปลดล็อก
+export async function facebookSubscriberCheck(context) {
+  const { request, env } = context;
+  if (request.method === 'OPTIONS') return handleOptions();
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return errorResponse(400, 'BAD_JSON', 'Request body must be valid JSON');
+  }
+
+  const userToken = body.accessToken || body.access_token;
+  if (!userToken) {
+    return errorResponse(400, 'MISSING_TOKEN', 'Provide accessToken from FB Login');
+  }
+
+  const pageId = String(env.FACEBOOK_PAGE_ID || '').trim() || '1071926269337612';
+  const checks = {};
+
+  // ── วิธี 1: viewer check (user token) ──
+  try {
+    const url = `${GRAPH_BASE}/${pageId}?fields=is_subscribed_by_viewer,can_viewer_subscribe&access_token=${encodeURIComponent(userToken)}`;
+    const resp = await fetch(url);
+    const data = await resp.json();
+    checks.viewer = data;
+    if (data && typeof data.is_subscribed_by_viewer === 'boolean') {
+      if (data.is_subscribed_by_viewer) {
+        const token = await signSubscriberToken(body.userID, env);
+        return jsonResponse({
+          success: true,
+          method: 'is_subscribed_by_viewer',
+          isSubscriber: true,
+          token,
+          plan: 'premium_fb',
+        });
+      }
+      return jsonResponse({ success: true, method: 'is_subscribed_by_viewer', isSubscriber: false });
+    }
+  } catch (e) {
+    checks.viewerError = String((e && e.message) || e);
+  }
+
+  // ── วิธี 2: subscribers edge (page token — ต้อง advanced access) ──
+  try {
+    const pageToken = env.FACEBOOK_PAGE_TOKEN;
+    if (pageToken) {
+      const url = `${GRAPH_BASE}/${pageId}/subscribers?limit=1000&fields=id&access_token=${encodeURIComponent(pageToken)}`;
+      const resp = await fetch(url);
+      const data = await resp.json();
+      checks.subscribers = data;
+      if (data && Array.isArray(data.data)) {
+        const ids = new Set(data.data.map((s) => String(s.id)));
+        const isSub = body.userID ? ids.has(String(body.userID)) : false;
+        return jsonResponse({
+          success: true,
+          method: 'subscribers_edge',
+          isSubscriber: isSub,
+          subscriberCount: ids.size,
+          total: (data.summary && data.summary.total_count) || ids.size,
+        });
+      }
+    }
+  } catch (e) {
+    checks.subscribersError = String((e && e.message) || e);
+  }
+
+  // ── ไม่มีวิธีไหนตรวจได้ — คืนข้อมูล debug ให้ admin เห็นว่า Facebook ตอบอะไร ──
+  return jsonResponse(
+    {
+      success: false,
+      isSubscriber: false,
+      method: 'none',
+      message:
+        'Facebook ยังไม่เปิดช่องทางตรวจสมาชิกให้ (ดู checks) — ต้องขอ permission ผ่าน app review หรือรอ Meta เปิด API',
+      checks,
+    },
+    502
+  );
+}
+
+async function signSubscriberToken(fbUserId, env) {
+  const issuedAt = Math.floor(Date.now() / 1000);
+  const expiresIn = Number(env.STARVIA_TOKEN_TTL_SECONDS || 24 * 60 * 60);
+  return signHS256(
+    {
+      sub: `fb_${String(fbUserId || 'user').slice(0, 32)}`,
+      plan: 'premium_fb',
+      iat: issuedAt,
+      exp: issuedAt + expiresIn,
+    },
+    env.STARVIA_JWT_SECRET
+  );
+}
 export const facebookAutoPinAuth = (context) => withAdminAuth(context, facebookAutoPin);

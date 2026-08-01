@@ -4,7 +4,10 @@ const $ = (id) => document.getElementById(id);
 const API = "/v1/pick";
 
 const state = {
-  member: true,
+  // สมาชิก = มี JWT premium (จาก PIN หรือ FB subscription) เก็บใน localStorage
+  member:
+    localStorage.getItem("starvia_premium") === "true" ||
+    !!localStorage.getItem("starvia_premium_token"),
   quotaLeft: 1,
   streak: 0,
   topic: null,
@@ -284,8 +287,82 @@ $("btnShare").addEventListener("click", () => {
 $("btnTomorrow").addEventListener("click", () => {
   alert("🔔 เปิดการแจ้งเตือนสำเร็จ (mock) — ตอนนี้พรุ่งนี้ 07:00 จะเตือนค่ะ");
 });
+/* ── Modal ข้อความกลางจอ (แจ้งผล login/เตือน) ── */
+function showMsg(icon, title, body) {
+  $("msgIc").textContent = icon;
+  $("msgTitle").textContent = title;
+  $("msgBody").innerHTML = body;
+  $("msgModal").hidden = false;
+}
+$("btnMsgOk").addEventListener("click", () => { $("msgModal").hidden = true; });
+
+/* ── FB Login — สมาชิก subscription เข้าสู่ระบบ ── */
+const FB_APP_ID = "961734170201333";
+let fbSdkPromise = null;
+
+function loadFbSdk() {
+  if (window.FB) return Promise.resolve(true);
+  if (fbSdkPromise) return fbSdkPromise;
+  fbSdkPromise = new Promise((resolve) => {
+    window.fbAsyncInit = () => {
+      window.FB.init({ appId: FB_APP_ID, version: "v22.0", cookie: true });
+      resolve(true);
+    };
+    const s = document.createElement("script");
+    s.src = "https://connect.facebook.net/en_US/sdk.js";
+    s.defer = true;
+    document.head.appendChild(s);
+  });
+  return fbSdkPromise;
+}
+
+async function checkSubscriber(accessToken, userID) {
+  const btn = $("btnFbLogin");
+  if (btn) { btn.disabled = true; btn.textContent = "⏳ กำลังตรวจสถานะสมาชิก…"; }
+  try {
+    const r = await fetch("/v1/facebook/subscriber-check", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ accessToken, userID }),
+    });
+    const d = await r.json();
+    if (d.success && d.isSubscriber && d.token) {
+      localStorage.setItem("starvia_premium_token", d.token);
+      localStorage.setItem("starvia_premium", "true");
+      localStorage.setItem("starvia_fb_user", String(userID || ""));
+      location.reload();
+    } else if (d.success && !d.isSubscriber) {
+      showMsg("💜", "ยังไม่ได้เป็นสมาชิกค่ะ", "กดปุ่ม <b>\"สมัครสมาชิกผ่าน Facebook\"</b> ข้างบนก่อน แล้วกลับมาเข้าด้วย Facebook อีกครั้งนะคะ");
+    } else {
+      console.warn("subscriber-check:", d);
+      showMsg("🔧", "ระบบตรวจสมาชิกยังไม่พร้อม", "Facebook ยังไม่เปิดช่องทางนี้ให้ (แม่หมอกำลังจัดการอยู่) — สมัครสมาชิกผ่าน Facebook แล้วใช้ PIN จากแชทกรอกได้เลยค่ะ");
+    }
+  } catch (e) {
+    console.warn("subscriber-check error:", e);
+    showMsg("😔", "ติดต่อระบบไม่ได้", "ลองใหม่อีกครั้งนะคะ ถ้ายังไม่ได้ แจ้งแม่หมอได้เลยค่ะ");
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = "🔑 เป็นสมาชิกแล้ว? เข้าด้วย Facebook"; }
+  }
+}
+
+$("btnFbLogin").addEventListener("click", async () => {
+  try {
+    await loadFbSdk();
+    window.FB.login((resp) => {
+      if (resp.authResponse) {
+        checkSubscriber(resp.authResponse.accessToken, resp.authResponse.userID);
+      } else {
+        showMsg("😔", "เข้าสู่ระบบไม่สำเร็จ", "แตะปุ่มอีกครั้งเพื่อลองใหม่นะคะ");
+      }
+    }, { scope: "public_profile,email" });
+  } catch (e) {
+    console.warn("fb login error:", e);
+    showMsg("😔", "โหลดระบบ Facebook ไม่สำเร็จ", "ลองใหม่ภายหลังนะคะ");
+  }
+});
+
 $("btnSubscribe").addEventListener("click", () => {
-  window.open("https://www.facebook.com/", "_blank");
+  window.open("https://www.facebook.com/1071926269337612", "_blank");
 });
 
 boot();
