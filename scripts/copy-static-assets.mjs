@@ -106,10 +106,15 @@ const extraDirs = [
   { src: 'assets/zodiac', dst: 'assets/zodiac' },
   { src: 'public/hero',   dst: 'assets/hero' },  // public/hero/* → dist/assets/hero/*
   { src: 'assets/hero',   dst: 'assets/hero' },
+  { src: 'public/pick-a-card', dst: 'pick-a-card', recursive: true },  // Pick-a-Card เว็บย่อย (78 ไพ่ + js + css + data)
 ];
-for (const { src, dst } of extraDirs) {
+for (const { src, dst, recursive } of extraDirs) {
   const sourceDir = path.join(root, src);
   if (!fs.existsSync(sourceDir)) continue;
+  if (recursive) {
+    fs.cpSync(sourceDir, path.join(dist, dst), { recursive: true });
+    continue;
+  }
   const entries = fs.readdirSync(sourceDir, { withFileTypes: true });
   for (const entry of entries) {
     if (!entry.isFile()) continue;

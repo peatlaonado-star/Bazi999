@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Pick a Card · STARVIA — ไพ่ประจำวันของคุณ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="pick-a-card.css">
+</head>
+<body>
+
+<!-- ═══════════ TOP BAR ═══════════ -->
+<nav class="pac-top">
+  <a href="/" class="pac-brand">
+    <span class="pac-logo">🌙</span>
+    <span class="pac-brand-t">STARVIA</span>
+  </a>
+  <div class="pac-user" id="userChip">
+    <span class="pac-user-n" id="userName">สมาชิก</span>
+    <span class="pac-user-t" id="userTier">MEMBER</span>
+  </div>
+</nav>
+
+<!-- ═══════════ SCREEN 1 · CHOOSE TOPIC ═══════════ -->
+<main class="w">
+
+  <section class="scr scr-topic on" id="scrTopic">
+    <header class="pac-hd">
+      <div class="pac-hd-tag">DAILY TAROT RITUAL</div>
+      <h1 class="pac-hd-t">ไพ่ประจำวันของคุณ</h1>
+      <div class="pac-hd-d" id="dateLine">วันนี้ · <span id="todayText">—</span></div>
+      <div class="dl"></div>
+      <p class="pac-hd-sub">ตั้งจิตให้นิ่ง เลือกเรื่องที่อยากรู้<br>ไพ่ 1 ใบจะเฉลยทางให้วันนี้</p>
+    </header>
+
+    <div class="topic-grid" id="topicGrid">
+      <button class="tp" data-topic="career">
+        <span class="tp-i">💼</span>
+        <span class="tp-t">การงาน</span>
+        <span class="tp-s">ตำแหน่ง · โอกาส · เจ้านาย</span>
+      </button>
+      <button class="tp" data-topic="money">
+        <span class="tp-i">💰</span>
+        <span class="tp-t">การเงิน</span>
+        <span class="tp-s">รายรับ · ลาภ · การลงทุน</span>
+      </button>
+      <button class="tp" data-topic="love">
+        <span class="tp-i">💕</span>
+        <span class="tp-t">ความรัก</span>
+        <span class="tp-s">คนโสด · คู่รัก · ความสัมพันธ์</span>
+      </button>
+      <button class="tp" data-topic="health">
+        <span class="tp-i">🌿</span>
+        <span class="tp-t">สุขภาพ</span>
+        <span class="tp-s">ร่างกาย · ใจ · พลังงาน</span>
+      </button>
+    </div>
+
+    <div class="pac-meta">
+      <button class="meta-pill" id="btnHistory">
+        <span class="mp-i">📜</span>
+        <span class="mp-t">ประวัติของฉัน</span>
+        <span class="mp-v" id="historyCount">0</span>
+      </button>
+      <div class="meta-pill meta-streak">
+        <span class="mp-i">🔥</span>
+        <span class="mp-t">Streak</span>
+        <span class="mp-v mp-fire" id="streakVal">0 วัน</span>
+      </div>
+      <div class="meta-pill meta-quota">
+        <span class="mp-i">✨</span>
+        <span class="mp-t">วันนี้เหลือ</span>
+        <span class="mp-v" id="quotaVal">1 ครั้ง</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ SCREEN 2 · FAN OF CARDS ═══════════ -->
+  <section class="scr scr-fan" id="scrFan">
+    <button class="back" id="btnBackTopic">← เปลี่ยนหัวข้อ</button>
+    <header class="pac-hd pac-hd-sm">
+      <h2 class="pac-hd-t2" id="fanTopicTitle">💰 การเงิน</h2>
+      <p class="pac-hd-sub">หลับตาลงสักครู่ นึกคำถามในใจ<br>แล้วแตะไพ่ที่รู้สึกว่า "เรียก" คุณ</p>
+    </header>
+    <div class="fan" id="fanRow" role="listbox" aria-label="เลือกไพ่ 1 ใบจาก 7">
+      <!-- JS จะ render ไพ่ 7 ใบ -->
+    </div>
+    <div class="fan-hint">แตะไพ่เพื่อเฉลย</div>
+  </section>
+
+  <!-- ═══════════ SCREEN 3 · REVEAL ═══════════ -->
+  <section class="scr scr-reveal" id="scrReveal">
+    <div class="rv-flip" id="rvFlip">
+      <div class="rv-flip-in">
+        <div class="rv-face rv-back">🃏</div>
+        <div class="rv-face rv-front" id="rvCardFace">⭐</div>
+      </div>
+    </div>
+    <h2 class="rv-name" id="rvName">The Star</h2>
+    <div class="rv-sub" id="rvSub">ดวงดาวแห่งความหวัง</div>
+
+    <div class="rv-meter" id="rvMeter">
+      <div class="meter-top">
+        <span class="meter-label">ระดับความมงคลของวันนี้</span>
+        <span class="meter-pct" id="rvPosPct">92%</span>
+      </div>
+      <div class="meter-bar">
+        <div class="meter-fill" id="rvPosFill"></div>
+      </div>
+      <div class="meter-tag" id="rvPosTag">✨ ดวงดีมาก — วันที่จักรวาลหนุน</div>
+    </div>
+
+    <div class="rv-msg card" id="rvMsg">
+      <div class="phd">คำทำนายวันนี้ · <span id="rvTopicLabel">การเงิน</span></div>
+      <p id="rvReading">…</p>
+    </div>
+
+    <div class="rv-grid">
+      <div class="rv-box"><div class="rvb-l">🔮 เลขมงคล</div><div class="rvb-v" id="rvNum">7 · 23</div></div>
+      <div class="rv-box"><div class="rvb-l">🎨 สีมงคล</div><div class="rvb-v" id="rvColor">ม่วงอ่อน</div></div>
+      <div class="rv-box"><div class="rvb-l">✅ ควรทำ</div><div class="rvb-v rvb-do" id="rvDo">วางแผนเงิน</div></div>
+      <div class="rv-box"><div class="rvb-l">⚠️ ควรเลี่ยง</div><div class="rvb-v rvb-dont" id="rvDont">การกู้ยืม</div></div>
+    </div>
+
+    <div class="rv-actions">
+      <button class="btn btn-g" id="btnShare">📤 แชร์ผลไพ่</button>
+      <button class="btn btn-o" id="btnTomorrow">🔔 เตือนฉันพรุ่งนี้ 07:00</button>
+    </div>
+    <div class="rv-note">กลับมาหยิบใหม่ได้พรุ่งนี้นะคะ 💜</div>
+  </section>
+
+  <!-- ═══════════ SCREEN 4 · HISTORY ═══════════ -->
+  <section class="scr scr-history" id="scrHistory">
+    <button class="back" id="btnBackHome">← กลับหน้าแรก</button>
+    <header class="pac-hd pac-hd-sm">
+      <h2 class="pac-hd-t2">📜 ไพ่ของฉัน</h2>
+      <p class="pac-hd-sub">ย้อนดูไพ่ที่เคยหยิบ · ไพ่มักมีเรื่องบอกซ้ำๆ</p>
+    </header>
+    <div class="hs-streak card">
+      <div class="hss-i">🔥</div>
+      <div class="hss-t">
+        <div class="hss-n" id="hsStreakN">0 วันติดต่อกัน</div>
+        <div class="hss-s" id="hsStreakS">มาหยิบไพ่ทุกวัน แม่หมอจะรอคุณ</div>
+      </div>
+    </div>
+    <div class="hs-list" id="hsList">
+      <div class="hs-empty" id="hsEmpty">ยังไม่มีประวัติ — เริ่มหยิบใบแรกกันเถอะ ✨</div>
+    </div>
+  </section>
+
+  <!-- ═══════════ SCREEN 5 · GATE (ยังไม่เป็นสมาชิก) ═══════════ -->
+  <section class="scr scr-gate" id="scrGate">
+    <div class="gate-card">
+      <div class="gate-lock">🔮</div>
+      <h2 class="gate-t">ไพ่จองสงวนไว้<br>ให้สมาชิก STARVIA เท่านั้น</h2>
+      <div class="dl"></div>
+      <ul class="gate-ul">
+        <li>🃏 หยิบไพ่ทุกวัน ไม่จำกัด</li>
+        <li>📜 ประวัติย้อนหลัง 30 วัน</li>
+        <li>🔥 Streak สะสมความมงคล</li>
+        <li>📤 การ์ดแชร์ลง Facebook</li>
+      </ul>
+      <div class="gate-price">
+        <span class="gp-n">19</span>
+        <span class="gp-u">บาท / เดือน</span>
+      </div>
+      <button class="btn btn-g gate-cta" id="btnSubscribe">💜 สมัครสมาชิกผ่าน Facebook</button>
+      <div class="gate-note">ชำระผ่านระบบ Subscriptions ของ Facebook<br>ยกเลิกได้ทุกเมื่อ ไม่มีผูกมัด</div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer class="pac-ft">
+  <div class="pac-ft-l">STARVIA · ใจฉันมั่งคั่ง รักตัวเอง 💜</div>
+  <a href="/" class="pac-ft-a">← กลับเว็บหลัก</a>
+</footer>
+
+<script src="data/tarot-card-data.js"></script>
+<script src="pick-a-card.js"></script>
+</body>
+</html>

@@ -17,6 +17,7 @@ import {
 import { createPayment, paymentWebhook, verifyPayment, paymentStatus } from '../_lib/payment.js';
 import { handleChat, chatInfo } from '../_lib/chat.js';
 import { handleAgentRequest } from '../_lib/agent-card.js';
+import { getPickState, drawPick } from '../_lib/pick.js';
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -134,6 +135,12 @@ export async function onRequest(context) {
         ...context,
         params: { path: segments.slice(1).join('/') },
       });
+    }
+
+    // ── Pick-a-Card (quota + streak) ──
+    if (segments[0] === 'pick') {
+      if (segments[1] === 'state' && request.method === 'GET') return getPickState(context);
+      if (segments[1] === 'draw' && request.method === 'POST') return drawPick(context);
     }
 
     return json({ success: false, error: 'NOT_FOUND', path: path }, 404);
