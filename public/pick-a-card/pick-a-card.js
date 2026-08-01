@@ -142,6 +142,11 @@ async function pickCard(el, idx) {
         emoji: card.emoji,
         reading: card.reading || "",
         pos: card.pos != null ? Number(card.pos) : null,
+        sub: card.sub || "",
+        num: card.num || "",
+        color: card.color || "",
+        do: card.do || "",
+        dont: card.dont || "",
       }),
     });
     const d = await r.json();
@@ -160,6 +165,8 @@ async function pickCard(el, idx) {
       date: new Date().toISOString(), card: card.name, emoji: card.emoji,
       topic: TOPIC_LABEL[state.topic], slug: card.slug,
       reading: card.reading || "", pos: card.pos != null ? Number(card.pos) : null,
+      sub: card.sub || "", num: card.num || "", color: card.color || "",
+      do: card.do || "", dont: card.dont || "",
     });
   }
 
