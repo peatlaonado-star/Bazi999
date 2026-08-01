@@ -123,7 +123,10 @@ function buildFan() {
 
 /* ── Pick → Reveal ──────────────────────── */
 async function pickCard(el, idx) {
-  if (state.quotaLeft <= 0) return;
+  if (state.quotaLeft <= 0) {
+    showQuotaModal();
+    return;
+  }
   const card = state.fanCards[idx];
 
   // บันทึกการเปิดไพ่ผ่าน API (หัก quota จริง) — fallback offline ถ้า API ไม่พร้อม
@@ -140,7 +143,7 @@ async function pickCard(el, idx) {
     });
     const d = await r.json();
     if (!d.success) {
-      alert(d.message || "วันนี้เปิดไพ่ครบ 1 ครั้งแล้ว พรุ่งนี้มาใหม่นะคะ ✨");
+      showQuotaModal();
       return;
     }
     state.quotaLeft = d.quotaLeft;
@@ -256,6 +259,20 @@ function renderHistory() {
   });
   $("hsStreakN").textContent = `${state.streak} วันติดต่อกัน`;
 }
+
+/* ── Quota modal ────────────────────────── */
+function showQuotaModal() {
+  $("quotaModal").hidden = false;
+}
+$("btnModalClose").addEventListener("click", () => {
+  $("quotaModal").hidden = true;
+  show("scrTopic");
+});
+$("btnModalHistory").addEventListener("click", () => {
+  $("quotaModal").hidden = true;
+  renderHistory();
+  show("scrHistory");
+});
 
 /* ── Nav wiring ─────────────────────────── */
 $("btnBackTopic").addEventListener("click", () => show("scrTopic"));

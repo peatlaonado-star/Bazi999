@@ -385,3 +385,28 @@ body{
   .fan{height:270px}
   .rv-grid{gap:7px}
 }
+
+/* ── Quota modal ─────────────────────────── */
+.pac-modal{
+  position:fixed;inset:0;z-index:2000;
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+  background:rgba(9,6,28,.78);
+  backdrop-filter:blur(10px);
+  animation:fu .3s ease both;
+}
+.pac-modal[hidden]{display:none}
+.pm-card{
+  width:100%;max-width:360px;
+  padding:34px 26px 26px;
+  text-align:center;
+  border-radius:var(--radius);
+  border:1px solid rgba(214,173,69,.35);
+  background:linear-gradient(180deg,rgba(52,34,89,.96),rgba(26,15,52,.98));
+  box-shadow:var(--shadow),0 0 60px rgba(142,114,216,.25);
+}
+.pm-ic{font-size:44px;line-height:1;filter:drop-shadow(0 6px 18px rgba(214,173,69,.45));animation:floaty 3s ease-in-out infinite}
+@keyframes floaty{50%{transform:translateY(-6px)}}
+.pm-t{font-family:var(--font-display);font-weight:700;font-size:21px;margin:16px 0 8px;color:var(--tx)}
+.pm-d{font-size:13.5px;line-height:1.85;color:var(--tx2)}
+.pm-actions{display:flex;flex-direction:column;gap:10px;margin-top:22px}

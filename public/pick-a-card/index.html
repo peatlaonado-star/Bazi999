@@ -6,7 +6,7 @@
 <title>Pick a Card · STARVIA — ไพ่ประจำวันของคุณ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="pick-a-card.css?v=2">
+<link rel="stylesheet" href="pick-a-card.css?v=3">
 </head>
 <body>
 
@@ -170,6 +170,19 @@
     </div>
   </section>
 
+  <!-- ═══════════ MODAL · QUOTA หมด ═══════════ -->
+  <div class="pac-modal" id="quotaModal" hidden>
+    <div class="pm-card">
+      <div class="pm-ic">🌙</div>
+      <h3 class="pm-t">วันนี้เปิดไพ่ครบแล้วนะคะ</h3>
+      <p class="pm-d">ไพ่ประจำวัน 1 ใบต่อวัน<br>พรุ่งนี้ 07:00 กลับมาหยิบใบใหม่ได้เลย ✨</p>
+      <div class="pm-actions">
+        <button class="btn btn-g" id="btnModalHistory">📜 ดูประวัติของฉัน</button>
+        <button class="btn btn-o" id="btnModalClose">← กลับหน้าหลัก</button>
+      </div>
+    </div>
+  </div>
+
 </main>
 
 <!-- ═══════════ FOOTER ═══════════ -->
@@ -178,7 +191,7 @@
   <a href="/" class="pac-ft-a">← กลับเว็บหลัก</a>
 </footer>
 
-<script src="data/tarot-card-data.js?v=2"></script>
-<script src="pick-a-card.js?v=2"></script>
+<script src="data/tarot-card-data.js?v=3"></script>
+<script src="pick-a-card.js?v=3"></script>
 </body>
 </html>
