@@ -127,42 +127,47 @@ body{
 .mp-v{color:var(--g);font-weight:700}
 .mp-fire{color:#ffb45e}
 
-/* ── Fan (ไพ่ 7 ใบ) ────────────────────────── */
+/* ── Fan (ไพ่ 7 ใบ — คว่ำหลัง พลิกเฉลยตอนเลือก) ── */
 .fan{
   position:relative;height:300px;margin:26px auto 8px;
   display:flex;justify-content:center;align-items:flex-end;
+  perspective:1500px;
 }
 .card-f{
   --rot:0deg; --x:0px; --y:0px;
   position:absolute;bottom:0;left:50%;
   width:92px;height:150px;
   border-radius:14px;
-  border:1.5px solid rgba(214,173,69,.55);
-  background:
-    radial-gradient(circle at 50% 30%,rgba(214,173,69,.22),transparent 55%),
-    linear-gradient(160deg,#2a1b52,#120a2d 70%);
-  box-shadow:0 12px 26px rgba(0,0,0,.5), inset 0 0 22px rgba(214,173,69,.1);
+  background:transparent;
+  border:none;
+  box-shadow:0 12px 26px rgba(0,0,0,.5);
   transform:translateX(calc(-50% + var(--x))) translateY(var(--y)) rotate(var(--rot));
   transform-origin:50% 130%;
   cursor:pointer;
-  transition:transform .35s cubic-bezier(.34,1.4,.5,1), box-shadow .3s, border-color .3s;
-  display:flex;align-items:center;justify-content:center;
-  overflow:hidden;
-  padding:4px;
+  transition:transform .35s cubic-bezier(.34,1.4,.5,1), box-shadow .3s, filter .3s;
+  padding:0;
 }
-.card-f-img{
-  width:100%;height:100%;
-  border-radius:10px;
-  object-fit:cover;
-  opacity:0.92;
-  transition:opacity .2s;
+.card-inner{
+  position:relative;width:100%;height:100%;
+  transform-style:preserve-3d;
+  transition:transform .75s cubic-bezier(.35,.9,.3,1);
+  border-radius:14px;
 }
-.card-f:hover .card-f-img,.card-f.sel .card-f-img{opacity:1}
+.card-f.sel .card-inner{transform:rotateY(180deg)}
+.card-back,.card-front{
+  position:absolute;inset:0;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  border-radius:14px;overflow:hidden;
+}
+.card-front{transform:rotateY(180deg)}
+.card-back img,.card-front img{
+  width:100%;height:100%;object-fit:cover;display:block;
+}
 .card-f:hover,.card-f.sel{
   transform:translateX(calc(-50% + var(--x))) translateY(calc(var(--y) - 22px)) rotate(var(--rot));
-  border-color:var(--g2);
   box-shadow:0 18px 34px rgba(0,0,0,.6), 0 0 24px rgba(214,173,69,.35);
 }
+.card-f:not(.sel):hover .card-inner{transform:rotateY(14deg)}
 .fan-hint{text-align:center;font-size:12px;color:var(--tx2);letter-spacing:.3em;text-transform:uppercase;margin-top:6px}
 
 /* ── Reveal ─────────────────────────────── */

@@ -86,19 +86,35 @@ function buildFan() {
     const c = document.createElement("button");
     c.className = "card-f";
     c.setAttribute("role", "option");
-    c.setAttribute("aria-label", card.name);
+    c.setAttribute("aria-label", `เลือกไพ่ใบที่ ${i + 1}`); // ไม่เฉลยชื่อไพ่ก่อนเลือก
     c.style.setProperty("--rot", `${(t * spread) / (N / 2)}deg`);
     c.style.setProperty("--x", `${t * 40}px`);
     c.style.setProperty("--y", `${Math.abs(t) * 7}px`);
     c.style.transitionDelay = `${i * 40}ms`;
 
-    // ใส่ภาพไพ่
-    const img = document.createElement("img");
-    img.src = CARD_IMG(card.slug);
-    img.alt = card.name;
-    img.className = "card-f-img";
-    img.loading = "lazy";
-    c.appendChild(img);
+    // โครงสร้างพลิก: หลังไพ่ (เห็นก่อน) + หน้าไพ่ (ซ่อน พลิกเฉลยตอนเลือก)
+    const inner = document.createElement("div");
+    inner.className = "card-inner";
+
+    const back = document.createElement("div");
+    back.className = "card-back";
+    const backImg = document.createElement("img");
+    backImg.src = CARD_IMG("_back");
+    backImg.alt = "";
+    backImg.loading = "lazy";
+    back.appendChild(backImg);
+
+    const front = document.createElement("div");
+    front.className = "card-front";
+    const frontImg = document.createElement("img");
+    frontImg.src = CARD_IMG(card.slug);
+    frontImg.alt = card.name;
+    frontImg.loading = "lazy";
+    front.appendChild(frontImg);
+
+    inner.appendChild(back);
+    inner.appendChild(front);
+    c.appendChild(inner);
 
     c.addEventListener("click", () => pickCard(c, i));
     row.appendChild(c);
@@ -151,7 +167,7 @@ async function pickCard(el, idx) {
     requestAnimationFrame(() =>
       setTimeout(() => $("rvFlip").classList.add("flip"), 250)
     );
-  }, 420);
+  }, 900); // รอ fan flip (750ms) จบก่อนเข้าหน้าเฉลย
 }
 
 function fillReveal(card) {
