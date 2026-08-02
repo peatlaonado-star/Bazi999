@@ -422,7 +422,7 @@ async function verifyPin() {
   msg.style.color = "#aaa";
   msg.textContent = "⏳ กำลังตรวจสอบ PIN…";
   try {
-    const r = await fetch("/v1/pick/premium/verify", {
+    const r = await fetch("/v1/premium/verify", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ pin }),
