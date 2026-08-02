@@ -21,6 +21,7 @@ const GRAPH_BASE = `https://graph.facebook.com/${GRAPH_API_VERSION}`;
 
 function getConfig(env) {
   const token = env.FACEBOOK_PAGE_TOKEN;
+
   const pageId = String(env.FACEBOOK_PAGE_ID || '').trim();
   if (!token) throw new Error('FACEBOOK_PAGE_TOKEN not set in env');
   if (!pageId) throw new Error('FACEBOOK_PAGE_ID not set in env');
@@ -1376,8 +1377,28 @@ export async function facebookSubscriberCheck(context) {
     return errorResponse(400, 'MISSING_TOKEN', 'Provide accessToken from FB Login');
   }
 
-  const pageId = String(env.FACEBOOK_PAGE_ID || '').trim() || '1071926269337612';
   const checks = {};
+  // ── วิธี 0: KV subscriber check (webhook-backed) ──
+  try {
+    const raw = await env.STARVIA_KV.get("premium:subscribers", { type: "json" });
+    if (Array.isArray(raw)) {
+      const uid = String(body.userID || "");
+      if (uid && raw.some(s => s.id === uid)) {
+        const token = await signSubscriberToken(body.userID, env);
+        return jsonResponse({
+          success: true,
+          method: "kv_subscriber",
+          isSubscriber: true,
+          token,
+          plan: "premium_fb",
+        });
+      }
+    }
+  } catch (e) {
+    checks.kvError = String((e && e.message) || e);
+  }
+
+  const pageId = String(env.FACEBOOK_PAGE_ID || "").trim() || "1071926269337612";
 
   // ── วิธี 1: viewer check (user token) ──
   try {

@@ -16,6 +16,7 @@ STARVIA_TOKEN_TTL_SECONDS = "86400"
 STARVIA_ADMIN_TOKEN_TTL = "43200"
 STARVIA_API_VERSION = "2.1.0-opencode-zen"
 FACEBOOK_PAGE_ID = "1071926269337612"
+FB_WEBHOOK_VERIFY_TOKEN = "starvia_webhook_20260802"
 
 # Secrets (set via `wrangler secret put` or dashboard):
 # - OPENCODE_ZEN_API_KEY (LLM for chat — https://opencode.ai/auth)

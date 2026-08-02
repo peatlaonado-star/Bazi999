@@ -82,6 +82,11 @@ export async function onRequest(context) {
     }
 
     // POST /v1/facebook/subscriber-check (FB Login — ตรวจว่าเป็นสมาชิกเพจหรือไม่)
+    // GET/POST /v1/facebook/webhook (Facebook Page Webhook — verification + events)
+    if (path === "webhook") {
+      return facebookWebhook(context);
+    }
+
     if (path === 'subscriber-check' && request.method === 'POST') {
       return facebookSubscriberCheck(context);
     }
