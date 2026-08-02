@@ -18,10 +18,70 @@ import {
   facebookAutoPostAuth,
   facebookAutoPostPreviewAuth,
 } from '../../_lib/auto-post.js';
-import { facebookWebhook } from '../../_lib/facebook-webhook.js';
 // DISABLED 20 ก.ค.69 (Option A): keyword auto-reply เลิกใช้
 // ระบบหลัก = ~/.hermes/scripts/starvia-autoreply-llm.py (cron 2f1b6bfd4c21)
 // ไฟล์เก่าอยู่ที่ functions/_lib/_disabled/auto-reply.js — ยังไม่ deploy ปิด production
+
+// ── Inline Facebook Webhook Handler ──
+async function handleFacebookWebhook(context) {
+  const { request, env } = context;
+  const SUBSCRIBERS_KEY = 'premium:subscribers';
+
+  // GET: Facebook Verification
+  if (request.method === 'GET') {
+    const url = new URL(request.url);
+    const mode = url.searchParams.get('hub.mode');
+    const token = url.searchParams.get('hub.verify_token');
+    const challenge = url.searchParams.get('hub.challenge');
+    if (mode === 'subscribe' && token === env.FB_WEBHOOK_VERIFY_TOKEN) {
+      return new Response(challenge, { status: 200 });
+    }
+    return new Response('Forbidden', { status: 403 });
+  }
+
+  // OPTIONS: CORS
+  if (request.method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS' } });
+  }
+
+  // POST: Event Notification
+  try {
+    const body = await request.json();
+    const userIds = new Set();
+    if (body.object === 'page') {
+      for (const entry of body.entry || []) {
+        for (const event of entry.messaging || []) {
+          if (event.sender?.id) userIds.add(String(event.sender.id));
+        }
+        for (const change of entry.changes || []) {
+          if (change.value?.from?.id) userIds.add(String(change.value.from.id));
+          if (change.value?.sender_id) userIds.add(String(change.value.sender_id));
+        }
+      }
+    }
+    if (userIds.size > 0) {
+      let subscribers = [];
+      try {
+        const raw = await env.STARVIA_KV.get(SUBSCRIBERS_KEY, { type: 'json' });
+        if (Array.isArray(raw)) subscribers = raw;
+      } catch {}
+      const existing = new Set(subscribers.map(s => s.id));
+      let added = 0;
+      for (const uid of userIds) {
+        if (!existing.has(uid)) {
+          subscribers.push({ id: uid, at: new Date().toISOString(), src: 'webhook' });
+          added++;
+        }
+      }
+      if (added > 0) {
+        if (subscribers.length > 10000) subscribers = subscribers.slice(-10000);
+        await env.STARVIA_KV.put(SUBSCRIBERS_KEY, JSON.stringify(subscribers));
+      }
+    }
+  } catch {}
+  return new Response('OK', { status: 200 });
+}
+
 
 export async function onRequest(context) {
   const { request } = context;
@@ -85,7 +145,7 @@ export async function onRequest(context) {
     // POST /v1/facebook/subscriber-check (FB Login — ตรวจว่าเป็นสมาชิกเพจหรือไม่)
     // GET/POST /v1/facebook/webhook (Facebook Page Webhook — verification + events)
     if (path === "webhook") {
-      return facebookWebhook(context);
+      return handleFacebookWebhook(context);
     }
 
     if (path === 'subscriber-check' && request.method === 'POST') {
