@@ -18,6 +18,7 @@ import {
   facebookAutoPostAuth,
   facebookAutoPostPreviewAuth,
 } from '../../_lib/auto-post.js';
+import { facebookWebhook } from '../../_lib/facebook-webhook.js';
 // DISABLED 20 ก.ค.69 (Option A): keyword auto-reply เลิกใช้
 // ระบบหลัก = ~/.hermes/scripts/starvia-autoreply-llm.py (cron 2f1b6bfd4c21)
 // ไฟล์เก่าอยู่ที่ functions/_lib/_disabled/auto-reply.js — ยังไม่ deploy ปิด production
