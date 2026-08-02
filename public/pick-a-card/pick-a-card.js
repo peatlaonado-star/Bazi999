@@ -337,6 +337,12 @@ $("btnMsgOk").addEventListener("click", () => { $("msgModal").hidden = true; });
 
 /* ── FB Login — สมาชิก subscription เข้าสู่ระบบ ── */
 const FB_APP_ID = "961734170201333";
+/* FIX 2 ส.ค.69: ใช้ config_id (Facebook Login for Business) แทน scope เดิม
+   ที่ขอแค่ public_profile,email — Facebook บล็อกเพราะต้องมี supported
+   permission อย่างน้อย 1 ตัว ("This app needs at least one supported
+   permission") — config นี้สร้างใน App Dashboard → Facebook Login for
+   Business → Configuration (id 2107475713169524) */
+const FB_LOGIN_CONFIG_ID = "2107475713169524";
 let fbSdkPromise = null;
 
 function loadFbSdk() {
@@ -393,7 +399,7 @@ $("btnFbLogin").addEventListener("click", async () => {
       } else {
         showMsg("😔", "เข้าสู่ระบบไม่สำเร็จ", "แตะปุ่มอีกครั้งเพื่อลองใหม่นะคะ");
       }
-    }, { scope: "public_profile,email" });
+    }, { config_id: FB_LOGIN_CONFIG_ID });
   } catch (e) {
     console.warn("fb login error:", e);
     showMsg("😔", "โหลดระบบ Facebook ไม่สำเร็จ", "ลองใหม่ภายหลังนะคะ");
