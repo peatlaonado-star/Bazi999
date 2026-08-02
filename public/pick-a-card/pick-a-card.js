@@ -410,4 +410,38 @@ $("btnSubscribe").addEventListener("click", () => {
   window.open("https://www.facebook.com/1071926269337612", "_blank");
 });
 
+/* ── PIN Verify ── */
+$("btnPin").addEventListener("click", verifyPin);
+$("pinInput").addEventListener("keydown", (e) => { if (e.key === "Enter") verifyPin(); });
+
+async function verifyPin() {
+  const pin = ($("pinInput").value || "").trim().toUpperCase();
+  if (!pin) return;
+  const msg = $("pinMsg");
+  msg.hidden = false;
+  msg.style.color = "#aaa";
+  msg.textContent = "⏳ กำลังตรวจสอบ PIN…";
+  try {
+    const r = await fetch("/v1/pick/verify-pin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pin }),
+    });
+    const d = await r.json();
+    if (d.success && d.token) {
+      msg.style.color = "#0f0";
+      msg.textContent = "✅ เข้าสำเร็จ กำลังโหลด…";
+      localStorage.setItem("starvia_premium_token", d.token);
+      localStorage.setItem("starvia_premium", "true");
+      setTimeout(() => location.reload(), 600);
+    } else {
+      msg.style.color = "#f0c";
+      msg.textContent = "❌ " + (d.message || d.error || "PIN ไม่ถูกต้อง");
+    }
+  } catch (e) {
+    msg.style.color = "#f0c";
+    msg.textContent = "❌ ติดต่อเซิร์ฟเวอร์ไม่ได้ ลองใหม่อีกครั้ง";
+  }
+}
+
 boot();
