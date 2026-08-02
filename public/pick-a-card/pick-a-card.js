@@ -26,14 +26,27 @@ function show(id) {
 }
 
 /* ── Boot ───────────────────────────────── */
+/* ── API helper: ส่ง Authorization header (JWT premium) ทุก call ── */
+function apiFetch(path, options = {}) {
+  const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
+  const token = localStorage.getItem("starvia_premium_token");
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  return fetch(path, { ...options, headers });
+}
+
 async function loadState() {
   try {
-    const r = await fetch(`${API}/state`);
+    const r = await apiFetch(`${API}/state`);
     const d = await r.json();
     if (d.success) {
       state.quotaLeft = d.quotaLeft;
       state.streak = d.streak;
       state.history = d.history || [];
+    } else if (d.error === "TOKEN_EXPIRED" || d.error === "INVALID_TOKEN") {
+      // Token หมดอายุ → ล้าง session ให้กลับไปหน้า gate
+      localStorage.removeItem("starvia_premium");
+      localStorage.removeItem("starvia_premium_token");
+      state.member = false;
     }
   } catch (e) {
     console.warn("pick state API ไม่พร้อม — ใช้โหมด offline", e);
@@ -132,9 +145,8 @@ async function pickCard(el, idx) {
 
   // บันทึกการเปิดไพ่ผ่าน API (หัก quota จริง) — fallback offline ถ้า API ไม่พร้อม
   try {
-    const r = await fetch(`${API}/draw`, {
+    const r = await apiFetch(`${API}/draw`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         topic: state.topic,
         slug: card.slug,

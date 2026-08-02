@@ -3,10 +3,35 @@
 // Fingerprint = SHA-256(UA + IP) → 16 hex (same pattern as streak.js)
 
 import { jsonResponse, errorResponse, getClientIp } from './cors.js';
+import { verifyHS256, extractBearerToken } from './jwt.js';
 
 const DAILY_QUOTA = 1;
 const HISTORY_CAP = 10;
 const BANGKOK_OFFSET_MS = 7 * 60 * 60 * 1000;
+
+// ── Auth guard: pick-a-card ต้องเป็นสมาชิกเท่านั้น ──────────────
+// ยอมรับ JWT premium ที่ plan เป็น premium_fb (19฿ FB) หรือ premium_199 (เว็บหลัก)
+export async function requirePickAuth(context) {
+  const { request, env } = context;
+  const auth = request.headers.get('authorization') || '';
+  const token = extractBearerToken(auth);
+  if (!token) return { ok: false, error: 'TOKEN_REQUIRED', message: 'กรุณาเข้าสู่ระบบสมาชิกก่อน', status: 401 };
+
+  const verified = await verifyHS256(token, env.STARVIA_JWT_SECRET);
+  if (!verified.valid) return { ok: false, error: 'INVALID_TOKEN', message: 'Token ไม่ถูกต้อง', status: 401 };
+
+  const now = Math.floor(Date.now() / 1000);
+  if (Number(verified.payload.exp) <= now) {
+    return { ok: false, error: 'TOKEN_EXPIRED', message: 'สิทธิ์หมดอายุแล้ว กรุณาเข้าสู่ระบบใหม่', status: 401 };
+  }
+
+  const plan = verified.payload.plan || '';
+  if (!['premium_fb', 'premium_199'].includes(plan)) {
+    return { ok: false, error: 'PLAN_NOT_ALLOWED', message: 'สิทธิ์นี้ใช้หน้าไพ่ประจำวันไม่ได้', status: 403 };
+  }
+
+  return { ok: true, plan, payload: verified.payload };
+}
 
 // ── Pure helpers ────────────────────────────────
 
@@ -90,10 +115,14 @@ export async function createFingerprint(request) {
 
 // ── HTTP handlers ───────────────────────────────
 
-/** GET /v1/pick/state — returns quota/streak/history for this visitor */
+/** GET /v1/pick/state — returns quota/streak/history for this member */
 export async function getPickState(context) {
   const { request, env } = context;
   if (!env.STARVIA_KV) return errorResponse(500, 'KV_NOT_BOUND', 'เซิร์ฟเวอร์ยังไม่พร้อม');
+
+  const auth = await requirePickAuth(context);
+  if (!auth.ok) return errorResponse(auth.status, auth.error, auth.message);
+
   const fingerprint = await createFingerprint(request);
   const today = todayKey();
 
@@ -103,13 +132,16 @@ export async function getPickState(context) {
     await env.STARVIA_KV.put(stateKey(fingerprint), JSON.stringify(next));
   }
 
-  return jsonResponse({ success: true, ...next, today });
+  return jsonResponse({ success: true, ...next, today, plan: auth.plan });
 }
 
 /** POST /v1/pick/draw { topic, slug, name, emoji } — spend quota, return new state */
 export async function drawPick(context) {
   const { request, env } = context;
   if (!env.STARVIA_KV) return errorResponse(500, 'KV_NOT_BOUND', 'เซิร์ฟเวอร์ยังไม่พร้อม');
+
+  const auth = await requirePickAuth(context);
+  if (!auth.ok) return errorResponse(auth.status, auth.error, auth.message);
 
   let body = {};
   try {
