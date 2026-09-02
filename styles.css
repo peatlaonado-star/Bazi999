@@ -5730,3 +5730,110 @@ details[open] > .ps-power-toggle {
   transition: color 0.2s ease;
 }
 .site-footer a:hover { color: var(--g); }
+
+/* ================================================================
+   STARVIA SENIOR MODE (age gate + body.senior) — 2 ก.ย.69
+   Spec: Desktop/STARVIA-Senior-Mode-Spec.md (approve 2 ก.ย.69)
+   ================================================================ */
+
+/* ---------- AGE GATE ---------- */
+.agegate{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 20%,rgba(91,63,166,.35),transparent 55%),linear-gradient(160deg,#1a1438,#0d0a1f);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.agegate-inner{width:100%;max-width:420px;margin:auto;padding:36px 28px;text-align:center;color:#efe8d6}
+.agegate-logo{font-family:"Chakra Petch","Kanit","Sarabun",sans-serif;font-size:36px;font-weight:700;letter-spacing:.22em;color:#D6AD45;margin-bottom:6px}
+.agegate-tag{font-size:15px;color:#8E72D8;margin-bottom:26px;letter-spacing:.12em}
+.agegate h2{font-size:24px;line-height:1.5;margin:0 0 8px;color:#fff}
+.agegate p{font-size:16px;line-height:1.7;color:rgba(255,255,255,.78);margin:0 0 30px}
+.age-btn{display:block;width:100%;max-width:340px;margin:0 auto 14px;padding:19px 14px;border-radius:50px;font-size:19px;font-weight:700;cursor:pointer;border:3px solid;transition:transform .2s}
+.age-btn:hover{transform:translateY(-2px)}
+.age-btn.senior{background:#D6AD45;color:#09061c;border-color:#F4D987}
+.age-btn.normal{background:rgba(255,255,255,.06);color:#efe8d6;border-color:#8E72D8}
+.age-btn-sub{display:block;margin-top:6px;font-size:15px;font-weight:400;opacity:.85}
+.age-note{font-size:14px;line-height:1.6;color:rgba(255,255,255,.55);margin:16px auto 0;max-width:300px}
+
+/* ---------- TOGGLE BAR (base = normal/dark) ---------- */
+.starvia-toggle-bar{position:fixed;bottom:0;left:0;right:0;z-index:10000;display:flex;align-items:center;justify-content:center;gap:10px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:rgba(13,10,31,.94);border-top:1px solid #554488;backdrop-filter:blur(10px)}
+.starvia-toggle-btn{flex:0 0 auto;min-height:44px;padding:10px 18px;border-radius:50px;border:1px solid #8E72D8;background:transparent;color:#C9B8F0;font-family:"Sarabun","Leelawadee UI","Segoe UI",sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:background .2s}
+.starvia-toggle-btn:hover{background:rgba(142,114,216,.18)}
+
+/* ---------- SENIOR MODE (hero/video section kept original dark) ---------- */
+body.senior{
+  --tx:#000;--tx2:#232323;--g3:#5a4400;--g2:#7a4a00;--g:#7a4a00;
+  --bg:#fff8d6;--bg2:#ffffe0;--surface:#ffffe0;--surface2:#fff8d6;
+  --br:rgba(0,0,0,.38);--cd:rgba(255,255,255,.7);
+  --radius:16px;--shadow:0 8px 24px rgba(0,0,0,.18);
+  background:#fff8d6;color:#000;font-size:18px;line-height:1.7;overflow-x:hidden
+}
+body.senior .w{padding-bottom:140px}
+body.senior .mnb{min-height:52px;padding:14px 10px;font-size:17px;border:2px solid #000;border-radius:44px;background:#fff;color:#111}
+body.senior .mnb:hover{transform:none;border-color:#000;color:#000;box-shadow:none}
+body.senior .mnb.on{background:#D6AD45;color:#000;border-color:#000;box-shadow:none}
+body.senior .mnb.on::after{background:#000}
+body.senior .modenav{background:rgba(255,248,214,.92);border:2px solid #000;border-radius:999px;position:sticky;top:8px;z-index:30}
+body.senior .card{background:#ffffe0;border:3px solid #000;border-radius:16px;box-shadow:none;color:#000}
+body.senior .card::before{display:none}
+body.senior .form-head h2{font-size:26px}
+body.senior .form-head p{font-size:18px;line-height:1.7}
+body.senior .f label{font-size:18px;color:#000;letter-spacing:0;margin-bottom:8px;font-weight:700}
+body.senior .f input,body.senior .f select{font-size:18px;padding:14px;border:2px solid #000;border-radius:12px;background:#fff;color:#000}
+body.senior .f input:focus,body.senior .f select:focus{border-color:#000;background:#fff;box-shadow:0 0 0 3px rgba(214,173,69,.5)}
+body.senior .f select option{background:#fff;color:#000}
+body.senior .opt-label{font-size:14px;color:#333}
+body.senior .btn{font-size:19px;padding:16px 34px;min-height:56px;border-radius:50px;border:3px solid #000;color:#000;background:linear-gradient(135deg,#F4D987,#D6AD45);letter-spacing:.04em}
+body.senior .phd{font-size:15px;color:#000;background:rgba(214,173,69,.25);border-left:4px solid #000;padding:9px 14px}
+body.senior .cdiv{font-size:14px;color:rgba(0,0,0,.55)}
+body.senior .trust-strip{font-size:17px;line-height:1.7;color:#111;background:#fff;border:2px solid #000;border-radius:14px}
+body.senior .value-card,body.senior .value-card.featured{background:#ffffe0;border:3px solid #000;border-radius:16px;box-shadow:none}
+body.senior .value-card h3{font-size:26px;line-height:1.3}
+body.senior .value-card p{font-size:18px;line-height:1.8;color:#222}
+body.senior .value-quote{font-size:16px;color:#7a4a00;border-left:3px solid #7a4a00}
+body.senior .value-feat{font-size:15px;color:#333;opacity:1}
+body.senior .section-title{font-size:28px}
+body.senior .section-desc{font-size:18px;line-height:1.8}
+body.senior .daily-fortune-card{background:#ffffe0;border:3px solid #000;border-radius:16px;box-shadow:none}
+body.senior .df-label{font-size:16px;color:#7a4a00}
+body.senior .df-date{font-size:15px;color:#333}
+body.senior .df-quote{font-size:20px;line-height:1.8;color:#111}
+body.senior .df-item-label{font-size:13px;color:#333}
+body.senior .df-item-value{font-size:16px;color:#111}
+body.senior .compact-daily .df-item:nth-child(1) .df-item-label,body.senior .compact-daily .df-item:nth-child(1) .df-item-value{color:#7a4a00}
+body.senior .df-footer-text{font-size:15px;color:#333}
+body.senior .sp-stat-card{background:#ffffe0;border:2px solid #000;border-radius:14px}
+body.senior .sp-stat-number{font-size:24px;color:#7a4a00}
+body.senior .sp-stat-label{font-size:14px;color:#333}
+body.senior .testimonial-text{font-size:16px;color:#222}
+body.senior .testimonial-author{font-size:15px;color:#4a2f8a}
+body.senior .couple-invite h2{font-size:26px}
+body.senior .couple-invite p{font-size:18px;line-height:1.7}
+body.senior .couple-note{font-size:16px;border:2px solid #000;border-radius:12px;background:#fff}
+/* results (renderer output) */
+body.senior #r0,body.senior #r1,body.senior #r2{font-size:20px;line-height:1.9;color:#111}
+body.senior #r0 *,body.senior #r1 *,body.senior #r2 *{color:#111;border-color:rgba(0,0,0,.35)}
+body.senior #r0 .card,body.senior #r1 .card,body.senior #r2 .card{background:#ffffe0;border:2px solid #000;border-radius:14px}
+body.senior #r0 button,body.senior #r1 button,body.senior #r2 button{min-height:48px;padding:12px 26px;font-size:18px;border:2px solid #000;border-radius:14px;background:#D6AD45;color:#000;font-weight:700;cursor:pointer}
+body.senior #r0 input,body.senior #r1 input,body.senior #r2 input,body.senior #r0 select,body.senior #r1 select,body.senior #r2 select{font-size:18px;padding:12px;border:2px solid #000;border-radius:10px;background:#fff;color:#000}
+/* toggle bar in senior mode */
+body.senior .starvia-toggle-bar{background:#000;border-top:2px solid #D6AD45;gap:12px;padding:12px 12px calc(12px + env(safe-area-inset-bottom))}
+body.senior .starvia-toggle-btn{min-height:52px;padding:12px 26px;font-size:17px;border:2px solid #D6AD45;background:#D6AD45;color:#000;border-radius:50px}
+body.senior .starvia-toggle-btn:hover{background:#F4D987}
+/* footer (inline styles -> !important) */
+body.senior .site-footer div{font-size:18px!important;line-height:1.8!important;color:#111!important;-webkit-text-fill-color:#111!important;background:none!important;letter-spacing:.05em!important}
+body.senior .site-footer a{font-size:18px!important;color:#111!important;text-decoration:underline!important}
+
+/* ---------- SENIOR mode: small screens + landscape ---------- */
+@media (max-width:480px){
+  .agegate-inner{padding:28px 18px}
+  .age-btn{font-size:18px;padding:17px 10px}
+  .starvia-toggle-btn{padding:10px 12px;font-size:14px}
+  body.senior .mnb{font-size:16px;min-height:50px;padding:12px 6px}
+  body.senior .btn{font-size:19px;padding:14px 20px}
+  body.senior .starvia-toggle-btn{font-size:17px;padding:11px 16px;min-height:50px}
+}
+@media (max-height:520px) and (orientation:landscape){
+  .agegate-inner{padding:18px 24px}
+  .age-btn{padding:12px 10px;margin-bottom:10px}
+  .agegate-logo{font-size:28px}
+  .agegate h2{font-size:20px}
+}
+@media (prefers-reduced-motion:reduce){
+  .agegate *{animation:none!important;transition:none!important}
+}

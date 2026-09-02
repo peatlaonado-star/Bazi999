@@ -145,6 +145,40 @@
 </div>
 
 <body>
+<!-- ===== STARVIA AGE GATE (senior mode) ===== -->
+<div class="agegate" id="agegate" role="dialog" aria-modal="true" aria-labelledby="agegate-title">
+  <div class="agegate-inner">
+    <div class="agegate-logo">STARVIA</div>
+    <div class="agegate-tag">ค้นพบตัวเองผ่านดวงดาว</div>
+    <h2 id="agegate-title">เพื่อให้ท่านเห็นตัวอักษรชัดเจนที่สุด</h2>
+    <p>กรุณาเลือกช่วงอายุของท่าน</p>
+    <button class="age-btn senior" onclick="starviaChoose('senior')">👴 อายุ 60 ปีขึ้นไป<br><span class="age-btn-sub">เปิดโหมดตัวใหญ่ อ่านง่าย</span></button>
+    <button class="age-btn normal" onclick="starviaChoose('normal')">👩 อายุต่ำกว่า 60 ปี<br><span class="age-btn-sub">เว็บแบบปกติ</span></button>
+    <div class="age-note">* จำการเลือกไว้ ครั้งหน้าไม่ถามซ้ำ (มีปุ่มสลับโหมดด้านล่างตลอดเวลา)</div>
+  </div>
+</div>
+<script>
+/* STARVIA senior-mode boot — must run before first paint to avoid flash */
+(function(){
+  var KEY='starvia_mode';
+  function apply(mode){
+    var b=document.body;
+    b.classList.remove('senior','normal');
+    if(mode==='senior'||mode==='normal'){ b.classList.add(mode); }
+    var gate=document.getElementById('agegate');
+    if(gate) gate.style.display=mode? 'none':'';
+  }
+  window.starviaChoose=function(mode){
+    try{ localStorage.setItem(KEY,mode); }catch(e){}
+    apply(mode);
+  };
+  window.starviaApplyMode=apply;
+  var saved=null;
+  try{ saved=localStorage.getItem(KEY); }catch(e){}
+  if(saved){ apply(saved); }
+  else { apply(''); }
+})();
+</script>
 <div id="aria-live-announcer" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 <style>
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
@@ -447,39 +481,39 @@
 </div>
 
 
-<script defer src="js/daily-fortune.js?v=2.0.5"></script>
+<script defer src="js/daily-fortune.js?v=2.0.6"></script>
 <script defer src="data/cosmic-events-generated.js"></script>
-<script defer src="js/cosmic-events.js?v=2.0.5"></script>
-<script defer src="js/share-viral.js?v=2.0.5"></script>
-<script defer src="js/social-proof.js?v=2.0.5"></script>
-<script defer src="astrology-core.js?v=2.0.5"></script>
-<script defer src="data/premium-config.js?v=2.0.5"></script>
-<script defer src="js/toc-navigation.js?v=2.0.5"></script>
-<script defer src="data/thai-astrology-content.js?v=2.0.5"></script>
-<script defer src="data/zodiac-identities.js?v=2.0.5"></script>
-<script defer src="data/element-practices.js?v=2.0.5"></script>
-<script defer src="data/life-periods.js?v=2.0.5"></script>
-<script defer src="data/yearly-transit.js?v=2.0.5"></script>
-<script defer src="data/couple-compatibility.js?v=2.0.5"></script>
-<script defer src="data/rahu-ketu.js?v=2.0.5"></script>
-<script defer src="data/yearly-enhancement.js?v=2.0.5"></script>
-<script defer src="data/auspicious-timing.js?v=2.0.5"></script>
-<script defer src="data/planetary-strength.js?v=2.0.5"></script>
-<script defer src="data/element-quiz.js?v=2.0.5"></script>
-<script defer src="data/life-graph-data.js?v=2.0.5"></script>
-<script defer src="js/reading-helpers.js?v=2.0.5"></script>
-<script defer src="js/life-graph.js?v=2.0.5"></script>
-<script defer src="js/renderer-shared.js?v=2.0.5"></script>
-<script defer src="js/streak-tracker.js?v=2.0.5"></script>
-<script defer src="js/renderer-individual.js?v=2.0.5"></script>
-<script defer src="js/renderer-couple.js?v=2.0.5"></script>
-<script defer src="js/renderer-auspicious.js?v=2.0.5"></script>
-<script defer src="js/onboarding.js?v=2.0.5"></script>
-<script defer src="js/gamification.js?v=2.0.5"></script>
-<script defer src="ui-actions.js?v=2.0.5"></script>
-<script defer src="js/analytics.js?v=2.0.5"></script>
-<script defer src="js/ab-testing.js?v=2.0.5"></script>
-<script defer src="app.js?v=2.0.5"></script>
+<script defer src="js/cosmic-events.js?v=2.0.6"></script>
+<script defer src="js/share-viral.js?v=2.0.6"></script>
+<script defer src="js/social-proof.js?v=2.0.6"></script>
+<script defer src="astrology-core.js?v=2.0.6"></script>
+<script defer src="data/premium-config.js?v=2.0.6"></script>
+<script defer src="js/toc-navigation.js?v=2.0.6"></script>
+<script defer src="data/thai-astrology-content.js?v=2.0.6"></script>
+<script defer src="data/zodiac-identities.js?v=2.0.6"></script>
+<script defer src="data/element-practices.js?v=2.0.6"></script>
+<script defer src="data/life-periods.js?v=2.0.6"></script>
+<script defer src="data/yearly-transit.js?v=2.0.6"></script>
+<script defer src="data/couple-compatibility.js?v=2.0.6"></script>
+<script defer src="data/rahu-ketu.js?v=2.0.6"></script>
+<script defer src="data/yearly-enhancement.js?v=2.0.6"></script>
+<script defer src="data/auspicious-timing.js?v=2.0.6"></script>
+<script defer src="data/planetary-strength.js?v=2.0.6"></script>
+<script defer src="data/element-quiz.js?v=2.0.6"></script>
+<script defer src="data/life-graph-data.js?v=2.0.6"></script>
+<script defer src="js/reading-helpers.js?v=2.0.6"></script>
+<script defer src="js/life-graph.js?v=2.0.6"></script>
+<script defer src="js/renderer-shared.js?v=2.0.6"></script>
+<script defer src="js/streak-tracker.js?v=2.0.6"></script>
+<script defer src="js/renderer-individual.js?v=2.0.6"></script>
+<script defer src="js/renderer-couple.js?v=2.0.6"></script>
+<script defer src="js/renderer-auspicious.js?v=2.0.6"></script>
+<script defer src="js/onboarding.js?v=2.0.6"></script>
+<script defer src="js/gamification.js?v=2.0.6"></script>
+<script defer src="ui-actions.js?v=2.0.6"></script>
+<script defer src="js/analytics.js?v=2.0.6"></script>
+<script defer src="js/ab-testing.js?v=2.0.6"></script>
+<script defer src="app.js?v=2.0.6"></script>
 
 <!-- 🎴 Tarot Modal -->
 <div id="tarot-modal" role="dialog" aria-modal="true" aria-labelledby="tarot-title">
@@ -579,12 +613,12 @@
   </div>
 </div>
 
-<script defer src="js/tarot.js?v=2.0.5"></script>
-<script defer src="js/tarot-ui.js?v=2.0.5"></script>
+<script defer src="js/tarot.js?v=2.0.6"></script>
+<script defer src="js/tarot-ui.js?v=2.0.6"></script>
 <script>
 // Version-based cache busting
 (function() {
-  var APP_VERSION = "2.0.5"; // Update this on each deploy
+  var APP_VERSION = "2.0.6"; // Update this on each deploy
   // Test: post-commit hook + reward preview deploy
   var stored = localStorage.getItem('starvia_version');
   
@@ -602,5 +636,11 @@
 })();
 </script>
 <script>if(typeof Onboarding!=="undefined"){Onboarding.init();}if(typeof Gamification!=="undefined"){Gamification.init();}</script>
+
+<!-- STARVIA senior-mode toggle bar (visible in both modes) -->
+<div class="starvia-toggle-bar" id="starvia-toggle-bar">
+  <button type="button" class="starvia-toggle-btn" onclick="starviaChoose('senior')" aria-label="สลับโหมดตัวใหญ่">👴 โหมดตัวใหญ่</button>
+  <button type="button" class="starvia-toggle-btn" onclick="starviaChoose('normal')" aria-label="สลับโหมดปกติ">👩 โหมดปกติ</button>
+</div>
 </body>
 </html>

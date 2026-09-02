@@ -1022,3 +1022,37 @@
   border-color: rgba(50, 205, 50, 0.6);
   background: rgba(50, 205, 50, 0.1);
 }
+
+/* ============== STARVIA SENIOR MODE (tarot) — 2 ก.ย.69 ============== */
+body.senior .tarot-container{background:#ffffe0;border:3px solid #000;border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+body.senior .tarot-container h2{font-size:26px;color:#000}
+body.senior .tarot-subtitle{font-size:18px;line-height:1.7;color:#222}
+body.senior .tarot-close{width:48px;height:48px;font-size:22px;background:#fff;border:2px solid #000;color:#000}
+body.senior .tarot-close:hover{background:#000;color:#fff;border-color:#000}
+body.senior .tarot-category{background:#fff;border:2px solid #000;border-radius:14px;min-height:88px}
+body.senior .tarot-category:hover{border-color:#000;background:#FFF3C4;transform:none}
+body.senior .tarot-category-emoji{font-size:30px}
+body.senior .tarot-category-name{font-size:19px;color:#000;font-weight:700}
+body.senior .tarot-category-desc{font-size:15px;color:#333}
+body.senior .tarot-picker{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+body.senior .tarot-card-back,.tarot-card-front{background:#fff;border:3px solid #000;border-radius:14px}
+body.senior .tarot-card-label{font-size:17px;color:#000;font-weight:700}
+body.senior .tarot-card-name-thai{font-size:19px;color:#000;font-weight:700}
+body.senior .tarot-card-name-en{font-size:14px;color:#333}
+body.senior .tarot-card-symbol{font-size:16px;color:#7a4a00}
+body.senior .tarot-card-emoji{font-size:36px}
+body.senior #tarot-result-content{font-size:19px;line-height:1.85;color:#111}
+body.senior .tarot-result-card{background:#fff;border:3px solid #000;border-radius:14px;padding:18px}
+body.senior .tarot-result-name-thai{font-size:22px;color:#000;font-weight:700}
+body.senior .tarot-result-name-en{font-size:14px;color:#333}
+body.senior .tarot-result-orientation{font-size:16px;color:#7a4a00;font-weight:700}
+body.senior .tarot-result-category{font-size:17px;color:#111;font-weight:600}
+body.senior .tarot-result-meaning{font-size:19px;color:#111;line-height:1.9}
+body.senior .tarot-keyword{background:#fff;border:2px solid #000;color:#000;font-size:16px;font-weight:700}
+body.senior .tarot-btn-primary,body.senior .tarot-btn-secondary{min-height:52px;padding:12px 30px;font-size:18px;border:2px solid #000;border-radius:50px;font-weight:700;cursor:pointer}
+body.senior .tarot-btn-primary{background:#D6AD45;color:#000}
+body.senior .tarot-btn-secondary{background:#fff;color:#000}
+body.senior .tarot-limit-tip{font-size:17px;color:#111}
+body.senior .tarot-trigger{min-height:52px;padding:12px 26px;font-size:18px;border:2px solid #000;border-radius:50px;background:#D6AD45;color:#000;font-weight:700}
+body.senior .tarot-trigger-emoji{font-size:20px}
+body.senior .tarot-spread-btn{min-height:48px;font-size:17px;border:2px solid #000;border-radius:14px;background:#fff;color:#000;font-weight:700}
