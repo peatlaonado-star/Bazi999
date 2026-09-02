@@ -5877,3 +5877,58 @@ body.senior .site-footer a{font-size:18px!important;color:#111!important;text-de
 .mlm-phase-up    { color: #7BE0A6; background: rgba(76,175,80,.16); border-color: rgba(76,175,80,.42); }
 .mlm-phase-stable{ color: #FFD86B; background: rgba(255,216,107,.14); border-color: rgba(255,216,107,.38); }
 .mlm-phase-warn  { color: #FF7D74; background: rgba(239,83,80,.16); border-color: rgba(239,83,80,.42); }
+
+/* ===== 2026-09-02 SENIOR 60+ — การ์ด report ม่วงเข้ม + ตัวหนังสือดำ = อ่านไม่เห็น → พื้นสว่างเหลือง/ดำ ===== */
+body.senior .weekday-power-card,
+body.senior .mlm-pill,
+body.senior .mlm-domain,
+body.senior .mlm-week,
+body.senior .mlm-ritual,
+body.senior .mlm-summary,
+body.senior .mlm-mystic-intro,
+body.senior .mlm-moo-forecast,
+body.senior .mlm-omen,
+body.senior .mlm-action {
+  background: #ffffe0;
+  border: 2px solid #000;
+  color: #111;
+}
+body.senior .wpc-badge {
+  background: #fff;
+  border: 2px solid #000;
+}
+body.senior .wpc-action {
+  background: #fffbe8;
+  border: 2px solid #000;
+}
+body.senior .wpc-badge-label,
+body.senior .wpc-color-hint,
+body.senior .mlm-mystic-sub,
+body.senior .mlm-mystic-quote,
+body.senior .mlm-domain p,
+body.senior .mlm-week p,
+body.senior .mlm-money-list li,
+body.senior .mlm-score-row,
+body.senior .mlm-day-label,
+body.senior .mlm-day-advice,
+body.senior .mlm-cal-day span,
+body.senior .mlm-ritual-day,
+body.senior .mlm-moo-text,
+body.senior .mlm-omen,
+body.senior .mlm-domain-label {
+  color: #111;
+}
+body.senior .wpc-color-hint strong {
+  background: transparent;
+  padding: 0;
+  text-shadow: none;
+  color: #c62828;
+}
+body.senior .mlm-phase-up   { color: #1b5e20; background: #c8e6c9; border: 1px solid #000; }
+body.senior .mlm-phase-stable{ color: #7a4a00; background: #ffe082; border: 1px solid #000; }
+body.senior .mlm-phase-warn  { color: #b71c1c; background: #ffcdd2; border: 1px solid #000; }
+body.senior .mlm-lucky-day,
+body.senior .mlm-ritual-day,
+body.senior .mlm-score-row strong { color: #7a4a00; }
+body.senior .mlm-score-bar { background: #d9cfa8; }
+body.senior .mlm-score-bar i { background: linear-gradient(90deg, #7a4a00, #4a2f8a); }
